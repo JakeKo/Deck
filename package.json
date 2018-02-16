@@ -2,7 +2,7 @@
   "name": "deck",
   "version": "1.0.0",
   "description": "Deck is a slideshow presentation application developed with Electron.",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
