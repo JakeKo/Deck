@@ -14,6 +14,12 @@ gulp.task("typescript", () => {
 		.pipe(gulp.dest("./dist/js/"));
 });
 
+gulp.task("html", () => {
+	gulp.src("./src/index.html")
+		.pipe(gulp.dest("./dist/"));
+});
+
 gulp.task("default", [
 	"typescript",
+	"html",
 ]);
