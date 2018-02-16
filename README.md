@@ -1,2 +1,2 @@
 # Deck
-Deck is slideshow presentation application developed with Electron.
+Deck is a slideshow presentation application developed with Electron.
