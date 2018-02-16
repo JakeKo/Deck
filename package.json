@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/JakeKo/Deck/issues"
   },
-  "homepage": "https://github.com/JakeKo/Deck#readme"
+  "homepage": "https://github.com/JakeKo/Deck#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^4.0.1",
+    "typescript": "^2.7.2"
+  }
 }
