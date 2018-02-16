@@ -1,0 +1,19 @@
+{
+  "name": "deck",
+  "version": "1.0.0",
+  "description": "Deck is a slideshow presentation application developed with Electron.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JakeKo/Deck.git"
+  },
+  "author": "Jacob Koperski et al.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JakeKo/Deck/issues"
+  },
+  "homepage": "https://github.com/JakeKo/Deck#readme"
+}
