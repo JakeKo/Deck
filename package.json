@@ -18,6 +18,7 @@
   "homepage": "https://github.com/JakeKo/Deck#readme",
   "devDependencies": {
     "gulp": "^3.9.1",
+    "gulp-stylus": "^2.7.0",
     "gulp-typescript": "^4.0.1",
     "typescript": "^2.7.2"
   }

@@ -1,7 +1,7 @@
-import { Style } from "./style";
-import { Element } from "./element";
+import { Style } from "./Style";
+import { Element } from "./Element";
 
-class Slide {
+export class Slide {
 	private _style: Style;
 	private _elements: Element[];
 
