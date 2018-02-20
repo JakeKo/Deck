@@ -6,13 +6,13 @@ const stylus = require("gulp-stylus");
 // const mqpacker = require("css-mqpacker");
 // const minify = require("gulp-minify");
 // const htmlmin = require("gulp-htmlmin");
-// const concat = require("gulp-concat");
+const concat = require("gulp-concat");
 const typescript = require("gulp-typescript");
 
 gulp.task("stylus", () => {
 	gulp.src("./src/styl/*.styl")
 		.pipe(stylus())
-		// .pipe(concat("./main.css"))
+		.pipe(concat("./main.css"))
 		// .pipe(postcss([
 		// 	mqpacker,
 		// 	autoprefixer,
