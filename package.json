@@ -4,9 +4,8 @@
   "description": "Deck is a slideshow presentation application developed with Electron.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "gulp",
-    "fresh": "gulp && electron ."
+	"build:dev": "webpack --mode development --config webpack-dev.config.js",
+	"build:prod": "webpack --mode production --config webpack-prod.config.js"
   },
   "repository": {
     "type": "git",
@@ -19,10 +18,11 @@
   },
   "homepage": "https://github.com/JakeKo/Deck#readme",
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-stylus": "^2.7.0",
-    "gulp-typescript": "^4.0.1",
-    "typescript": "^2.7.2"
+    "html-loader": "^0.5.5",
+    "stylus-loader": "^3.0.2",
+    "ts-loader": "^4.4.2",
+    "typescript": "^2.7.2",
+    "webpack": "^4.12.2",
+    "webpack-cli": "^3.0.8"
   }
 }
