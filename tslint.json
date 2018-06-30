@@ -1,7 +1,12 @@
 {
     "defaultSeverity": "error",
     "jsRules": { },
-    "rules": { },
+    "rules": {
+		"semicolon": true,
+		"quotemark": {
+			"options": "double"
+		}
+	},
 	"rulesDirectory": [],
 	"files": [
 		"vue.d.ts"
