@@ -1,10 +1,8 @@
-var path = require("path")
-var webpack = require("webpack")
+const path = require("path");
+const webpack = require("webpack");
 
 module.exports = {
-	entry: {
-		"index": "./src/ts/index.ts"
-	},
+	entry: { },
 	output: {
 		path: path.resolve(__dirname, "./dist"),
 		publicPath: "/dist/",
@@ -32,4 +30,4 @@ module.exports = {
 			}
 		]
 	}
-}
+};
