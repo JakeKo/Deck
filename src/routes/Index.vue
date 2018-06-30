@@ -2,8 +2,8 @@
 <div>
 	<h1>Hello App!</h1>
 	<p>
-		<router-link to="/foo">Go to Foo</router-link>
-		<router-link to="/bar">Go to Bar</router-link>
+		<router-link to="/foo">Go to App</router-link>
+		<router-link to="/bar">Go to Other App</router-link>
 	</p>
 	
 	<router-view></router-view>
