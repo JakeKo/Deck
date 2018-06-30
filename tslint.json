@@ -2,5 +2,8 @@
     "defaultSeverity": "error",
     "jsRules": { },
     "rules": { },
-    "rulesDirectory": []
+	"rulesDirectory": [],
+	"files": [
+		"vue.d.ts"
+	]
 }
