@@ -4,8 +4,7 @@
 	"description": "Deck is a slideshow presentation application developed with Electron.",
 	"main": "index.js",
 	"scripts": {
-		"build:dev": "webpack --mode development --config webpack-dev.config.js",
-		"build:prod": "webpack --mode production --config webpack-prod.config.js"
+		"build:dev": "webpack --mode development --config webpack-dev.config.js"
 	},
 	"repository": {
 		"type": "git",
