@@ -18,7 +18,9 @@
 	},
 	"homepage": "https://github.com/JakeKo/Deck#readme",
 	"devDependencies": {
+		"eslint": "^5.0.1",
 		"html-loader": "^0.5.5",
+		"stylus": "^0.54.5",
 		"stylus-loader": "^3.0.2",
 		"ts-loader": "^4.4.2",
 		"typescript": "^2.7.2",
