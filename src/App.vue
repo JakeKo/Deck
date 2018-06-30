@@ -8,7 +8,7 @@ import Component from "vue-class-component";
 
 @Component
 export default class MyComponent extends Vue {
-	public message: string = "Hello!";
+	public message: string = this.$store.state.message;
 
 	public onClick(): void {
 		window.alert(this.message);
