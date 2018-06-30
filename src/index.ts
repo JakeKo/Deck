@@ -1,5 +1,5 @@
 import Vue from "vue";
-import App from "./routes/App.vue";
+import Index from "./routes/Index.vue";
 import Store from "./Store";
 import Router from "./Router";
 
@@ -7,5 +7,5 @@ new Vue({
 	el: "#app",
 	store: Store,
 	router: Router,
-	render: h => h(App)
+	render: h => h(Index)
 });
