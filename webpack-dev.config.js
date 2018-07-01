@@ -13,11 +13,11 @@ module.exports = {
 	devServer: {
 		contentBase: __dirname,
 		compress: true,
-		hot: true,
 		port: 8080
 	},
 	output: {
 		path: path.resolve(__dirname, "dist"),
+		publicPath: "/dist/",
 		filename: "[name].bundle.js"
 	},
 	resolve: {
