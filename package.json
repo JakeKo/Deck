@@ -18,6 +18,28 @@
 		"instrument": false,
 		"sourceMap": false
 	},
+	"babel": {
+		"env": {
+			"production": {
+				"plugins": [
+					"istanbul"
+				]
+			}
+		}
+	},
+	"eslintConfig": {
+		"env": {
+			"es6": true,
+			"browser": true,
+			"node": true
+		},
+		"rules": {
+			"semi": [ "error", "always" ],
+			"quotes": [ "error", "double" ],
+			"no-var": "error"
+		}
+	},
+	"eslintIgnore": [ "/dist", "/node_modules" ],
 	"devDependencies": {
 		"@vue/test-utils": "^1.0.0-beta.20",
 		"babel-core": "^6.26.3",
