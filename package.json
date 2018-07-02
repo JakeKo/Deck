@@ -2,21 +2,15 @@
 	"name": "deck",
 	"version": "1.0.0",
 	"description": "Deck is a slideshow presentation application developed with Electron.",
-	"main": "index.js",
-	"scripts": {
-		"test": "nyc mocha-webpack --webpack-config webpack-dev.config.js --require test/setup.js test/**/*.spec.js",
-		"serve": "webpack-dev-server --config webpack-dev.config.js --hot --inline"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/JakeKo/Deck.git"
-	},
 	"author": "Jacob Koperski et al.",
 	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/JakeKo/Deck/issues"
-	},
 	"homepage": "https://github.com/JakeKo/Deck#readme",
+	"bugs": "https://github.com/JakeKo/Deck/issues",
+	"repository": "git+https://github.com/JakeKo/Deck.git",
+	"scripts": {
+		"test": "cross-env NODE_ENV=production nyc mocha-webpack --webpack-config webpack-test.config.js --require test/setup.js test/**/*.spec.js",
+		"serve": "cross-env NODE_ENV=development webpack-dev-server --config webpack-dev.config.js --hot --inline"
+	},
 	"nyc": {
 		"include": [
 			"src/**/*.(js|vue)"
@@ -26,7 +20,10 @@
 	},
 	"devDependencies": {
 		"@vue/test-utils": "^1.0.0-beta.20",
+		"babel-core": "^6.26.3",
+		"babel-loader": "^7.1.4",
 		"babel-plugin-istanbul": "^4.1.6",
+		"cross-env": "^5.2.0",
 		"css-loader": "^0.28.11",
 		"eslint": "^5.0.1",
 		"expect": "^23.2.0",

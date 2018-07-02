@@ -3,18 +3,15 @@ const webpack = require("webpack");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 module.exports = {
-	mode: "development",
+	mode: "production",
+	devtool: "inline-cheap-module-source-map",
+	externals: [require("webpack-node-externals")()],
 	entry: {
 		"index": "./src/index.ts"
 	},
 	plugins: [
 		new VueLoaderPlugin()
 	],
-	devServer: {
-		contentBase: __dirname,
-		compress: true,
-		port: 8080
-	},
 	output: {
 		path: path.resolve(__dirname, "dist"),
 		publicPath: "/dist/",
