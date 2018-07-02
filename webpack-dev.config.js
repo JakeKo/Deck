@@ -4,6 +4,8 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 module.exports = {
 	mode: "development",
+	externals: [require("webpack-node-externals")()],
+	devtool: "inline-cheap-module-source-map",
 	entry: {
 		"index": "./src/index.ts"
 	},
