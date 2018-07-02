@@ -1,14 +1,14 @@
 {
 	"name": "deck",
 	"version": "1.0.0",
-	"description": "Deck is a slideshow presentation application developed with Electron.",
-	"author": "Jacob Koperski et al.",
+	"description": "An open source, well-armed, safe-to-swallow, and fluoride-free application for editing and presenting slide decks",
+	"author": "Jacob Koperski",
 	"license": "MIT",
 	"homepage": "https://github.com/JakeKo/Deck#readme",
 	"bugs": "https://github.com/JakeKo/Deck/issues",
 	"repository": "git+https://github.com/JakeKo/Deck.git",
 	"scripts": {
-		"test": "cross-env NODE_ENV=production nyc mocha-webpack --webpack-config webpack-test.config.js --require test/setup.js test/**/*.spec.js",
+		"test": "cross-env NODE_ENV=development nyc mocha-webpack --webpack-config webpack-test.config.js --require test/setup.js test/**/*.spec.js",
 		"serve": "cross-env NODE_ENV=development webpack-dev-server --config webpack-dev.config.js --hot --inline"
 	},
 	"nyc": {
@@ -20,7 +20,7 @@
 	},
 	"babel": {
 		"env": {
-			"production": {
+			"development": {
 				"plugins": [
 					"istanbul"
 				]
@@ -34,12 +34,21 @@
 			"node": true
 		},
 		"rules": {
-			"semi": [ "error", "always" ],
-			"quotes": [ "error", "double" ],
+			"semi": [
+				"error",
+				"always"
+			],
+			"quotes": [
+				"error",
+				"double"
+			],
 			"no-var": "error"
 		}
 	},
-	"eslintIgnore": [ "/dist", "/node_modules" ],
+	"eslintIgnore": [
+		"/dist",
+		"/node_modules"
+	],
 	"devDependencies": {
 		"@vue/test-utils": "^1.0.0-beta.20",
 		"babel-core": "^6.26.3",
@@ -49,14 +58,11 @@
 		"css-loader": "^0.28.11",
 		"eslint": "^5.0.1",
 		"expect": "^23.2.0",
-		"html-loader": "^0.5.5",
 		"jsdom": "^11.11.0",
 		"jsdom-global": "^3.0.2",
 		"mocha": "^5.2.0",
 		"mocha-webpack": "^1.1.0",
 		"nyc": "^12.0.2",
-		"stylus": "^0.54.5",
-		"stylus-loader": "^3.0.2",
 		"ts-loader": "^4.4.2",
 		"tslint": "^5.10.0",
 		"typescript": "^2.7.2",
