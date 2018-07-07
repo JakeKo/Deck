@@ -25,7 +25,6 @@
 		],
 		"interface-name": true,
 		"jsdoc-format": true,
-		"linebreak-style": true,
 		"max-classes-per-file": [
 			true,
 			1
