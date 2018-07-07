@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
-<div>
-    <canvas></canvas>
+<div id="workspace">
+    <editor></editor>
     <roadmap></roadmap>
 </div>
 </template>
@@ -10,12 +10,12 @@
 /* tslint:enable */
 import Vue from "vue";
 import Component from "vue-class-component";
-import Canvas from "./Canvas.vue";
+import Editor from "./Editor.vue";
 import Roadmap from "./Roadmap.vue";
 
 @Component({
     components: {
-        Canvas,
+        Editor,
         Roadmap
     }
 })
@@ -24,5 +24,9 @@ export default class Workspace extends Vue {}
 </script>
 
 <style lang="scss" scoped>
-
+#workspace {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
 </style>

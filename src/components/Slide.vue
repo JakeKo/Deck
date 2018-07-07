@@ -1,6 +1,8 @@
 /* tslint:disable */
 <template>
-    
+<div id="slide">
+
+</div>
 </template>
 
 <script lang="ts">
@@ -14,5 +16,10 @@ export default class Slide extends Vue {}
 </script>
 
 <style lang="scss" scoped>
-
+#slide {
+    height: 603px;
+    width: 1072px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.15);
+    background: #FFF;
+}
 </style>

@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div>
+<div id="roadmap">
     <slide-preview></slide-preview>
     <slide-preview></slide-preview>
     <slide-preview></slide-preview>
@@ -25,5 +25,11 @@ export default class Roadmap extends Vue {}
 </script>
 
 <style lang="scss" scoped>
-
+#roadmap {
+    height: 96px;
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
 </style>

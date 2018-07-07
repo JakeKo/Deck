@@ -1,6 +1,10 @@
 /* tslint:disable */
 <template>
-<div>
+<div id="toolbox">
+    <tool></tool>
+    <tool></tool>
+    <tool></tool>
+    <tool></tool>
     <tool></tool>
 </div>
 </template>
@@ -21,5 +25,10 @@ export default class Toolbox extends Vue {}
 </script>
 
 <style lang="scss" scoped>
-
+#toolbox {
+    width: 64px;
+    border-right: 1px solid rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+}
 </style>

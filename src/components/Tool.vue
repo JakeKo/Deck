@@ -1,6 +1,8 @@
 /* tslint:disable */
 <template>
-    
+<div id="tool">
+    <div id="tool-icon"></div>
+</div>
 </template>
 
 <script lang="ts">
@@ -14,5 +16,19 @@ export default class Tool extends Vue {}
 </script>
 
 <style lang="scss" scoped>
+#tool {
+    width: 100%;
+    height: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
 
+#tool-icon {
+    height: 36px;
+    width: 36px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+}
 </style>

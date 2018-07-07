@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div>
+<div id="editor">
     <slide></slide>
 </div>
 </template>
@@ -16,10 +16,16 @@ import Slide from "./Slide.vue";
         Slide
     }
 })
-export default class Canvas extends Vue {}
+export default class Editor extends Vue {}
 /* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
-
+#editor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    background: rgba(0, 0, 0, 0.05);
+}
 </style>

@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div>
+<div id="app">
     <toolbox></toolbox>
     <workspace></workspace>
 </div>
@@ -27,6 +27,5 @@ export default class App extends Vue {}
 #app {
     display: flex;
     height: 100vh;
-    background: pink;
 }
 </style>
