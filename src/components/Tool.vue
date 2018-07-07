@@ -13,6 +13,6 @@ export default class Tool extends Vue {}
 /* tslint:disable */
 </script>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 
 </style>

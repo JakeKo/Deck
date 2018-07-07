@@ -20,6 +20,6 @@ export default class Toolbox extends Vue {}
 /* tslint:disable */
 </script>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 
 </style>

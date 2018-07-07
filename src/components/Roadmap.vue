@@ -24,6 +24,6 @@ export default class Roadmap extends Vue {}
 /* tslint:disable */
 </script>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 
 </style>
