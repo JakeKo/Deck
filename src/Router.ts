@@ -6,14 +6,14 @@ import Index from "./routes/Index.vue";
 Vue.use(VueRouter);
 
 export default new VueRouter({
-	routes: [
-		{
-			path: "/foo",
-			component: Index
-		},
-		{
-			path: "/bar",
-			component: Index
-		}
-	]
+    routes: [
+        {
+            path: "/foo",
+            component: Index
+        },
+        {
+            path: "/bar",
+            component: Index
+        }
+    ]
 });

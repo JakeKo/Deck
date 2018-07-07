@@ -1,28 +1,38 @@
+/* tslint:disable */
 <template>
-	<div>
-		<toolbox></toolbox>
+<div>
+    <toolbox></toolbox>
 
-		<widgets></widgets>
+    <widgets></widgets>
 
-		<workspace>
-			<canvas>
-				<slide></slide>
-			</canvas>
+    <workspace>
+        <canvas>
+            <slide></slide>
+        </canvas>
 
-			<roadmap>
-				<slide-preview></slide-preview>
-				<slide-preview></slide-preview>
-				<slide-preview></slide-preview>
-				<slide-preview></slide-preview>
-				<slide-preview></slide-preview>
-			</roadmap>
-		</workspace>
-	</div>
+        <roadmap>
+            <slide-preview></slide-preview>
+            <slide-preview></slide-preview>
+            <slide-preview></slide-preview>
+            <slide-preview></slide-preview>
+            <slide-preview></slide-preview>
+        </roadmap>
+    </workspace>
+</div>
 </template>
 
 <script lang="ts">
+/* tslint:enable */
 import Vue from "vue";
-export default Vue.extend({
-	
-});
+import Component from "vue-class-component";
+
+@Component
+export default class App extends Vue {
+    
+}
+/* tslint:disable */
 </script>
+
+<style lang="sass" scoped>
+
+</style>

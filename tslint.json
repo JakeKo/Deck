@@ -1,11 +1,58 @@
 {
-    "defaultSeverity": "error",
-    "jsRules": { },
-    "rules": {
+	"defaultSeverity": "error",
+	"jsRules": {},
+	"rules": {
 		"semicolon": true,
 		"quotemark": {
 			"options": "double"
-		}
+		},
+		"adjacent-overload-signatures": true,
+		"arrow-parens": true,
+		"arrow-return-shorthand": true,
+		"binary-expression-operand-order": true,
+		"class-name": true,
+		"comment-format": [
+			true,
+			"check-space",
+			"check-uppercase"
+		],
+		"curly": true,
+		"eofline": true,
+		"import-spacing": true,
+		"indent": [
+			true,
+			"spaces"
+		],
+		"interface-name": true,
+		"jsdoc-format": true,
+		"linebreak-style": true,
+		"max-classes-per-file": [
+			true,
+			1
+		],
+		"member-access": true,
+		"new-parens": true,
+		"no-conditional-assignment": true,
+		"no-duplicate-super": true,
+		"no-duplicate-switch-case": true,
+		"no-empty": true,
+		"no-empty-interface": true,
+		"no-eval": true,
+		"no-invalid-template-strings": true,
+		"no-irregular-whitespace": true,
+		"no-misused-new": true,
+		"no-reference-import": true,
+		"no-trailing-whitespace": true,
+		"no-unnecessary-callback-wrapper": true,
+		"no-unnecessary-class": true,
+		"no-var-keyword": true,
+		"number-literal-format": true,
+		"prefer-conditional-expression": true,
+		"prefer-const": true,
+		"prefer-for-of": true,
+		"prefer-function-over-method": true,
+		"prefer-template": true,
+		"use-isnan": true
 	},
 	"rulesDirectory": [],
 	"files": [

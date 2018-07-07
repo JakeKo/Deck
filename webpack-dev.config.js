@@ -29,7 +29,17 @@ module.exports = {
 	module: {
 		rules: [
 			{
+				enforce: "pre",
 				test: /\.ts$/,
+				loader: "tslint-loader",
+				exclude: /(node_modules)/,
+				options: {
+					configFile: "tslint.json"
+				}
+			},
+			{
+				test: /\.ts$/,
+                exclude: /node_modules|vue\/src/,
 				loader: "ts-loader",
 				options: {
 					appendTsSuffixTo: [/\.vue$/],
@@ -40,7 +50,7 @@ module.exports = {
 				loader: "vue-loader",
 				options: {
 					loaders: {
-						ts: "babel-loader!ts-loader"
+						ts: "babel-loader!ts-loader!tslint-loader"
 					}
 				}
 			}
