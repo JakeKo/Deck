@@ -1,8 +1,8 @@
 /* tslint:disable */
 <template>
 <div>
-    <toolbox></toolbox>
-    <workspace></workspace>
+    <canvas></canvas>
+    <roadmap></roadmap>
 </div>
 </template>
 
@@ -10,16 +10,16 @@
 /* tslint:enable */
 import Vue from "vue";
 import Component from "vue-class-component";
-import Toolbox from "../components/Toolbox.vue";
-import Workspace from "../components/Workspace.vue";
+import Canvas from "./Canvas.vue";
+import Roadmap from "./Roadmap.vue";
 
 @Component({
     components: {
-        Toolbox,
-        Workspace
+        Canvas,
+        Roadmap
     }
 })
-export default class App extends Vue {}
+export default class Workspace extends Vue {}
 /* tslint:disable */
 </script>
 
