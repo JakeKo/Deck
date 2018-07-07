@@ -9,9 +9,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 
 @Component
-export default class MyComponent extends Vue {
-    
-}
+export default class MyComponent extends Vue {}
 /* tslint:disable */
 </script>
 
