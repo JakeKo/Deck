@@ -5,6 +5,10 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        message: "Hello World!"
+        slides: [
+            {
+                elements: { }
+            }
+        ]
     }
 });

@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="slide">
-
+    <shape backgroundColor="pink"></shape>
 </div>
 </template>
 
@@ -9,8 +9,13 @@
 /* tslint:enable */
 import Vue from "vue";
 import Component from "vue-class-component";
+import Shape from "./Shape.vue";
 
-@Component
+@Component({
+    components: {
+        Shape
+    }
+})
 export default class Slide extends Vue {}
 /* tslint:disable */
 </script>
