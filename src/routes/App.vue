@@ -24,5 +24,9 @@ export default class App extends Vue {}
 </script>
 
 <style lang="scss" scoped>
-
+#app {
+    display: flex;
+    height: 100vh;
+    background: pink;
+}
 </style>
