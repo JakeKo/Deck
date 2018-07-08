@@ -8,8 +8,7 @@
 
 <script lang="ts">
 /* tslint:enable */
-import Vue from "vue";
-import Component from "vue-class-component";
+import { Vue, Component } from "vue-property-decorator";
 import Toolbox from "../components/Toolbox.vue";
 import Workspace from "../components/Workspace.vue";
 
