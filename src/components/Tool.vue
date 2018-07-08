@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div id="tool">
+<div id="tool" @click="$emit('tool-click')">
     <div id="tool-icon"></div>
 </div>
 </template>

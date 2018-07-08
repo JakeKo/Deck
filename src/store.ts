@@ -1,10 +1,11 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import Shape from "./components/Shape.vue";
 
 Vue.use(Vuex);
 
 const generateId = () => {
-    const s4 = () => Math.floor(( Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
+    const s4 = () => Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
     return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
 };
 
@@ -13,6 +14,7 @@ export default new Vuex.Store({
         slides: [
             {
                 id: generateId(),
+                active: true,
                 previous: "",
                 next: "",
                 shapes: [
@@ -32,22 +34,41 @@ export default new Vuex.Store({
             }
         ]
     },
+    getters: {
+        getActiveSlide: (state) => {
+            const slide = state.slides.filter((s) => s.active);
+
+            if (slide.length > 1) {
+                console.error("More than one active slide");
+                return;
+            }
+
+            return slide[0];
+        }
+    },
     mutations: {
-        addSlide(state) {
+        addSlide: (state) => {
             state.slides.push({
                 id: generateId(),
-                previous: state.slides[state.slides.length - 1].id,
+                active: false,
+                previous: "",
                 next: "",
                 shapes: []
             });
         },
-        addShape(state, { slideId, shape }) {
+        addShape: (state, { slideId, shape }) => {
             const slide = state.slides.filter((s) => s.id === slideId)[0];
-            const newShape = shape || {};
-
-            if (newShape.id === undefined) {
-                newShape.id = generateId();
-            }
+            const newShape = shape ? {
+                id: generateId(),
+                backgroundColor: shape.backgroundColor,
+                height: shape.height,
+                width: shape.width
+            } : {
+                id: generateId(),
+                backgroundColor: undefined,
+                height: undefined,
+                width: undefined
+            };
 
             slide.shapes.push(newShape);
         }

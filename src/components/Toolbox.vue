@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="toolbox">
-    <tool></tool>
+    <tool @tool-click="shapeToolClickHandler"></tool>
     <tool></tool>
     <tool></tool>
     <tool></tool>
@@ -13,13 +13,23 @@
 /* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
 import Tool from "./Tool.vue";
+import Shape from "./Shape.vue";
 
 @Component({
     components: {
         Tool
     }
 })
-export default class Toolbox extends Vue {}
+export default class Toolbox extends Vue {
+    public shapeToolClickHandler(): void {
+        const payload = {
+            slideId: this.$store.getters.getActiveSlide.id
+        };
+
+        console.log(payload);
+        this.$store.commit("addShape", payload);
+    }
+}
 /* tslint:disable */
 </script>
 
