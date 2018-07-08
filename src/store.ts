@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import Shape from "./components/Shape.vue";
+import ShapeModel from "./models/ShapeModel";
 
 Vue.use(Vuex);
 
@@ -18,29 +19,18 @@ export default new Vuex.Store({
                 previous: "",
                 next: "",
                 shapes: [
-                    {
-                        id: generateId(),
-                        backgroundColor: "pink",
-                        height: "200px",
-                        width: "200px"
-                    },
-                    {
-                        id: generateId(),
-                        backgroundColor: "blue",
-                        height: "150px",
-                        width: "200px"
-                    }
+                    new ShapeModel().ToJson(),
+                    new ShapeModel().ToJson(),
                 ]
             }
         ]
     },
     getters: {
-        getActiveSlide: (state) => {
+        activeSlide: (state) => {
             const slide = state.slides.filter((s) => s.active);
 
             if (slide.length > 1) {
                 console.error("More than one active slide");
-                return;
             }
 
             return slide[0];
@@ -56,21 +46,9 @@ export default new Vuex.Store({
                 shapes: []
             });
         },
-        addShape: (state, { slideId, shape }) => {
+        addShapeToSlide: (state, { slideId, shapeModel }: { slideId: String, shapeModel: ShapeModel }) => {
             const slide = state.slides.filter((s) => s.id === slideId)[0];
-            const newShape = shape ? {
-                id: generateId(),
-                backgroundColor: shape.backgroundColor,
-                height: shape.height,
-                width: shape.width
-            } : {
-                id: generateId(),
-                backgroundColor: undefined,
-                height: undefined,
-                width: undefined
-            };
-
-            slide.shapes.push(newShape);
+            slide.shapes.push(shapeModel.ToJson());
         }
     }
 });
