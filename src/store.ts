@@ -19,21 +19,21 @@ export default new Vuex.Store({
                 previous: "",
                 next: "",
                 shapes: [
-                    new ShapeModel().ToJson(),
-                    new ShapeModel().ToJson(),
+                    new ShapeModel(),
+                    new ShapeModel(),
                 ]
             }
         ]
     },
     getters: {
         activeSlide: (state) => {
-            const slide = state.slides.filter((s) => s.active);
+            const slides = state.slides.filter((s) => s.active);
 
-            if (slide.length > 1) {
+            if (slides.length > 1) {
                 console.error("More than one active slide");
             }
 
-            return slide[0];
+            return slides[0];
         }
     },
     mutations: {
@@ -47,8 +47,13 @@ export default new Vuex.Store({
             });
         },
         addShapeToSlide: (state, { slideId, shapeModel }: { slideId: String, shapeModel: ShapeModel }) => {
-            const slide = state.slides.filter((s) => s.id === slideId)[0];
-            slide.shapes.push(shapeModel.ToJson());
+            const slides = state.slides.filter((s) => s.id === slideId);
+
+            if (slides.length > 1) {
+                console.error("More than one slide with id");
+            }
+
+            slides[0].shapes.push(shapeModel);
         }
     }
 });
