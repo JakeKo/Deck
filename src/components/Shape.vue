@@ -1,42 +1,33 @@
 /* tslint:disable */
 <template>
-<div id="shape"></div>
+<div id="shape" :style="style"></div>
 </template>
 
 <script lang="ts">
 /* tslint:enable */
-import Vue from "vue";
-import Component from "vue-class-component";
-
-const Props = Vue.extend({
-    props: {
-        backgroundColor: {
-            type: String,
-            required: false,
-            default: "white"
-        },
-        height: {
-            type: String,
-            required: false,
-            default: "100px"
-        },
-        width: {
-            type: String,
-            required: false,
-            default: "100px"
-        },
-        border: {
-            type: String,
-            required: false,
-            default: "solid 1px rgba(0, 0, 0, 0.15)"
-        }
-    }
-});
+import { Vue, Component, Prop } from "vue-property-decorator";
 
 @Component
-export default class Shape extends Props {
-    constructor() {
-        super();
+export default class Shape extends Vue {
+    @Prop({ type: String, default: "white" })
+    public backgroundColor: String | undefined;
+
+    @Prop({ type: String, default: "100px" })
+    public height: String | undefined;
+
+    @Prop({ type: String, default: "100px" })
+    public width: String | undefined;
+
+    @Prop({ type: String, default: "solid 1px rgba(0, 0, 0, 0.15)" })
+    public border: String | undefined;
+
+    get style() {
+        return {
+            backgroundColor: this.backgroundColor,
+            height: this.height,
+            width: this.width,
+            border: this.border
+        };
     }
 }
 /* tslint:disable */
