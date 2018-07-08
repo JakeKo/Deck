@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="slide">
-    <shape backgroundColor="pink"></shape>
+    <shape v-for="(shape, index) in $store.state.slides[0].shapes" v-bind="shape" :key="index"></shape>
 </div>
 </template>
 
