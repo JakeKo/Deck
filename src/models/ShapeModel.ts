@@ -9,15 +9,11 @@ export default class ShapeModel {
     public get style(): Object { return this._style; }
     public set style(value: Object) { this._style = value; }
 
-    constructor(style?: Object, id?: String) {
-        this._style = style || { };
+    constructor(
+        { id, style }:
+        { id?: String, style?: Object } = { }
+    ) {
         this._id = id || GenerateId();
-    }
-
-    public ToJson() {
-        return {
-            id: this.id,
-            style: this.style
-        };
+        this._style = style || { };
     }
 }

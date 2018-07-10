@@ -8,7 +8,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         slides: [
-            new SlideModel(undefined, true)
+            new SlideModel({ active: true })
         ]
     },
     getters: {
@@ -26,7 +26,8 @@ export default new Vuex.Store({
         addSlide: (state) => {
             const lastSlideId = state.slides.length > 0 ? state.slides[state.slides.length - 1].id : undefined;
 
-            state.slides.push(new SlideModel(undefined, false, lastSlideId));
+            // Use getter to retrieve lastSlideId
+            state.slides.push(new SlideModel({ previous: lastSlideId}));
         },
         addShapeToSlide: (state, { slideId, shapeModel }: { slideId: String, shapeModel: ShapeModel }) => {
             const slides = state.slides.filter((s) => s.id === slideId);
@@ -35,6 +36,7 @@ export default new Vuex.Store({
                 console.error("More than one slide with id");
             }
 
+            // TODO: Append to active slide
             slides[0].shapes.push(shapeModel);
         }
     }

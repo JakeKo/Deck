@@ -22,11 +22,14 @@ export default class SlideModel {
     public get shapes(): Array<ShapeModel> { return this._shapes; }
     public set shapes(value: Array<ShapeModel>) { this._shapes = value; }
 
-    constructor(id?: String, active?: Boolean, previous?: String, next?: String, shapes?: Array<ShapeModel>) {
+    constructor(
+        { id, active, previous, next, shapes }:
+        { id?: String, active?: Boolean, previous?: String, next?: String, shapes?: Array<ShapeModel> } = { }
+    ) {
         this._id = id || GenerateId();
         this._active = active || false;
         this._previous = previous;
         this._next = next;
-        this._shapes = shapes || [];
+        this._shapes = shapes = [];
     }
 }
