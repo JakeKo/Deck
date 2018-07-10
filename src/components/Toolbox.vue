@@ -25,7 +25,7 @@ export default class Toolbox extends Vue {
     public shapeToolClickHandler(): void {
         this.$store.commit("addShapeToSlide", {
             slideId: this.$store.getters.activeSlide.id,
-            shapeModel: new ShapeModel()
+            shape: new ShapeModel()
         });
     }
 }

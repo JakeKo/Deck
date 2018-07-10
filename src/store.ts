@@ -23,21 +23,17 @@ export default new Vuex.Store({
         }
     },
     mutations: {
-        addSlide: (state) => {
-            const lastSlideId = state.slides.length > 0 ? state.slides[state.slides.length - 1].id : undefined;
-
-            // Use getter to retrieve lastSlideId
-            state.slides.push(new SlideModel({ previous: lastSlideId}));
+        addSlide: (state, { previousSlideId }) => {
+            state.slides.push(new SlideModel({ previous: previousSlideId}));
         },
-        addShapeToSlide: (state, { slideId, shapeModel }: { slideId: String, shapeModel: ShapeModel }) => {
+        addShapeToSlide: (state, { slideId, shape }: { slideId: String, shape: ShapeModel }) => {
             const slides = state.slides.filter((s) => s.id === slideId);
 
             if (slides.length > 1) {
                 console.error("More than one slide with id");
             }
 
-            // TODO: Append to active slide
-            slides[0].shapes.push(shapeModel);
+            slides[0].shapes.push(shape);
         }
     }
 });
