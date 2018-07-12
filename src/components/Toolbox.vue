@@ -2,7 +2,7 @@
 <template>
 <div id="toolbox">
     <tool @tool-click="shapeToolClickHandler"></tool>
-    <tool></tool>
+    <tool @tool-click="slideToolClickHandler"></tool>
     <tool></tool>
     <tool></tool>
     <tool></tool>
@@ -26,6 +26,12 @@ export default class Toolbox extends Vue {
         this.$store.commit("addShapeToSlide", {
             slideId: this.$store.getters.activeSlide.id,
             shape: new ShapeModel()
+        });
+    }
+
+    public slideToolClickHandler(): void {
+        this.$store.commit("addSlide", {
+            previousSlideId: this.$store.getters.activeSlide.id
         });
     }
 }
