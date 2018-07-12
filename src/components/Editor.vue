@@ -1,7 +1,9 @@
 /* tslint:disable */
 <template>
 <div id="editor">
-    <slide></slide>
+    <div id="canvas">
+        <slide></slide>
+    </div>
 </div>
 </template>
 
@@ -15,16 +17,27 @@ import Slide from "./Slide.vue";
         Slide
     }
 })
-export default class Editor extends Vue {}
+export default class Editor extends Vue {
+    public mounted() {
+        this.$el.scrollTop = 1000 - this.$el.clientHeight / 2;
+        this.$el.scrollLeft = 2000 - this.$el.clientWidth / 2;
+    }
+}
 /* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
 #editor {
+    height: calc(100vh - 96px);
+    overflow: scroll;
+}
+
+#canvas {
+    width: 4000px;
+    height: 2000px;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-grow: 1;
     background: rgba(0, 0, 0, 0.05);
 }
 </style>

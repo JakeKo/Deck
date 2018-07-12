@@ -26,5 +26,6 @@ export default class App extends Vue {}
 #app {
     display: flex;
     height: 100vh;
+    overflow: hidden;
 }
 </style>

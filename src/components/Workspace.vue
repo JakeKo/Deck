@@ -26,6 +26,6 @@ export default class Workspace extends Vue {}
 #workspace {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    max-width: calc(100% - 64px);
 }
 </style>
