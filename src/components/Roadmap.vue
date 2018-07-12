@@ -1,11 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="roadmap">
-    <slide-preview></slide-preview>
-    <slide-preview></slide-preview>
-    <slide-preview></slide-preview>
-    <slide-preview></slide-preview>
-    <slide-preview></slide-preview>
+    <slide-preview v-for="(slide, index) in $store.state.slides" :key="index"></slide-preview>
 </div>
 </template>
 
