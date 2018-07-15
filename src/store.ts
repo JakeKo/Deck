@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import ShapeModel from "./models/ShapeModel";
 import SlideModel from "./models/SlideModel";
+import * as Utilities from "./utilities/store";
 
 Vue.use(Vuex);
 
@@ -12,57 +13,38 @@ export default new Vuex.Store({
         ]
     },
     getters: {
-        activeSlide: (state) => {
-            const slides = state.slides.filter((s) => s.active);
+        activeSlide: (state): SlideModel => {
+            const slides: Array<SlideModel> = state.slides.filter((s) => s.active);
 
             if (slides.length > 1) {
-                console.error("More than one active slide");
+                console.error(`There are ${slides.length} active slides`);
+            } else if (slides.length === 0) {
+                console.error("There are no active slides");
             }
 
             return slides[0];
         }
     },
     mutations: {
-        addSlide: (state, { previous, next }: { previous: String, next: String }) => {
-            const newSlide = new SlideModel({ previous, next });
+        addSlide: (state, { previous, next }: { previous: String, next: String }): void => {
+            const newSlide: SlideModel = new SlideModel({ previous, next });
 
             if (previous) {
-                const slides = state.slides.filter((s) => s.id === previous);
-
-                if (slides.length > 1) {
-                    console.error("More than one slide with id");
-                } else if (slides.length === 0) {
-                    console.error("No slide with id");
-                } else {
-                    slides[0].next = newSlide.id;
-                }
+                const slide: SlideModel = Utilities.getSlide(state.slides, previous);
+                slide.next = newSlide.id;
             }
 
             if (next) {
-                const slides = state.slides.filter((s) => s.id === next);
-
-                if (slides.length > 1) {
-                    console.error("More than one slide with id");
-                } else if (slides.length === 0) {
-                    console.error("No slide with id");
-                } else {
-                    slides[0].previous = newSlide.id;
-                }
+                const slide: SlideModel = Utilities.getSlide(state.slides, next);
+                slide.previous = newSlide.id;
             }
 
             state.slides.push(newSlide);
         },
-        addShapeToSlide: (state, { slideId }: { slideId: String }) => {
-            const shape = new ShapeModel();
-            const slides = state.slides.filter((s) => s.id === slideId);
-
-            if (slides.length > 1) {
-                console.error("More than one slide with id");
-            } else if (slides.length === 0) {
-                console.error("No slide with id");
-            } else {
-                slides[0].shapes.push(shape);
-            }
+        addShapeToSlide: (state, { slideId }: { slideId: String }): void => {
+            const shape: ShapeModel = new ShapeModel();
+            const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
+            slide.shapes.push(shape);
         }
     }
 });
