@@ -52,14 +52,17 @@ export default new Vuex.Store({
 
             state.slides.push(newSlide);
         },
-        addShapeToSlide: (state, { slideId, shape }: { slideId: String, shape: ShapeModel }) => {
+        addShapeToSlide: (state, { slideId }: { slideId: String }) => {
+            const shape = new ShapeModel();
             const slides = state.slides.filter((s) => s.id === slideId);
 
             if (slides.length > 1) {
                 console.error("More than one slide with id");
+            } else if (slides.length === 0) {
+                console.error("No slide with id");
+            } else {
+                slides[0].shapes.push(shape);
             }
-
-            slides[0].shapes.push(shape);
         }
     }
 });

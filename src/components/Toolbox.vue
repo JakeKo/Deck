@@ -14,7 +14,6 @@
 import { Vue, Component } from "vue-property-decorator";
 import Tool from "./Tool.vue";
 import Shape from "./Shape.vue";
-import ShapeModel from "../models/ShapeModel";
 
 @Component({
     components: {
@@ -24,8 +23,7 @@ import ShapeModel from "../models/ShapeModel";
 export default class Toolbox extends Vue {
     public shapeToolClickHandler(): void {
         this.$store.commit("addShapeToSlide", {
-            slideId: this.$store.getters.activeSlide.id,
-            shape: new ShapeModel()
+            slideId: this.$store.getters.activeSlide.id
         });
     }
 
