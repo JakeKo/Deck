@@ -23,17 +23,34 @@ export default new Vuex.Store({
         }
     },
     mutations: {
-        addSlide: (state, { previousSlideId }) => {
-            const slide = new SlideModel({ previous: previousSlideId});
-            state.slides.push(slide);
+        addSlide: (state, { previous, next }: { previous: String, next: String }) => {
+            const newSlide = new SlideModel({ previous, next });
 
-            const slides = state.slides.filter((s) => s.id === previousSlideId);
+            if (previous) {
+                const slides = state.slides.filter((s) => s.id === previous);
 
-            if (slides.length > 1) {
-                console.error("More than one slide with id");
+                if (slides.length > 1) {
+                    console.error("More than one slide with id");
+                } else if (slides.length === 0) {
+                    console.error("No slide with id");
+                } else {
+                    slides[0].next = newSlide.id;
+                }
             }
 
-            slides[0].next = slide.id;
+            if (next) {
+                const slides = state.slides.filter((s) => s.id === next);
+
+                if (slides.length > 1) {
+                    console.error("More than one slide with id");
+                } else if (slides.length === 0) {
+                    console.error("No slide with id");
+                } else {
+                    slides[0].previous = newSlide.id;
+                }
+            }
+
+            state.slides.push(newSlide);
         },
         addShapeToSlide: (state, { slideId, shape }: { slideId: String, shape: ShapeModel }) => {
             const slides = state.slides.filter((s) => s.id === slideId);

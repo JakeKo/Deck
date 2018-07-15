@@ -31,7 +31,8 @@ export default class Toolbox extends Vue {
 
     public slideToolClickHandler(): void {
         this.$store.commit("addSlide", {
-            previousSlideId: this.$store.getters.activeSlide.id
+            previous: this.$store.getters.activeSlide.id,
+            next: this.$store.getters.activeSlide.next
         });
     }
 }
