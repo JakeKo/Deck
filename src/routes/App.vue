@@ -20,7 +20,7 @@ import Workspace from "../components/Workspace.vue";
 })
 export default class App extends Vue {
     public created() {
-        this.$store.commit("addSlide", { });
+        this.$store.commit("addSlide");
     }
 }
 /* tslint:disable */
