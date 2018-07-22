@@ -1,24 +1,29 @@
 /* tslint:disable */
 <template>
-<div id="slide-preview">
-
-</div>
+<div id="slide-preview" :style="{ 'border': border }"></div>
 </template>
 
 <script lang="ts">
 /* tslint:enable */
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Prop } from "vue-property-decorator";
 
 @Component
-export default class SlidePreview extends Vue {}
+export default class SlidePreview extends Vue {
+    @Prop({ type: Boolean, default: false })
+    public active?: Boolean;
+
+    get border(): String {
+        return `1px solid ${this.active ? "blue" : "rgba(0, 0, 0, 0.15)"}`;
+    }
+}
 /* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
 #slide-preview {
-    border: 1px solid rgba(0, 0, 0, 0.15);
     height: 63px;
     width: 112px;
     margin-left: 24px;
+    cursor: pointer;
 }
 </style>
