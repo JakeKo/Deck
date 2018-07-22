@@ -22,16 +22,11 @@ import Shape from "./Shape.vue";
 })
 export default class Toolbox extends Vue {
     public shapeToolClickHandler(): void {
-        this.$store.commit("addShapeToSlide", {
-            slideId: this.$store.getters.activeSlide.id
-        });
+        this.$store.commit("addShapeToSlideWithId", this.$store.getters.activeSlide.id);
     }
 
     public slideToolClickHandler(): void {
-        this.$store.commit("addSlide", {
-            previous: this.$store.getters.activeSlide.id,
-            next: this.$store.getters.activeSlide.next
-        });
+        this.$store.commit("addSlideAfterSlideWithId", this.$store.getters.activeSlide.id);
     }
 }
 /* tslint:disable */

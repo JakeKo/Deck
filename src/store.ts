@@ -8,37 +8,35 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        activeSlideId: "",
+        activeSlideId: "foo",
         slides: new Array<SlideModel>()
     },
     getters: {
-        activeSlide: (state): SlideModel => {
-            const slides: SlideModel[] = state.slides.filter((s) => s.id === state.activeSlideId);
-
-            if (slides.length !== 1) {
-                console.error(`There are ${slides.length} active slides`);
+        slides: (state): SlideModel[] => {
+            return state.slides;
+        },
+        firstSlide: (state): SlideModel => {
+            if (state.slides.length === 0) {
+                console.error("There are 0 slides");
             }
 
-            return slides[0];
+            return state.slides[0];
+        },
+        activeSlide: (state): SlideModel | undefined => {
+            return state.slides.length === 0 ? undefined : Utilities.getSlide(state.slides, state.activeSlideId);
         }
     },
     mutations: {
-        addSlide: (state, { previous, next }: { previous?: string, next?: string } = { }): void => {
-            const newSlide: SlideModel = new SlideModel({ previous, next });
-
-            if (previous) {
-                const slide: SlideModel = Utilities.getSlide(state.slides, previous);
-                slide.next = newSlide.id;
-            }
-
-            if (next) {
-                const slide: SlideModel = Utilities.getSlide(state.slides, next);
-                slide.previous = newSlide.id;
-            }
-
-            state.slides.push(newSlide);
+        setActiveSlide: (state, slideId: string): void => {
+            state.activeSlideId = slideId;
         },
-        addShapeToSlide: (state, { slideId }: { slideId: string }): void => {
+        addSlideAfterSlideWithId: (state, slideId: string): void => {
+            const newSlide: SlideModel = new SlideModel();
+            const index: number = slideId ? state.slides.indexOf(Utilities.getSlide(state.slides, slideId)) : 0;
+            state.slides.splice(index + 1, 0, newSlide);
+            state.activeSlideId = newSlide.id;
+        },
+        addShapeToSlideWithId: (state, slideId: string): void => {
             const shape: ShapeModel = new ShapeModel();
             const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
             slide.shapes.push(shape);
