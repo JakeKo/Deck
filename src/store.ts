@@ -8,18 +8,14 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        slides: [
-            new SlideModel({ active: true })
-        ]
+        slides: new Array<SlideModel>()
     },
     getters: {
         activeSlide: (state): SlideModel => {
             const slides: SlideModel[] = state.slides.filter((s) => s.active);
 
-            if (slides.length > 1) {
+            if (slides.length !== 1) {
                 console.error(`There are ${slides.length} active slides`);
-            } else if (slides.length === 0) {
-                console.error("There are no active slides");
             }
 
             return slides[0];
