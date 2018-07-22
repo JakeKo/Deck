@@ -10,16 +10,16 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 @Component
 export default class Shape extends Vue {
     @Prop({ type: String, default: "white" })
-    public backgroundColor?: String;
+    public backgroundColor?: string;
 
     @Prop({ type: String, default: "100px" })
-    public height?: String;
+    public height?: string;
 
     @Prop({ type: String, default: "100px" })
-    public width?: String;
+    public width?: string;
 
     @Prop({ type: String, default: "solid 1px rgba(0, 0, 0, 0.15)" })
-    public border?: String;
+    public border?: string;
 
     get style() {
         return {

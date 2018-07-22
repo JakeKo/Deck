@@ -1,9 +1,9 @@
 import { GenerateId } from "../utilities/models";
 
 export default class ShapeModel {
-    private _id: String;
-    public get id(): String { return this._id; }
-    public set id(value: String) { this._id = value; }
+    private _id: string;
+    public get id(): string { return this._id; }
+    public set id(value: string) { this._id = value; }
 
     private _style: Object;
     public get style(): Object { return this._style; }
@@ -11,7 +11,7 @@ export default class ShapeModel {
 
     constructor(
         { id, style }:
-        { id?: String, style?: Object } = { }
+        { id?: string, style?: Object } = { }
     ) {
         this._id = id || GenerateId();
         this._style = style || { };

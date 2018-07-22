@@ -14,7 +14,7 @@ export default new Vuex.Store({
     },
     getters: {
         activeSlide: (state): SlideModel => {
-            const slides: Array<SlideModel> = state.slides.filter((s) => s.active);
+            const slides: SlideModel[] = state.slides.filter((s) => s.active);
 
             if (slides.length > 1) {
                 console.error(`There are ${slides.length} active slides`);
@@ -26,7 +26,7 @@ export default new Vuex.Store({
         }
     },
     mutations: {
-        addSlide: (state, { previous, next }: { previous: String, next: String }): void => {
+        addSlide: (state, { previous, next }: { previous: string, next: string }): void => {
             const newSlide: SlideModel = new SlideModel({ previous, next });
 
             if (previous) {
@@ -41,7 +41,7 @@ export default new Vuex.Store({
 
             state.slides.push(newSlide);
         },
-        addShapeToSlide: (state, { slideId }: { slideId: String }): void => {
+        addShapeToSlide: (state, { slideId }: { slideId: string }): void => {
             const shape: ShapeModel = new ShapeModel();
             const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
             slide.shapes.push(shape);

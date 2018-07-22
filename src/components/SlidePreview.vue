@@ -10,9 +10,9 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 @Component
 export default class SlidePreview extends Vue {
     @Prop({ type: Boolean, default: false })
-    public active?: Boolean;
+    public active?: boolean;
 
-    get border(): String {
+    get border(): string {
         return `1px solid ${this.active ? "blue" : "rgba(0, 0, 0, 0.15)"}`;
     }
 }
