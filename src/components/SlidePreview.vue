@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div id="slide-preview" :style="{ 'border': border }"></div>
+<div id="slide-preview" :style="{ 'border': border }" @click="$store.commit('setActiveSlide', id)"></div>
 </template>
 
 <script lang="ts">
@@ -9,6 +9,9 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 
 @Component
 export default class SlidePreview extends Vue {
+    @Prop({ type: String, default: ""})
+    public id?: string;
+
     @Prop({ type: Boolean, default: false })
     public active?: boolean;
 
