@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="editor">
-    <div id="canvas">
+    <div id="canvas" :style="{ 'width': `${$store.state.canvas.width}px`, 'height': `${$store.state.canvas.height}px` }">
         <slide></slide>
     </div>
 </div>
@@ -19,8 +19,8 @@ import Slide from "./Slide.vue";
 })
 export default class Editor extends Vue {
     public mounted() {
-        this.$el.scrollTop = 1000 - this.$el.clientHeight / 2;
-        this.$el.scrollLeft = 2000 - this.$el.clientWidth / 2;
+        this.$el.scrollTop = this.$store.state.canvas.height / 2 - this.$el.clientHeight / 2;
+        this.$el.scrollLeft = this.$store.state.canvas.width / 2 - this.$el.clientWidth / 2;
     }
 }
 /* tslint:disable */
@@ -33,8 +33,6 @@ export default class Editor extends Vue {
 }
 
 #canvas {
-    width: 4000px;
-    height: 2000px;
     display: flex;
     justify-content: center;
     align-items: center;

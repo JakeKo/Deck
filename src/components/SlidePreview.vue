@@ -26,7 +26,8 @@ export default class SlidePreview extends Vue {
 #slide-preview {
     height: 63px;
     width: 112px;
-    margin-left: 24px;
+    margin: 0 12px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 </style>

@@ -9,6 +9,10 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         activeSlideId: "foo",
+        canvas: {
+            height: 2000,
+            width: 4000
+        },
         slides: new Array<SlideModel>()
     },
     getters: {
