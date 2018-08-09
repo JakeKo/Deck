@@ -1,0 +1,23 @@
+/* tslint:disable */
+<template>
+    <div id="style-editor">
+
+    </div>
+</template>
+
+<script lang="ts">
+/* tslint:enable */
+import { Vue, Component } from "vue-property-decorator";
+
+@Component
+export default class StyleEditor extends Vue {}
+/* tslint:disable */
+</script>
+
+<style lang="scss" scoped>
+#style-editor {
+    width: 448px;
+    background: white;
+    border-left: 1px solid rgba(0, 0, 0, 0.15);
+}
+</style>
