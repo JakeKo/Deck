@@ -1,38 +1,30 @@
 /* tslint:disable */
 <template>
-<div id="shape" :style="style"></div>
+<div id="shape" :style="styleModel" @click="clickHandler"></div>
 </template>
 
 <script lang="ts">
 /* tslint:enable */
 import { Vue, Component, Prop } from "vue-property-decorator";
+import StyleModel from "../models/StyleModel";
 
 @Component
 export default class Shape extends Vue {
-    @Prop({ type: String, default: "white" })
-    public backgroundColor?: string;
+    @Prop({ type: String, required: true })
+    public id?: string;
 
-    @Prop({ type: String, default: "100px" })
-    public height?: string;
+    @Prop({ type: StyleModel, default: () => new StyleModel() })
+    public styleModel?: StyleModel;
 
-    @Prop({ type: String, default: "100px" })
-    public width?: string;
-
-    @Prop({ type: String, default: "solid 1px rgba(0, 0, 0, 0.15)" })
-    public border?: string;
-
-    get style() {
-        return {
-            backgroundColor: this.backgroundColor,
-            height: this.height,
-            width: this.width,
-            border: this.border
-        };
+    private clickHandler() {
+        this.$store.commit("setFocusedShape", this.id);
     }
 }
 /* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
-
+#shape {
+    cursor: pointer;
+}
 </style>

@@ -1,8 +1,6 @@
 /* tslint:disable */
 <template>
-    <div id="style-editor">
-
-    </div>
+<div id="style-editor">{{ content }}</div>
 </template>
 
 <script lang="ts">
@@ -10,7 +8,12 @@
 import { Vue, Component } from "vue-property-decorator";
 
 @Component
-export default class StyleEditor extends Vue {}
+export default class StyleEditor extends Vue {
+    get content(): string {
+        const focusedShape = this.$store.getters.focusedShape;
+        return focusedShape ? focusedShape.styleModel : "";
+    }
+}
 /* tslint:disable */
 </script>
 

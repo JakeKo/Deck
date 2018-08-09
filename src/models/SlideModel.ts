@@ -15,6 +15,6 @@ export default class SlideModel {
         { id?: string, shapes?: ShapeModel[] } = { }
     ) {
         this._id = id || GenerateId();
-        this._shapes = shapes = [];
+        this._shapes = shapes || [];
     }
 }
