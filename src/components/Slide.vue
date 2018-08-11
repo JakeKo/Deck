@@ -1,7 +1,13 @@
 /* tslint:disable */
 <template>
 <div id="slide">
-    <shape v-for="(shape, index) in $store.getters.activeSlide.shapes" :styleModel="shape.styleModel" :key="index" :id="shape.id"></shape>
+    <shape
+        v-for="(shape, index) in $store.getters.activeSlide.shapes"
+        :focused="shape.id === $store.getters.activeSlide.focusedShapeId"
+        :styleModel="shape.styleModel"
+        :key="index"
+        :id="shape.id">
+    </shape>
 </div>
 </template>
 

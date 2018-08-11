@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div id="shape" :style="styleModel" @click="clickHandler"></div>
+<div id="shape" :style="style" @click="clickHandler">{{focused}}</div>
 </template>
 
 <script lang="ts">
@@ -16,8 +16,17 @@ export default class Shape extends Vue {
     @Prop({ type: StyleModel, default: () => new StyleModel() })
     public styleModel?: StyleModel;
 
+    @Prop({ type: Boolean, default: false })
+    public focused?: boolean;
+
     private clickHandler() {
         this.$store.commit("setFocusedShape", this.id);
+    }
+
+    get style(): any {
+        const style: any = { ...this.styleModel };
+        style.border = this.focused ? "1px solid blue" : style.border || "";
+        return new StyleModel(...style).toCss();
     }
 }
 /* tslint:disable */
@@ -26,5 +35,9 @@ export default class Shape extends Vue {
 <style lang="scss" scoped>
 #shape {
     cursor: pointer;
+}
+
+#focused-shape {
+    border: 1px solid blue;
 }
 </style>
