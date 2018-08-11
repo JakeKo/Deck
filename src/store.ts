@@ -9,7 +9,6 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         activeSlideId: "",
-        focusedShapeId: "",
         canvas: {
             height: 2000,
             width: 4000
@@ -31,12 +30,13 @@ export default new Vuex.Store({
             return state.slides.length === 0 ? undefined : Utilities.getSlide(state.slides, state.activeSlideId);
         },
         focusedShape: (state): ShapeModel | undefined => {
-            // TODO: Search all slides for redundancy
             const activeSlide: SlideModel = Utilities.getSlide(state.slides, state.activeSlideId);
-            const shapes: ShapeModel[] = activeSlide.shapes.filter((shape) => shape.id === state.focusedShapeId);
+            const shapes: ShapeModel[] = activeSlide.shapes.filter((shape) => shape.id === activeSlide.focusedShapeId);
 
-            if (shapes.length !== 1) {
+            if (shapes.length > 1 || shapes.length < 0) {
                 console.error(`There are ${shapes.length} focused shapes`);
+                return undefined;
+            } else if (shapes.length === 0) {
                 return undefined;
             }
 
@@ -48,7 +48,8 @@ export default new Vuex.Store({
             state.activeSlideId = slideId;
         },
         setFocusedShape: (state, shapeId: string): void => {
-            state.focusedShapeId = shapeId;
+            const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
+            activeSlide.focusedShapeId = shapeId;
         },
         addSlideAfterSlideWithId: (state, slideId: string): void => {
             const newSlide: SlideModel = new SlideModel();

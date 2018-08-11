@@ -10,11 +10,16 @@ export default class SlideModel {
     public get shapes(): ShapeModel[] { return this._shapes; }
     public set shapes(value: ShapeModel[]) { this._shapes = value; }
 
+    private _focusedShapeId: string;
+    public get focusedShapeId(): string { return this._focusedShapeId; }
+    public set focusedShapeId(value: string) { this._focusedShapeId = value; }
+
     constructor(
-        { id, shapes }:
-        { id?: string, shapes?: ShapeModel[] } = { }
+        { id, shapes, focusedShapeId }:
+        { id?: string, shapes?: ShapeModel[], focusedShapeId?: string } = { }
     ) {
         this._id = id || GenerateId();
         this._shapes = shapes || [];
+        this._focusedShapeId = focusedShapeId || "";
     }
 }

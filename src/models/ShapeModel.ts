@@ -11,10 +11,10 @@ export default class ShapeModel {
     public set styleModel(value: StyleModel) { this._styleModel = value; }
 
     constructor(
-        { id, style }:
-        { id?: string, style?: StyleModel } = { }
+        { id, styleModel }:
+        { id?: string, styleModel?: StyleModel } = { }
     ) {
         this._id = id || GenerateId();
-        this._styleModel = style || new StyleModel();
+        this._styleModel = styleModel || new StyleModel();
     }
 }

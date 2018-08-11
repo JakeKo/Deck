@@ -31,4 +31,13 @@ export default class StyleModel {
         this._width = width || "100px";
         this._border = border || "1px solid rgba(0, 0, 0, 0.15)";
     }
+
+    public toCss(): any {
+        return {
+            "background-color": this.backgroundColor,
+            "height": this.height,
+            "width": this.width,
+            "border": this.border
+        };
+    }
 }
