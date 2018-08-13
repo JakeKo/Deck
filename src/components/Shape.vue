@@ -1,6 +1,7 @@
 /* tslint:disable */
 <template>
-<div id="shape" :style="style" @click="clickHandler">{{focused}}</div>
+<polygon @click="clickHandler" points="100,10 40,198 190,78 10,78 160,198"
+    :fill="styleModel.fill" :stroke="styleModel.stroke" :stroke-width="styleModel.strokeWidth" fill-rule="evenodd" />
 </template>
 
 <script lang="ts">
@@ -22,22 +23,12 @@ export default class Shape extends Vue {
     private clickHandler() {
         this.$store.commit("setFocusedShape", this.id);
     }
-
-    get style(): any {
-        const style: any = { ...this.styleModel };
-        style.border = this.focused ? "1px solid blue" : style.border || "";
-        return new StyleModel(...style).toCss();
-    }
 }
 /* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
-#shape {
+polygon {
     cursor: pointer;
-}
-
-#focused-shape {
-    border: 1px solid blue;
 }
 </style>

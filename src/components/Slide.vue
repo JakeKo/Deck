@@ -1,13 +1,15 @@
 /* tslint:disable */
 <template>
 <div id="slide">
-    <shape
-        v-for="(shape, index) in $store.getters.activeSlide.shapes"
-        :focused="shape.id === $store.getters.activeSlide.focusedShapeId"
-        :styleModel="shape.styleModel"
-        :key="index"
-        :id="shape.id">
-    </shape>
+    <svg>
+        <shape
+            v-for="(shape, index) in $store.getters.activeSlide.shapes"
+            :focused="shape.id === $store.getters.activeSlide.focusedShapeId"
+            :styleModel="shape.styleModel"
+            :key="index"
+            :id="shape.id">
+        </shape>
+    </svg>
 </div>
 </template>
 
@@ -31,5 +33,10 @@ export default class Slide extends Vue {}
     width: 1072px;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.15);
     background: #FFF;
+}
+
+svg {
+    height: 100%;
+    width: 100%;
 }
 </style>

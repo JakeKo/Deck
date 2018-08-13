@@ -11,7 +11,7 @@ import { Vue, Component } from "vue-property-decorator";
 export default class StyleEditor extends Vue {
     get content(): string {
         const focusedShape = this.$store.getters.focusedShape;
-        return focusedShape ? focusedShape.styleModel.toCss() : "";
+        return focusedShape ? focusedShape.styleModel : "";
     }
 }
 /* tslint:disable */
