@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import ShapeModel from "./models/ShapeModel";
 import SlideModel from "./models/SlideModel";
+import Point from "./models/Point";
 import * as Utilities from "./utilities/store";
 
 Vue.use(Vuex);
@@ -58,7 +59,15 @@ export default new Vuex.Store({
             state.activeSlideId = newSlide.id;
         },
         addShapeToSlideWithId: (state, slideId: string): void => {
-            const shape: ShapeModel = new ShapeModel();
+            const shape: ShapeModel = new ShapeModel({
+                points: [
+                    new Point(100, 10),
+                    new Point(40, 198),
+                    new Point(190, 78),
+                    new Point(10, 78),
+                    new Point(160, 198)
+                ]
+            });
             const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
             slide.shapes.push(shape);
         }

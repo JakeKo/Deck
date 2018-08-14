@@ -6,6 +6,7 @@
             v-for="(shape, index) in $store.getters.activeSlide.shapes"
             :focused="shape.id === $store.getters.activeSlide.focusedShapeId"
             :styleModel="shape.styleModel"
+            :points="shape.points"
             :key="index"
             :id="shape.id">
         </shape>

@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<polygon @click="clickHandler" points="100,10 40,198 190,78 10,78 160,198"
+<polygon @click="clickHandler" :points="pointsToString"
     :fill="styleModel.fill" :stroke="styleModel.stroke" :stroke-width="styleModel.strokeWidth" fill-rule="evenodd" />
 </template>
 
@@ -8,6 +8,7 @@
 /* tslint:enable */
 import { Vue, Component, Prop } from "vue-property-decorator";
 import StyleModel from "../models/StyleModel";
+import Point from "../models/Point";
 
 @Component
 export default class Shape extends Vue {
@@ -20,8 +21,16 @@ export default class Shape extends Vue {
     @Prop({ type: Boolean, default: false })
     public focused?: boolean;
 
+    @Prop({ type: Array, required: true })
+    public points?: Point[];
+
     private clickHandler() {
         this.$store.commit("setFocusedShape", this.id);
+    }
+
+    get pointsToString() {
+        const points = this.points || new Array<Point>();
+        return points.map((point) => `${point.x},${point.y}`).reduce((base, value) => `${base} ${value}`);
     }
 }
 /* tslint:disable */
