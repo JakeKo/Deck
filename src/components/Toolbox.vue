@@ -36,7 +36,7 @@ export default class Toolbox extends Vue {
 #toolbox {
     width: 64px;
     border-right: 1px solid rgba(0, 0, 0, 0.15);
-    display: flex;
+    flex-shrink: 0;
     flex-direction: column;
 }
 </style>

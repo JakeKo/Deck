@@ -28,7 +28,6 @@ export default class Editor extends Vue {
 
 <style lang="scss" scoped>
 #editor {
-    height: calc(100vh - 96px);
     overflow: scroll;
 }
 

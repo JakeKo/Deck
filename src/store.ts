@@ -14,6 +14,9 @@ export default new Vuex.Store({
             height: 2000,
             width: 4000
         },
+        styleEditor: {
+            width: 450
+        },
         slides: new Array<SlideModel>()
     },
     getters: {
@@ -42,6 +45,9 @@ export default new Vuex.Store({
             }
 
             return shapes[0];
+        },
+        styleEditorWidth: (state): number => {
+            return state.styleEditor.width;
         }
     },
     mutations: {
@@ -70,6 +76,9 @@ export default new Vuex.Store({
             });
             const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
             slide.shapes.push(shape);
+        },
+        setStyleEditorWidth: (state, width: number): void => {
+            state.styleEditor.width = width;
         }
     }
 });

@@ -29,6 +29,7 @@ export default class Roadmap extends Vue {}
 <style lang="scss" scoped>
 #roadmap {
     height: 96px;
+    flex-shrink: 0;
     border-top: 1px solid rgba(0, 0, 0, 0.15);
     overflow-x: scroll;
 }
