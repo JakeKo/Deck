@@ -17,6 +17,9 @@ export default new Vuex.Store({
         styleEditor: {
             width: 450
         },
+        roadmap: {
+            height: 96
+        },
         slides: new Array<SlideModel>()
     },
     getters: {
@@ -48,6 +51,9 @@ export default new Vuex.Store({
         },
         styleEditorWidth: (state): number => {
             return state.styleEditor.width;
+        },
+        roadmapHeight: (state): number => {
+            return state.roadmap.height;
         }
     },
     mutations: {
@@ -79,6 +85,9 @@ export default new Vuex.Store({
         },
         setStyleEditorWidth: (state, width: number): void => {
             state.styleEditor.width = width;
+        },
+        setRoadmapHeight: (state, height: number): void => {
+            state.roadmap.height = height;
         }
     }
 });
