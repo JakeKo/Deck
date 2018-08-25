@@ -3,7 +3,9 @@
 <div id="style-editor" :style="{ 'min-width': `${width}px` }">
     <div id="zone" @mousedown="bindResize"></div>
     <textarea id="editor" v-model="content"></textarea>
-    <button @click="submit">Apply</button>
+    <div id="submit-button-container">
+        <button id="submit-button" @click="submit">Apply</button>
+    </div>
 </div>
 </template>
 
@@ -40,7 +42,7 @@ export default class StyleEditor extends Vue {
         event.preventDefault();
         event.stopPropagation();
         const focusedShape = this.$store.getters.focusedShape;
-        focusedShape.styleModel.fromJson(this.content);
+        focusedShape.fromJson(this.content);
     }
 
     public resetStyleEditor(content: string): void {
@@ -67,7 +69,23 @@ export default class StyleEditor extends Vue {
 
 #editor {
     width: 100%;
-    height: 80%;
+    height: calc(100% - 96px);
+    border: none;
+    outline: none;
+}
+
+#submit-button-container {
+    height: 96px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#submit-button {
+    height: 48px;
+    width: 80%;
+    background: rgba(0, 0, 0, 0.15);
+    cursor: pointer;
     border: none;
     outline: none;
 }

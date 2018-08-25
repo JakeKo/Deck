@@ -23,4 +23,27 @@ export default class ShapeModel {
         this._styleModel = styleModel || new StyleModel();
         this._points = points || new Array<Point>();
     }
+
+    public toJson(): string {
+        return `
+{
+    "points": [ ${this.points.map((point: Point) => point.toJson()).join(", ")} ],
+    "fill": "${this.styleModel.fill}",
+    "stroke": "${this.styleModel.stroke}",
+    "strokeWidth": "${this.styleModel.strokeWidth}"
+}`;
+    }
+
+    public fromJson(jsonString: string): void {
+        const json: any = JSON.parse(jsonString);
+
+        this.points = [];
+        json.points.forEach((point: { x: number, y: number }) => {
+            this.points.push(new Point(point.x, point.y));
+        });
+
+        this.styleModel.fill = json.fill || "white";
+        this.styleModel.stroke = json.stroke || "grey";
+        this.styleModel.strokeWidth = json.strokeWidth || "1";
+    }
 }

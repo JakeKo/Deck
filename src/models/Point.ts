@@ -11,4 +11,12 @@ export default class Point {
         this._x = x;
         this._y = y;
     }
+
+    public toJson(): string {
+        return `
+{
+    "x": ${this.x},
+    "y": ${this.y}
+}`;
+    }
 }

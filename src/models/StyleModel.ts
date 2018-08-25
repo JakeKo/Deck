@@ -24,19 +24,4 @@ export default class StyleModel {
         this._stroke = stroke || "grey";
         this._strokeWidth = strokeWidth || "1";
     }
-
-    public toJson(): string {
-        return `{
-    "fill": "${this.fill}",
-    "stroke": "${this.stroke}",
-    "strokeWidth": "${this.strokeWidth}"
-}`;
-    }
-
-    public fromJson(jsonString: string): void {
-        const json: any = JSON.parse(jsonString);
-        this.fill = json.fill || "white";
-        this.stroke = json.stroke || "grey";
-        this.strokeWidth = json.strokeWidth || "1";
-    }
 }
