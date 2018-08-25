@@ -2,7 +2,7 @@
 <template>
 <div id="editor">
     <div id="canvas" :style="{ 'width': `${$store.state.canvas.width}px`, 'height': `${$store.state.canvas.height}px` }">
-        <slide></slide>
+        <slide @shape-focused="(id) => $emit('shape-focused', id)"></slide>
     </div>
 </div>
 </template>

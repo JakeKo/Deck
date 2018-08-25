@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<polygon @click="clickHandler" :points="pointsToString"
+<polygon @click="$emit('shape-focused', id)" :points="pointsToString"
     :fill="styleModel.fill" :stroke="styleModel.stroke" :stroke-width="styleModel.strokeWidth" fill-rule="evenodd" />
 </template>
 
@@ -23,10 +23,6 @@ export default class Shape extends Vue {
 
     @Prop({ type: Array, required: true })
     public points?: Point[];
-
-    private clickHandler() {
-        this.$store.commit("setFocusedShape", this.id);
-    }
 
     get pointsToString() {
         const points = this.points || new Array<Point>();

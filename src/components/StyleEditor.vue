@@ -2,7 +2,8 @@
 <template>
 <div id="style-editor" :style="{ 'min-width': `${width}px` }">
     <div id="zone" @mousedown="bindResize"></div>
-    {{ content }}
+    <textarea id="editor" v-model="content"></textarea>
+    <button @click="submit">Apply</button>
 </div>
 </template>
 
@@ -12,12 +13,8 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 
 @Component
 export default class StyleEditor extends Vue {
+    private content: string = "";
     private width: number = this.$store.getters.styleEditorWidth;
-
-    get content(): string {
-        const focusedShape = this.$store.getters.focusedShape;
-        return focusedShape ? focusedShape.styleModel : "";
-    }
 
     private bindResize(event: Event): void {
         event.preventDefault();
@@ -38,6 +35,17 @@ export default class StyleEditor extends Vue {
         // Event is any type because pageX is not defined on Event
         this.width = window.innerWidth - event.pageX;
     }
+
+    private submit(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        const focusedShape = this.$store.getters.focusedShape;
+        focusedShape.styleModel.fromJson(this.content);
+    }
+
+    public resetStyleEditor(content: string): void {
+        this.content = content;
+    }
 }
 /* tslint:disable */
 </script>
@@ -55,5 +63,12 @@ export default class StyleEditor extends Vue {
     width: 6px;
     transform: translateX(-50%);
     cursor: ew-resize;
+}
+
+#editor {
+    width: 100%;
+    height: 80%;
+    border: none;
+    outline: none;
 }
 </style>

@@ -2,8 +2,8 @@
 <template>
 <div id="app">
     <toolbox></toolbox>
-    <workspace></workspace>
-    <style-editor></style-editor>
+    <workspace @shape-focused="setFocusedShape"></workspace>
+    <style-editor ref="styleEditor"></style-editor>
 </div>
 </template>
 
@@ -22,9 +22,15 @@ import StyleEditor from "../components/StyleEditor.vue";
     }
 })
 export default class App extends Vue {
-    public created() {
+    public created(): void {
         this.$store.commit("addSlideAfterSlideWithId");
         this.$store.commit("setActiveSlide", this.$store.getters.firstSlide.id);
+    }
+
+    private setFocusedShape(id: string): void {
+        this.$store.commit("setFocusedShape", id);
+        const styleEditor: any = this.$refs.styleEditor;
+        styleEditor.resetStyleEditor(this.$store.getters.focusedShape.styleModel.toJson());
     }
 }
 /* tslint:disable */

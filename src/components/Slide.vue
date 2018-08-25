@@ -8,7 +8,8 @@
             :styleModel="shape.styleModel"
             :points="shape.points"
             :key="index"
-            :id="shape.id">
+            :id="shape.id"
+            @shape-focused="(id) => $emit('shape-focused', id)">
         </shape>
     </svg>
 </div>

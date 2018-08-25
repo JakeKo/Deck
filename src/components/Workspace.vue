@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="workspace">
-    <editor></editor>
+    <editor @shape-focused="(id) => $emit('shape-focused', id)"></editor>
     <roadmap></roadmap>
 </div>
 </template>
