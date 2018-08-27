@@ -2,7 +2,7 @@
 <template>
 <div id="style-editor" :style="{ 'min-width': `${width}px` }">
     <div id="zone" @mousedown="bindResize"></div>
-    <textarea id="editor" v-model="content"></textarea>
+    <textarea id="editor" v-model="content" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <div id="submit-button-container">
         <button id="submit-button" @click="submit">Apply</button>
     </div>

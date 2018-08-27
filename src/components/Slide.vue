@@ -11,6 +11,11 @@
             :id="shape.id"
             @shape-focused="(id) => $emit('shape-focused', id)">
         </shape>
+        <textbox
+            v-for="(textbox, index) in $store.getters.activeSlide.textboxes"
+            :key="index"
+            :id="textbox.id">
+        </textbox>
     </svg>
 </div>
 </template>
@@ -19,10 +24,12 @@
 /* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
 import Shape from "./Shape.vue";
+import Textbox from "./Textbox.vue";
 
 @Component({
     components: {
-        Shape
+        Shape,
+        Textbox
     }
 })
 export default class Slide extends Vue {}
