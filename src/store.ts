@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import ShapeModel from "./models/ShapeModel";
 import SlideModel from "./models/SlideModel";
+import TextboxModel from "./models/TextboxModel";
 import Point from "./models/Point";
 import * as Utilities from "./utilities/store";
 
@@ -39,15 +40,17 @@ export default new Vuex.Store({
         focusedShape: (state): ShapeModel | undefined => {
             const activeSlide: SlideModel = Utilities.getSlide(state.slides, state.activeSlideId);
             const shapes: ShapeModel[] = activeSlide.shapes.filter((shape) => shape.id === activeSlide.focusedShapeId);
+            const textboxes: TextboxModel[] = activeSlide.textboxes.filter((textbox) => textbox.id === activeSlide.focusedShapeId);
+            const elements: any = shapes.length > 0 ? shapes : textboxes; // TODO: Awful
 
-            if (shapes.length > 1 || shapes.length < 0) {
-                console.error(`There are ${shapes.length} focused shapes`);
+            if (elements.length > 1 || elements.length < 0) {
+                console.error(`There are ${elements.length} focused elements`);
                 return undefined;
-            } else if (shapes.length === 0) {
+            } else if (elements.length === 0) {
                 return undefined;
             }
 
-            return shapes[0];
+            return elements[0];
         },
         styleEditorWidth: (state): number => {
             return state.styleEditor.width;
@@ -82,6 +85,10 @@ export default new Vuex.Store({
             });
             const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
             slide.shapes.push(shape);
+        },
+        addTextboxToSlideWithId: (state, slideId: string): void => {
+            const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
+            slide.textboxes.push(new TextboxModel());
         },
         setStyleEditorWidth: (state, width: number): void => {
             state.styleEditor.width = width;

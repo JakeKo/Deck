@@ -3,7 +3,7 @@
 <div id="toolbox">
     <tool @tool-click="shapeToolClickHandler"></tool>
     <tool @tool-click="slideToolClickHandler"></tool>
-    <tool></tool>
+    <tool @tool-click="textboxToolClickHandler"></tool>
     <tool></tool>
     <tool></tool>
 </div>
@@ -27,6 +27,10 @@ export default class Toolbox extends Vue {
 
     public slideToolClickHandler(): void {
         this.$store.commit("addSlideAfterSlideWithId", this.$store.getters.activeSlide.id);
+    }
+
+    public textboxToolClickHandler(): void {
+        this.$store.commit("addTextboxToSlideWithId", this.$store.getters.activeSlide.id);
     }
 }
 /* tslint:disable */
