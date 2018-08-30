@@ -1,15 +1,11 @@
 import { GenerateId } from "../utilities/models";
 import StyleModel from "./StyleModel";
 import Point from "./Point";
+import ISlideElement from "./ISlideElement";
 
-export default class ShapeModel {
-    private _id: string;
-    public get id(): string { return this._id; }
-    public set id(value: string) { this._id = value; }
-
-    private _styleModel: StyleModel;
-    public get styleModel(): StyleModel { return this._styleModel; }
-    public set styleModel(value: StyleModel) { this._styleModel = value; }
+export default class ShapeModel implements ISlideElement {
+    public id: string;
+    public styleModel: StyleModel;
 
     private _points: Point[];
     public get points(): Point[] { return this._points; }
@@ -19,8 +15,8 @@ export default class ShapeModel {
         { id, styleModel, points }:
         { id?: string, styleModel?: StyleModel, points?: Point[] } = { }
     ) {
-        this._id = id || GenerateId();
-        this._styleModel = styleModel || new StyleModel();
+        this.id = id || GenerateId();
+        this.styleModel = styleModel || new StyleModel();
         this._points = points || new Array<Point>();
     }
 

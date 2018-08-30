@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<polygon @click="clickHandler" :points="pointsToString"
+<polygon @click="$emit('shape-focused', id)" :points="pointsToString"
     :fill="styleModel.fill" :stroke="styleModel.stroke" :stroke-width="styleModel.strokeWidth" fill-rule="evenodd" />
 </template>
 
@@ -9,10 +9,9 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import StyleModel from "../models/StyleModel";
 import Point from "../models/Point";
-import ISlideElement from "../models/ISlideElement";
 
 @Component
-export default class Shape extends Vue implements ISlideElement {
+export default class Shape extends Vue {
     @Prop({ type: String, required: true })
     public id?: string;
 
@@ -28,10 +27,6 @@ export default class Shape extends Vue implements ISlideElement {
     get pointsToString() {
         const points = this.points || new Array<Point>();
         return points.map((point) => `${point.x},${point.y}`).reduce((base, value) => `${base} ${value}`);
-    }
-
-    public clickHandler(event: Event): void {
-        this.$emit("shape-focused", this.id);
     }
 }
 /* tslint:disable */

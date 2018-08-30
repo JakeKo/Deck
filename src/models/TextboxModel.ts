@@ -1,10 +1,10 @@
 import { GenerateId } from "../utilities/models";
 import TextboxStyleModel from "./TextboxStyleModel";
+import ISlideElement from "./ISlideElement";
 
-export default class TextboxModel {
-    private _id: string;
-    public get id(): string { return this._id; }
-    public set id(value: string) { this._id = value; }
+export default class TextboxModel implements ISlideElement {
+    public id: string;
+    public styleModel: TextboxStyleModel;
 
     private _x: number;
     public get x(): number { return this._x; }
@@ -18,19 +18,15 @@ export default class TextboxModel {
     public get text(): string { return this._text; }
     public set text(value: string) { this._text = value; }
 
-    private _styleModel: TextboxStyleModel;
-    public get styleModel(): TextboxStyleModel { return this._styleModel; }
-    public set styleModel(value: TextboxStyleModel) { this._styleModel = value; }
-
     constructor(
         { id, x, y, text, styleModel }:
         { id?: string, x?: number, y?: number, text?: string, styleModel?: TextboxStyleModel } = { }
     ) {
-        this._id = id || GenerateId();
+        this.id = id || GenerateId();
         this._x = x || 100;
         this._y = y || 100;
         this._text = text || "Lorem Ipsum";
-        this._styleModel = styleModel || new TextboxStyleModel();
+        this.styleModel = styleModel || new TextboxStyleModel();
     }
 
     public toJson(): string {
