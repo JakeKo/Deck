@@ -23,7 +23,10 @@
 			true,
 			"spaces"
 		],
-		"interface-name": true,
+		"interface-name": [
+            true,
+            "always-prefix"
+        ],
 		"jsdoc-format": true,
 		"max-classes-per-file": [
 			true,

@@ -1,15 +1,16 @@
 /* tslint:disable */
 <template>
-<text :x="x" :y="y" :fill="styleModel.fill" @click="$emit('text-focused', id)">{{text}}</text>
+<text :x="x" :y="y" :fill="styleModel.fill" @click="clickHandler">{{text}}</text>
 </template>
 
 <script lang="ts">
 /* tslint:enable */
 import { Vue, Component, Prop } from "vue-property-decorator";
 import TextboxStyleModel from "../models/TextboxStyleModel";
+import ISlideElement from "../models/ISlideElement";
 
 @Component
-export default class Textbox extends Vue {
+export default class Textbox extends Vue implements ISlideElement{
     @Prop({ type: String, required: true })
     public id?: string;
 
@@ -24,6 +25,10 @@ export default class Textbox extends Vue {
 
     @Prop({ type: TextboxStyleModel, default: () => new TextboxStyleModel() })
     public styleModel?: TextboxStyleModel;
+
+    public clickHandler(event: Event): void {
+        this.$emit("text-focused", this.id);
+    }
 }
 /* tslint:disable */
 </script>
