@@ -41,8 +41,8 @@ export default class StyleEditor extends Vue {
     private submit(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        const focusedShape = this.$store.getters.focusedShape;
-        focusedShape.fromJson(this.content);
+        const focusedElement = this.$store.getters.focusedElement;
+        focusedElement.fromJson(this.content);
     }
 
     public resetStyleEditor(content: string): void {

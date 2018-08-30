@@ -4,7 +4,7 @@
     <svg>
         <shape
             v-for="(shape) in $store.getters.activeSlide.shapes"
-            :focused="shape.id === $store.getters.activeSlide.focusedShapeId"
+            :focused="shape.id === $store.getters.activeSlide.focusedElementId"
             :styleModel="shape.styleModel"
             :points="shape.points"
             :key="shape.id"
@@ -13,7 +13,7 @@
         </shape>
         <textbox
             v-for="(textbox) in $store.getters.activeSlide.textboxes"
-            :focused="textbox.id === $store.getters.activeSlide.focusedShapeId"
+            :focused="textbox.id === $store.getters.activeSlide.focusedElementId"
             :styleModel="textbox.styleModel"
             :x="textbox.x"
             :y="textbox.y"

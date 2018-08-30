@@ -37,10 +37,10 @@ export default new Vuex.Store({
         activeSlide: (state): SlideModel | undefined => {
             return state.slides.length === 0 ? undefined : Utilities.getSlide(state.slides, state.activeSlideId);
         },
-        focusedShape: (state): ShapeModel | undefined => {
+        focusedElement: (state): ShapeModel | undefined => {
             const activeSlide: SlideModel = Utilities.getSlide(state.slides, state.activeSlideId);
-            const shapes: ShapeModel[] = activeSlide.shapes.filter((shape) => shape.id === activeSlide.focusedShapeId);
-            const textboxes: TextboxModel[] = activeSlide.textboxes.filter((textbox) => textbox.id === activeSlide.focusedShapeId);
+            const shapes: ShapeModel[] = activeSlide.shapes.filter((shape) => shape.id === activeSlide.focusedElementId);
+            const textboxes: TextboxModel[] = activeSlide.textboxes.filter((textbox) => textbox.id === activeSlide.focusedElementId);
             const elements: any = shapes.length > 0 ? shapes : textboxes; // TODO: Awful
 
             if (elements.length > 1 || elements.length < 0) {
@@ -63,9 +63,9 @@ export default new Vuex.Store({
         setActiveSlide: (state, slideId: string): void => {
             state.activeSlideId = slideId;
         },
-        setFocusedShape: (state, shapeId: string): void => {
+        setFocusedElement: (state, shapeId: string): void => {
             const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
-            activeSlide.focusedShapeId = shapeId;
+            activeSlide.focusedElementId = shapeId;
         },
         addSlideAfterSlideWithId: (state, slideId: string): void => {
             const newSlide: SlideModel = new SlideModel();

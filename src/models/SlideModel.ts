@@ -15,17 +15,17 @@ export default class SlideModel {
     public get textboxes(): TextboxModel[] { return this._textboxes; }
     public set textboxes(value: TextboxModel[]) { this._textboxes = value; }
 
-    private _focusedShapeId: string;
-    public get focusedShapeId(): string { return this._focusedShapeId; }
-    public set focusedShapeId(value: string) { this._focusedShapeId = value; }
+    private _focusedElementId: string;
+    public get focusedElementId(): string { return this._focusedElementId; }
+    public set focusedElementId(value: string) { this._focusedElementId = value; }
 
     constructor(
-        { id, shapes, textboxes, focusedShapeId }:
-        { id?: string, shapes?: ShapeModel[], textboxes?: TextboxModel[], focusedShapeId?: string } = { }
+        { id, shapes, textboxes, focusedElementId }:
+        { id?: string, shapes?: ShapeModel[], textboxes?: TextboxModel[], focusedElementId?: string } = { }
     ) {
         this._id = id || GenerateId();
         this._shapes = shapes || [];
         this._textboxes = textboxes || [];
-        this._focusedShapeId = focusedShapeId || "";
+        this._focusedElementId = focusedElementId || "";
     }
 }

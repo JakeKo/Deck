@@ -2,8 +2,8 @@
 <template>
 <div id="app">
     <toolbox></toolbox>
-    <workspace @shape-focused="setFocusedShape"></workspace>
-    <style-editor ref="styleEditor" v-show="$store.getters.focusedShape"></style-editor>
+    <workspace @shape-focused="setFocusedElement"></workspace>
+    <style-editor ref="styleEditor" v-show="$store.getters.focusedElement"></style-editor>
 </div>
 </template>
 
@@ -27,10 +27,10 @@ export default class App extends Vue {
         this.$store.commit("setActiveSlide", this.$store.getters.firstSlide.id);
     }
 
-    private setFocusedShape(id: string): void {
-        this.$store.commit("setFocusedShape", id);
+    private setFocusedElement(id: string): void {
+        this.$store.commit("setFocusedElement", id);
         const styleEditor: any = this.$refs.styleEditor;
-        styleEditor.resetStyleEditor(this.$store.getters.focusedShape.toJson());
+        styleEditor.resetStyleEditor(this.$store.getters.focusedElement.toJson());
     }
 }
 /* tslint:disable */
