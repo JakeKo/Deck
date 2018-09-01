@@ -5,34 +5,28 @@ import ISlideElement from "./ISlideElement";
 export default class TextboxModel implements ISlideElement {
     public id: string;
     public styleModel: TextboxStyleModel;
-
-    private _x: number;
-    public get x(): number { return this._x; }
-    public set x(value: number) { this._x = value; }
-
-    private _y: number;
-    public get y(): number { return this._y; }
-    public set y(value: number) { this._y = value; }
-
-    private _text: string;
-    public get text(): string { return this._text; }
-    public set text(value: string) { this._text = value; }
+    public x: number;
+    public y: number;
+    public text: string;
 
     constructor(
         { id, x, y, text, styleModel }:
         { id?: string, x?: number, y?: number, text?: string, styleModel?: TextboxStyleModel } = { }
     ) {
         this.id = id || GenerateId();
-        this._x = x || 100;
-        this._y = y || 100;
-        this._text = text || "Lorem Ipsum";
+        this.x = x || 100;
+        this.y = y || 100;
+        this.text = text || "Lorem Ipsum";
         this.styleModel = styleModel || new TextboxStyleModel();
     }
 
     public toJson(): string {
         return `
 {
-    "fill": "${this.styleModel.fill}"
+    "fill": "${this.styleModel.fill}",
+    "text": "${this.text}",
+    "x": ${this.x},
+    "y": ${this.y}
 }`;
     }
 
@@ -40,5 +34,8 @@ export default class TextboxModel implements ISlideElement {
         const json: any = JSON.parse(jsonString);
 
         this.styleModel.fill = json.fill || "grey";
+        this.text = json.text || "";
+        this.x = json.x || 100;
+        this.y = json.y || 100;
     }
 }
