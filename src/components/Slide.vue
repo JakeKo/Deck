@@ -3,8 +3,8 @@
 <div id="slide">
     <svg>
         <shape
-            v-for="(shape) in $store.getters.activeSlide.shapes"
-            :focused="shape.id === $store.getters.activeSlide.focusedElementId"
+            v-for="(shape) in $store.getters.activeSlideShapes"
+            :focused="shape.id === $store.getters.activeSlide.focusedShapeId"
             :styleModel="shape.styleModel"
             :points="shape.points"
             :key="shape.id"
@@ -12,8 +12,8 @@
             @shape-focused="(id) => $emit('shape-focused', id)">
         </shape>
         <textbox
-            v-for="(textbox) in $store.getters.activeSlide.textboxes"
-            :focused="textbox.id === $store.getters.activeSlide.focusedElementId"
+            v-for="(textbox) in $store.getters.activeSlideTextboxes"
+            :focused="textbox.id === $store.getters.activeSlide.focusedShapeId"
             :styleModel="textbox.styleModel"
             :x="textbox.x"
             :y="textbox.y"

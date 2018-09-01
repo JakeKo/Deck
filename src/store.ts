@@ -5,6 +5,7 @@ import SlideModel from "./models/SlideModel";
 import TextboxModel from "./models/TextboxModel";
 import Point from "./models/Point";
 import * as Utilities from "./utilities/store";
+import ISlideElement from "./models/ISlideElement";
 
 Vue.use(Vuex);
 
@@ -37,11 +38,9 @@ export default new Vuex.Store({
         activeSlide: (state): SlideModel | undefined => {
             return state.slides.length === 0 ? undefined : Utilities.getSlide(state.slides, state.activeSlideId);
         },
-        focusedElement: (state): ShapeModel | undefined => {
+        focusedElement: (state): ISlideElement | undefined => {
             const activeSlide: SlideModel = Utilities.getSlide(state.slides, state.activeSlideId);
-            const shapes: ShapeModel[] = activeSlide.shapes.filter((shape) => shape.id === activeSlide.focusedElementId);
-            const textboxes: TextboxModel[] = activeSlide.textboxes.filter((textbox) => textbox.id === activeSlide.focusedElementId);
-            const elements: any = shapes.length > 0 ? shapes : textboxes; // TODO: Awful
+            const elements: ISlideElement[] = activeSlide.elements.filter((element) => element.id === activeSlide.focusedElementId);
 
             if (elements.length > 1 || elements.length < 0) {
                 console.error(`There are ${elements.length} focused elements`);
@@ -57,6 +56,30 @@ export default new Vuex.Store({
         },
         roadmapHeight: (state): number => {
             return state.roadmap.height;
+        },
+        activeSlideShapes: (state): ShapeModel[] => {
+            const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
+            const shapes = new Array<ShapeModel>();
+
+            activeSlide.elements.forEach((element) => {
+                if (element instanceof ShapeModel) {
+                    shapes.push(element);
+                }
+            });
+
+            return shapes;
+        },
+        activeSlideTextboxes: (state): TextboxModel[] => {
+            const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
+            const textboxes = new Array<TextboxModel>();
+
+            activeSlide.elements.forEach((element) => {
+                if (element instanceof TextboxModel) {
+                    textboxes.push(element);
+                }
+            });
+
+            return textboxes;
         }
     },
     mutations: {
@@ -84,11 +107,11 @@ export default new Vuex.Store({
                 ]
             });
             const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
-            slide.shapes.push(shape);
+            slide.elements.push(shape);
         },
         addTextboxToSlideWithId: (state, slideId: string): void => {
             const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
-            slide.textboxes.push(new TextboxModel());
+            slide.elements.push(new TextboxModel());
         },
         setStyleEditorWidth: (state, width: number): void => {
             state.styleEditor.width = width;
