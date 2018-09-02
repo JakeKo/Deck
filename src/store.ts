@@ -6,6 +6,7 @@ import TextboxModel from "./models/TextboxModel";
 import Point from "./models/Point";
 import * as Utilities from "./utilities/store";
 import ISlideElement from "./models/ISlideElement";
+import Deck from "./utilities/deck";
 
 Vue.use(Vuex);
 
@@ -158,7 +159,8 @@ export default new Vuex.Store({
 
             html.appendChild(body);
 
-            const url: string = `data:text/html;charset=UTF-8,${encodeURIComponent(html.outerHTML)}`;
+            const deck = `${html.outerHTML}${Deck}`;
+            const url: string = `data:text/html;charset=UTF-8,${encodeURIComponent(deck)}`;
             const anchor: HTMLElement = document.createElement("a");
             anchor.setAttribute("href", url);
             anchor.setAttribute("download", "deck.html");
