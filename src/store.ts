@@ -119,5 +119,50 @@ export default new Vuex.Store({
         setRoadmapHeight: (state, height: number): void => {
             state.roadmap.height = height;
         }
+    },
+    actions: {
+        export: (store): void => {
+            const html = document.createElement("html");
+
+            html.appendChild(document.createElement("head"));
+            // Append metadata to head element
+
+            const body = document.createElement("body");
+            store.getters.slides.forEach((slideModel: SlideModel) => {
+                const slide: HTMLElement = document.createElement("svg");
+                slide.setAttribute("id", slideModel.id);
+                slide.setAttribute("class", "slide");
+
+                slideModel.elements.forEach((element: ISlideElement) => {
+                    if (element instanceof ShapeModel) {
+                        const polygon = document.createElement("polygon");
+                        const points = element.points.map((point) => `${point.x},${point.y}`).reduce((base, value) => `${base} ${value}`);
+                        polygon.setAttribute("points", points);
+                        polygon.setAttribute("fill", element.styleModel.fill);
+                        polygon.setAttribute("stroke", element.styleModel.stroke);
+                        polygon.setAttribute("stroke-width", element.styleModel.strokeWidth);
+                        polygon.setAttribute("fill-rule", "evenodd");
+                        slide.appendChild(polygon);
+                    } else if (element instanceof TextboxModel) {
+                        const text = document.createElement("text");
+                        text.setAttribute("x", `${element.x}`);
+                        text.setAttribute("y", `${element.y}`);
+                        text.setAttribute("fill", element.styleModel.fill);
+                        text.innerHTML = element.text;
+                        slide.appendChild(text);
+                    }
+                });
+
+                body.appendChild(slide);
+            });
+
+            html.appendChild(body);
+
+            const url: string = `data:text/html;charset=UTF-8,${encodeURIComponent(html.outerHTML)}`;
+            const anchor: HTMLElement = document.createElement("a");
+            anchor.setAttribute("href", url);
+            anchor.setAttribute("download", "deck.html");
+            anchor.click();
+        }
     }
 });

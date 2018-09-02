@@ -4,7 +4,7 @@
     <tool @tool-click="shapeToolClickHandler"></tool>
     <tool @tool-click="slideToolClickHandler"></tool>
     <tool @tool-click="textboxToolClickHandler"></tool>
-    <tool></tool>
+    <tool @tool-click="exportToolClickHandler"></tool>
     <tool></tool>
 </div>
 </template>
@@ -14,6 +14,7 @@
 import { Vue, Component } from "vue-property-decorator";
 import Tool from "./Tool.vue";
 import Shape from "./Shape.vue";
+import SlideModel from "../models/SlideModel";
 
 @Component({
     components: {
@@ -31,6 +32,10 @@ export default class Toolbox extends Vue {
 
     public textboxToolClickHandler(): void {
         this.$store.commit("addTextboxToSlideWithId", this.$store.getters.activeSlide.id);
+    }
+
+    public exportToolClickHandler(): void {
+        this.$store.dispatch("export");
     }
 }
 /* tslint:disable */
