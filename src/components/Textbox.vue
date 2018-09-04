@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<text :x="x" :y="y" :fill="styleModel.fill" @click="$emit('text-focused', id)">{{text}}</text>
+<text :x="x" :y="y" :fill="styleModel.fill" @click="$emit('element-focused', id)">{{text}}</text>
 </template>
 
 <script lang="ts">

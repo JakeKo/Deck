@@ -9,7 +9,7 @@
             :points="shape.points"
             :key="shape.id"
             :id="shape.id"
-            @shape-focused="(id) => $emit('shape-focused', id)">
+            @element-focused="(id) => $emit('element-focused', id)">
         </shape>
         <textbox
             v-for="(textbox) in $store.getters.activeSlideTextboxes"
@@ -20,7 +20,7 @@
             :text="textbox.text"
             :key="textbox.id"
             :id="textbox.id"
-            @text-focused="(id) => $emit('shape-focused', id)">
+            @element-focused="(id) => $emit('element-focused', id)">
         </textbox>
     </svg>
 </div>

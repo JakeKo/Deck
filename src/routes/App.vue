@@ -2,7 +2,7 @@
 <template>
 <div id="app">
     <toolbox></toolbox>
-    <workspace @shape-focused="setFocusedElement"></workspace>
+    <workspace @element-focused="setFocusedElement"></workspace>
     <style-editor ref="styleEditor" v-show="$store.getters.focusedElement"></style-editor>
 </div>
 </template>
