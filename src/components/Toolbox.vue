@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div id="toolbox">
+<div id="toolbox" :style="{ borderRight: `1px solid ${$store.getters.theme.tertiary}`}">
     <tool @tool-click="shapeToolClickHandler"></tool>
     <tool @tool-click="slideToolClickHandler"></tool>
     <tool @tool-click="textboxToolClickHandler"></tool>
@@ -44,7 +44,6 @@ export default class Toolbox extends Vue {
 <style lang="scss" scoped>
 #toolbox {
     width: 64px;
-    border-right: 1px solid rgba(0, 0, 0, 0.15);
     flex-shrink: 0;
     flex-direction: column;
 }

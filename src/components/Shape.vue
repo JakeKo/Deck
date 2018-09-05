@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<polygon @click="$emit('shape-focused', id)" :points="pointsToString"
+<polygon @click="$emit('element-focused', id)" :points="pointsToString"
     :fill="styleModel.fill" :stroke="styleModel.stroke" :stroke-width="styleModel.strokeWidth" fill-rule="evenodd" />
 </template>
 

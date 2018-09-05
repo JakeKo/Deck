@@ -27,8 +27,8 @@ export default new Vuex.Store({
         slides: new Array<SlideModel>(),
         theme: 0,
         themes: [
-            new Theme("light", "#FFFFFF", "#EEEEEE", "#275DAD", "#2FBF71" ,"#ED7D3A", "#A22C29"),
-            new Theme("dark", "", "", "", "", "", "")
+            new Theme("light", "#FFFFFF", "#EEEEEE", "#DDDDDD", "#275DAD", "#2FBF71" ,"#ED7D3A", "#A22C29"),
+            new Theme("dark", "", "", "", "", "", "", "")
         ]
     },
     getters: {

@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div id="slide-preview" :style="{ 'border': border }" @click="$store.commit('setActiveSlide', id)"></div>
+<div id="slide-preview" :style="{ border: `1px solid ${this.active ? $store.getters.theme.information : $store.getters.theme.tertiary }` }" @click="$store.commit('setActiveSlide', id)"></div>
 </template>
 
 <script lang="ts">
@@ -14,10 +14,6 @@ export default class SlidePreview extends Vue {
 
     @Prop({ type: Boolean, default: false })
     public active?: boolean;
-
-    get border(): string {
-        return `1px solid ${this.active ? "blue" : "rgba(0, 0, 0, 0.15)"}`;
-    }
 }
 /* tslint:disable */
 </script>

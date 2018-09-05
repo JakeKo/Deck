@@ -1,10 +1,10 @@
 /* tslint:disable */
 <template>
-<div id="style-editor" :style="{ 'min-width': `${width}px` }">
+<div id="style-editor" :style="styleEditorStyle">
     <div id="zone" @mousedown="bindResize"></div>
     <textarea id="editor" v-model="content" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <div id="submit-button-container">
-        <button id="submit-button" @click="submit">Apply</button>
+        <button id="submit-button" :style="{ background: $store.getters.theme.tertiary }" @click="submit">Apply</button>
     </div>
 </div>
 </template>
@@ -48,14 +48,20 @@ export default class StyleEditor extends Vue {
     public resetStyleEditor(content: string): void {
         this.content = content;
     }
+
+    get styleEditorStyle(): any {
+        return {
+            "background": this.$store.getters.theme.primary,
+            "border-left": `1px solid ${this.$store.getters.theme.tertiary}`,
+            "min-width": `${this.width}px`
+        };
+    }
 }
 /* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
 #style-editor {
-    background: white;
-    border-left: 1px solid rgba(0, 0, 0, 0.15);
     position: relative;
 }
 
@@ -84,7 +90,6 @@ export default class StyleEditor extends Vue {
 #submit-button {
     height: 48px;
     width: 80%;
-    background: rgba(0, 0, 0, 0.15);
     cursor: pointer;
     border: none;
     outline: none;

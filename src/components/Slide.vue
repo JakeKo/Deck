@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div id="slide">
+<div id="slide" :style="{ boxShadow: `0 0 4px 0 ${$store.getters.theme.tertiary}`, background: `${$store.getters.theme.primary}` }">
     <svg>
         <shape
             v-for="(shape) in $store.getters.activeSlideShapes"
@@ -46,8 +46,6 @@ export default class Slide extends Vue {}
 #slide {
     height: 603px;
     width: 1072px;
-    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.15);
-    background: #FFF;
 }
 
 svg {

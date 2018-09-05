@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div id="roadmap" :style="{ 'height': `${height}px` }">
+<div id="roadmap" :style="{ height: `${height}px`, borderTop: `1px solid ${$store.getters.theme.tertiary}` }">
     <div id="zone" @mousedown="bindResize"></div>
     <div id="slide-previews">
         <slide-preview
@@ -52,7 +52,6 @@ export default class Roadmap extends Vue {
 <style lang="scss" scoped>
 #roadmap {
     flex-shrink: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.15);
     overflow-x: scroll;
     position: relative;
     max-height: 256px;

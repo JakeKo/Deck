@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="tool" @click="$emit('tool-click')">
-    <div id="tool-icon"></div>
+    <div id="tool-icon" :style="{ background: $store.getters.theme.tertiary }"></div>
 </div>
 </template>
 
@@ -27,7 +27,6 @@ export default class Tool extends Vue {}
 #tool-icon {
     height: 36px;
     width: 36px;
-    background: rgba(0, 0, 0, 0.15);
     border-radius: 50%;
 }
 </style>

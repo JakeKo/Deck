@@ -25,9 +25,9 @@ export default class Editor extends Vue {
 
     get style(): any {
         return {
-            "width": `${this.$store.state.canvas.width}px`,
-            "height": `${this.$store.state.canvas.height}px`,
-            "background": `${this.$store.getters.theme.secondary}`
+            width: `${this.$store.state.canvas.width}px`,
+            height: `${this.$store.state.canvas.height}px`,
+            background: this.$store.getters.theme.secondary
         };
     }
 }
