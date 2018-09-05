@@ -7,6 +7,7 @@ import Point from "./models/Point";
 import * as Utilities from "./utilities/store";
 import ISlideElement from "./models/ISlideElement";
 import Deck from "./utilities/deck";
+import Theme from "./models/Theme";
 
 Vue.use(Vuex);
 
@@ -23,7 +24,12 @@ export default new Vuex.Store({
         roadmap: {
             height: 96
         },
-        slides: new Array<SlideModel>()
+        slides: new Array<SlideModel>(),
+        theme: 0,
+        themes: [
+            new Theme("light", "#FFFFFF", "#EEEEEE", "#275DAD", "#2FBF71" ,"#ED7D3A", "#A22C29"),
+            new Theme("dark", "", "", "", "", "", "")
+        ]
     },
     getters: {
         slides: (state): SlideModel[] => {
@@ -81,6 +87,9 @@ export default new Vuex.Store({
             });
 
             return textboxes;
+        },
+        theme: (state): Theme => {
+            return state.themes[state.theme];
         }
     },
     mutations: {

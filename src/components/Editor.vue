@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="editor">
-    <div id="canvas" :style="{ 'width': `${$store.state.canvas.width}px`, 'height': `${$store.state.canvas.height}px` }">
+    <div id="canvas" :style="style">
         <slide @element-focused="(id) => $emit('element-focused', id)"></slide>
     </div>
 </div>
@@ -22,6 +22,14 @@ export default class Editor extends Vue {
         this.$el.scrollTop = this.$store.state.canvas.height / 2 - this.$el.clientHeight / 2;
         this.$el.scrollLeft = this.$store.state.canvas.width / 2 - this.$el.clientWidth / 2;
     }
+
+    get style(): any {
+        return {
+            "width": `${this.$store.state.canvas.width}px`,
+            "height": `${this.$store.state.canvas.height}px`,
+            "background": `${this.$store.getters.theme.secondary}`
+        };
+    }
 }
 /* tslint:disable */
 </script>
@@ -35,6 +43,5 @@ export default class Editor extends Vue {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.05);
 }
 </style>
