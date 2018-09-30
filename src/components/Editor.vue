@@ -39,6 +39,17 @@ export default class Editor extends Vue {
     overflow: scroll;
 }
 
+::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+    background: #EEEEEE;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #DDDDDD;
+    border-radius: 5px;
+}
+
 #canvas {
     display: flex;
     justify-content: center;

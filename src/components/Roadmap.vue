@@ -9,6 +9,7 @@
             :id="slide.id"
             :key="index">
         </slide-preview>
+        <div id="new-slide-button" @click="newSlideHandler" :style="newSlideButtonStyle">+</div>
     </div>
 </div>
 </template>
@@ -25,6 +26,14 @@ import SlidePreview from "./SlidePreview.vue";
 })
 export default class Roadmap extends Vue {
     private height: number = this.$store.getters.roadmapHeight;
+
+    get newSlideButtonStyle(): any {
+        return {
+            border: `1px solid ${this.$store.getters.theme.tertiary}`,
+            color: this.$store.getters.theme.tertiary,
+            background: this.$store.getters.theme.primary
+        };
+    }
 
     private bindResize(event: Event): void {
         event.preventDefault();
@@ -45,6 +54,10 @@ export default class Roadmap extends Vue {
         // Event is any type because pageY is not defined on Event
         this.height = window.innerHeight - event.pageY;
     }
+
+    private newSlideHandler(event: Event): void {
+        this.$store.commit("addSlideAfterSlideWithId", this.$store.getters.lastSlide.id);
+    }
 }
 /* tslint:disable */
 </script>
@@ -59,10 +72,10 @@ export default class Roadmap extends Vue {
 
 #slide-previews {
     height: 100%;
-    padding: 0 12px;
     display: flex;
     align-items: center;
-    min-width: 100%;
+    position: absolute;
+    padding: 0 12px;
 }
 
 ::-webkit-scrollbar { 
@@ -75,5 +88,17 @@ export default class Roadmap extends Vue {
     height: 6px;
     transform: translateY(-50%);
     cursor: ns-resize;
+}
+
+#new-slide-button {
+    height: 63px;
+    width: 112px;
+    margin: 0 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
 }
 </style>

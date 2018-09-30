@@ -1,6 +1,8 @@
 /* tslint:disable */
 <template>
-<div id="slide-preview" :style="{ border: `1px solid ${this.active ? $store.getters.theme.information : $store.getters.theme.tertiary }` }" @click="$store.commit('setActiveSlide', id)"></div>
+<transition name="slide-preview">
+    <div id="slide-preview" :style="style" @click="$store.commit('setActiveSlide', id)"></div>
+</transition>
 </template>
 
 <script lang="ts">
@@ -14,6 +16,12 @@ export default class SlidePreview extends Vue {
 
     @Prop({ type: Boolean, default: false })
     public active?: boolean;
+
+    get style(): any {
+        return {
+            border: `1px solid ${this.active ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`
+        };
+    }
 }
 /* tslint:disable */
 </script>

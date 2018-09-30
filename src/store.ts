@@ -42,6 +42,13 @@ export default new Vuex.Store({
 
             return state.slides[0];
         },
+        lastSlide: (state): SlideModel => {
+            if (state.slides.length === 0) {
+                console.error("There are 0 slides");
+            }
+
+            return state.slides[state.slides.length - 1];
+        },
         activeSlide: (state): SlideModel | undefined => {
             return state.slides.length === 0 ? undefined : Utilities.getSlide(state.slides, state.activeSlideId);
         },

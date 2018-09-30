@@ -2,9 +2,9 @@
 <template>
 <div id="toolbox" :style="{ borderRight: `1px solid ${$store.getters.theme.tertiary}`}">
     <tool @tool-click="shapeToolClickHandler"></tool>
-    <tool @tool-click="slideToolClickHandler"></tool>
     <tool @tool-click="textboxToolClickHandler"></tool>
     <tool @tool-click="exportToolClickHandler"></tool>
+    <tool></tool>
     <tool></tool>
 </div>
 </template>
@@ -24,10 +24,6 @@ import SlideModel from "../models/SlideModel";
 export default class Toolbox extends Vue {
     public shapeToolClickHandler(): void {
         this.$store.commit("addShapeToSlideWithId", this.$store.getters.activeSlide.id);
-    }
-
-    public slideToolClickHandler(): void {
-        this.$store.commit("addSlideAfterSlideWithId", this.$store.getters.activeSlide.id);
     }
 
     public textboxToolClickHandler(): void {
