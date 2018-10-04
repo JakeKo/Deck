@@ -1,13 +1,13 @@
 /* tslint:disable */
 <template>
-<div id="roadmap" :style="{ height: `${height}px`, borderTop: `1px solid ${$store.getters.theme.tertiary}` }">
-    <div id="zone" @mousedown="bindResize"></div>
+<div id="roadmap" :style="roadmapStyle">
+    <div class="stretcher-vertical top" @mousedown="startStretch"></div>
     <div id="slide-previews">
         <slide-preview
-            v-for="(slide, index) in $store.state.slides"
+            v-for="(slide) in $store.state.slides"
             :active="$store.getters.activeSlide.id === slide.id"
             :id="slide.id"
-            :key="index">
+            :key="slide.id">
         </slide-preview>
         <div id="new-slide-button" @click="newSlideHandler" :style="newSlideButtonStyle">+</div>
     </div>
@@ -27,6 +27,13 @@ import SlidePreview from "./SlidePreview.vue";
 export default class Roadmap extends Vue {
     private height: number = this.$store.getters.roadmapHeight;
 
+    get roadmapStyle(): any {
+        return {
+            height: `${this.height}px`,
+            borderTop: `1px solid ${this.$store.getters.theme.tertiary}`
+        };
+    }
+
     get newSlideButtonStyle(): any {
         return {
             border: `1px solid ${this.$store.getters.theme.tertiary}`,
@@ -35,24 +42,23 @@ export default class Roadmap extends Vue {
         };
     }
 
-    private bindResize(event: Event): void {
+    private startStretch(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        document.addEventListener("mousemove", this.mouseMoveHandler);
-        document.addEventListener("mouseup", this.unbindResize);
+        document.addEventListener("mousemove", this.previewStretch);
+        document.addEventListener("mouseup", this.endStretch);
     }
 
-    private unbindResize(event: Event): void {
+    private previewStretch(event: any): void {
+        this.height = window.innerHeight - event.pageY;
+    }
+
+    private endStretch(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
         this.$store.commit("setRoadmapHeight", this.height);
-        document.removeEventListener("mousemove", this.mouseMoveHandler);
-        document.removeEventListener("mouseup", this.unbindResize);
-    }
-
-    private mouseMoveHandler(event: any): void {
-        // Event is any type because pageY is not defined on Event
-        this.height = window.innerHeight - event.pageY;
+        document.removeEventListener("mousemove", this.previewStretch);
+        document.removeEventListener("mouseup", this.endStretch);
     }
 
     private newSlideHandler(event: Event): void {
@@ -63,6 +69,8 @@ export default class Roadmap extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import "../styles/components";
+
 #roadmap {
     flex-shrink: 0;
     overflow-x: scroll;
@@ -80,14 +88,6 @@ export default class Roadmap extends Vue {
 
 ::-webkit-scrollbar { 
     display: none; 
-}
-
-#zone {
-    position: absolute;
-    width: 100%;
-    height: 6px;
-    transform: translateY(-50%);
-    cursor: ns-resize;
 }
 
 #new-slide-button {

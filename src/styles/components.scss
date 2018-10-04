@@ -1,0 +1,33 @@
+.stretcher-vertical {
+    position: absolute;
+    height: 6px;
+    width: 100%;
+    z-index: 100;
+    transform: translateY(-50%);
+    cursor: ns-resize;
+}
+
+.stretcher-horizontal {
+    position: absolute;
+    height: 100%;
+    width: 6px;
+    z-index: 100;
+    transform: translateX(-50%);
+    cursor: ew-resize;
+}
+
+.top {
+    top: 0;
+}
+
+.bottom {
+    top: 100%;
+}
+
+.left {
+    left: 0;
+}
+
+.right {
+    left: 100%;
+}

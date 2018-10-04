@@ -1,10 +1,10 @@
 /* tslint:disable */
 <template>
 <div id="style-editor" :style="styleEditorStyle">
-    <div id="zone" @mousedown="bindResize"></div>
+    <div class="stretcher-horizontal left" @mousedown="startStretch"></div>
     <textarea id="editor" v-model="content" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <div id="submit-button-container">
-        <button id="submit-button" :style="{ background: $store.getters.theme.tertiary }" @click="submit">Apply</button>
+        <button id="submit-button" :style="submitButtonStyle" @click="submit">Apply</button>
     </div>
 </div>
 </template>
@@ -18,24 +18,37 @@ export default class StyleEditor extends Vue {
     private content: string = "";
     private width: number = this.$store.getters.styleEditorWidth;
 
-    private bindResize(event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-        document.addEventListener("mousemove", this.mouseMoveHandler);
-        document.addEventListener("mouseup", this.unbindResize);
+    get styleEditorStyle(): any {
+        return {
+            background: this.$store.getters.theme.primary,
+            borderLeft: `1px solid ${this.$store.getters.theme.tertiary}`,
+            minWidth: `${this.width}px`
+        };
     }
 
-    private unbindResize(event: Event): void {
+    get submitButtonStyle(): any {
+        return {
+            background: this.$store.getters.theme.tertiary
+        };
+    }
+
+    private startStretch(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        document.addEventListener("mousemove", this.previewStretch);
+        document.addEventListener("mouseup", this.endStretch);
+    }
+
+    private previewStretch(event: any): void {
+        this.width = window.innerWidth - event.pageX;
+    }
+
+    private endStretch(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
         this.$store.commit("setStyleEditorWidth", this.width);
-        document.removeEventListener("mousemove", this.mouseMoveHandler);
-        document.removeEventListener("mouseup", this.unbindResize);
-    }
-
-    private mouseMoveHandler(event: any): void {
-        // Event is any type because pageX is not defined on Event
-        this.width = window.innerWidth - event.pageX;
+        document.removeEventListener("mousemove", this.previewStretch);
+        document.removeEventListener("mouseup", this.endStretch);
     }
 
     private submit(event: Event): void {
@@ -48,34 +61,21 @@ export default class StyleEditor extends Vue {
     public resetStyleEditor(content: string): void {
         this.content = content;
     }
-
-    get styleEditorStyle(): any {
-        return {
-            "background": this.$store.getters.theme.primary,
-            "border-left": `1px solid ${this.$store.getters.theme.tertiary}`,
-            "min-width": `${this.width}px`
-        };
-    }
 }
 /* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
+@import "../styles/components";
+
 #style-editor {
     position: relative;
-}
-
-#zone {
-    position: absolute;
-    height: 100%;
-    width: 6px;
-    transform: translateX(-50%);
-    cursor: ew-resize;
+    display: flex;
+    flex-direction: column;
 }
 
 #editor {
-    width: 100%;
-    height: calc(100% - 96px);
+    flex-grow: 1;
     border: none;
     outline: none;
 }

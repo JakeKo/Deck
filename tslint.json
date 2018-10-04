@@ -27,10 +27,6 @@
             "always-prefix"
         ],
 		"jsdoc-format": true,
-		"max-classes-per-file": [
-			true,
-			1
-		],
 		"member-access": true,
 		"new-parens": true,
 		"no-conditional-assignment": true,
