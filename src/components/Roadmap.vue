@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="roadmap" :style="roadmapStyle">
-    <div class="stretcher-vertical top" @mousedown="startStretch"></div>
+    <div class="stretcher-vertical top" :style="stretcherStyle" @mousedown="startStretch"></div>
     <div id="slide-previews">
         <slide-preview
             v-for="(slide) in $store.state.slides"
@@ -26,11 +26,18 @@ import SlidePreview from "./SlidePreview.vue";
 })
 export default class Roadmap extends Vue {
     private height: number = this.$store.getters.roadmapHeight;
+    private stretcherHeight: number = 6;
 
     get roadmapStyle(): any {
         return {
             height: `${this.height}px`,
             borderTop: `1px solid ${this.$store.getters.theme.tertiary}`
+        };
+    }
+
+    get stretcherStyle(): any {
+        return {
+            height: `${this.stretcherHeight}px`
         };
     }
 
@@ -45,20 +52,26 @@ export default class Roadmap extends Vue {
     private startStretch(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        document.addEventListener("mousemove", this.previewStretch);
-        document.addEventListener("mouseup", this.endStretch);
+        event.currentTarget!.addEventListener("mousemove", this.previewStretch);
+        event.currentTarget!.addEventListener("mouseup", this.endStretch);
+
+        this.stretcherHeight = window.innerHeight * 2;
     }
 
     private previewStretch(event: any): void {
+        event.preventDefault();
+        event.stopPropagation();
         this.height = window.innerHeight - event.pageY;
     }
 
     private endStretch(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
+        event.currentTarget!.removeEventListener("mousemove", this.previewStretch);
+        event.currentTarget!.removeEventListener("mouseup", this.endStretch);
+
+        this.stretcherHeight = 6;
         this.$store.commit("setRoadmapHeight", this.height);
-        document.removeEventListener("mousemove", this.previewStretch);
-        document.removeEventListener("mouseup", this.endStretch);
     }
 
     private newSlideHandler(event: Event): void {
@@ -73,17 +86,18 @@ export default class Roadmap extends Vue {
 
 #roadmap {
     flex-shrink: 0;
-    overflow-x: scroll;
     position: relative;
     max-height: 256px;
 }
 
 #slide-previews {
     height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
-    position: absolute;
     padding: 0 12px;
+    box-sizing: border-box;
+    overflow-x: scroll;
 }
 
 ::-webkit-scrollbar { 

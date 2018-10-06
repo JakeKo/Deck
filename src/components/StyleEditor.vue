@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="style-editor" :style="styleEditorStyle">
-    <div class="stretcher-horizontal left" @mousedown="startStretch"></div>
+    <div class="stretcher-horizontal left" :style="stretcherStyle" @mousedown="startStretch"></div>
     <textarea id="editor" v-model="content" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <div id="submit-button-container">
         <button id="submit-button" :style="submitButtonStyle" @click="submit">Apply</button>
@@ -17,6 +17,7 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 export default class StyleEditor extends Vue {
     private content: string = "";
     private width: number = this.$store.getters.styleEditorWidth;
+    private stretcherWidth: number = 6;
 
     get styleEditorStyle(): any {
         return {
@@ -32,23 +33,35 @@ export default class StyleEditor extends Vue {
         };
     }
 
+    get stretcherStyle(): any {
+        return {
+            width: `${this.stretcherWidth}px`
+        };
+    }
+
     private startStretch(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        document.addEventListener("mousemove", this.previewStretch);
-        document.addEventListener("mouseup", this.endStretch);
+        event.currentTarget!.addEventListener("mousemove", this.previewStretch);
+        event.currentTarget!.addEventListener("mouseup", this.endStretch);
+
+        this.stretcherWidth = window.innerWidth * 2;
     }
 
     private previewStretch(event: any): void {
+        event.preventDefault();
+        event.stopPropagation();
         this.width = window.innerWidth - event.pageX;
     }
 
     private endStretch(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
+        event.currentTarget!.removeEventListener("mousemove", this.previewStretch);
+        event.currentTarget!.removeEventListener("mouseup", this.endStretch);
+
+        this.stretcherWidth = 6;
         this.$store.commit("setStyleEditorWidth", this.width);
-        document.removeEventListener("mousemove", this.previewStretch);
-        document.removeEventListener("mouseup", this.endStretch);
     }
 
     private submit(event: Event): void {

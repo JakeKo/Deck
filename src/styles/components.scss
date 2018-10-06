@@ -1,6 +1,5 @@
 .stretcher-vertical {
     position: absolute;
-    height: 6px;
     width: 100%;
     z-index: 100;
     transform: translateY(-50%);
@@ -10,7 +9,6 @@
 .stretcher-horizontal {
     position: absolute;
     height: 100%;
-    width: 6px;
     z-index: 100;
     transform: translateX(-50%);
     cursor: ew-resize;
