@@ -19,7 +19,7 @@ export default new Vuex.Store({
             width: 4000
         },
         styleEditor: {
-            width: 300
+            width: 500
         },
         roadmap: {
             height: 96
