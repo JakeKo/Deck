@@ -15,6 +15,70 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 import StyleModel from "../models/StyleModel";
 import TextboxStyleModel from "../models/TextboxStyleModel";
 
+function span(innerText: string): HTMLDivElement {
+    const element = document.createElement("div");
+    element.innerText = innerText;
+    return element;
+}
+
+function space(): HTMLDivElement {
+    const element: HTMLDivElement = document.createElement("div");
+    element.style.width = "7px";
+    return element;
+}
+
+function lineNumber(number: number): HTMLDivElement[] {
+    const elements: HTMLDivElement[] = [];
+    const lineNumberWidth = 2;
+    const padSize = lineNumberWidth - number.toString().length;
+    
+    for (let i = 0; i < padSize; i++) {
+        elements.push(space());
+    }
+
+    elements.push(span(number.toString()));
+    elements.push(span("|"));
+    elements.push(space());
+
+    return elements;
+}
+
+function line(number: number, indentDepth: number, elements: HTMLSpanElement[]): HTMLDivElement {
+    const line = document.createElement("div");
+    line.style.display = "flex";
+    
+    lineNumber(number).forEach((element: HTMLDivElement) => {
+        line.appendChild(element);
+    });
+
+    for (let i = 0; i < 4 * indentDepth; i++) {
+        line.appendChild(space());
+    }
+
+    elements.forEach((element) => {
+        line.appendChild(element);
+    });
+
+    return line;
+}
+
+// padStart polyfill
+function padStart(base: string, targetLength: number, padString: string): string {
+    if (base.length >= targetLength) {
+        return base;
+    }
+
+    targetLength -= base.length;
+
+    if (targetLength > padString.length) {
+         for (let i = 0; i < targetLength / padString.length; i++) {
+             padString += padString;
+         }
+    }
+
+    return padString.slice(0, targetLength) + base;
+};
+
 @Component
 export default class StyleEditor extends Vue {
     private content: string = "";
@@ -84,44 +148,25 @@ export default class StyleEditor extends Vue {
         let lineCount: number = 0;
 
         // Convenient constants
-        const tab = this.span("    "), colon = this.span(": "), comma = this.span(",");
+        const colon = span(": "), comma = span(",");
 
         if (styleModel === undefined) {
             document.getElementById("style-editor-content")!.innerHTML = "";
         }
 
-        document.appendChild(this.line(lineCount, [this.span("{")]));
+        html.appendChild(line(lineCount, 0, [span("{")]));
         lineCount++;
 
         for (const property in styleModel) {
-            if (styleModel.hasOwnProperty(property)) {
-                const line = this.line(lineCount, [tab, this.span(property), colon, this.span(styleModel[property]), comma]);
-                document.appendChild(line);
-                lineCount++;
-            }
+            const elements: HTMLDivElement[] = [span(property), colon, space(), span(styleModel[property]), comma];
+            const lineElement = line(lineCount, 1, elements);
+            html.appendChild(lineElement);
+            lineCount++;
         }
 
-        document.appendChild(this.line(lineCount, [this.span("}")]));
+        html.appendChild(line(lineCount, 0, [span("}")]));
 
         document.getElementById("style-editor-content")!.innerHTML = html.outerHTML;
-    }
-
-    private span(innerText: string): HTMLSpanElement {
-        const element = document.createElement("span");
-        element.innerText = innerText;
-        return element;
-    }
-
-    private line(number: number, elements: HTMLSpanElement[]): HTMLDivElement {
-        const line = document.createElement("div");
-        const numberString: String = number.toString();
-        line.appendChild(this.span(numberString.padStart(4, " ")));
-
-        elements.forEach((element) => {
-            line.appendChild(element);
-        });
-
-        return line;
     }
 }
 /* tslint:disable */
@@ -136,10 +181,11 @@ export default class StyleEditor extends Vue {
     flex-direction: column;
 }
 
-#editor {
+#style-editor-content {
     flex-grow: 1;
     border: none;
     outline: none;
+    font-family: monospace;
 }
 
 #submit-button-container {
