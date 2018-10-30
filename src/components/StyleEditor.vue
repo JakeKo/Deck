@@ -12,8 +12,8 @@
 <script lang="ts">
 /* tslint:enable */
 import { Vue, Component, Prop } from "vue-property-decorator";
-import StyleModel from "../models/StyleModel";
-import TextboxStyleModel from "../models/TextboxStyleModel";
+import TextboxModel from "../models/TextboxModel";
+import ShapeModel from "../models/ShapeModel";
 
 function span(innerText: string): HTMLDivElement {
     const element = document.createElement("div");
@@ -76,25 +76,39 @@ function padStart(base: string, targetLength: number, padString: string): string
 }
 function objectToHtml(object: any, lineCount: number, indentDepth: number): HTMLDivElement[] {
     const lines: HTMLDivElement[] = [];
-
+    const actualPropertyCount = Object.keys(object).length - 1;
+    let propertyCount = 0;
+    
     for (const property in object) {
         const value = object[property];
 
         if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") {
-            const elements: HTMLDivElement[] = [span(property), span(":"), space(), span(value.toString()), span(",")];
+            const elements: HTMLDivElement[] = [span(property), span(":"), space(), span(value.toString())];
+            if (propertyCount < actualPropertyCount) {
+                elements.push(span(","));
+            }
+
             lines.push(line(lineCount, indentDepth, elements));
             lineCount++;
         } else if (typeof value === "object") {
             lines.push(line(lineCount, indentDepth, [span(property), span(":"), space(), span("{")]));
             lineCount++;
 
+            // Recursively cast child objects to html
             const propertyLines: HTMLDivElement[] = objectToHtml(value, lineCount, indentDepth + 1);
             propertyLines.forEach((line: HTMLDivElement) => lines.push(line));
             lineCount += propertyLines.length;
 
-            lines.push(line(lineCount, indentDepth, [span("}"), span(",")]));
+            const elements = [span("}")];
+            if (propertyCount < actualPropertyCount) {
+                elements.push(span(","));
+            }
+
+            lines.push(line(lineCount, indentDepth, elements));
             lineCount++;
         }
+
+        propertyCount++;
     }
 
     return lines;
@@ -158,7 +172,7 @@ export default class StyleEditor extends Vue {
         focusedElement.fromJson(this.content);
     }
 
-    public resetStyleEditor(json: any): void {
+    public resetStyleEditor(json: ShapeModel | TextboxModel): void {
         const lines: HTMLDivElement[] = objectToHtml({ shape: json }, 0, 0);
         const element: HTMLDivElement | null = this.$el.querySelector("#style-editor-content");
         lines.forEach((line: HTMLDivElement) => element!.appendChild(line));
