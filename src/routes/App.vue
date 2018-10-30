@@ -30,7 +30,7 @@ export default class App extends Vue {
     private setFocusedElement(id: string): void {
         this.$store.commit("setFocusedElement", id);
         const styleEditor: any = this.$refs.styleEditor;
-        styleEditor.resetStyleEditor(this.$store.getters.focusedElement.toJson());
+        styleEditor.resetStyleEditor(this.$store.getters.focusedElement);
     }
 }
 /* tslint:disable */

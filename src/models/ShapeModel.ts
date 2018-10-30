@@ -6,10 +6,7 @@ import ISlideElement from "./ISlideElement";
 export default class ShapeModel implements ISlideElement {
     public id: string;
     public styleModel: StyleModel;
-
-    private _points: Point[];
-    public get points(): Point[] { return this._points; }
-    public set points(value: Point[]) { this._points = value; }
+    public points: Point[];
 
     constructor(
         { id, styleModel, points }:
@@ -17,17 +14,7 @@ export default class ShapeModel implements ISlideElement {
     ) {
         this.id = id || GenerateId();
         this.styleModel = styleModel || new StyleModel();
-        this._points = points || new Array<Point>();
-    }
-
-    public toJson(): string {
-        return `
-{
-    "points": [ ${this.points.map((point: Point) => point.toJson()).join(", ")} ],
-    "fill": "${this.styleModel.fill}",
-    "stroke": "${this.styleModel.stroke}",
-    "strokeWidth": "${this.styleModel.strokeWidth}"
-}`;
+        this.points = points || new Array<Point>();
     }
 
     public fromJson(jsonString: string): void {

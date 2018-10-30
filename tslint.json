@@ -16,7 +16,7 @@
 			"check-space"
 		],
 		"curly": true,
-		"eofline": true,
+        "eofline": true,
 		"import-spacing": true,
 		"indent": [
 			true,

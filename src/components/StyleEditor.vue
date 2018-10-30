@@ -29,9 +29,8 @@ function space(): HTMLDivElement {
 
 function lineNumber(number: number): HTMLDivElement[] {
     const elements: HTMLDivElement[] = [];
-    const lineNumberWidth = 2;
-    const padSize = lineNumberWidth - number.toString().length;
-    
+    const padSize = 4 - number.toString().length;
+
     for (let i = 0; i < padSize; i++) {
         elements.push(space());
     }
@@ -43,41 +42,63 @@ function lineNumber(number: number): HTMLDivElement[] {
     return elements;
 }
 
-function line(number: number, indentDepth: number, elements: HTMLSpanElement[]): HTMLDivElement {
+// Wraps a collection of blocks into a line, complete with a line number
+function line(number: number, indentDepth: number, elements: HTMLDivElement[]): HTMLDivElement {
     const line = document.createElement("div");
     line.style.display = "flex";
-    
-    lineNumber(number).forEach((element: HTMLDivElement) => {
-        line.appendChild(element);
-    });
 
-    for (let i = 0; i < 4 * indentDepth; i++) {
+    // Add the line number, indent, then append elements
+    lineNumber(number).forEach((element: HTMLDivElement) => line.appendChild(element));
+
+    for (let i = 0; i < indentDepth * 2; i++) {
         line.appendChild(space());
     }
 
-    elements.forEach((element) => {
-        line.appendChild(element);
-    });
+    elements.forEach((element) => line.appendChild(element));
 
     return line;
 }
 
-// padStart polyfill
+// Pads the base string with the given padString on the left so the result is targetLength long
 function padStart(base: string, targetLength: number, padString: string): string {
     if (base.length >= targetLength) {
         return base;
     }
 
     targetLength -= base.length;
-
     if (targetLength > padString.length) {
-         for (let i = 0; i < targetLength / padString.length; i++) {
-             padString += padString;
-         }
+        for (let i = 0; i < targetLength / padString.length; i++) {
+            padString += padString;
+        }
     }
 
     return padString.slice(0, targetLength) + base;
-};
+}
+function objectToHtml(object: any, lineCount: number, indentDepth: number): HTMLDivElement[] {
+    const lines: HTMLDivElement[] = [];
+
+    for (const property in object) {
+        const value = object[property];
+
+        if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") {
+            const elements: HTMLDivElement[] = [span(property), span(":"), space(), span(value.toString()), span(",")];
+            lines.push(line(lineCount, indentDepth, elements));
+            lineCount++;
+        } else if (typeof value === "object") {
+            lines.push(line(lineCount, indentDepth, [span(property), span(":"), space(), span("{")]));
+            lineCount++;
+
+            const propertyLines: HTMLDivElement[] = objectToHtml(value, lineCount, indentDepth + 1);
+            propertyLines.forEach((line: HTMLDivElement) => lines.push(line));
+            lineCount += propertyLines.length;
+
+            lines.push(line(lineCount, indentDepth, [span("}"), span(",")]));
+            lineCount++;
+        }
+    }
+
+    return lines;
+}
 
 @Component
 export default class StyleEditor extends Vue {
@@ -137,36 +158,10 @@ export default class StyleEditor extends Vue {
         focusedElement.fromJson(this.content);
     }
 
-    public resetStyleEditor(content: string): void {
-        this.jsonToHtml(JSON.parse(content));
-    }
-
-    private jsonToHtml(styleModel: StyleModel | TextboxStyleModel): void {
-        const html: HTMLDivElement = document.createElement("div");
-
-        // Yes, we zero-index our line numbers
-        let lineCount: number = 0;
-
-        // Convenient constants
-        const colon = span(": "), comma = span(",");
-
-        if (styleModel === undefined) {
-            document.getElementById("style-editor-content")!.innerHTML = "";
-        }
-
-        html.appendChild(line(lineCount, 0, [span("{")]));
-        lineCount++;
-
-        for (const property in styleModel) {
-            const elements: HTMLDivElement[] = [span(property), colon, space(), span(styleModel[property]), comma];
-            const lineElement = line(lineCount, 1, elements);
-            html.appendChild(lineElement);
-            lineCount++;
-        }
-
-        html.appendChild(line(lineCount, 0, [span("}")]));
-
-        document.getElementById("style-editor-content")!.innerHTML = html.outerHTML;
+    public resetStyleEditor(json: any): void {
+        const lines: HTMLDivElement[] = objectToHtml({ shape: json }, 0, 0);
+        const element: HTMLDivElement | null = this.$el.querySelector("#style-editor-content");
+        lines.forEach((line: HTMLDivElement) => element!.appendChild(line));
     }
 }
 /* tslint:disable */
