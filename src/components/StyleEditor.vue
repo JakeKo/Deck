@@ -2,7 +2,13 @@
 <template>
 <div id="style-editor" :style="styleEditorStyle">
     <div class="stretcher-horizontal left" :style="stretcherStyle" @mousedown="startStretch"></div>
-    <div id="style-editor-content"> </div>
+    <div id="style-editor-content">
+        <editor-line
+            v-for="editorLineModel in editorLineModels"
+            :editorBlocks="editorLineModel.editorBlocks"
+            :key="editorLineModel.id">
+        </editor-line>
+    </div>
     <div id="submit-button-container">
         <button id="submit-button" :style="submitButtonStyle" @click="submit">Apply</button>
     </div>
@@ -11,24 +17,23 @@
 
 <script lang="ts">
 /* tslint:enable */
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component } from "vue-property-decorator";
 import TextboxModel from "../models/TextboxModel";
 import ShapeModel from "../models/ShapeModel";
+import EditorLineModel from "../models/EditorLineModel";
+import EditorBlockModel from "../models/EditorBlockModel";
+import EditorLine from "./EditorLine.vue";
 
-function span(innerText: string): HTMLDivElement {
-    const element = document.createElement("div");
-    element.innerText = innerText;
-    return element;
+function span(innerText: string): EditorBlockModel {
+    return new EditorBlockModel({ content: innerText });
 }
 
-function space(): HTMLDivElement {
-    const element: HTMLDivElement = document.createElement("div");
-    element.style.width = "7px";
-    return element;
+function space(): EditorBlockModel {
+    return new EditorBlockModel({ style: { width: "7px" }});
 }
 
-function lineNumber(number: number): HTMLDivElement[] {
-    const elements: HTMLDivElement[] = [];
+function lineNumber(number: number): EditorBlockModel[] {
+    const elements: EditorBlockModel[] = [];
     const padSize = 4 - number.toString().length;
 
     for (let i = 0; i < padSize; i++) {
@@ -43,47 +48,31 @@ function lineNumber(number: number): HTMLDivElement[] {
 }
 
 // Wraps a collection of blocks into a line, complete with a line number
-function line(number: number, indentDepth: number, elements: HTMLDivElement[]): HTMLDivElement {
-    const line = document.createElement("div");
-    line.style.display = "flex";
+function line(number: number, indentDepth: number, elements: EditorBlockModel[]): EditorLineModel {
+    const line: EditorLineModel = new EditorLineModel();
 
     // Add the line number, indent, then append elements
-    lineNumber(number).forEach((element: HTMLDivElement) => line.appendChild(element));
+    lineNumber(number).forEach((element: EditorBlockModel) => line.addBlock(element));
 
     for (let i = 0; i < indentDepth * 2; i++) {
-        line.appendChild(space());
+        line.addBlock(space());
     }
 
-    elements.forEach((element) => line.appendChild(element));
+    elements.forEach((element: EditorBlockModel) => line.addBlock(element));
 
     return line;
 }
 
-// Pads the base string with the given padString on the left so the result is targetLength long
-function padStart(base: string, targetLength: number, padString: string): string {
-    if (base.length >= targetLength) {
-        return base;
-    }
-
-    targetLength -= base.length;
-    if (targetLength > padString.length) {
-        for (let i = 0; i < targetLength / padString.length; i++) {
-            padString += padString;
-        }
-    }
-
-    return padString.slice(0, targetLength) + base;
-}
-function objectToHtml(object: any, lineCount: number, indentDepth: number): HTMLDivElement[] {
-    const lines: HTMLDivElement[] = [];
+function objectToHtml(object: any, lineCount: number, indentDepth: number): EditorLineModel[] {
+    const lines: EditorLineModel[] = [];
     const actualPropertyCount = Object.keys(object).length - 1;
     let propertyCount = 0;
-    
+
     for (const property in object) {
         const value = object[property];
 
         if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") {
-            const elements: HTMLDivElement[] = [span(property), span(":"), space(), span(value.toString())];
+            const elements: EditorBlockModel[] = [span(property), span(":"), space(), span(value.toString())];
             if (propertyCount < actualPropertyCount) {
                 elements.push(span(","));
             }
@@ -95,8 +84,8 @@ function objectToHtml(object: any, lineCount: number, indentDepth: number): HTML
             lineCount++;
 
             // Recursively cast child objects to html
-            const propertyLines: HTMLDivElement[] = objectToHtml(value, lineCount, indentDepth + 1);
-            propertyLines.forEach((line: HTMLDivElement) => lines.push(line));
+            const propertyLines: EditorLineModel[] = objectToHtml(value, lineCount, indentDepth + 1);
+            propertyLines.forEach((line: EditorLineModel) => lines.push(line));
             lineCount += propertyLines.length;
 
             const elements = [span("}")];
@@ -114,11 +103,16 @@ function objectToHtml(object: any, lineCount: number, indentDepth: number): HTML
     return lines;
 }
 
-@Component
+@Component({
+    components: {
+        EditorLine
+    }
+})
 export default class StyleEditor extends Vue {
     private content: string = "";
     private width: number = this.$store.getters.styleEditorWidth;
     private stretcherWidth: number = 6;
+    private editorLineModels: EditorLineModel[] = [];
 
     get styleEditorStyle(): any {
         return {
@@ -173,9 +167,7 @@ export default class StyleEditor extends Vue {
     }
 
     public resetStyleEditor(json: ShapeModel | TextboxModel): void {
-        const lines: HTMLDivElement[] = objectToHtml({ shape: json }, 0, 0);
-        const element: HTMLDivElement | null = this.$el.querySelector("#style-editor-content");
-        lines.forEach((line: HTMLDivElement) => element!.appendChild(line));
+        this.editorLineModels = objectToHtml({ shape: json }, 0, 0);
     }
 }
 /* tslint:disable */
