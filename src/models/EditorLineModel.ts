@@ -1,5 +1,5 @@
 import EditorBlockModel from "./EditorBlockModel";
-import Utilities from "../utilities/Utilities";
+import Utilities from "../Utilities";
 
 export default class EditorLineModel {
     public id: string;

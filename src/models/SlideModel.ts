@@ -1,4 +1,4 @@
-import Utilities from "../utilities/Utilities";
+import Utilities from "../Utilities";
 import ISlideElement from "./ISlideElement";
 
 export default class SlideModel {

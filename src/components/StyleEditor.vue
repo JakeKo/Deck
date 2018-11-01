@@ -22,7 +22,7 @@ import TextboxModel from "../models/TextboxModel";
 import ShapeModel from "../models/ShapeModel";
 import EditorLineModel from "../models/EditorLineModel";
 import EditorLine from "./EditorLine.vue";
-import Utilities from "../utilities/Utilities";
+import Utilities from "../Utilities";
 
 @Component({
     components: {

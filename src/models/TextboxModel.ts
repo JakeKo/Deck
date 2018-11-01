@@ -1,4 +1,4 @@
-import Utilities from "../utilities/Utilities";
+import Utilities from "../Utilities";
 import TextboxStyleModel from "./TextboxStyleModel";
 import ISlideElement from "./ISlideElement";
 

@@ -1,4 +1,4 @@
-import Utilities from "../utilities/Utilities";
+import Utilities from "../Utilities";
 import StyleModel from "./StyleModel";
 import Point from "./Point";
 import ISlideElement from "./ISlideElement";

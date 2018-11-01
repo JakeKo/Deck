@@ -4,9 +4,8 @@ import ShapeModel from "./models/ShapeModel";
 import SlideModel from "./models/SlideModel";
 import TextboxModel from "./models/TextboxModel";
 import Point from "./models/Point";
-import * as Utilities from "./utilities/store";
+import Utilities from "./Utilities";
 import ISlideElement from "./models/ISlideElement";
-import Deck from "./utilities/deck";
 import Theme from "./models/Theme";
 
 Vue.use(Vuex);
@@ -175,7 +174,7 @@ export default new Vuex.Store({
 
             html.appendChild(body);
 
-            const deck = `${html.outerHTML}${Deck}`;
+            const deck = `${html.outerHTML}${Utilities.deckScript()}`;
             const url: string = `data:text/html;charset=UTF-8,${encodeURIComponent(deck)}`;
             const anchor: HTMLElement = document.createElement("a");
             anchor.setAttribute("href", url);
