@@ -17,16 +17,9 @@ export default class ShapeModel implements ISlideElement {
         this.points = points || new Array<Point>();
     }
 
-    public fromJson(jsonString: string): void {
-        const json: any = JSON.parse(jsonString);
-
-        this.points = [];
-        json.points.forEach((point: { x: number, y: number }) => {
-            this.points.push(new Point(point.x, point.y));
-        });
-
-        this.styleModel.fill = json.fill || "white";
-        this.styleModel.stroke = json.stroke || "grey";
-        this.styleModel.strokeWidth = json.strokeWidth || "1";
+    public reset(model: any): void {
+        // Note: Do not reset the id
+        this.styleModel = new StyleModel(model.styleModel);
+        this.points = Object.keys(model.points).map((key) => new Point(Number(model.points[key].x), Number(model.points[key].y)));
     }
 }

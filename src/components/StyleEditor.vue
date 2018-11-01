@@ -82,8 +82,10 @@ export default class StyleEditor extends Vue {
     private submit(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        console.log(this.$store.getters.focusedElement);
-        // TODO: Export data in style editor to element style
+
+        // TODO: More robust handling of array to and from json
+        const json = Utilities.htmlToObject(this.editorLineModels).shape;
+        this.$store.getters.focusedElement.reset(json);
     }
 
     public resetStyleEditor(json: ShapeModel | TextboxModel): void {

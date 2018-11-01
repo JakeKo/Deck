@@ -3,7 +3,8 @@ import EditorBlockModel from "../models/EditorBlockModel";
 
 export default {
     generateId,
-    objectToHtml
+    objectToHtml,
+    htmlToObject
 };
 
 function generateId(): string {
@@ -88,4 +89,23 @@ function objectToHtml(object: any, lineCount: number, indentDepth: number): Edit
     }
 
     return lines;
+}
+
+function htmlToObject(lines: EditorLineModel[]): any {
+    let objectString: string = "{";
+
+    lines.forEach((line) => {
+        // TODO: More robust ignorance of line numbers
+        line.editorBlocks.slice(5).forEach((block) => {
+            // TODO: More robust detection of properties that need quotes
+            if (block.content === ":" || block.content === "{" || block.content === "}" || block.content === "" || block.content === ",") {
+                objectString += block.content;
+            } else {
+                objectString += `"${block.content}"`;
+            }
+        });
+    });
+
+    objectString += "}";
+    return JSON.parse(objectString);
 }
