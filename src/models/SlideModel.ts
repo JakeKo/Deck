@@ -1,4 +1,4 @@
-import { GenerateId } from "../utilities/models";
+import Utilities from "../utilities/Utilities";
 import ISlideElement from "./ISlideElement";
 
 export default class SlideModel {
@@ -10,7 +10,7 @@ export default class SlideModel {
         { id, elements, focusedElementId }:
         { id?: string, elements?: ISlideElement[], focusedElementId?: string } = { }
     ) {
-        this.id = id || GenerateId();
+        this.id = id || Utilities.generateId();
         this.elements = elements || [];
         this.focusedElementId = focusedElementId || "";
     }

@@ -1,4 +1,4 @@
-import { GenerateId } from "../utilities/models";
+import Utilities from "../utilities/Utilities";
 
 export default class EditorBlockModel {
     public id: string;
@@ -9,7 +9,7 @@ export default class EditorBlockModel {
         { id, content, style }:
         { id?: string, content?: string, style?: any } = { }
     ) {
-        this.id = id || GenerateId();
+        this.id = id || Utilities.generateId();
         this.content = content || "";
         this.style = style || {};
     }

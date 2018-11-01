@@ -1,4 +1,4 @@
-import { GenerateId } from "../utilities/models";
+import Utilities from "../utilities/Utilities";
 import StyleModel from "./StyleModel";
 import Point from "./Point";
 import ISlideElement from "./ISlideElement";
@@ -12,7 +12,7 @@ export default class ShapeModel implements ISlideElement {
         { id, styleModel, points }:
         { id?: string, styleModel?: StyleModel, points?: Point[] } = { }
     ) {
-        this.id = id || GenerateId();
+        this.id = id || Utilities.generateId();
         this.styleModel = styleModel || new StyleModel();
         this.points = points || new Array<Point>();
     }

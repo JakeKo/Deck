@@ -25,7 +25,7 @@ export default class EditorLine extends Vue {
     @Prop({ type: Array, required: true })
     private editorBlocks?: EditorBlockModel[];
 
-    public addBlock(block: EditorBlockModel) {
+    public addBlock(block: EditorBlockModel): void {
         this.editorBlocks!.push(block);
     }
 }

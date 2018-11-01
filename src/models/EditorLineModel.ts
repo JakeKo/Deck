@@ -1,5 +1,5 @@
 import EditorBlockModel from "./EditorBlockModel";
-import { GenerateId } from "../utilities/models";
+import Utilities from "../utilities/Utilities";
 
 export default class EditorLineModel {
     public id: string;
@@ -9,7 +9,7 @@ export default class EditorLineModel {
         { id, editorBlocks }:
         { id?: string, editorBlocks?: EditorBlockModel[] } = { }
     ) {
-        this.id = id || GenerateId();
+        this.id = id || Utilities.generateId();
         this.editorBlocks = editorBlocks || [];
     }
 

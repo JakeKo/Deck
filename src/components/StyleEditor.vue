@@ -21,87 +21,8 @@ import { Vue, Component } from "vue-property-decorator";
 import TextboxModel from "../models/TextboxModel";
 import ShapeModel from "../models/ShapeModel";
 import EditorLineModel from "../models/EditorLineModel";
-import EditorBlockModel from "../models/EditorBlockModel";
 import EditorLine from "./EditorLine.vue";
-
-function span(innerText: string): EditorBlockModel {
-    return new EditorBlockModel({ content: innerText });
-}
-
-function space(): EditorBlockModel {
-    return new EditorBlockModel({ style: { width: "7px" }});
-}
-
-function lineNumber(number: number): EditorBlockModel[] {
-    const elements: EditorBlockModel[] = [];
-    const padSize = 4 - number.toString().length;
-
-    for (let i = 0; i < padSize; i++) {
-        elements.push(space());
-    }
-
-    elements.push(span(number.toString()));
-    elements.push(span("|"));
-    elements.push(space());
-
-    return elements;
-}
-
-// Wraps a collection of blocks into a line, complete with a line number
-function line(number: number, indentDepth: number, elements: EditorBlockModel[]): EditorLineModel {
-    const line: EditorLineModel = new EditorLineModel();
-
-    // Add the line number, indent, then append elements
-    lineNumber(number).forEach((element: EditorBlockModel) => line.addBlock(element));
-
-    for (let i = 0; i < indentDepth * 2; i++) {
-        line.addBlock(space());
-    }
-
-    elements.forEach((element: EditorBlockModel) => line.addBlock(element));
-
-    return line;
-}
-
-function objectToHtml(object: any, lineCount: number, indentDepth: number): EditorLineModel[] {
-    const lines: EditorLineModel[] = [];
-    const actualPropertyCount = Object.keys(object).length - 1;
-    let propertyCount = 0;
-
-    for (const property in object) {
-        const value = object[property];
-
-        if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") {
-            const elements: EditorBlockModel[] = [span(property), span(":"), space(), span(value.toString())];
-            if (propertyCount < actualPropertyCount) {
-                elements.push(span(","));
-            }
-
-            lines.push(line(lineCount, indentDepth, elements));
-            lineCount++;
-        } else if (typeof value === "object") {
-            lines.push(line(lineCount, indentDepth, [span(property), span(":"), space(), span("{")]));
-            lineCount++;
-
-            // Recursively cast child objects to html
-            const propertyLines: EditorLineModel[] = objectToHtml(value, lineCount, indentDepth + 1);
-            propertyLines.forEach((line: EditorLineModel) => lines.push(line));
-            lineCount += propertyLines.length;
-
-            const elements = [span("}")];
-            if (propertyCount < actualPropertyCount) {
-                elements.push(span(","));
-            }
-
-            lines.push(line(lineCount, indentDepth, elements));
-            lineCount++;
-        }
-
-        propertyCount++;
-    }
-
-    return lines;
-}
+import Utilities from "../utilities/Utilities";
 
 @Component({
     components: {
@@ -109,7 +30,6 @@ function objectToHtml(object: any, lineCount: number, indentDepth: number): Edit
     }
 })
 export default class StyleEditor extends Vue {
-    private content: string = "";
     private width: number = this.$store.getters.styleEditorWidth;
     private stretcherWidth: number = 6;
     private editorLineModels: EditorLineModel[] = [];
@@ -162,12 +82,12 @@ export default class StyleEditor extends Vue {
     private submit(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        const focusedElement = this.$store.getters.focusedElement;
-        focusedElement.fromJson(this.content);
+        console.log(this.$store.getters.focusedElement);
+        // TODO: Export data in style editor to element style
     }
 
     public resetStyleEditor(json: ShapeModel | TextboxModel): void {
-        this.editorLineModels = objectToHtml({ shape: json }, 0, 0);
+        this.editorLineModels = Utilities.objectToHtml({ shape: json }, 0, 0);
     }
 }
 /* tslint:disable */
