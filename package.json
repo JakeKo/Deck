@@ -66,6 +66,7 @@
 		"node-sass": "^4.9.1",
 		"nyc": "^12.0.2",
 		"sass-loader": "^7.0.3",
+		"svg.js": "^2.6.6",
 		"ts-loader": "^4.4.2",
 		"tslint": "^5.10.0",
 		"tslint-loader": "^3.6.0",

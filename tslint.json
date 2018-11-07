@@ -2,20 +2,21 @@
 	"defaultSeverity": "error",
 	"jsRules": {},
 	"rules": {
-		"semicolon": true,
-		"quotemark": {
-			"options": "double"
-		},
 		"adjacent-overload-signatures": true,
+        "align": true,
 		"arrow-parens": true,
 		"arrow-return-shorthand": true,
-		"binary-expression-operand-order": true,
+        "await-promise": true,
+        "ban-comma-operator": true,
+        "binary-expression-operand-order": true,
 		"class-name": true,
 		"comment-format": [
 			true,
 			"check-space"
 		],
+        "completed-docs": true,
 		"curly": true,
+        "deprecation": true,
         "eofline": true,
 		"import-spacing": true,
 		"indent": [
@@ -49,6 +50,10 @@
 		"prefer-for-of": true,
 		"prefer-function-over-method": true,
 		"prefer-template": true,
+		"quotemark": {
+			"options": "double"
+		},
+		"semicolon": true,
 		"use-isnan": true
 	},
 	"rulesDirectory": [],

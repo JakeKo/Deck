@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
-<div id="slide" :style="{ boxShadow: `0 0 4px 0 ${$store.getters.theme.tertiary}`, background: `${$store.getters.theme.primary}` }">
-    <svg>
+<div id="slide" :style="slideStyle">
+    <!-- <svg>
         <shape
             v-for="(shape) in $store.getters.activeSlideShapes"
             :focused="shape.id === $store.getters.activeSlide.focusedShapeId"
@@ -22,7 +22,7 @@
             :id="textbox.id"
             @element-focused="(id) => $emit('element-focused', id)">
         </textbox>
-    </svg>
+    </svg> -->
 </div>
 </template>
 
@@ -31,6 +31,7 @@
 import { Vue, Component } from "vue-property-decorator";
 import Shape from "./Shape.vue";
 import Textbox from "./Textbox.vue";
+import * as SVG from "svg.js";
 
 @Component({
     components: {
@@ -38,7 +39,19 @@ import Textbox from "./Textbox.vue";
         Textbox
     }
 })
-export default class Slide extends Vue {}
+export default class Slide extends Vue {
+    get slideStyle(): any {
+        return {
+            boxShadow: `0 0 4px 0 ${this.$store.getters.theme.tertiary}`,
+            background: this.$store.getters.theme.primary
+        };
+    }
+
+    public mounted(): void {
+        const canvas = SVG(this.$el.id);
+        const rect = canvas.rect(100, 100).attr({ fill: "#f06" });
+    }
+}
 /* tslint:disable */
 </script>
 
