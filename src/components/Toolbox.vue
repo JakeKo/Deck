@@ -1,9 +1,9 @@
 /* tslint:disable */
 <template>
-<div id="toolbox" :style="{ borderRight: `1px solid ${$store.getters.theme.tertiary}`}">
-    <tool @tool-click="shapeToolClickHandler"></tool>
-    <tool @tool-click="textboxToolClickHandler"></tool>
-    <tool @tool-click="exportToolClickHandler"></tool>
+<div id="toolbox" :style="toolboxStyle">
+    <tool @tool-click="$store.commit('addGraphicToSlide', $store.getters.activeSlide.id)"></tool>
+    <tool @tool-click="$store.commit('addTextboxToSlideWithId', $store.getters.activeSlide.id)"></tool>
+    <tool @tool-click="$store.dispatch('export')"></tool>
     <tool></tool>
     <tool></tool>
 </div>
@@ -13,8 +13,6 @@
 /* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
 import Tool from "./Tool.vue";
-import Shape from "./Shape.vue";
-import SlideModel from "../models/SlideModel";
 
 @Component({
     components: {
@@ -22,16 +20,10 @@ import SlideModel from "../models/SlideModel";
     }
 })
 export default class Toolbox extends Vue {
-    public shapeToolClickHandler(): void {
-        this.$store.commit("addShapeToSlideWithId", this.$store.getters.activeSlide.id);
-    }
-
-    public textboxToolClickHandler(): void {
-        this.$store.commit("addTextboxToSlideWithId", this.$store.getters.activeSlide.id);
-    }
-
-    public exportToolClickHandler(): void {
-        this.$store.dispatch("export");
+    get toolboxStyle(): any {
+        return {
+            borderRight: `1px solid ${this.$store.getters.theme.tertiary}`
+        };
     }
 }
 /* tslint:disable */

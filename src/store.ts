@@ -3,7 +3,6 @@ import Vuex from "vuex";
 import ShapeModel from "./models/ShapeModel";
 import SlideModel from "./models/SlideModel";
 import TextboxModel from "./models/TextboxModel";
-import Point from "./models/Point";
 import Utilities from "./Utilities";
 import ISlideElement from "./models/ISlideElement";
 import Theme from "./models/Theme";
@@ -52,8 +51,8 @@ export default new Vuex.Store({
             return state.slides.length === 0 ? undefined : Utilities.getSlide(state.slides, state.activeSlideId);
         },
         focusedElement: (state): ISlideElement | undefined => {
-            const activeSlide: SlideModel = Utilities.getSlide(state.slides, state.activeSlideId);
-            const elements: ISlideElement[] = activeSlide.elements.filter((element) => element.id === activeSlide.focusedElementId);
+            const activeSlide: SlideModel | undefined = Utilities.getSlide(state.slides, state.activeSlideId);
+            const elements: ISlideElement[] = activeSlide!.elements.filter((element) => element.id === activeSlide!.focusedElementId);
 
             if (elements.length > 1 || elements.length < 0) {
                 console.error(`There are ${elements.length} focused elements`);
@@ -74,7 +73,7 @@ export default new Vuex.Store({
             const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
             const shapes = new Array<ShapeModel>();
 
-            activeSlide.elements.forEach((element) => {
+            activeSlide!.elements.forEach((element) => {
                 if (element instanceof ShapeModel) {
                     shapes.push(element);
                 }
@@ -86,7 +85,7 @@ export default new Vuex.Store({
             const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
             const textboxes = new Array<TextboxModel>();
 
-            activeSlide.elements.forEach((element) => {
+            activeSlide!.elements.forEach((element) => {
                 if (element instanceof TextboxModel) {
                     textboxes.push(element);
                 }
@@ -104,30 +103,26 @@ export default new Vuex.Store({
         },
         setFocusedElement: (state, shapeId: string): void => {
             const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
-            activeSlide.focusedElementId = shapeId;
+            activeSlide!.focusedElementId = shapeId;
         },
         addSlideAfterSlideWithId: (state, slideId: string): void => {
             const newSlide: SlideModel = new SlideModel();
-            const index: number = slideId ? state.slides.indexOf(Utilities.getSlide(state.slides, slideId)) : 0;
+            const index: number = slideId ? state.slides.indexOf(Utilities.getSlide(state.slides, slideId)!) : 0;
             state.slides.splice(index + 1, 0, newSlide);
             state.activeSlideId = newSlide.id;
         },
-        addShapeToSlideWithId: (state, slideId: string): void => {
-            const shape: ShapeModel = new ShapeModel({
-                points: [
-                    new Point(100, 10),
-                    new Point(40, 198),
-                    new Point(190, 78),
-                    new Point(10, 78),
-                    new Point(160, 198)
-                ]
-            });
-            const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
-            slide.elements.push(shape);
+        addGraphicToSlide: (state, slideId: string): void => {
+            const slide: SlideModel | undefined = Utilities.getSlide(state.slides, slideId);
+
+            if (slide === undefined) {
+                throw `No slide exists with the id ${slideId}`;
+            }
+
+            slide.elements.push(new ShapeModel({ type: "rectangle" }));
         },
         addTextboxToSlideWithId: (state, slideId: string): void => {
-            const slide: SlideModel = Utilities.getSlide(state.slides, slideId);
-            slide.elements.push(new TextboxModel());
+            const slide: SlideModel | undefined = Utilities.getSlide(state.slides, slideId);
+            slide!.elements.push(new TextboxModel());
         },
         setStyleEditorWidth: (state, width: number): void => {
             state.styleEditor.width = width;

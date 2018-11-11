@@ -5,14 +5,16 @@ import ISlideElement from "./ISlideElement";
 
 export default class ShapeModel implements ISlideElement {
     public id: string;
+    public type: string;
     public styleModel: StyleModel;
     public points: Point[];
 
     constructor(
-        { id, styleModel, points }:
-        { id?: string, styleModel?: StyleModel, points?: Point[] } = { }
+        { id, type, styleModel, points }:
+        { id?: string, type?: string, styleModel?: StyleModel, points?: Point[] } = { }
     ) {
         this.id = id || Utilities.generateId();
+        this.type = type || "";
         this.styleModel = styleModel || new StyleModel();
         this.points = points || new Array<Point>();
     }

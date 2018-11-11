@@ -1,8 +1,14 @@
 /* tslint:disable */
 <template>
 <div id="editor">
-    <div id="canvas" :style="style">
-        <slide @element-focused="(id) => $emit('element-focused', id)"></slide>
+    <div id="canvas" :style="canvasStyle">
+        <slide v-for="slide in $store.getters.slides" 
+            :key="slide.id"
+            :graphics="slide.elements"
+            :isActive="slide.id === $store.getters.activeSlide.id"
+            :focusedGraphicId="slide.focusedElementId"
+            @element-focused="(id) => $emit('element-focused', id)"
+        ></slide>
     </div>
 </div>
 </template>
@@ -23,7 +29,7 @@ export default class Editor extends Vue {
         this.$el.scrollLeft = this.$store.state.canvas.width / 2 - this.$el.clientWidth / 2;
     }
 
-    get style(): any {
+    get canvasStyle(): any {
         return {
             width: `${this.$store.state.canvas.width}px`,
             height: `${this.$store.state.canvas.height}px`,
