@@ -1,11 +1,9 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import ShapeModel from "./models/ShapeModel";
 import SlideModel from "./models/SlideModel";
-import TextboxModel from "./models/TextboxModel";
 import Utilities from "./Utilities";
-import ISlideElement from "./models/ISlideElement";
 import Theme from "./models/Theme";
+import GrahpicModel from "./models/GraphicModel";
 
 Vue.use(Vuex);
 
@@ -50,9 +48,9 @@ export default new Vuex.Store({
         activeSlide: (state): SlideModel | undefined => {
             return state.slides.length === 0 ? undefined : Utilities.getSlide(state.slides, state.activeSlideId);
         },
-        focusedElement: (state): ISlideElement | undefined => {
+        focusedElement: (state): GrahpicModel | undefined => {
             const activeSlide: SlideModel | undefined = Utilities.getSlide(state.slides, state.activeSlideId);
-            const elements: ISlideElement[] = activeSlide!.elements.filter((element) => element.id === activeSlide!.focusedElementId);
+            const elements: GrahpicModel[] = activeSlide!.elements.filter((element) => element.id === activeSlide!.focusedElementId);
 
             if (elements.length > 1 || elements.length < 0) {
                 console.error(`There are ${elements.length} focused elements`);
@@ -69,29 +67,17 @@ export default new Vuex.Store({
         roadmapHeight: (state): number => {
             return state.roadmap.height;
         },
-        activeSlideShapes: (state): ShapeModel[] => {
+        activeSlideShapes: (state): GrahpicModel[] => {
             const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
-            const shapes = new Array<ShapeModel>();
+            const shapes = new Array<GrahpicModel>();
 
             activeSlide!.elements.forEach((element) => {
-                if (element instanceof ShapeModel) {
+                if (element instanceof GrahpicModel) {
                     shapes.push(element);
                 }
             });
 
             return shapes;
-        },
-        activeSlideTextboxes: (state): TextboxModel[] => {
-            const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
-            const textboxes = new Array<TextboxModel>();
-
-            activeSlide!.elements.forEach((element) => {
-                if (element instanceof TextboxModel) {
-                    textboxes.push(element);
-                }
-            });
-
-            return textboxes;
         },
         theme: (state): Theme => {
             return state.themes[state.theme];
@@ -118,11 +104,11 @@ export default new Vuex.Store({
                 throw `No slide exists with the id ${slideId}`;
             }
 
-            slide.elements.push(new ShapeModel({ type: "rectangle" }));
+            slide.elements.push(new GrahpicModel({ type: "rectangle" }));
         },
         addTextboxToSlideWithId: (state, slideId: string): void => {
             const slide: SlideModel | undefined = Utilities.getSlide(state.slides, slideId);
-            slide!.elements.push(new TextboxModel());
+            slide!.elements.push(new GrahpicModel({ type: "textbox" }));
         },
         setStyleEditorWidth: (state, width: number): void => {
             state.styleEditor.width = width;
@@ -144,24 +130,14 @@ export default new Vuex.Store({
                 slide.setAttribute("id", slideModel.id);
                 slide.setAttribute("class", "slide");
 
-                slideModel.elements.forEach((element: ISlideElement) => {
-                    if (element instanceof ShapeModel) {
-                        const polygon = document.createElement("polygon");
-                        const points = element.points.map((point) => `${point.x},${point.y}`).reduce((base, value) => `${base} ${value}`);
-                        polygon.setAttribute("points", points);
-                        polygon.setAttribute("fill", element.styleModel.fill);
-                        polygon.setAttribute("stroke", element.styleModel.stroke);
-                        polygon.setAttribute("stroke-width", element.styleModel.strokeWidth);
-                        polygon.setAttribute("fill-rule", "evenodd");
-                        slide.appendChild(polygon);
-                    } else if (element instanceof TextboxModel) {
-                        const text = document.createElement("text");
-                        text.setAttribute("x", `${element.x}`);
-                        text.setAttribute("y", `${element.y}`);
-                        text.setAttribute("fill", element.styleModel.fill);
-                        text.innerHTML = element.text;
-                        slide.appendChild(text);
-                    }
+                // TODO: Use svg.js to programmatically add graphics
+                slideModel.elements.forEach((element: GrahpicModel) => {
+                    const polygon = document.createElement("polygon");
+                    polygon.setAttribute("fill", element.styleModel.fill);
+                    polygon.setAttribute("stroke", element.styleModel.stroke);
+                    polygon.setAttribute("stroke-width", element.styleModel.strokeWidth);
+                    polygon.setAttribute("fill-rule", "evenodd");
+                    slide.appendChild(polygon);
                 });
 
                 body.appendChild(slide);

@@ -1,27 +1,23 @@
 import Utilities from "../Utilities";
 import StyleModel from "./StyleModel";
-import Point from "./Point";
-import ISlideElement from "./ISlideElement";
 
-export default class ShapeModel implements ISlideElement {
+export default class GrahpicModel {
     public id: string;
     public type: string;
     public styleModel: StyleModel;
-    public points: Point[];
 
     constructor(
-        { id, type, styleModel, points }:
-        { id?: string, type?: string, styleModel?: StyleModel, points?: Point[] } = { }
+        { id, type, styleModel }:
+        { id?: string, type?: string, styleModel?: StyleModel } = { }
     ) {
         this.id = id || Utilities.generateId();
         this.type = type || "";
         this.styleModel = styleModel || new StyleModel();
-        this.points = points || new Array<Point>();
     }
 
     public reset(model: any): void {
         // Note: Do not reset the id
+        this.type = model.type;
         this.styleModel = new StyleModel(model.styleModel);
-        this.points = Object.keys(model.points).map((key) => new Point(Number(model.points[key].x), Number(model.points[key].y)));
     }
 }

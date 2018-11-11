@@ -18,11 +18,10 @@
 <script lang="ts">
 /* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
-import TextboxModel from "../models/TextboxModel";
-import ShapeModel from "../models/ShapeModel";
 import EditorLineModel from "../models/EditorLineModel";
 import EditorLine from "./EditorLine.vue";
 import Utilities from "../Utilities";
+import GrahpicModel from "../models/GraphicModel";
 
 @Component({
     components: {
@@ -88,7 +87,7 @@ export default class StyleEditor extends Vue {
         this.$store.getters.focusedElement.reset(json);
     }
 
-    public resetStyleEditor(json: ShapeModel | TextboxModel): void {
+    public resetStyleEditor(json: GrahpicModel): void {
         this.editorLineModels = Utilities.objectToHtml({ shape: json }, 0, 0);
     }
 }
