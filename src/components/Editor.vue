@@ -4,6 +4,7 @@
     <div id="canvas" :style="canvasStyle">
         <slide v-for="slide in $store.getters.slides" 
             :key="slide.id"
+            :id="slide.id"
             :graphics="slide.elements"
             :isActive="slide.id === $store.getters.activeSlide.id"
             :focusedGraphicId="slide.focusedElementId"

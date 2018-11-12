@@ -13,7 +13,5 @@ export default class SlideModel {
         this.id = id || Utilities.generateId();
         this.elements = elements || [];
         this.focusedElementId = focusedElementId || "";
-
-        this.elements.push(new GrahpicModel({ type: "rectangle" }));
     }
 }

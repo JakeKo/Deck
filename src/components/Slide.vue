@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div id="slide" :style="slideStyle"></div>
+<div :id="slideId" :style="slideStyle"></div>
 </template>
 
 <script lang="ts">
@@ -13,6 +13,9 @@ import GraphicModel from "../models/GraphicModel";
 export default class Slide extends Vue {
     private canvas!: SVG.Doc;
 
+    @Prop({ type: String, required: true })
+    private id!: string;
+
     @Prop({ type: Array, default: () => new Array<GraphicModel>() })
     private graphics!: GraphicModel[];
 
@@ -22,43 +25,44 @@ export default class Slide extends Vue {
     @Prop({ type: String, default: "" })
     private focusedGraphicId!: string;
 
+    // Necessary to generate unique id field so SVG canvas is bound to each slide
+    get slideId(): string {
+        return `slide_${this.id}`;
+    }
+
     get slideStyle(): any {
         return {
             boxShadow: `0 0 4px 0 ${this.$store.getters.theme.tertiary}`,
             background: this.$store.getters.theme.primary,
-            display: this.isActive ? "block" : "none"
+            display: this.isActive ? "block" : "none",
+            height: "603px",
+            width: "1072px"
         };
     }
 
     public mounted(): void {
         this.canvas = SVG(this.$el.id);
-        this.displayGraphics;
     }
 
-    get displayGraphics(): any {
+    public updated(): any {
         this.graphics.forEach((graphic: GraphicModel) => {
             switch (graphic.type) {
                 case "rectangle":
-                    this.canvas.rect(50, Math.random() * 100).attr({
-                        fill: "red",
+                    this.canvas.rect(50, 100).attr({
+                        fill: graphic.styleModel.fill,
                     });
                     break;
                 default: break;
             }
         });
 
-        return true;
+        return;
     }
 }
 /* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
-#slide {
-    height: 603px;
-    width: 1072px;
-}
-
 svg {
     height: 100%;
     width: 100%;
