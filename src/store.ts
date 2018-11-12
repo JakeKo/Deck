@@ -97,18 +97,11 @@ export default new Vuex.Store({
             state.slides.splice(index + 1, 0, newSlide);
             state.activeSlideId = newSlide.id;
         },
-        addGraphicToSlide: (state, slideId: string): void => {
-            const slide: SlideModel | undefined = Utilities.getSlide(state.slides, slideId);
-
-            if (slide === undefined) {
-                throw `No slide exists with the id ${slideId}`;
-            }
-
-            slide.elements.push(new GrahpicModel({ type: "rectangle" }));
-        },
-        addTextboxToSlideWithId: (state, slideId: string): void => {
-            const slide: SlideModel | undefined = Utilities.getSlide(state.slides, slideId);
-            slide!.elements.push(new GrahpicModel({ type: "textbox" }));
+        mountTool: (state, { tool, slideId }: { tool: string, slideId: string }): void => {
+            // TODO: Mount specific tool
+            console.log(tool);
+            console.log(slideId);
+            state.activeSlideId = slideId;
         },
         setStyleEditorWidth: (state, width: number): void => {
             state.styleEditor.width = width;

@@ -7,14 +7,14 @@
 /* tslint:enable */
 import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
-import ShapeModel from "../models/ShapeModel";
+import GraphicModel from "../models/GraphicModel";
 
 @Component
 export default class Slide extends Vue {
     private canvas!: SVG.Doc;
 
-    @Prop({ type: Array, default: () => new Array<ShapeModel>() })
-    private graphics!: ShapeModel[];
+    @Prop({ type: Array, default: () => new Array<GraphicModel>() })
+    private graphics!: GraphicModel[];
 
     @Prop({ type: Boolean, default: false })
     private isActive!: boolean;
@@ -36,7 +36,7 @@ export default class Slide extends Vue {
     }
 
     get displayGraphics(): any {
-        this.graphics.forEach((graphic: ShapeModel) => {
+        this.graphics.forEach((graphic: GraphicModel) => {
             switch (graphic.type) {
                 case "rectangle":
                     this.canvas.rect(50, Math.random() * 100).attr({
