@@ -108,6 +108,9 @@ export default new Vuex.Store({
         },
         setRoadmapHeight: (state, height: number): void => {
             state.roadmap.height = height;
+        },
+        onGraphicFocused: (state, graphic: GrahpicModel): void => {
+            console.log(graphic);
         }
     },
     actions: {

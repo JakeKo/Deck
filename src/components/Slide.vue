@@ -8,6 +8,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import GraphicModel from "../models/GraphicModel";
+import Point from "../models/Point";
 
 @Component
 export default class Slide extends Vue {
@@ -42,18 +43,46 @@ export default class Slide extends Vue {
 
     public mounted(): void {
         this.canvas = SVG(this.$el.id);
+        this.graphics.push(new GraphicModel({ type: "rectangle" }));
+        this.initializeGraphics();
     }
 
-    public updated(): any {
-        this.graphics.forEach((graphic: GraphicModel) => {
+    public initializeGraphics(): any {
+        const self: Slide = this;
+
+        self.graphics.forEach((graphic: GraphicModel) => {
+            let svg: SVG.Element;
+
             switch (graphic.type) {
                 case "rectangle":
-                    this.canvas.rect(50, 100).attr({
+                    svg = this.canvas.rect(50, 100).attr({
                         fill: graphic.styleModel.fill,
                     });
                     break;
                 default: break;
             }
+
+            svg!.on("click", function(): void {
+                self.$store.commit("onGraphicFocused", graphic);
+            });
+
+            // Begin moving shape on click
+            svg!.on("mousedown", function(event: MouseEvent): void {
+                const offset = new Point(event.clientX - svg!.attr("x"), event.clientY - svg!.attr("y"));
+                self.canvas.on("mousemove", preview);
+                self.canvas.on("mouseup", end);
+
+                // Preview moving shape
+                function preview(event: MouseEvent): void {
+                    svg!.move(event.clientX - offset.x, event.clientY - offset.y);
+                }
+
+                // End moving shape
+                function end(this: SVG.Element): void {
+                    self.canvas.off("mousemove", preview);
+                    self.canvas.off("mouseup", end);
+                }
+            });
         });
 
         return;

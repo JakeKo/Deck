@@ -87,6 +87,10 @@ export default class StyleEditor extends Vue {
         this.$store.getters.focusedElement.reset(json);
     }
 
+    public updated(): void {
+        console.log(this.width);
+    }
+
     public resetStyleEditor(json: GrahpicModel): void {
         this.editorLineModels = Utilities.objectToHtml({ shape: json }, 0, 0);
     }

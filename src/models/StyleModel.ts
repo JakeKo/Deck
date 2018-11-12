@@ -8,8 +8,8 @@ export default class StyleModel {
         { fill, stroke, strokeWidth }:
         { fill?: string, stroke?: string, strokeWidth?: string } = {}
     ) {
-        this.fill = fill || "white";
-        this.stroke = stroke || "grey";
+        this.fill = fill || "green";
+        this.stroke = stroke || "black";
         this.strokeWidth = strokeWidth || "1";
     }
 }
