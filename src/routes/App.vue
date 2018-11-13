@@ -2,8 +2,8 @@
 <template>
 <div id="app">
     <toolbox></toolbox>
-    <workspace @element-focused="setFocusedElement"></workspace>
-    <style-editor ref="styleEditor" v-show="$store.getters.focusedElement"></style-editor>
+    <workspace></workspace>
+    <style-editor :object="$store.getters.styleEditorObject"></style-editor>
 </div>
 </template>
 
@@ -23,14 +23,8 @@ import StyleEditor from "../components/StyleEditor.vue";
 })
 export default class App extends Vue {
     public created(): void {
-        this.$store.commit("addSlideAfterSlideWithId");
+        this.$store.commit("addSlide");
         this.$store.commit("setActiveSlide", this.$store.getters.firstSlide.id);
-    }
-
-    private setFocusedElement(id: string): void {
-        this.$store.commit("setFocusedElement", id);
-        const styleEditor: any = this.$refs.styleEditor;
-        styleEditor.resetStyleEditor(this.$store.getters.focusedElement);
     }
 }
 /* tslint:disable */

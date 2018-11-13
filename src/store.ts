@@ -15,7 +15,8 @@ export default new Vuex.Store({
             width: 4000
         },
         styleEditor: {
-            width: 500
+            width: 500,
+            object: undefined
         },
         roadmap: {
             height: 96
@@ -32,52 +33,22 @@ export default new Vuex.Store({
             return state.slides;
         },
         firstSlide: (state): SlideModel => {
-            if (state.slides.length === 0) {
-                console.error("There are 0 slides");
-            }
-
             return state.slides[0];
         },
         lastSlide: (state): SlideModel => {
-            if (state.slides.length === 0) {
-                console.error("There are 0 slides");
-            }
-
             return state.slides[state.slides.length - 1];
         },
-        activeSlide: (state): SlideModel | undefined => {
-            return state.slides.length === 0 ? undefined : Utilities.getSlide(state.slides, state.activeSlideId);
-        },
-        focusedElement: (state): GrahpicModel | undefined => {
-            const activeSlide: SlideModel | undefined = Utilities.getSlide(state.slides, state.activeSlideId);
-            const elements: GrahpicModel[] = activeSlide!.elements.filter((element) => element.id === activeSlide!.focusedElementId);
-
-            if (elements.length > 1 || elements.length < 0) {
-                console.error(`There are ${elements.length} focused elements`);
-                return undefined;
-            } else if (elements.length === 0) {
-                return undefined;
-            }
-
-            return elements[0];
+        activeSlide: (state): SlideModel => {
+            return Utilities.getSlide(state.slides, state.activeSlideId)!;
         },
         styleEditorWidth: (state): number => {
             return state.styleEditor.width;
         },
+        styleEditorObject: (state): any => {
+            return state.styleEditor.object;
+        },
         roadmapHeight: (state): number => {
             return state.roadmap.height;
-        },
-        activeSlideShapes: (state): GrahpicModel[] => {
-            const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
-            const shapes = new Array<GrahpicModel>();
-
-            activeSlide!.elements.forEach((element) => {
-                if (element instanceof GrahpicModel) {
-                    shapes.push(element);
-                }
-            });
-
-            return shapes;
         },
         theme: (state): Theme => {
             return state.themes[state.theme];
@@ -87,13 +58,9 @@ export default new Vuex.Store({
         setActiveSlide: (state, slideId: string): void => {
             state.activeSlideId = slideId;
         },
-        setFocusedElement: (state, shapeId: string): void => {
-            const activeSlide = Utilities.getSlide(state.slides, state.activeSlideId);
-            activeSlide!.focusedElementId = shapeId;
-        },
-        addSlideAfterSlideWithId: (state, slideId: string): void => {
+        addSlide: (state, slideId: string): void => {
             const newSlide: SlideModel = new SlideModel();
-            const index: number = slideId ? state.slides.indexOf(Utilities.getSlide(state.slides, slideId)!) : 0;
+            const index: number = slideId ? state.slides.findIndex((slide: SlideModel) => slide.id === slideId) : -1;
             state.slides.splice(index + 1, 0, newSlide);
             state.activeSlideId = newSlide.id;
         },
@@ -109,8 +76,9 @@ export default new Vuex.Store({
         setRoadmapHeight: (state, height: number): void => {
             state.roadmap.height = height;
         },
-        onGraphicFocused: (state, graphic: GrahpicModel): void => {
-            console.log(graphic);
+        onGraphicFocused: (state, graphic: any): void => {
+            // Graphic is of type any because object is initialized as undefined
+            state.styleEditor.object = graphic;
         }
     },
     actions: {

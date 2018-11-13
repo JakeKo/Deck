@@ -75,7 +75,7 @@ export default class Roadmap extends Vue {
     }
 
     private newSlideHandler(event: Event): void {
-        this.$store.commit("addSlideAfterSlideWithId", this.$store.getters.lastSlide.id);
+        this.$store.commit("addSlide", this.$store.getters.lastSlide.id);
     }
 }
 /* tslint:disable */

@@ -6,8 +6,8 @@
         <editor-line
             v-for="editorLineModel in editorLineModels"
             :editorBlocks="editorLineModel.editorBlocks"
-            :key="editorLineModel.id">
-        </editor-line>
+            :key="editorLineModel.id"
+        ></editor-line>
     </div>
     <div id="submit-button-container">
         <button id="submit-button" :style="submitButtonStyle" @click="submit">Apply</button>
@@ -17,7 +17,7 @@
 
 <script lang="ts">
 /* tslint:enable */
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import EditorLineModel from "../models/EditorLineModel";
 import EditorLine from "./EditorLine.vue";
 import Utilities from "../Utilities";
@@ -32,6 +32,14 @@ export default class StyleEditor extends Vue {
     private width: number = this.$store.getters.styleEditorWidth;
     private stretcherWidth: number = 6;
     private editorLineModels: EditorLineModel[] = [];
+
+    @Prop({ type: GrahpicModel, required: true })
+    public object?: GrahpicModel;
+
+    @Watch("object")
+    private onObjectChanged(): void {
+        this.importObject(this.object);
+    }
 
     get styleEditorStyle(): any {
         return {
@@ -81,18 +89,16 @@ export default class StyleEditor extends Vue {
     private submit(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-
-        // TODO: More robust handling of array to and from json
-        const json = Utilities.htmlToObject(this.editorLineModels).shape;
-        this.$store.getters.focusedElement.reset(json);
+        console.log(this.exportObject());
     }
 
-    public updated(): void {
-        console.log(this.width);
-    }
-
-    public resetStyleEditor(json: GrahpicModel): void {
+    public importObject(json: any): void {
         this.editorLineModels = Utilities.objectToHtml({ shape: json }, 0, 0);
+    }
+
+    public exportObject(): any {
+        // TODO: More robust handling of array to and from json
+        return Utilities.htmlToObject(this.editorLineModels).shape;
     }
 }
 /* tslint:disable */

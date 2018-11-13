@@ -6,9 +6,7 @@
             :key="slide.id"
             :id="slide.id"
             :graphics="slide.elements"
-            :isActive="slide.id === $store.getters.activeSlide.id"
             :focusedGraphicId="slide.focusedElementId"
-            @element-focused="(id) => $emit('element-focused', id)"
         ></slide>
     </div>
 </div>

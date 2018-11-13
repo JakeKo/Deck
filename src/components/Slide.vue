@@ -20,9 +20,6 @@ export default class Slide extends Vue {
     @Prop({ type: Array, default: () => new Array<GraphicModel>() })
     private graphics!: GraphicModel[];
 
-    @Prop({ type: Boolean, default: false })
-    private isActive!: boolean;
-
     @Prop({ type: String, default: "" })
     private focusedGraphicId!: string;
 
@@ -35,7 +32,7 @@ export default class Slide extends Vue {
         return {
             boxShadow: `0 0 4px 0 ${this.$store.getters.theme.tertiary}`,
             background: this.$store.getters.theme.primary,
-            display: this.isActive ? "block" : "none",
+            display: this.id === this.$store.getters.activeSlide.id ? "block" : "none",
             height: "603px",
             width: "1072px"
         };
@@ -64,6 +61,14 @@ export default class Slide extends Vue {
 
             svg!.on("click", function(): void {
                 self.$store.commit("onGraphicFocused", graphic);
+            });
+
+            svg!.on("mouseover", function(): void {
+                self.$el.style.cursor = "pointer";
+            });
+
+            svg!.on("mouseout", function(): void {
+                self.$el.style.cursor = "default";
             });
 
             // Begin moving shape on click
