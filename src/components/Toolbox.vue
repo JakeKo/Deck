@@ -1,11 +1,10 @@
 /* tslint:disable */
 <template>
 <div id="toolbox" :style="toolboxStyle">
-    <tool @tool-click="$store.commit('mountTool', { tool: 'rectangle', slideId: $store.getters.activeSlide.id })"></tool>
-    <tool @tool-click="$store.commit('mountTool', { tool: 'textbox', slideId: $store.getters.activeSlide.id })"></tool>
+    <tool @tool-click="$store.commit('tool', 'cursor')"></tool>
+    <tool @tool-click="$store.commit('tool', 'rectangle')"></tool>
+    <tool @tool-click="$store.commit('tool', 'textbox')"></tool>
     <tool @tool-click="$store.dispatch('export')"></tool>
-    <tool></tool>
-    <tool></tool>
 </div>
 </template>
 

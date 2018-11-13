@@ -9,6 +9,7 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import GraphicModel from "../models/GraphicModel";
 import Point from "../models/Point";
+import ToolModel from "../models/ToolModel";
 
 @Component
 export default class Slide extends Vue {
@@ -16,6 +17,9 @@ export default class Slide extends Vue {
 
     @Prop({ type: String, required: true })
     private id!: string;
+
+    @Prop({ type: ToolModel, required: true })
+    private tool!: ToolModel;
 
     @Prop({ type: Array, default: () => new Array<GraphicModel>() })
     private graphics!: GraphicModel[];

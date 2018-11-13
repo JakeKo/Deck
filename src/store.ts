@@ -4,6 +4,8 @@ import SlideModel from "./models/SlideModel";
 import Utilities from "./Utilities";
 import Theme from "./models/Theme";
 import GrahpicModel from "./models/GraphicModel";
+import Toolset from "./models/Toolset";
+import ToolModel from "./models/ToolModel";
 
 Vue.use(Vuex);
 
@@ -26,7 +28,9 @@ export default new Vuex.Store({
         themes: [
             new Theme("light", "#FFFFFF", "#EEEEEE", "#DDDDDD", "#275DAD", "#2FBF71" ,"#ED7D3A", "#A22C29"),
             new Theme("dark", "", "", "", "", "", "", "")
-        ]
+        ],
+        currentTool: "cursor",
+        tools: new Toolset(new ToolModel([]), new ToolModel([]), new ToolModel([]))
     },
     getters: {
         slides: (state): SlideModel[] => {
@@ -52,6 +56,9 @@ export default new Vuex.Store({
         },
         theme: (state): Theme => {
             return state.themes[state.theme];
+        },
+        tool: (state): ToolModel => {
+            return state.tools[state.currentTool];
         }
     },
     mutations: {
@@ -59,11 +66,8 @@ export default new Vuex.Store({
             const index: number = slideId ? state.slides.findIndex((slide: SlideModel) => slide.id === slideId) : -1;
             state.slides.splice(index + 1, 0, new SlideModel());
         },
-        mountTool: (state, { tool, slideId }: { tool: string, slideId: string }): void => {
-            // TODO: Mount specific tool
-            console.log(tool);
-            console.log(slideId);
-            state.activeSlideId = slideId;
+        tool: (state, toolName: string): void => {
+            state.currentTool = toolName;
         },
         styleEditorWidth: (state, width: number): void => {
             state.styleEditor.width = width;
