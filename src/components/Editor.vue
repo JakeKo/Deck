@@ -6,7 +6,6 @@
             :key="slide.id"
             :id="slide.id"
             :graphics="slide.elements"
-            :focusedGraphicId="slide.focusedElementId"
         ></slide>
     </div>
 </div>

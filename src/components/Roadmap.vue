@@ -5,7 +5,6 @@
     <div id="slide-previews">
         <slide-preview
             v-for="(slide) in $store.state.slides"
-            :active="$store.getters.activeSlide.id === slide.id"
             :id="slide.id"
             :key="slide.id">
         </slide-preview>
@@ -18,6 +17,7 @@
 /* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
 import SlidePreview from "./SlidePreview.vue";
+import SlideModel from "../models/SlideModel";
 
 @Component({
     components: {
@@ -71,11 +71,15 @@ export default class Roadmap extends Vue {
         event.currentTarget!.removeEventListener("mouseup", this.endStretch);
 
         this.stretcherHeight = 6;
-        this.$store.commit("setRoadmapHeight", this.height);
+        this.$store.commit("roadmapHeight", this.height);
     }
 
     private newSlideHandler(event: Event): void {
         this.$store.commit("addSlide", this.$store.getters.lastSlide.id);
+        const slides: SlideModel[] = this.$store.getters.slides;
+        const activeSlideIndex: number = slides.findIndex((slide: SlideModel) => slide.id === this.$store.getters.activeSlide.id);
+        this.$store.commit("activeSlide", slides[activeSlideIndex + 1].id);
+        this.$store.commit("styleEditorObject", undefined);
     }
 }
 /* tslint:disable */

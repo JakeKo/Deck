@@ -55,14 +55,9 @@ export default new Vuex.Store({
         }
     },
     mutations: {
-        setActiveSlide: (state, slideId: string): void => {
-            state.activeSlideId = slideId;
-        },
         addSlide: (state, slideId: string): void => {
-            const newSlide: SlideModel = new SlideModel();
             const index: number = slideId ? state.slides.findIndex((slide: SlideModel) => slide.id === slideId) : -1;
-            state.slides.splice(index + 1, 0, newSlide);
-            state.activeSlideId = newSlide.id;
+            state.slides.splice(index + 1, 0, new SlideModel());
         },
         mountTool: (state, { tool, slideId }: { tool: string, slideId: string }): void => {
             // TODO: Mount specific tool
@@ -70,15 +65,18 @@ export default new Vuex.Store({
             console.log(slideId);
             state.activeSlideId = slideId;
         },
-        setStyleEditorWidth: (state, width: number): void => {
+        styleEditorWidth: (state, width: number): void => {
             state.styleEditor.width = width;
         },
-        setRoadmapHeight: (state, height: number): void => {
+        styleEditorObject: (state, object: any): void => {
+            // Object is of type any because styleEditor.object is initialized as undefined
+            state.styleEditor.object = object;
+        },
+        roadmapHeight: (state, height: number): void => {
             state.roadmap.height = height;
         },
-        onGraphicFocused: (state, graphic: any): void => {
-            // Graphic is of type any because object is initialized as undefined
-            state.styleEditor.object = graphic;
+        activeSlide: (state, slideId: string): void => {
+            state.activeSlideId = slideId;
         }
     },
     actions: {
@@ -95,7 +93,7 @@ export default new Vuex.Store({
                 slide.setAttribute("class", "slide");
 
                 // TODO: Use svg.js to programmatically add graphics
-                slideModel.elements.forEach((element: GrahpicModel) => {
+                slideModel.graphics.forEach((element: GrahpicModel) => {
                     const polygon = document.createElement("polygon");
                     polygon.setAttribute("fill", element.styleModel.fill);
                     polygon.setAttribute("stroke", element.styleModel.stroke);

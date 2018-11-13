@@ -33,7 +33,7 @@ export default class StyleEditor extends Vue {
     private stretcherWidth: number = 6;
     private editorLineModels: EditorLineModel[] = [];
 
-    @Prop({ type: GrahpicModel, required: true })
+    @Prop({ type: GrahpicModel, required: false, default: undefined })
     public object?: GrahpicModel;
 
     @Watch("object")
@@ -83,7 +83,7 @@ export default class StyleEditor extends Vue {
         event.currentTarget!.removeEventListener("mouseup", this.endStretch);
 
         this.stretcherWidth = 6;
-        this.$store.commit("setStyleEditorWidth", this.width);
+        this.$store.commit("styleEditorWidth", this.width);
     }
 
     private submit(event: Event): void {

@@ -3,6 +3,7 @@
 <div id="app">
     <toolbox></toolbox>
     <workspace></workspace>
+    <!-- styleEditorObject has to be passed in so it binds to updates in the store -->
     <style-editor :object="$store.getters.styleEditorObject"></style-editor>
 </div>
 </template>
@@ -24,7 +25,7 @@ import StyleEditor from "../components/StyleEditor.vue";
 export default class App extends Vue {
     public created(): void {
         this.$store.commit("addSlide");
-        this.$store.commit("setActiveSlide", this.$store.getters.firstSlide.id);
+        this.$store.commit("activeSlide", this.$store.getters.firstSlide.id);
     }
 }
 /* tslint:disable */

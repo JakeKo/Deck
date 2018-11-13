@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <transition name="slide-preview">
-    <div id="slide-preview" :style="style" @click="$store.commit('setActiveSlide', id)"></div>
+    <div id="slide-preview" :style="style" @click="onSlidePreviewClicked"></div>
 </transition>
 </template>
 
@@ -14,13 +14,16 @@ export default class SlidePreview extends Vue {
     @Prop({ type: String, default: ""})
     public id?: string;
 
-    @Prop({ type: Boolean, default: false })
-    public active?: boolean;
-
     get style(): any {
         return {
-            border: `1px solid ${this.active ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`
+            border: `1px solid ${this.id === this.$store.getters.activeSlide.id ?
+                this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`
         };
+    }
+
+    private onSlidePreviewClicked(): void {
+        this.$store.commit("activeSlide", this.id);
+        this.$store.commit("styleEditorObject", undefined);
     }
 }
 /* tslint:disable */

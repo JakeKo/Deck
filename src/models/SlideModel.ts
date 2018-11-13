@@ -3,15 +3,13 @@ import GrahpicModel from "./GraphicModel";
 
 export default class SlideModel {
     public id: string;
-    public elements: GrahpicModel[];
-    public focusedElementId: string;
+    public graphics: GrahpicModel[];
 
     constructor(
-        { id, elements, focusedElementId }:
-        { id?: string, elements?: GrahpicModel[], focusedElementId?: string } = { }
+        { id, graphics }:
+        { id?: string, graphics?: GrahpicModel[] } = { }
     ) {
         this.id = id || Utilities.generateId();
-        this.elements = elements || [];
-        this.focusedElementId = focusedElementId || "";
+        this.graphics = graphics || [];
     }
 }
