@@ -1,9 +1,12 @@
 import EditorLineModel from "./models/EditorLineModel";
 import EditorBlockModel from "./models/EditorBlockModel";
 import SlideModel from "./models/SlideModel";
+import * as SVG from "svg.js";
+import Point from "./models/Point";
 
 export default {
     generateId,
+    cursorHandlers,
     objectToHtml,
     htmlToObject,
     getSlide,
@@ -13,6 +16,29 @@ export default {
 function generateId(): string {
     const s4 = () => Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
     return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
+}
+
+function cursorHandlers(canvas: SVG.Doc, svg: SVG.Element) {
+    return {
+        startMoveGraphic
+    };
+
+    function startMoveGraphic(event: MouseEvent): void {
+        const offset = new Point(event.clientX - svg.attr("x"), event.clientY - svg.attr("y"));
+        canvas.on("mousemove", previewMoveGraphic);
+        canvas.on("mouseup", endMoveGrahpic);
+
+        // Preview moving shape
+        function previewMoveGraphic(event: MouseEvent): void {
+            svg.move(event.clientX - offset.x, event.clientY - offset.y);
+        }
+
+        // End moving shape
+        function endMoveGrahpic(this: SVG.Element): void {
+            canvas.off("mousemove", previewMoveGraphic);
+            canvas.off("mouseup", endMoveGrahpic);
+        }
+    }
 }
 
 function block(innerText: string): EditorBlockModel {

@@ -30,7 +30,11 @@ export default new Vuex.Store({
             new Theme("dark", "", "", "", "", "", "", "")
         ],
         currentTool: "cursor",
-        tools: new Toolset(new ToolModel([]), new ToolModel([]), new ToolModel([]))
+        tools: new Toolset(
+            new ToolModel("cursor", Utilities.cursorHandlers),
+            new ToolModel("rectangle", Utilities.cursorHandlers),
+            new ToolModel("textbox", Utilities.cursorHandlers)
+        )
     },
     getters: {
         slides: (state): SlideModel[] => {

@@ -60,6 +60,7 @@ export default class Slide extends Vue {
                 default: break;
             }
 
+            const handlers = self.tool.graphicHandlers(self.canvas, svg!);
             svg!.on("mouseover", function(): void {
                 self.$el.style.cursor = "pointer";
             });
@@ -68,23 +69,9 @@ export default class Slide extends Vue {
                 self.$el.style.cursor = "default";
             });
 
-            // Begin moving shape on click
             svg!.on("mousedown", function(event: MouseEvent): void {
                 self.$store.commit("styleEditorObject", graphic);
-                const offset = new Point(event.clientX - svg!.attr("x"), event.clientY - svg!.attr("y"));
-                self.canvas.on("mousemove", preview);
-                self.canvas.on("mouseup", end);
-
-                // Preview moving shape
-                function preview(event: MouseEvent): void {
-                    svg!.move(event.clientX - offset.x, event.clientY - offset.y);
-                }
-
-                // End moving shape
-                function end(this: SVG.Element): void {
-                    self.canvas.off("mousemove", preview);
-                    self.canvas.off("mouseup", end);
-                }
+                handlers.startMoveGraphic(event);
             });
         });
 

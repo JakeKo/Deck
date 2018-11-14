@@ -1,7 +1,11 @@
-export default class ToolModel {
-    public handlers: any[];
+import * as SVG from "svg.js";
 
-    constructor(handlers: any[]) {
-        this.handlers = handlers;
+export default class ToolModel {
+    public name: string;
+    public graphicHandlers: (canvas: SVG.Doc, svg: SVG.Element) => any;
+
+    constructor(name: string, graphicHandlers: (canvas: SVG.Doc, svg: SVG.Element) => any) {
+        this.name = name;
+        this.graphicHandlers = graphicHandlers;
     }
 }
