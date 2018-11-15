@@ -30,7 +30,6 @@ export default class App extends Vue {
             const isPressed = this.$store.getters.pressedKeys[event.keyCode];
 
             if (!isPressed) {
-                console.log(event.keyCode);
                 this.$store.commit("pressedKeys", { keyCode: event.keyCode, isPressed: true });
             }
         });
@@ -39,7 +38,6 @@ export default class App extends Vue {
             const isPressed = this.$store.getters.pressedKeys[event.keyCode];
 
             if (isPressed) {
-                console.log(event.keyCode);
                 this.$store.commit("pressedKeys", { keyCode: event.keyCode, isPressed: false });
             }
         });
