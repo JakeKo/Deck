@@ -44,14 +44,7 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
             const width: number = client.x - start.x;
             const height: number = client.y - start.y;
 
-            if (width < 0) {
-                shape.x(client.x);
-            }
-
-            if (height < 0) {
-                shape.y(client.y);
-            }
-
+            shape.move(width < 0 ? client.x : start.x, height < 0 ? client.y : start.y);
             shape.width(Math.sign(width) * width);
             shape.height(Math.sign(height) * height);
         }
