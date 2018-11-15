@@ -25,6 +25,24 @@ export default class App extends Vue {
     public created(): void {
         this.$store.commit("addSlide");
         this.$store.commit("activeSlide", this.$store.getters.firstSlide.id);
+
+        document.addEventListener("keydown", (event: KeyboardEvent) => {
+            const isPressed = this.$store.getters.pressedKeys[event.keyCode];
+
+            if (!isPressed) {
+                console.log(event.keyCode);
+                this.$store.commit("pressedKeys", { keyCode: event.keyCode, isPressed: true });
+            }
+        });
+
+        document.addEventListener("keyup", (event: KeyboardEvent) => {
+            const isPressed = this.$store.getters.pressedKeys[event.keyCode];
+
+            if (isPressed) {
+                console.log(event.keyCode);
+                this.$store.commit("pressedKeys", { keyCode: event.keyCode, isPressed: false });
+            }
+        });
     }
 }
 /* tslint:disable */

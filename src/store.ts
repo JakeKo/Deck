@@ -4,7 +4,6 @@ import SlideModel from "./models/SlideModel";
 import Utilities from "./Utilities";
 import Theme from "./models/Theme";
 import GraphicModel from "./models/GraphicModel";
-import Toolset from "./models/Toolset";
 import ToolModel from "./models/ToolModel";
 
 Vue.use(Vuex);
@@ -31,11 +30,12 @@ export default new Vuex.Store({
             new Theme("dark", "", "", "", "", "", "", "")
         ],
         currentTool: "cursor",
-        tools: new Toolset(
-            Utilities.cursorTool,
-            Utilities.rectangleTool,
-            Utilities.cursorTool
-        )
+        tools: {
+            cursor: Utilities.cursorTool,
+            rectangle: Utilities.rectangleTool,
+            textbox: Utilities.cursorTool
+        } as { [key: string]: ToolModel },
+        pressedKeys: { } as { [key: number]: boolean }
     },
     getters: {
         slides: (state): SlideModel[] => {
@@ -67,6 +67,9 @@ export default new Vuex.Store({
         },
         tool: (state): ToolModel => {
             return state.tools[state.currentTool];
+        },
+        pressedKeys: (state): any => {
+            return state.pressedKeys;
         }
     },
     mutations: {
@@ -95,6 +98,9 @@ export default new Vuex.Store({
         },
         activeSlide: (state, slideId: string): void => {
             state.activeSlideId = slideId;
+        },
+        pressedKeys: (state, { keyCode, isPressed }) => {
+            state.pressedKeys[keyCode] = isPressed;
         }
     },
     actions: {

@@ -63,7 +63,7 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
             const graphic = new GraphicModel({
                 type: "rectangle",
                 styleModel: new StyleModel({
-                    fill: "black",
+                    fill: shape.attr("fill"),
                     x: shape.x(),
                     y: shape.y(),
                     width: shape.width(),
