@@ -3,7 +3,7 @@ import EditorBlockModel from "./models/EditorBlockModel";
 import SlideModel from "./models/SlideModel";
 import * as SVG from "svg.js";
 import Point from "./models/Point";
-import GrahpicModel from "./models/GraphicModel";
+import GraphicModel from "./models/GraphicModel";
 
 export default {
     generateId,
@@ -20,7 +20,7 @@ function generateId(): string {
     return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
 }
 
-function cursorHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: GrahpicModel): any {
+function cursorHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: GraphicModel): any {
     return {
         onMouseOver,
         onMouseOut,
@@ -36,46 +36,45 @@ function cursorHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: 
     }
 
     function onMouseDown(event: MouseEvent): void {
-        console.log("cursor");
         store.commit("styleEditorObject", graphic);
         const offset = new Point(event.clientX - svg.attr("x"), event.clientY - svg.attr("y"));
-        canvas.on("mousemove", previewMoveGraphic);
-        canvas.on("mouseup", endMoveGrahpic);
+        canvas.on("mousemove", preview);
+        canvas.on("mouseup", end);
 
         // Preview moving shape
-        function previewMoveGraphic(event: MouseEvent): void {
+        function preview(event: MouseEvent): void {
             svg.move(event.clientX - offset.x, event.clientY - offset.y);
         }
 
         // End moving shape
-        function endMoveGrahpic(this: SVG.Element): void {
-            canvas.off("mousemove", previewMoveGraphic);
-            canvas.off("mouseup", endMoveGrahpic);
+        function end(): void {
+            canvas.off("mousemove", preview);
+            canvas.off("mouseup", end);
         }
     }
 }
 
-function rectangleHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: GrahpicModel): any {
+function rectangleHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: GraphicModel): any {
     return {
         onMouseDown
     };
 
     function onMouseDown(event: MouseEvent): void {
-        console.log("rectangle");
-        store.commit("styleEditorObject", graphic);
-        const offset = new Point(event.clientX - svg.attr("x"), event.clientY - svg.attr("y"));
-        canvas.on("mousemove", previewMoveGraphic);
-        canvas.on("mouseup", endMoveGrahpic);
+        const shape: SVG.Element = canvas.rect(0, 0);
+        shape.move(event.clientX, event.clientY);
+        canvas.on("mousemove", preview);
+        canvas.on("mouseup", end);
 
-        // Preview moving shape
-        function previewMoveGraphic(event: MouseEvent): void {
-            svg.move(event.clientX - offset.x, event.clientY - offset.y);
+        // Preview drawing rectangle
+        function preview(event: MouseEvent): void {
+            shape.width(event.clientX - shape.x());
+            shape.height(event.clientY - shape.y());
         }
 
-        // End moving shape
-        function endMoveGrahpic(this: SVG.Element): void {
-            canvas.off("mousemove", previewMoveGraphic);
-            canvas.off("mouseup", endMoveGrahpic);
+        // End drawing rectangle
+        function end(): void {
+            canvas.off("mousemove", preview);
+            canvas.off("mouseup", end);
         }
     }
 }
