@@ -48,7 +48,7 @@ export default class Slide extends Vue {
            }
         });
 
-        this.graphics.push(new GraphicModel());
+        this.updateCanvas();
     }
 
     public updateCanvas(): void {
@@ -57,8 +57,19 @@ export default class Slide extends Vue {
     }
 
     private renderGraphic(graphic: GraphicModel): SVG.Element {
-        // TODO: Handle multiples type of graphics
-        return this.canvas.rect(50, 100);
+        const style = graphic.styleModel;
+
+        if (graphic.type === "rectangle") {
+            return this.canvas.rect(style.width, style.height).attr({
+                "x": style.x,
+                "y": style.y,
+                "fill": style.fill,
+                "stroke": style.stroke,
+                "stroke-width": style.strokeWidth
+            });
+        }
+
+        throw `Undefined type of graphic: ${graphic.type}`;
     }
 
     public addGraphic(graphic: GraphicModel): void {

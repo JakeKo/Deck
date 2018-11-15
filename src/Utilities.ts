@@ -56,12 +56,19 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
 
             const graphic = new GraphicModel({
                 type: "rectangle",
-                styleModel: new StyleModel({ fill: "black" })
+                styleModel: new StyleModel({
+                    fill: "black",
+                    x: shape.x(),
+                    y: shape.y(),
+                    width: shape.width(),
+                    height: shape.height()
+                })
             });
 
             shape.remove();
             slide.graphics.push(graphic);
             slide.addGraphic(graphic);
+            slide.$store.commit("styleEditorObject", graphic);
         }
     }
 });
