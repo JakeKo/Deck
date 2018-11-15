@@ -4,6 +4,7 @@
     z-index: 100;
     transform: translateY(-50%);
     cursor: ns-resize;
+    height: 6px;
 }
 
 .stretcher-horizontal {
@@ -12,6 +13,7 @@
     z-index: 100;
     transform: translateX(-50%);
     cursor: ew-resize;
+    width: 6px;
 }
 
 .top {

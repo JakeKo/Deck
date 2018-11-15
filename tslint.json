@@ -6,7 +6,6 @@
         "align": true,
 		"arrow-parens": true,
 		"arrow-return-shorthand": true,
-        "await-promise": true,
         "ban-comma-operator": true,
         "binary-expression-operand-order": true,
 		"class-name": true,
@@ -14,9 +13,7 @@
 			true,
 			"check-space"
 		],
-        "completed-docs": true,
 		"curly": true,
-        "deprecation": true,
         "eofline": true,
 		"import-spacing": true,
 		"indent": [

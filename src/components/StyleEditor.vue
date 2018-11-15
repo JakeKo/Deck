@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>
 <div id="style-editor" :style="styleEditorStyle">
-    <div class="stretcher-horizontal left" :style="stretcherStyle" @mousedown="startStretch"></div>
+    <div class="stretcher-horizontal left" @mousedown="stretch"></div>
     <div id="style-editor-content">
         <editor-line
             v-for="editorLineModel in editorLineModels"
@@ -29,8 +29,6 @@ import StyleModel from "../models/StyleModel";
     }
 })
 export default class StyleEditor extends Vue {
-    private width: number = this.$store.getters.styleEditorWidth;
-    private stretcherWidth: number = 6;
     private editorLineModels: EditorLineModel[] = [];
 
     @Watch("object")
@@ -47,7 +45,7 @@ export default class StyleEditor extends Vue {
         return {
             background: this.$store.getters.theme.primary,
             borderLeft: `1px solid ${this.$store.getters.theme.tertiary}`,
-            minWidth: `${this.width}px`
+            minWidth: `${this.$store.getters.styleEditorWidth}px`
         };
     }
 
@@ -57,35 +55,21 @@ export default class StyleEditor extends Vue {
         };
     }
 
-    get stretcherStyle(): any {
-        return {
-            width: `${this.stretcherWidth}px`
-        };
-    }
-
-    private startStretch(event: Event): void {
-        event.preventDefault();
+    private stretch(event: MouseEvent): void {
+        const self = this;
         event.stopPropagation();
-        event.currentTarget!.addEventListener("mousemove", this.previewStretch);
-        event.currentTarget!.addEventListener("mouseup", this.endStretch);
-
-        this.stretcherWidth = window.innerWidth * 2;
-    }
-
-    private previewStretch(event: any): void {
         event.preventDefault();
-        event.stopPropagation();
-        this.width = window.innerWidth - event.pageX;
-    }
+        document.addEventListener("mousemove", preview);
+        document.addEventListener("mouseup", end);
 
-    private endStretch(event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-        event.currentTarget!.removeEventListener("mousemove", this.previewStretch);
-        event.currentTarget!.removeEventListener("mouseup", this.endStretch);
+        function preview(event: MouseEvent): void {
+            self.$store.commit("styleEditorWidth", window.innerWidth - event.pageX);
+        }
 
-        this.stretcherWidth = 6;
-        this.$store.commit("styleEditorWidth", this.width);
+        function end(): void {
+            document.removeEventListener("mousemove", preview);
+            document.removeEventListener("mouseup", end);
+        }
     }
 
     private submit(event: Event): void {
