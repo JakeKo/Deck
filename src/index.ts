@@ -1,7 +1,7 @@
 import Vue from "vue";
 import App from "./routes/App.vue";
-import Store from "./Store";
-import Router from "./Router";
+import Store from "./store";
+import Router from "./router";
 
 new Vue({
     el: "#body",

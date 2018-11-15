@@ -51,6 +51,7 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
             const width: number = client.x - start.x;
             const height: number = client.y - start.y;
 
+            // Check if shift is pressed to toggle between rectangle and square
             if (slide.$store.getters.pressedKeys[16]) {
                 const sideLength = Math.min(Math.abs(width), Math.abs(height));
                 shape.move(width < 0 ? start.x - sideLength : start.x, height < 0 ? start.y - sideLength : start.y);
