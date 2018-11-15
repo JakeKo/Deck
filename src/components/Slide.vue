@@ -49,6 +49,10 @@ export default class Slide extends Vue {
         });
 
         this.graphics.push(new GraphicModel());
+    }
+
+    public updateCanvas(): void {
+        this.canvas.clear();
         this.graphics.forEach((graphic: GraphicModel) => this.addGraphic(graphic));
     }
 
@@ -57,7 +61,7 @@ export default class Slide extends Vue {
         return this.canvas.rect(50, 100);
     }
 
-    private addGraphic(graphic: GraphicModel): void {
+    public addGraphic(graphic: GraphicModel): void {
         const svg: SVG.Element = this.renderGraphic(graphic);
 
         // Bind each event handler for all that exist

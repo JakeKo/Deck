@@ -5,6 +5,7 @@ import * as SVG from "svg.js";
 import Point from "./models/Point";
 import GraphicModel from "./models/GraphicModel";
 import ToolModel from "./models/ToolModel";
+import StyleModel from "./models/StyleModel";
 
 // Cursor Tool handlers
 const cursorTool: ToolModel = new ToolModel("cursor", {
@@ -45,14 +46,22 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
             const height: number = client.y - start.y;
 
             shape.move(width < 0 ? client.x : start.x, height < 0 ? client.y : start.y);
-            shape.width(Math.sign(width) * width);
-            shape.height(Math.sign(height) * height);
+            shape.size(Math.sign(width) * width, Math.sign(height) * height);
         }
 
         // End drawing rectangle
         function end(): void {
             canvas.off("mousemove", preview);
             canvas.off("mouseup", end);
+
+            const graphic = new GraphicModel({
+                type: "rectangle",
+                styleModel: new StyleModel({ fill: "black" })
+            });
+
+            shape.remove();
+            slide.graphics.push(graphic);
+            slide.addGraphic(graphic);
         }
     }
 });
