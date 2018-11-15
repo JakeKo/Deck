@@ -3,8 +3,7 @@
 <div id="app">
     <toolbox></toolbox>
     <workspace></workspace>
-    <!-- styleEditorObject has to be passed in so it binds to updates in the store -->
-    <style-editor :object="$store.getters.styleEditorObject"></style-editor>
+    <style-editor></style-editor>
 </div>
 </template>
 

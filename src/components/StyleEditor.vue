@@ -21,7 +21,7 @@ import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import EditorLineModel from "../models/EditorLineModel";
 import EditorLine from "./EditorLine.vue";
 import Utilities from "../Utilities";
-import GrahpicModel from "../models/GraphicModel";
+import StyleModel from "../models/StyleModel";
 
 @Component({
     components: {
@@ -33,12 +33,14 @@ export default class StyleEditor extends Vue {
     private stretcherWidth: number = 6;
     private editorLineModels: EditorLineModel[] = [];
 
-    @Prop({ type: GrahpicModel, required: false, default: undefined })
-    public object?: GrahpicModel;
-
     @Watch("object")
     private onObjectChanged(): void {
         this.importObject(this.object);
+    }
+
+    // Watch for changes to the style editor object
+    get object(): StyleModel {
+        return this.$store.getters.styleEditorObject;
     }
 
     get styleEditorStyle(): any {
@@ -93,7 +95,7 @@ export default class StyleEditor extends Vue {
     }
 
     public importObject(json: any): void {
-        this.editorLineModels = Utilities.objectToHtml({ shape: json }, 0, 0);
+        this.editorLineModels = Utilities.objectToHtml({ style: json }, 0, 0);
     }
 
     public exportObject(): any {

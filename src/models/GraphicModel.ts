@@ -1,7 +1,7 @@
 import Utilities from "../Utilities";
 import StyleModel from "./StyleModel";
 
-export default class GrahpicModel {
+export default class GraphicModel {
     public id: string;
     public type: string;
     public styleModel: StyleModel;

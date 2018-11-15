@@ -23,13 +23,19 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
         }
 
         // End moving shape
-        function end(): void {
+        function end(event: MouseEvent): void {
             slide.canvas.off("mousemove", preview);
             slide.canvas.off("mouseup", end);
+            graphic.styleModel.x = event.clientX - offset.x;
+            graphic.styleModel.y = event.clientY - offset.y;
+            // Cache busting occurs here I presume
+            slide.$store.commit("styleEditorObject", undefined);
+            slide.$store.commit("styleEditorObject", graphic);
         }
     }
 });
 
+// Rectangle tool handlers
 const rectangleTool: ToolModel = new ToolModel("rectangle", {
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent) => {
         const bounds: DOMRect = slide.$el.getBoundingClientRect();

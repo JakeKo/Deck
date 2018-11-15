@@ -1,13 +1,13 @@
 import Utilities from "../Utilities";
-import GrahpicModel from "./GraphicModel";
+import GraphicModel from "./GraphicModel";
 
 export default class SlideModel {
     public id: string;
-    public graphics: GrahpicModel[];
+    public graphics: GraphicModel[];
 
     constructor(
         { id, graphics }:
-        { id?: string, graphics?: GrahpicModel[] } = { }
+        { id?: string, graphics?: GraphicModel[] } = { }
     ) {
         this.id = id || Utilities.generateId();
         this.graphics = graphics || [];

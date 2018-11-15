@@ -3,7 +3,7 @@ import Vuex from "vuex";
 import SlideModel from "./models/SlideModel";
 import Utilities from "./Utilities";
 import Theme from "./models/Theme";
-import GrahpicModel from "./models/GraphicModel";
+import GraphicModel from "./models/GraphicModel";
 import Toolset from "./models/Toolset";
 import ToolModel from "./models/ToolModel";
 
@@ -18,7 +18,8 @@ export default new Vuex.Store({
         },
         styleEditor: {
             width: 500,
-            object: undefined
+            object: undefined,
+            objectId: ""
         },
         roadmap: {
             height: 96
@@ -55,6 +56,9 @@ export default new Vuex.Store({
         styleEditorObject: (state): any => {
             return state.styleEditor.object;
         },
+        styleEditorObjectId: (state): string => {
+            return state.styleEditor.objectId;
+        },
         roadmapHeight: (state): number => {
             return state.roadmap.height;
         },
@@ -78,7 +82,13 @@ export default new Vuex.Store({
         },
         styleEditorObject: (state, object: any): void => {
             // Object is of type any because styleEditor.object is initialized as undefined
-            state.styleEditor.object = object;
+            if (object === undefined) {
+                state.styleEditor.objectId = "";
+                state.styleEditor.object = undefined;
+            } else {
+                state.styleEditor.objectId = object.id;
+                state.styleEditor.object = object.styleModel;
+            }
         },
         roadmapHeight: (state, height: number): void => {
             state.roadmap.height = height;
@@ -101,7 +111,7 @@ export default new Vuex.Store({
                 slide.setAttribute("class", "slide");
 
                 // TODO: Use svg.js to programmatically add graphics
-                slideModel.graphics.forEach((element: GrahpicModel) => {
+                slideModel.graphics.forEach((element: GraphicModel) => {
                     const polygon = document.createElement("polygon");
                     polygon.setAttribute("fill", element.styleModel.fill);
                     polygon.setAttribute("stroke", element.styleModel.stroke);
