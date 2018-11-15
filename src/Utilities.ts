@@ -30,16 +30,30 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
 });
 
 const rectangleTool: ToolModel = new ToolModel("rectangle", {
-    canvasMouseDown: (canvas: SVG.Doc) => (event: MouseEvent) => {
+    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent) => {
+        const bounds: DOMRect = slide.$el.getBoundingClientRect();
         const shape: SVG.Element = canvas.rect(0, 0);
-        shape.move(event.clientX, event.clientY);
+        const start: Point = new Point(event.clientX - bounds.left, event.clientY - bounds.top);
+        shape.move(start.x, start.y);
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
         // Preview drawing rectangle
         function preview(event: MouseEvent): void {
-            shape.width(event.clientX - shape.x());
-            shape.height(event.clientY - shape.y());
+            const client: Point = new Point(event.clientX - bounds.left, event.clientY - bounds.top);
+            const width: number = client.x - start.x;
+            const height: number = client.y - start.y;
+
+            if (width < 0) {
+                shape.x(client.x);
+            }
+
+            if (height < 0) {
+                shape.y(client.y);
+            }
+
+            shape.width(Math.sign(width) * width);
+            shape.height(Math.sign(height) * height);
         }
 
         // End drawing rectangle

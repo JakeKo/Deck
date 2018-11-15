@@ -44,7 +44,7 @@ export default class Slide extends Vue {
 
         this.canvas.on("mousedown", (event: MouseEvent) => {
            if (this.tool.canvasMouseDown !== undefined) {
-               this.tool.canvasMouseDown(this.canvas)(event);
+               this.tool.canvasMouseDown(this, this.canvas)(event);
            }
         });
 
