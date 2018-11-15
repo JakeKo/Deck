@@ -13,7 +13,7 @@ import ToolModel from "../models/ToolModel";
 
 @Component
 export default class Slide extends Vue {
-    private canvas!: SVG.Doc;
+    public canvas!: SVG.Doc;
 
     @Prop({ type: String, required: true })
     private id!: string;
@@ -41,6 +41,13 @@ export default class Slide extends Vue {
 
     public mounted(): void {
         this.canvas = SVG(this.$el.id);
+
+        this.canvas.on("mousedown", (event: MouseEvent) => {
+           if (this.tool.canvasMouseDown !== undefined) {
+               this.tool.canvasMouseDown(this.canvas)(event);
+           }
+        });
+
         this.graphics.push(new GraphicModel());
         this.graphics.forEach((graphic: GraphicModel) => this.addGraphic(graphic));
     }
@@ -55,26 +62,20 @@ export default class Slide extends Vue {
 
         // Bind each event handler for all that exist
         svg.on("mouseover", (event: MouseEvent) => {
-            const handler = this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseOver;
-
-            if (handler !== undefined) {
-                handler(event);
+            if (this.tool.graphicMouseOver !== undefined) {
+                this.tool.graphicMouseOver(svg)(event);
             }
         });
 
         svg.on("mouseout", (event: MouseEvent) => {
-            const handler = this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseOut;
-
-            if (handler !== undefined) {
-                handler(event);
+            if (this.tool.graphicMouseOut !== undefined) {
+                this.tool.graphicMouseOut(svg)(event);
             }
         });
 
         svg.on("mousedown", (event: MouseEvent) => {
-            const handler = this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseDown;
-
-            if (handler !== undefined) {
-                handler(event);
+            if (this.tool.graphicMouseDown !== undefined) {
+                this.tool.graphicMouseDown(this, svg, graphic)(event);
             }
         });
     }

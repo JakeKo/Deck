@@ -1,12 +1,25 @@
 import * as SVG from "svg.js";
-import GrahpicModel from "./GraphicModel";
+import GraphicModel from "./GraphicModel";
 
 export default class ToolModel {
     public name: string;
-    public graphicHandlers: (canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: GrahpicModel) => any;
+    public canvasMouseDown?: (canvas: SVG.Doc) => (event: MouseEvent) => any;
+    public graphicMouseOver?: (svg: SVG.Element) => (event: MouseEvent) => any;
+    public graphicMouseOut?: (svg: SVG.Element) => (event: MouseEvent) => any;
+    public graphicMouseDown?: (slide: any, svg: SVG.Element, graphic: GraphicModel) => (event: MouseEvent) => any;
 
-    constructor(name: string, graphicHandlers: (canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: GrahpicModel) => any) {
+    constructor(name: string, { canvasMouseDown, graphicMouseOver, graphicMouseOut, graphicMouseDown }:
+        {
+            canvasMouseDown?: (canvas: SVG.Doc) => (event: MouseEvent) => any;
+            graphicMouseOver?: (svg: SVG.Element) => (event: MouseEvent) => any;
+            graphicMouseOut?: (svg: SVG.Element) => (event: MouseEvent) => any;
+            graphicMouseDown?: (slide: any, svg: SVG.Element, graphic: GraphicModel) => (event: MouseEvent) => any;
+        }
+    ) {
         this.name = name;
-        this.graphicHandlers = graphicHandlers;
+        this.canvasMouseDown = canvasMouseDown;
+        this.graphicMouseOver = graphicMouseOver;
+        this.graphicMouseOut = graphicMouseOut;
+        this.graphicMouseDown = graphicMouseDown;
     }
 }

@@ -4,42 +4,17 @@ import SlideModel from "./models/SlideModel";
 import * as SVG from "svg.js";
 import Point from "./models/Point";
 import GraphicModel from "./models/GraphicModel";
+import ToolModel from "./models/ToolModel";
 
-export default {
-    generateId,
-    cursorHandlers,
-    rectangleHandlers,
-    objectToHtml,
-    htmlToObject,
-    getSlide,
-    deckScript
-};
-
-function generateId(): string {
-    const s4 = () => Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
-    return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
-}
-
-function cursorHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: GraphicModel): any {
-    return {
-        onMouseOver,
-        onMouseOut,
-        onMouseDown
-    };
-
-    function onMouseOver(): void {
-        svg.style("cursor", "pointer");
-    }
-
-    function onMouseOut(): void {
-        svg.style("cursor", "default");
-    }
-
-    function onMouseDown(event: MouseEvent): void {
-        store.commit("styleEditorObject", graphic);
-        const offset = new Point(event.clientX - svg.attr("x"), event.clientY - svg.attr("y"));
-        canvas.on("mousemove", preview);
-        canvas.on("mouseup", end);
+// Cursor Tool handlers
+const cursorTool: ToolModel = new ToolModel("cursor", {
+    graphicMouseOver: (svg: SVG.Element) => (): any => svg.style("cursor", "pointer"),
+    graphicMouseOut: (svg: SVG.Element) => (): any => svg.style("cursor", "default"),
+    graphicMouseDown: (slide: any, svg: SVG.Element, graphic: GraphicModel) => (event: MouseEvent): any => {
+        slide.$store.commit("styleEditorObject", graphic);
+        const offset = new Point(event.clientX - svg.x(), event.clientY - svg.y());
+        slide.canvas.on("mousemove", preview);
+        slide.canvas.on("mouseup", end);
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
@@ -48,18 +23,14 @@ function cursorHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: 
 
         // End moving shape
         function end(): void {
-            canvas.off("mousemove", preview);
-            canvas.off("mouseup", end);
+            slide.canvas.off("mousemove", preview);
+            slide.canvas.off("mouseup", end);
         }
     }
-}
+});
 
-function rectangleHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: GraphicModel): any {
-    return {
-        onMouseDown
-    };
-
-    function onMouseDown(event: MouseEvent): void {
+const rectangleTool: ToolModel = new ToolModel("rectangle", {
+    canvasMouseDown: (canvas: SVG.Doc) => (event: MouseEvent) => {
         const shape: SVG.Element = canvas.rect(0, 0);
         shape.move(event.clientX, event.clientY);
         canvas.on("mousemove", preview);
@@ -77,6 +48,21 @@ function rectangleHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphi
             canvas.off("mouseup", end);
         }
     }
+});
+
+export default {
+    cursorTool,
+    rectangleTool,
+    generateId,
+    objectToHtml,
+    htmlToObject,
+    getSlide,
+    deckScript
+};
+
+function generateId(): string {
+    const s4 = () => Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
+    return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
 }
 
 function block(innerText: string): EditorBlockModel {
