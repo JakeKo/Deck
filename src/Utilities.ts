@@ -57,18 +57,8 @@ function cursorHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: 
 
 function rectangleHandlers(canvas: SVG.Doc, store: any, svg: SVG.Element, graphic: GrahpicModel): any {
     return {
-        onMouseOver,
-        onMouseOut,
         onMouseDown
     };
-
-    function onMouseOver(): void {
-        svg.style("cursor", "pointer");
-    }
-
-    function onMouseOut(): void {
-        svg.style("cursor", "default");
-    }
 
     function onMouseDown(event: MouseEvent): void {
         console.log("rectangle");

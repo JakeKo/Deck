@@ -52,9 +52,31 @@ export default class Slide extends Vue {
 
     private addGraphic(graphic: GraphicModel): void {
         const svg: SVG.Element = this.renderGraphic(graphic);
-        svg.on("mouseover", (event: MouseEvent) => this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseOver(event));
-        svg.on("mouseout", (event: MouseEvent) => this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseOut(event));
-        svg.on("mousedown", (event: MouseEvent) => this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseDown(event));
+
+        // Bind each event handler for all that exist
+        svg.on("mouseover", (event: MouseEvent) => {
+            const handler = this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseOver;
+
+            if (handler !== undefined) {
+                handler(event);
+            }
+        });
+
+        svg.on("mouseout", (event: MouseEvent) => {
+            const handler = this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseOut;
+
+            if (handler !== undefined) {
+                handler(event);
+            }
+        });
+
+        svg.on("mousedown", (event: MouseEvent) => {
+            const handler = this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseDown;
+
+            if (handler !== undefined) {
+                handler(event);
+            }
+        });
     }
 }
 /* tslint:disable */
