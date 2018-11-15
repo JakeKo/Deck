@@ -41,41 +41,20 @@ export default class Slide extends Vue {
 
     public mounted(): void {
         this.canvas = SVG(this.$el.id);
-        this.graphics.push(new GraphicModel({ type: "rectangle" }));
-        this.initializeGraphics();
+        this.graphics.push(new GraphicModel());
+        this.graphics.forEach((graphic: GraphicModel) => this.addGraphic(graphic));
     }
 
-    public initializeGraphics(): any {
-        const self: Slide = this;
+    private renderGraphic(graphic: GraphicModel): SVG.Element {
+        // TODO: Handle multiples type of graphics
+        return this.canvas.rect(50, 100);
+    }
 
-        self.graphics.forEach((graphic: GraphicModel) => {
-            let svg: SVG.Element;
-
-            switch (graphic.type) {
-                case "rectangle":
-                    svg = this.canvas.rect(50, 100).attr({
-                        fill: graphic.styleModel.fill,
-                    });
-                    break;
-                default: break;
-            }
-
-            const handlers = self.tool.graphicHandlers(self.canvas, svg!);
-            svg!.on("mouseover", function(): void {
-                self.$el.style.cursor = "pointer";
-            });
-
-            svg!.on("mouseout", function(): void {
-                self.$el.style.cursor = "default";
-            });
-
-            svg!.on("mousedown", function(event: MouseEvent): void {
-                self.$store.commit("styleEditorObject", graphic);
-                handlers.startMoveGraphic(event);
-            });
-        });
-
-        return;
+    private addGraphic(graphic: GraphicModel): void {
+        const svg: SVG.Element = this.renderGraphic(graphic);
+        svg.on("mouseover", (event: MouseEvent) => this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseOver(event));
+        svg.on("mouseout", (event: MouseEvent) => this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseOut(event));
+        svg.on("mousedown", (event: MouseEvent) => this.tool.graphicHandlers(this.canvas, this.$store, svg, graphic).onMouseDown(event));
     }
 }
 /* tslint:disable */

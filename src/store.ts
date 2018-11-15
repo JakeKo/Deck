@@ -32,7 +32,7 @@ export default new Vuex.Store({
         currentTool: "cursor",
         tools: new Toolset(
             new ToolModel("cursor", Utilities.cursorHandlers),
-            new ToolModel("rectangle", Utilities.cursorHandlers),
+            new ToolModel("rectangle", Utilities.rectangleHandlers),
             new ToolModel("textbox", Utilities.cursorHandlers)
         )
     },
