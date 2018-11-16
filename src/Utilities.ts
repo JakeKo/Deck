@@ -37,6 +37,8 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
 
 // Rectangle tool handlers
 const rectangleTool: ToolModel = new ToolModel("rectangle", {
+    canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
+    canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent) => {
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
         const shape: SVG.Element = canvas.rect(0, 0);

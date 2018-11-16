@@ -42,6 +42,18 @@ export default class Slide extends Vue {
     public mounted(): void {
         this.canvas = SVG(this.$el.id);
 
+        this.canvas.on("mouseover", (event: MouseEvent) => {
+           if (this.tool.canvasMouseOver !== undefined) {
+               this.tool.canvasMouseOver(this.canvas)(event);
+           }
+        });
+
+        this.canvas.on("mouseout", (event: MouseEvent) => {
+           if (this.tool.canvasMouseOut !== undefined) {
+               this.tool.canvasMouseOut(this.canvas)(event);
+           }
+        });
+
         this.canvas.on("mousedown", (event: MouseEvent) => {
            if (this.tool.canvasMouseDown !== undefined) {
                this.tool.canvasMouseDown(this, this.canvas)(event);
