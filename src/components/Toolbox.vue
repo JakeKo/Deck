@@ -1,9 +1,9 @@
 /* tslint:disable */
 <template>
 <div id="toolbox" :style="toolboxStyle">
-    <tool @tool-click="$store.commit('tool', 'cursor')"></tool>
-    <tool @tool-click="$store.commit('tool', 'rectangle')"></tool>
-    <tool @tool-click="$store.commit('tool', 'textbox')"></tool>
+    <tool @tool-click="$store.commit('tool', 'cursor')" :isActive="$store.getters.tool.name === 'cursor'"></tool>
+    <tool @tool-click="$store.commit('tool', 'rectangle')" :isActive="$store.getters.tool.name === 'rectangle'"></tool>
+    <tool @tool-click="$store.commit('tool', 'textbox')" :isActive="$store.getters.tool.name === 'textbox'"></tool>
     <tool @tool-click="$store.dispatch('export')"></tool>
 </div>
 </template>

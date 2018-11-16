@@ -1,16 +1,25 @@
 /* tslint:disable */
 <template>
 <div id="tool" @click="$emit('tool-click')">
-    <div id="tool-icon" :style="{ background: $store.getters.theme.tertiary }"></div>
+    <div id="tool-icon" :style="toolIconStyle"></div>
 </div>
 </template>
 
 <script lang="ts">
 /* tslint:enable */
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Prop } from "vue-property-decorator";
 
 @Component
-export default class Tool extends Vue {}
+export default class Tool extends Vue {
+    @Prop({ type: Boolean, required: false, default: false })
+    private isActive!: boolean;
+
+    get toolIconStyle(): any {
+        return {
+            background: this.isActive ? "blue" : this.$store.getters.theme.tertiary
+        };
+    }
+}
 /* tslint:disable */
 </script>
 
