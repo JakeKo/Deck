@@ -21,7 +21,8 @@ import Tool from "./Tool.vue";
 export default class Toolbox extends Vue {
     get toolboxStyle(): any {
         return {
-            borderRight: `1px solid ${this.$store.getters.theme.tertiary}`
+            borderRight: `1px solid ${this.$store.getters.theme.tertiary}`,
+            width: `${this.$store.getters.toolboxWidth}px`
         };
     }
 }
@@ -30,8 +31,6 @@ export default class Toolbox extends Vue {
 
 <style lang="scss" scoped>
 #toolbox {
-    width: 64px;
-    flex-shrink: 0;
     flex-direction: column;
 }
 </style>

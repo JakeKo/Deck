@@ -16,7 +16,7 @@ export default new Vuex.Store({
             width: 4000
         },
         styleEditor: {
-            width: 500,
+            width: 300,
             object: undefined,
             objectId: ""
         },
@@ -35,7 +35,10 @@ export default new Vuex.Store({
             rectangle: Utilities.rectangleTool,
             textbox: Utilities.cursorTool
         } as { [key: string]: ToolModel },
-        pressedKeys: { } as { [key: number]: boolean }
+        pressedKeys: { } as { [key: number]: boolean },
+        toolbox: {
+            width: 64
+        }
     },
     getters: {
         slides: (state): SlideModel[] => {
@@ -70,6 +73,9 @@ export default new Vuex.Store({
         },
         pressedKeys: (state): any => {
             return state.pressedKeys;
+        },
+        toolboxWidth: (state): number => {
+            return state.toolbox.width;
         }
     },
     mutations: {

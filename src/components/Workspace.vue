@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-<div id="workspace">
+<div id="workspace" :style="workspaceStyle">
     <editor></editor>
     <roadmap></roadmap>
 </div>
@@ -18,7 +18,13 @@ import Roadmap from "./Roadmap.vue";
         Roadmap
     }
 })
-export default class Workspace extends Vue {}
+export default class Workspace extends Vue {
+    get workspaceStyle(): any {
+        return {
+            width: `calc(100vw - ${this.$store.getters.toolboxWidth + this.$store.getters.styleEditorWidth}px)`
+        };
+    }
+}
 /* tslint:disable */
 </script>
 
@@ -26,6 +32,5 @@ export default class Workspace extends Vue {}
 #workspace {
     display: flex;
     flex-direction: column;
-    overflow: auto;
 }
 </style>

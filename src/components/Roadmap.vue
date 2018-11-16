@@ -8,7 +8,7 @@
             :id="slide.id"
             :key="slide.id"
         ></slide-preview>
-        <div id="new-slide-button" @click="newSlideHandler" :style="newSlideButtonStyle">+</div>
+        <div><div id="new-slide-button" @click="newSlideHandler" :style="newSlideButtonStyle">+</div></div>
     </div>
 </div>
 </template>
@@ -63,6 +63,7 @@ export default class Roadmap extends Vue {
         const activeSlideIndex: number = slides.findIndex((slide: SlideModel) => slide.id === this.$store.getters.activeSlide.id);
         this.$store.commit("activeSlide", slides[activeSlideIndex + 1].id);
         this.$store.commit("styleEditorObject", undefined);
+
     }
 }
 /* tslint:disable */
@@ -72,32 +73,30 @@ export default class Roadmap extends Vue {
 @import "../styles/components";
 
 #roadmap {
-    flex-shrink: 0;
     position: relative;
-    max-height: 256px;
 }
 
 #slide-previews {
     height: 100%;
-    width: 100%;
+    min-width: 100%;
+    overflow-x: auto;
     display: flex;
     align-items: center;
     padding: 0 12px;
     box-sizing: border-box;
-    overflow-x: scroll;
 }
 
-::-webkit-scrollbar { 
-    display: none; 
+::-webkit-scrollbar {
+    display: none;
 }
 
 #new-slide-button {
     height: 63px;
     width: 112px;
-    margin: 0 12px;
+    margin: 0 24px 0 12px;
     cursor: pointer;
-    flex-shrink: 0;
     display: flex;
+    flex-shrink: 0;
     justify-content: center;
     align-items: center;
     font-size: 48px;
