@@ -18,9 +18,6 @@ export default class Slide extends Vue {
     @Prop({ type: String, required: true })
     private id!: string;
 
-    @Prop({ type: ToolModel, required: true })
-    private tool!: ToolModel;
-
     @Prop({ type: Array, default: () => new Array<GraphicModel>() })
     private graphics!: GraphicModel[];
 
@@ -42,16 +39,16 @@ export default class Slide extends Vue {
     public mounted(): void {
         this.canvas = SVG(this.$el.id);
 
-        this.canvas.on("mouseover", (event: MouseEvent) => this.tool.canvasMouseOver(this.canvas)(event));
-        this.canvas.on("mouseout", (event: MouseEvent) => this.tool.canvasMouseOut(this.canvas)(event));
-        this.canvas.on("mousedown", (event: MouseEvent) => this.tool.canvasMouseDown(this, this.canvas)(event));
+        this.canvas.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.canvasMouseOver(this.canvas)(event));
+        this.canvas.on("mouseout", (event: MouseEvent) => this.$store.getters.tool.canvasMouseOut(this.canvas)(event));
+        this.canvas.on("mousedown", (event: MouseEvent) => this.$store.getters.tool.canvasMouseDown(this, this.canvas)(event));
 
-        this.updateCanvas();
+        this.refreshCanvas();
     }
 
-    public updateCanvas(): void {
+    private refreshCanvas(): void {
         this.canvas.clear();
-        this.graphics.forEach((graphic: GraphicModel) => this.addGraphic(graphic));
+        this.graphics.forEach((graphic: GraphicModel) => this.initializeGraphic(graphic));
     }
 
     private renderGraphic(graphic: GraphicModel): SVG.Element {
@@ -70,13 +67,18 @@ export default class Slide extends Vue {
         throw `Undefined type of graphic: ${graphic.type}`;
     }
 
-    public addGraphic(graphic: GraphicModel): void {
+    private initializeGraphic(graphic: GraphicModel): void {
         const svg: SVG.Element = this.renderGraphic(graphic);
 
         // Bind each event handler
-        svg.on("mouseover", (event: MouseEvent) => this.tool.graphicMouseOver(svg)(event));
-        svg.on("mouseout", (event: MouseEvent) => this.tool.graphicMouseOut(svg)(event));
-        svg.on("mousedown", (event: MouseEvent) => this.tool.graphicMouseDown(this, svg, graphic)(event));
+        svg.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOver(svg)(event));
+        svg.on("mouseout", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOut(svg)(event));
+        svg.on("mousedown", (event: MouseEvent) => this.$store.getters.tool.graphicMouseDown(this, svg, graphic)(event));
+    }
+
+    private addGraphic(graphic: GraphicModel): void {
+        this.graphics.push(graphic);
+        this.initializeGraphic(graphic);
     }
 }
 /* tslint:disable */

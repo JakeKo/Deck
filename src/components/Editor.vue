@@ -6,7 +6,6 @@
             :key="slide.id"
             :id="slide.id"
             :graphics="slide.elements"
-            :tool="$store.getters.tool"
         ></slide>
     </div>
 </div>
