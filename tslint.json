@@ -1,6 +1,5 @@
 {
 	"defaultSeverity": "error",
-	"jsRules": {},
 	"rules": {
 		"adjacent-overload-signatures": true,
         "align": true,
@@ -52,9 +51,5 @@
 		},
 		"semicolon": true,
 		"use-isnan": true
-	},
-	"rulesDirectory": [],
-	"files": [
-		"vue.d.ts"
-	]
+	}
 }

@@ -1,2 +1,2 @@
 # Deck
-Deck is a slide deck editing and presenting application.
+Deck is an open-source, well-armed, safe-to-swallow, and fluoride-free application for editing and presenting slide decks.
