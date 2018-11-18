@@ -8,14 +8,18 @@
 	"bugs": "https://github.com/JakeKo/Deck/issues",
 	"repository": "git+https://github.com/JakeKo/Deck.git",
 	"scripts": {
-		"serve": "cross-env NODE_ENV=development webpack-dev-server --config webpack-dev.config.js --hot --inline"
+		"serve": "cross-env NODE_ENV=development webpack-dev-server --hot --inline",
+		"test": "cross-env NODE_ENV=development mocha-webpack --webpack-config webpack.config.js --require test/setup.js test/*.spec.js"
 	},
 	"devDependencies": {
-		"@vue/test-utils": "^1.0.0-beta.20",
-		"babel-core": "^6.26.3",
-		"babel-loader": "^7.1.4",
+		"@vue/test-utils": "^1.0.0-beta.25",
 		"cross-env": "^5.2.0",
 		"css-loader": "^0.28.11",
+		"expect": "^23.6.0",
+		"jsdom": "^13.0.0",
+		"jsdom-global": "^3.0.2",
+		"mocha": "^5.2.0",
+		"mocha-webpack": "^2.0.0-beta.0",
 		"node-sass": "^4.9.1",
 		"sass-loader": "^7.0.3",
 		"svg.js": "^2.6.6",
@@ -24,7 +28,6 @@
 		"tslint-loader": "^3.6.0",
 		"typescript": "^2.7.2",
 		"vue": "^2.5.16",
-		"vue-class-component": "^6.2.0",
 		"vue-loader": "^15.2.4",
 		"vue-property-decorator": "^7.0.0",
 		"vue-router": "^3.0.1",
@@ -32,7 +35,7 @@
 		"vue-template-compiler": "^2.5.16",
 		"vuex": "^3.0.1",
 		"webpack": "^4.12.2",
-		"webpack-cli": "^3.0.8",
+		"webpack-cli": "^3.1.2",
 		"webpack-dev-server": "^3.1.10",
 		"webpack-node-externals": "^1.7.2"
 	},

@@ -12,7 +12,7 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 @Component
 export default class Tool extends Vue {
     @Prop({ type: Boolean, required: false, default: false })
-    private isActive!: boolean;
+    public isActive!: boolean;
 
     get toolIconStyle(): any {
         return {

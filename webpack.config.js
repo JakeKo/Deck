@@ -1,15 +1,18 @@
 const Path = require("path");
+const NodeExternals = require("webpack-node-externals");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 module.exports = {
     mode: "development",
-    plugins: [ new VueLoaderPlugin() ],
+    devtool: "inline-cheap-module-source-map",
+    externals: [NodeExternals()],
+    plugins: [new VueLoaderPlugin()],
     output: {
         path: Path.resolve(__dirname, "dist"),
         publicPath: "/dist/"
     },
     resolve: {
-        extensions: [ ".ts", ".js", ".json", ".vue" ],
+        extensions: [".ts", ".js", ".json", ".vue"],
         alias: {
             vue: "vue/dist/vue.runtime.esm.js"
         }
@@ -18,7 +21,7 @@ module.exports = {
         rules: [
             {
                 test: /\.ts$/,
-                include: [ Path.resolve(__dirname, "src") ],
+                include: [Path.resolve(__dirname, "src")],
                 use: [
                     {
                         loader: "ts-loader",
