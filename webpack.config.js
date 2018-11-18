@@ -1,11 +1,8 @@
 const Path = require("path");
-const NodeExternals = require("webpack-node-externals");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 module.exports = {
     mode: "development",
-    devtool: "inline-cheap-module-source-map",
-    externals: [NodeExternals()],
     plugins: [new VueLoaderPlugin()],
     output: {
         path: Path.resolve(__dirname, "dist"),
