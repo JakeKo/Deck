@@ -129,9 +129,9 @@ export default new Vuex.Store({
                 // TODO: Use svg.js to programmatically add graphics
                 slideModel.graphics.forEach((element: GraphicModel) => {
                     const polygon = document.createElement("polygon");
-                    polygon.setAttribute("fill", element.styleModel.fill);
-                    polygon.setAttribute("stroke", element.styleModel.stroke);
-                    polygon.setAttribute("stroke-width", element.styleModel.strokeWidth);
+                    // polygon.setAttribute("fill", element.styleModel.fill);
+                    // polygon.setAttribute("stroke", element.styleModel.stroke);
+                    // polygon.setAttribute("stroke-width", element.styleModel.strokeWidth);
                     polygon.setAttribute("fill-rule", "evenodd");
                     slide.appendChild(polygon);
                 });

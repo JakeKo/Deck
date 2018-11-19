@@ -1,14 +1,13 @@
 export default class StyleModel {
-    [key:string]: string | number;
-    public fill: string;
-    public stroke: string;
-    public strokeWidth: string;
-    public x: number;
-    public y: number;
-    public width: number;
-    public height: number;
-    public message: string;
-    public rotation: number;
+    public fill?: string;
+    public stroke?: string;
+    public strokeWidth?: string;
+    public x?: number;
+    public y?: number;
+    public width?: number;
+    public height?: number;
+    public message?: string;
+    public rotation?: number;
 
     constructor(
         {
@@ -34,14 +33,14 @@ export default class StyleModel {
             rotation?: number
         } = {}
     ) {
-        this.fill = fill || "green";
-        this.stroke = stroke || "black";
-        this.strokeWidth = strokeWidth || "1";
-        this.x = x || 0;
-        this.y = y || 0;
-        this.width = width || 100;
-        this.height = height || 100;
-        this.message = message || "";
-        this.rotation = rotation || 0;
+        this.fill = fill;
+        this.stroke = stroke;
+        this.strokeWidth = strokeWidth;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.message = message;
+        this.rotation = rotation;
     }
 }

@@ -67,7 +67,7 @@ export default class Slide extends Vue {
                 "stroke-width": style.strokeWidth
             });
         } else if (graphic.type === "textbox") {
-            return this.canvas.text(style.message).attr({
+            return this.canvas.text(style.message || "").attr({
                 "x": style.x,
                 "y": style.y
             });

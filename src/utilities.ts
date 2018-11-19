@@ -91,7 +91,6 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any) => (event: MouseEvent): any => {
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
-
         const graphic = new GraphicModel({
             type: "textbox",
             styleModel: new StyleModel({
