@@ -5,7 +5,7 @@
         <slide v-for="slide in $store.getters.slides" 
             :key="slide.id"
             :id="slide.id"
-            :graphics="slide.elements"
+            :graphics="slide.graphics"
         ></slide>
     </div>
 </div>

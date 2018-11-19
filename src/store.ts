@@ -83,6 +83,10 @@ export default new Vuex.Store({
             const index: number = slideId ? state.slides.findIndex((slide: SlideModel) => slide.id === slideId) : -1;
             state.slides.splice(index + 1, 0, new SlideModel());
         },
+        addGraphic: (state: any, { slideId, graphic }: { slideId: string, graphic: GraphicModel }): void => {
+            const slide: SlideModel = state.slides.find((slide: SlideModel) => slide.id === slideId);
+            slide.graphics.push(graphic);
+        },
         tool: (state: any, toolName: string): void => {
             state.currentTool = toolName;
         },

@@ -1,15 +1,14 @@
 /* tslint:disable */
 <template>
-<div :id="slideId" :style="slideStyle"></div>
+<div :id="`slide_${id}`" :style="slideStyle"></div>
 </template>
 
 <script lang="ts">
 /* tslint:enable */
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import GraphicModel from "../models/GraphicModel";
-import Point from "../models/Point";
-import ToolModel from "../models/ToolModel";
+import StyleModel from "../models/StyleModel";
 
 @Component
 export default class Slide extends Vue {
@@ -21,9 +20,10 @@ export default class Slide extends Vue {
     @Prop({ type: Array, default: () => new Array<GraphicModel>() })
     private graphics!: GraphicModel[];
 
-    // Necessary to generate unique id field so SVG canvas is bound to each slide
-    get slideId(): string {
-        return `slide_${this.id}`;
+    @Watch("graphics")
+    private refreshCanvas(): void {
+        this.canvas.clear();
+        this.graphics.forEach((graphic: GraphicModel) => this.initializeGraphic(graphic));
     }
 
     get slideStyle(): any {
@@ -46,13 +46,17 @@ export default class Slide extends Vue {
         this.refreshCanvas();
     }
 
-    private refreshCanvas(): void {
-        this.canvas.clear();
-        this.graphics.forEach((graphic: GraphicModel) => this.initializeGraphic(graphic));
+    private initializeGraphic(graphic: GraphicModel): void {
+        const svg: SVG.Element = this.renderGraphic(graphic);
+
+        // Bind each event handler
+        svg.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOver(svg)(event));
+        svg.on("mouseout", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOut(svg)(event));
+        svg.on("mousedown", (event: MouseEvent) => this.$store.getters.tool.graphicMouseDown(this, svg, graphic)(event));
     }
 
     private renderGraphic(graphic: GraphicModel): SVG.Element {
-        const style = graphic.styleModel;
+        const style: StyleModel = graphic.styleModel;
 
         if (graphic.type === "rectangle") {
             return this.canvas.rect(style.width, style.height).attr({
@@ -65,20 +69,6 @@ export default class Slide extends Vue {
         }
 
         throw `Undefined type of graphic: ${graphic.type}`;
-    }
-
-    private initializeGraphic(graphic: GraphicModel): void {
-        const svg: SVG.Element = this.renderGraphic(graphic);
-
-        // Bind each event handler
-        svg.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOver(svg)(event));
-        svg.on("mouseout", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOut(svg)(event));
-        svg.on("mousedown", (event: MouseEvent) => this.$store.getters.tool.graphicMouseDown(this, svg, graphic)(event));
-    }
-
-    private addGraphic(graphic: GraphicModel): void {
-        this.graphics.push(graphic);
-        this.initializeGraphic(graphic);
     }
 }
 /* tslint:disable */

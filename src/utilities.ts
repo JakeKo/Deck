@@ -40,7 +40,7 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent) => {
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
-        const shape: SVG.Element = canvas.rect(0, 0);
+        const shape: SVG.Element = canvas.rect();
         const start: Point = new Point(event.clientX - bounds.left, event.clientY - bounds.top);
         shape.move(start.x, start.y);
         canvas.on("mousemove", preview);
@@ -80,8 +80,7 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
             });
 
             shape.remove();
-            slide.graphics.push(graphic);
-            slide.addGraphic(graphic);
+            slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
             slide.$store.commit("styleEditorObject", graphic);
         }
     }
