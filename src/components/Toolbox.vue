@@ -2,19 +2,19 @@
 <template>
 <div id="toolbox" :style="toolboxStyle">    
     <div class="tool" @click="$store.commit('tool', 'cursor')">
-        <div class="tool-icon" :style="toolIconStyle"></div>
+        <div class="tool-icon" :style="toolIconStyle('cursor')"></div>
     </div>
 
     <div class="tool" @click="$store.commit('tool', 'rectangle')">
-        <div class="tool-icon" :style="toolIconStyle"></div>
+        <div class="tool-icon" :style="toolIconStyle('rectangle')"></div>
     </div>
     
     <div class="tool" @click="$store.commit('tool', 'textbox')">
-        <div class="tool-icon" :style="toolIconStyle"></div>
+        <div class="tool-icon" :style="toolIconStyle('textbox')"></div>
     </div>
     
     <div class="tool" @click="$store.dispatch('export')">
-        <div class="tool-icon" :style="toolIconStyle"></div>
+        <div class="tool-icon" :style="toolIconStyle('')"></div>
     </div>
 </div>
 </template>
@@ -32,9 +32,9 @@ export default class Toolbox extends Vue {
         };
     }
 
-    get toolIconStyle(): any {
+    private toolIconStyle(toolName: string): any {
         return {
-            background: this.$store.getters.theme.tertiary
+            background: this.$store.getters.tool.name === toolName ? "blue" : this.$store.getters.theme.tertiary
         };
     }
 }
