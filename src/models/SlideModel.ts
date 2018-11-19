@@ -1,4 +1,4 @@
-import Utilities from "../foo";
+import Utilities from "../utilities";
 import GraphicModel from "./GraphicModel";
 
 export default class SlideModel {

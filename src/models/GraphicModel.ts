@@ -1,4 +1,4 @@
-import Utilities from "../foo";
+import Utilities from "../utilities";
 import StyleModel from "./StyleModel";
 
 export default class GraphicModel {

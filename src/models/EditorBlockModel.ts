@@ -1,4 +1,4 @@
-import Utilities from "../foo";
+import Utilities from "../utilities";
 
 export default class EditorBlockModel {
     public id: string;
