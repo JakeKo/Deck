@@ -1,28 +1,40 @@
 /* tslint:disable */
 <template>
-<div id="toolbox" :style="toolboxStyle">
-    <tool @tool-click="$store.commit('tool', 'cursor')" :isActive="$store.getters.tool.name === 'cursor'"></tool>
-    <tool @tool-click="$store.commit('tool', 'rectangle')" :isActive="$store.getters.tool.name === 'rectangle'"></tool>
-    <tool @tool-click="$store.commit('tool', 'textbox')" :isActive="$store.getters.tool.name === 'textbox'"></tool>
-    <tool @tool-click="$store.dispatch('export')"></tool>
+<div id="toolbox" :style="toolboxStyle">    
+    <div class="tool" @click="$store.commit('tool', 'cursor')">
+        <div class="tool-icon" :style="toolIconStyle"></div>
+    </div>
+
+    <div class="tool" @click="$store.commit('tool', 'rectangle')">
+        <div class="tool-icon" :style="toolIconStyle"></div>
+    </div>
+    
+    <div class="tool" @click="$store.commit('tool', 'textbox')">
+        <div class="tool-icon" :style="toolIconStyle"></div>
+    </div>
+    
+    <div class="tool" @click="$store.dispatch('export')">
+        <div class="tool-icon" :style="toolIconStyle"></div>
+    </div>
 </div>
 </template>
 
 <script lang="ts">
 /* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
-import Tool from "./Tool.vue";
 
-@Component({
-    components: {
-        Tool
-    }
-})
+@Component
 export default class Toolbox extends Vue {
     get toolboxStyle(): any {
         return {
             borderRight: `1px solid ${this.$store.getters.theme.tertiary}`,
             width: `${this.$store.getters.toolboxWidth}px`
+        };
+    }
+
+    get toolIconStyle(): any {
+        return {
+            background: this.$store.getters.theme.tertiary
         };
     }
 }
@@ -32,5 +44,20 @@ export default class Toolbox extends Vue {
 <style lang="scss" scoped>
 #toolbox {
     flex-direction: column;
+}
+
+.tool {
+    width: 100%;
+    height: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.tool-icon {
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
 }
 </style>
