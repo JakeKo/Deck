@@ -2,7 +2,10 @@
 <template>
 <div id="app">
     <toolbox></toolbox>
-    <workspace></workspace>
+    <div id="workspace" :style="workspaceStyle">
+        <editor></editor>
+        <roadmap></roadmap>
+    </div>
     <style-editor></style-editor>
 </div>
 </template>
@@ -11,13 +14,15 @@
 /* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
 import Toolbox from "../components/Toolbox.vue";
-import Workspace from "../components/Workspace.vue";
+import Editor from "../components/Editor.vue";
+import Roadmap from "../components/Roadmap.vue";
 import StyleEditor from "../components/StyleEditor.vue";
 
 @Component({
     components: {
         Toolbox,
-        Workspace,
+        Editor,
+        Roadmap,
         StyleEditor
     }
 })
@@ -42,6 +47,12 @@ export default class App extends Vue {
             }
         });
     }
+
+    get workspaceStyle(): any {
+        return {
+            width: `calc(100vw - ${this.$store.getters.toolboxWidth + this.$store.getters.styleEditorWidth}px)`
+        };
+    }
 }
 /* tslint:disable */
 </script>
@@ -51,5 +62,10 @@ export default class App extends Vue {
     display: flex;
     height: 100vh;
     overflow: hidden;
+}
+
+#workspace {
+    display: flex;
+    flex-direction: column;
 }
 </style>
