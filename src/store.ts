@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import SlideModel from "./models/SlideModel";
-import Utilities from "./utilities";
+import Utilities from "./foo";
 import Theme from "./models/Theme";
 import GraphicModel from "./models/GraphicModel";
 import ToolModel from "./models/ToolModel";
@@ -41,55 +41,55 @@ export default new Vuex.Store({
         }
     },
     getters: {
-        slides: (state): SlideModel[] => {
+        slides: (state: any): SlideModel[] => {
             return state.slides;
         },
-        firstSlide: (state): SlideModel => {
+        firstSlide: (state: any): SlideModel => {
             return state.slides[0];
         },
-        lastSlide: (state): SlideModel => {
+        lastSlide: (state: any): SlideModel => {
             return state.slides[state.slides.length - 1];
         },
-        activeSlide: (state): SlideModel => {
-            return Utilities.getSlide(state.slides, state.activeSlideId)!;
+        activeSlide: (state: any): SlideModel => {
+            return state.slides.find((slide: SlideModel) => slide.id === state.activeSlideId)!;
         },
-        styleEditorWidth: (state): number => {
+        styleEditorWidth: (state: any): number => {
             return state.styleEditor.width;
         },
-        styleEditorObject: (state): any => {
+        styleEditorObject: (state: any): any => {
             return state.styleEditor.object;
         },
-        styleEditorObjectId: (state): string => {
+        styleEditorObjectId: (state: any): string => {
             return state.styleEditor.objectId;
         },
-        roadmapHeight: (state): number => {
+        roadmapHeight: (state: any): number => {
             return state.roadmap.height;
         },
-        theme: (state): Theme => {
+        theme: (state: any): Theme => {
             return state.themes[state.theme];
         },
-        tool: (state): ToolModel => {
+        tool: (state: any): ToolModel => {
             return state.tools[state.currentTool];
         },
-        pressedKeys: (state): any => {
+        pressedKeys: (state: any): any => {
             return state.pressedKeys;
         },
-        toolboxWidth: (state): number => {
+        toolboxWidth: (state: any): number => {
             return state.toolbox.width;
         }
     },
     mutations: {
-        addSlide: (state, slideId: string): void => {
+        addSlide: (state: any, slideId: string): void => {
             const index: number = slideId ? state.slides.findIndex((slide: SlideModel) => slide.id === slideId) : -1;
             state.slides.splice(index + 1, 0, new SlideModel());
         },
-        tool: (state, toolName: string): void => {
+        tool: (state: any, toolName: string): void => {
             state.currentTool = toolName;
         },
-        styleEditorWidth: (state, width: number): void => {
+        styleEditorWidth: (state: any, width: number): void => {
             state.styleEditor.width = width;
         },
-        styleEditorObject: (state, object: any): void => {
+        styleEditorObject: (state: any, object: any): void => {
             // Object is of type any because styleEditor.object is initialized as undefined
             if (object === undefined) {
                 state.styleEditor.objectId = "";
@@ -99,18 +99,18 @@ export default new Vuex.Store({
                 state.styleEditor.object = object.styleModel;
             }
         },
-        roadmapHeight: (state, height: number): void => {
+        roadmapHeight: (state: any, height: number): void => {
             state.roadmap.height = height;
         },
-        activeSlide: (state, slideId: string): void => {
+        activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;
         },
-        pressedKeys: (state, { keyCode, isPressed }) => {
+        pressedKeys: (state: any, { keyCode, isPressed }: { keyCode: number, isPressed: boolean }) => {
             state.pressedKeys[keyCode] = isPressed;
         }
     },
     actions: {
-        export: (store): void => {
+        export: (store: any): void => {
             const html = document.createElement("html");
 
             html.appendChild(document.createElement("head"));

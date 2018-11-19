@@ -20,7 +20,7 @@
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import EditorLineModel from "../models/EditorLineModel";
 import EditorLine from "./EditorLine.vue";
-import Utilities from "../utilities";
+import Utilities from "../foo";
 import StyleModel from "../models/StyleModel";
 
 @Component({

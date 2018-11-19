@@ -1,6 +1,3 @@
 language: node_js
 node_js:
-  - "node"
-test:
-  - ls /home/travis/build/JakeKo/Deck/src
-  - npm test
+  - "10.13.0"

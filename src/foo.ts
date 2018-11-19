@@ -1,6 +1,5 @@
 import EditorLineModel from "./models/EditorLineModel";
 import EditorBlockModel from "./models/EditorBlockModel";
-import SlideModel from "./models/SlideModel";
 import * as SVG from "svg.js";
 import Point from "./models/Point";
 import GraphicModel from "./models/GraphicModel";
@@ -94,7 +93,6 @@ export default {
     generateId,
     objectToHtml,
     htmlToObject,
-    getSlide,
     deckScript
 };
 
@@ -199,10 +197,6 @@ function htmlToObject(lines: EditorLineModel[]): any {
 
     objectString += "}";
     return JSON.parse(objectString);
-}
-
-function getSlide(slides: SlideModel[], slideId: string): SlideModel | undefined {
-    return slides.find((slide) => slide.id === slideId);
 }
 
 function deckScript(): string {
