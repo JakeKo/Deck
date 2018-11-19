@@ -33,7 +33,7 @@ export default new Vuex.Store({
         tools: {
             cursor: Utilities.cursorTool,
             rectangle: Utilities.rectangleTool,
-            textbox: Utilities.cursorTool
+            textbox: Utilities.textboxTool
         } as { [key: string]: ToolModel },
         pressedKeys: { } as { [key: number]: boolean },
         toolbox: {
