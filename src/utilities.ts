@@ -11,7 +11,7 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
     graphicMouseOver: (svg: SVG.Element) => (): any => svg.style("cursor", "pointer"),
     graphicMouseOut: (svg: SVG.Element) => (): any => svg.style("cursor", "default"),
     graphicMouseDown: (slide: any, svg: SVG.Element, graphic: GraphicModel) => (event: MouseEvent): any => {
-        event.stopPropagation();
+        event.stopPropagation(); // Prevent the event from bubbling up to the canvas
 
         if (slide.$store.getters.focusedGraphicId !== graphic.id) {
             slide.$store.commit("focusGraphic", graphic);
@@ -31,14 +31,14 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
         function end(event: MouseEvent): void {
             slide.canvas.off("mousemove", preview);
             slide.canvas.off("mouseup", end);
+
             graphic.styleModel.x = event.clientX - offset.x;
             graphic.styleModel.y = event.clientY - offset.y;
-            // Cache busting occurs here I presume
             slide.$store.commit("styleEditorObject", undefined);
             slide.$store.commit("styleEditorObject", graphic);
         }
     },
-    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): any => {
+    canvasMouseDown: (slide: any) => (): any => {
         if (slide.$store.getters.focusedGraphicId !== "") {
             slide.$store.commit("focusGraphic", { id: "" });
             slide.$store.commit("styleEditorObject", undefined);

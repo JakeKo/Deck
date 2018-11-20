@@ -33,9 +33,16 @@ export default class App extends Vue {
 
         document.addEventListener("keydown", (event: KeyboardEvent) => {
             const isPressed = this.$store.getters.pressedKeys[event.keyCode];
+            const DELETE_KEY_CODE = 46, BACKSPACE_KEY_CODE = 8;
 
             if (!isPressed) {
                 this.$store.commit("pressedKeys", { keyCode: event.keyCode, isPressed: true });
+            }
+
+            if (event.keyCode === DELETE_KEY_CODE || event.keyCode === BACKSPACE_KEY_CODE) {
+                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: this.$store.getters.focusedGraphicId });
+                this.$store.commit("focusGraphic", { id: "" });
+                this.$store.commit("styleEditorObject", undefined);
             }
         });
 

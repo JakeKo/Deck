@@ -1,7 +1,7 @@
 export default class StyleModel {
     public fill?: string;
     public stroke?: string;
-    public strokeWidth?: string;
+    public strokeWidth?: number;
     public x?: number;
     public y?: number;
     public width?: number;
@@ -24,7 +24,7 @@ export default class StyleModel {
         {
             fill?: string,
             stroke?: string,
-            strokeWidth?: string,
+            strokeWidth?: number,
             x?: number,
             y?: number,
             width?: number,

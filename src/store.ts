@@ -91,6 +91,10 @@ export default new Vuex.Store({
             const slide: SlideModel = state.slides.find((slide: SlideModel) => slide.id === slideId);
             slide.graphics.push(graphic);
         },
+        removeGraphic: (state: any, { slideId, graphicId }: { slideId: string, graphicId: string}): void => {
+            const slide: SlideModel = state.slides.find((slide: SlideModel) => slide.id === slideId);
+            slide.graphics = slide.graphics.filter((graphic: GraphicModel) => graphic.id !== graphicId);
+        },
         tool: (state: any, toolName: string): void => {
             state.currentTool = toolName;
         },
