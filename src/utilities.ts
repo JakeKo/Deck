@@ -11,7 +11,13 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
     graphicMouseOver: (svg: SVG.Element) => (): any => svg.style("cursor", "pointer"),
     graphicMouseOut: (svg: SVG.Element) => (): any => svg.style("cursor", "default"),
     graphicMouseDown: (slide: any, svg: SVG.Element, graphic: GraphicModel) => (event: MouseEvent): any => {
-        slide.$store.commit("styleEditorObject", graphic);
+        event.stopPropagation();
+
+        if (slide.$store.getters.focusedGraphicId !== graphic.id) {
+            slide.$store.commit("focusGraphic", graphic);
+            slide.$store.commit("styleEditorObject", graphic);
+        }
+
         const offset = new Point(event.clientX - svg.x(), event.clientY - svg.y());
         slide.canvas.on("mousemove", preview);
         slide.canvas.on("mouseup", end);
@@ -30,6 +36,12 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
             // Cache busting occurs here I presume
             slide.$store.commit("styleEditorObject", undefined);
             slide.$store.commit("styleEditorObject", graphic);
+        }
+    },
+    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): any => {
+        if (slide.$store.getters.focusedGraphicId !== "") {
+            slide.$store.commit("focusGraphic", { id: "" });
+            slide.$store.commit("styleEditorObject", undefined);
         }
     }
 });
@@ -82,6 +94,7 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
             shape.remove();
             slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
             slide.$store.commit("styleEditorObject", graphic);
+            slide.$store.commit("focusGraphic", graphic);
         }
     }
 });
@@ -102,6 +115,7 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
 
         slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
         slide.$store.commit("styleEditorObject", graphic);
+        slide.$store.commit("focusGraphic", graphic);
     }
 });
 

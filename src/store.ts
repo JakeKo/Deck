@@ -11,6 +11,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         activeSlideId: "",
+        focusedGraphicId: "",
         canvas: {
             height: 2000,
             width: 4000
@@ -76,6 +77,9 @@ export default new Vuex.Store({
         },
         toolboxWidth: (state: any): number => {
             return state.toolbox.width;
+        },
+        focusedGraphicId: (state: any): string => {
+            return state.focusedGraphicId;
         }
     },
     mutations: {
@@ -111,6 +115,9 @@ export default new Vuex.Store({
         },
         pressedKeys: (state: any, { keyCode, isPressed }: { keyCode: number, isPressed: boolean }) => {
             state.pressedKeys[keyCode] = isPressed;
+        },
+        focusGraphic: (state: any, graphic: GraphicModel) => {
+            state.focusedGraphicId = graphic.id;
         }
     },
     actions: {
