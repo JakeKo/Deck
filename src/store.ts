@@ -4,7 +4,9 @@ import SlideModel from "./models/SlideModel";
 import Utilities from "./utilities";
 import Theme from "./models/Theme";
 import GraphicModel from "./models/GraphicModel";
+import StyleModel from "./models/StyleModel";
 import ToolModel from "./models/ToolModel";
+import * as SVG from "svg.js";
 
 Vue.use(Vuex);
 
@@ -126,25 +128,36 @@ export default new Vuex.Store({
     },
     actions: {
         export: (store: any): void => {
-            const html = document.createElement("html");
+            const html: HTMLHtmlElement = document.createElement("html");
 
             html.appendChild(document.createElement("head"));
             // Append metadata to head element
 
-            const body = document.createElement("body");
+            const body: HTMLBodyElement = document.createElement("body");
             store.getters.slides.forEach((slideModel: SlideModel) => {
-                const slide: HTMLElement = document.createElement("svg");
+                // TODO: Resolve discrepancy in that svg.js wants the node to be on the page
+                const slide: HTMLDivElement = document.createElement("div");
                 slide.setAttribute("id", slideModel.id);
                 slide.setAttribute("class", "slide");
 
-                // TODO: Use svg.js to programmatically add graphics
-                slideModel.graphics.forEach((element: GraphicModel) => {
-                    const polygon = document.createElement("polygon");
-                    // polygon.setAttribute("fill", element.styleModel.fill);
-                    // polygon.setAttribute("stroke", element.styleModel.stroke);
-                    // polygon.setAttribute("stroke-width", element.styleModel.strokeWidth);
-                    polygon.setAttribute("fill-rule", "evenodd");
-                    slide.appendChild(polygon);
+                const canvas: SVG.Doc = SVG(slideModel.id);
+                slideModel.graphics.forEach((graphic: GraphicModel) => {
+                    const style: StyleModel = graphic.styleModel;
+
+                    if (graphic.type === "rectangle") {
+                        return canvas.rect(style.width, style.height).attr({
+                            "x": style.x,
+                            "y": style.y,
+                            "fill": style.fill,
+                            "stroke": style.stroke,
+                            "stroke-width": style.strokeWidth
+                        });
+                    } else if (graphic.type === "textbox") {
+                        return canvas.text(style.message || "").attr({
+                            "x": style.x,
+                            "y": style.y
+                        });
+                    }
                 });
 
                 body.appendChild(slide);
@@ -152,10 +165,9 @@ export default new Vuex.Store({
 
             html.appendChild(body);
 
-            const deck = `${html.outerHTML}${Utilities.deckScript()}`;
-            const url: string = `data:text/html;charset=UTF-8,${encodeURIComponent(deck)}`;
-            const anchor: HTMLElement = document.createElement("a");
-            anchor.setAttribute("href", url);
+            const anchor: HTMLAnchorElement = document.createElement("a");
+            const page: string = `${html.outerHTML}${Utilities.deckScript()}`;
+            anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
             anchor.setAttribute("download", "deck.html");
             anchor.click();
         }

@@ -253,6 +253,11 @@ body {
 .slide:first-child {
     display: block;
 }
+
+svg {
+    height: 100%;
+    width: 100%;
+}
 </style>
 
 <script>
