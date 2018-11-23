@@ -21,7 +21,7 @@ describe("Toolbox", () => {
     it("has four tools", () => {
         const wrapper = shallowMount(Toolbox, { store, localVue });
         
-        expect(wrapper.findAll(".tool").length).toBe(4);
+        expect(wrapper.findAll(".tool").length).toBe(6);
     });
 
     it("has one active tool", () => {
@@ -35,6 +35,6 @@ describe("Toolbox", () => {
         const wrapper = shallowMount(Toolbox, { store, localVue });
         
         const icons = wrapper.findAll(".tool-icon").wrappers.map((w) => w.element);
-        expect(icons.filter((element) => element.style.background === "rgb(221, 221, 221)").length).toBe(3);
+        expect(icons.filter((element) => element.style.background === "rgb(221, 221, 221)").length).toBe(5);
     });
 });
