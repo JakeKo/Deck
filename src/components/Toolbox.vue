@@ -13,6 +13,14 @@
         <div class="tool-icon" :style="toolIconStyle('textbox')"></div>
     </div>
     
+    <div class="tool" @click="$store.commit('zoom')">
+        <div class="tool-icon" :style="toolIconStyle('')"></div>
+    </div>
+    
+    <div class="tool" @click="$store.commit('unzoom')">
+        <div class="tool-icon" :style="toolIconStyle('')"></div>
+    </div>
+    
     <div class="tool" @click="$store.dispatch('export')">
         <div class="tool-icon" :style="toolIconStyle('')"></div>
     </div>

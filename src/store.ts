@@ -16,7 +16,8 @@ export default new Vuex.Store({
         focusedGraphicId: "",
         canvas: {
             height: 2000,
-            width: 4000
+            width: 4000,
+            zoom: 1
         },
         styleEditor: {
             width: 300,
@@ -82,6 +83,9 @@ export default new Vuex.Store({
         },
         focusedGraphicId: (state: any): string => {
             return state.focusedGraphicId;
+        },
+        zoom: (state: any): number => {
+            return state.canvas.zoom;
         }
     },
     mutations: {
@@ -124,6 +128,12 @@ export default new Vuex.Store({
         },
         focusGraphic: (state: any, graphic: GraphicModel) => {
             state.focusedGraphicId = graphic.id;
+        },
+        zoom: (state: any) => {
+            state.canvas.zoom += 0.25;
+        },
+        unzoom: (state: any) => {
+            state.canvas.zoom -= 0.25;
         }
     },
     actions: {

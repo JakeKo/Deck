@@ -31,7 +31,8 @@ export default class Editor extends Vue {
         return {
             width: `${this.$store.state.canvas.width}px`,
             height: `${this.$store.state.canvas.height}px`,
-            background: this.$store.getters.theme.secondary
+            background: this.$store.getters.theme.secondary,
+            zoom: this.$store.getters.zoom
         };
     }
 }
