@@ -38,7 +38,7 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
             slide.$store.commit("styleEditorObject", graphic);
         }
     },
-    canvasMouseDown: (slide: any) => (): any => {
+    canvasMouseDown: (slide: any) => (): void => {
         if (slide.$store.getters.focusedGraphicId !== "") {
             slide.$store.commit("focusGraphic", { id: "" });
             slide.$store.commit("styleEditorObject", undefined);
@@ -50,7 +50,7 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
 const rectangleTool: ToolModel = new ToolModel("rectangle", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
-    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): any => {
+    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
         const shape: SVG.Element = canvas.rect();
         const start: Point = new Point(event.clientX - bounds.left, event.clientY - bounds.top);
@@ -102,7 +102,7 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
 const textboxTool: ToolModel = new ToolModel("textbox", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "text"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
-    canvasMouseDown: (slide: any) => (event: MouseEvent): any => {
+    canvasMouseDown: (slide: any) => (event: MouseEvent): void => {
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
         const graphic = new GraphicModel({
             type: "textbox",

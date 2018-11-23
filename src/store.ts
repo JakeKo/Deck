@@ -84,7 +84,13 @@ export default new Vuex.Store({
         focusedGraphicId: (state: any): string => {
             return state.focusedGraphicId;
         },
-        zoom: (state: any): number => {
+        canvasHeight: (state: any): number => {
+            return state.canvas.height;
+        },
+        canvasWidth: (state: any): number => {
+            return state.canvas.width;
+        },
+        canvasZoom: (state: any): number => {
             return state.canvas.zoom;
         }
     },
@@ -133,7 +139,7 @@ export default new Vuex.Store({
             state.canvas.zoom += 0.25;
         },
         unzoom: (state: any) => {
-            state.canvas.zoom -= 0.25;
+            state.canvas.zoom = Math.max(state.canvas.zoom - 0.25, 0.25);
         }
     },
     actions: {

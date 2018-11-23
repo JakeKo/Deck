@@ -13,7 +13,7 @@
 
 <script lang="ts">
 /* tslint:enable */
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Watch } from "vue-property-decorator";
 import Slide from "./Slide.vue";
 
 @Component({
@@ -22,18 +22,30 @@ import Slide from "./Slide.vue";
     }
 })
 export default class Editor extends Vue {
-    public mounted() {
-        this.$el.scrollTop = this.$store.state.canvas.height / 2 - this.$el.clientHeight / 2;
-        this.$el.scrollLeft = this.$store.state.canvas.width / 2 - this.$el.clientWidth / 2;
+    @Watch("canvasZoom")
+    private onCanvasZoomChanged(): void {
+        const percentageDown = this.$el.scrollTop / this.$el.scrollHeight;
+        const percentageOver = this.$el.scrollLeft / this.$el.scrollWidth;
+        document.getElementById("canvas")!.style.zoom = this.$store.getters.canvasZoom;
+        this.$el.scrollTop = this.$el.scrollHeight * percentageDown;
+        this.$el.scrollLeft = this.$el.scrollWidth * percentageOver;
+    }
+
+    get canvasZoom(): number {
+        return this.$store.getters.canvasZoom;
     }
 
     get canvasStyle(): any {
         return {
-            width: `${this.$store.state.canvas.width}px`,
-            height: `${this.$store.state.canvas.height}px`,
-            background: this.$store.getters.theme.secondary,
-            zoom: this.$store.getters.zoom
+            width: `${this.$store.getters.canvasWidth}px`,
+            height: `${this.$store.getters.canvasHeight}px`,
+            background: this.$store.getters.theme.secondary
         };
+    }
+
+    public mounted(): void {
+        this.$el.scrollTop = (this.$store.getters.canvasHeight - this.$el.clientHeight) / 2;
+        this.$el.scrollLeft = (this.$store.getters.canvasWidth - this.$el.clientWidth) / 2;
     }
 }
 /* tslint:disable */
