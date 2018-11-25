@@ -12,28 +12,31 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
     graphicMouseOut: (svg: SVG.Element) => (): any => svg.style("cursor", "default"),
     graphicMouseDown: (slide: any, svg: SVG.Element, graphic: GraphicModel) => (event: MouseEvent): any => {
         event.stopPropagation(); // Prevent the event from bubbling up to the canvas
+        event.preventDefault();
 
         if (slide.$store.getters.focusedGraphicId !== graphic.id) {
             slide.$store.commit("focusGraphic", graphic);
             slide.$store.commit("styleEditorObject", graphic);
         }
 
-        const offset = new Point(event.clientX - svg.x(), event.clientY - svg.y());
+        let zoom: number = slide.$store.getters.canvasZoom;
+        const offset = new Point(event.clientX / zoom - svg.x(), event.clientY / zoom - svg.y());
         slide.canvas.on("mousemove", preview);
         slide.canvas.on("mouseup", end);
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
-            svg.move(event.clientX - offset.x, event.clientY - offset.y);
+            zoom = slide.$store.getters.canvasZoom;
+            svg.move(event.clientX / zoom - offset.x, event.clientY / zoom - offset.y);
         }
 
         // End moving shape
-        function end(event: MouseEvent): void {
+        function end(): void {
             slide.canvas.off("mousemove", preview);
             slide.canvas.off("mouseup", end);
 
-            graphic.styleModel.x = event.clientX - offset.x;
-            graphic.styleModel.y = event.clientY - offset.y;
+            graphic.styleModel.x = svg.x();
+            graphic.styleModel.y = svg.y();
             slide.$store.commit("styleEditorObject", undefined);
             slide.$store.commit("styleEditorObject", graphic);
         }
@@ -51,16 +54,20 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
+        event.stopPropagation();
+
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
         const shape: SVG.Element = canvas.rect();
-        const start: Point = new Point(event.clientX - bounds.left, event.clientY - bounds.top);
+        let zoom: number = slide.$store.getters.canvasZoom;
+        const start: Point = new Point(event.clientX / zoom - bounds.left, event.clientY / zoom - bounds.top);
         shape.move(start.x, start.y);
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
         // Preview drawing rectangle
         function preview(event: MouseEvent): void {
-            const client: Point = new Point(event.clientX - bounds.left, event.clientY - bounds.top);
+            zoom = slide.$store.getters.canvasZoom;
+            const client: Point = new Point(event.clientX / zoom - bounds.left, event.clientY / zoom - bounds.top);
             const width: number = client.x - start.x;
             const height: number = client.y - start.y;
 
@@ -104,11 +111,12 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any) => (event: MouseEvent): void => {
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
+        const zoom: number = slide.$store.getters.canvasZoom;
         const graphic = new GraphicModel({
             type: "textbox",
             styleModel: new StyleModel({
-                x: event.clientX - bounds.left,
-                y: event.clientY - bounds.top,
+                x: event.clientX / zoom - bounds.left,
+                y: event.clientY / zoom - bounds.top,
                 message: "lorem ipsum\ndolor sit amet"
             })
         });
