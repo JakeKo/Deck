@@ -6,6 +6,12 @@
             <i class="fas fa-mouse-pointer" :style="toolIconStyle('cursor')"></i>
         </div>
     </div>
+    
+    <div class="tool" @click="$store.commit('tool', 'pencil')">
+        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('pencil')">
+            <i class="fas fa-pen" :style="toolIconStyle('pencil')"></i>
+        </div>
+    </div>
 
     <div class="tool" @click="$store.commit('tool', 'rectangle')">
         <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('rectangle')">

@@ -9,6 +9,7 @@ import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import GraphicModel from "../models/GraphicModel";
 import StyleModel from "../models/StyleModel";
+import Point from "../models/Point";
 
 @Component
 export default class Slide extends Vue {
@@ -70,6 +71,12 @@ export default class Slide extends Vue {
             return this.canvas.text(style.message || "").attr({
                 "x": style.x,
                 "y": style.y
+            });
+        } else if (graphic.type === "polyline") {
+            return this.canvas.polyline(style.points!.map((point: Point) => [point.x, point.y])).attr({
+                "fill": style.fill,
+                "stroke": style.stroke,
+                "stroke-width": style.strokeWidth
             });
         }
 

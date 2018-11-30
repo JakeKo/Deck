@@ -11,8 +11,10 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
     graphicMouseOver: (svg: SVG.Element) => (): any => svg.style("cursor", "pointer"),
     graphicMouseOut: (svg: SVG.Element) => (): any => svg.style("cursor", "default"),
     graphicMouseDown: (slide: any, svg: SVG.Element, graphic: GraphicModel) => (event: MouseEvent): any => {
-        event.stopPropagation(); // Prevent the event from bubbling up to the canvas
+        event.stopPropagation();
         event.preventDefault();
+        slide.canvas.on("mousemove", preview);
+        slide.canvas.on("mouseup", end);
 
         if (slide.$store.getters.focusedGraphicId !== graphic.id) {
             slide.$store.commit("focusGraphic", graphic);
@@ -21,8 +23,6 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
 
         let zoom: number = slide.$store.getters.canvasZoom;
         const offset = new Point(event.clientX / zoom - svg.x(), event.clientY / zoom - svg.y());
-        slide.canvas.on("mousemove", preview);
-        slide.canvas.on("mouseup", end);
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
@@ -60,20 +60,33 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
 
         let zoom: number = slide.$store.getters.canvasZoom;
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
-        const start: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
-        const points: Array<Array<number>> = [[start.x, start.y]];
-        const shape: SVG.PolyLine = canvas.polyline(points);
+        const points: Array<Array<number>> = [[Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top)]];
+        const shape: SVG.PolyLine = canvas.polyline(points).fill("none").stroke("black").attr("stroke-width", 3);
 
         function preview(event: MouseEvent): void {
             zoom = slide.$store.getters.canvasZoom;
-            const client: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
-            points.push([Math.round(client.x - start.x), Math.round(client.y - start.y)]);
+            points.push([Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top)]);
             shape.plot(points);
         }
 
         function end(): void {
             canvas.off("mousemove", preview);
             canvas.off("mouseup", end);
+
+            const graphic = new GraphicModel({
+                type: "polyline",
+                styleModel: new StyleModel({
+                    fill: shape.attr("fill"),
+                    stroke: shape.attr("stroke"),
+                    strokeWidth: shape.attr("stroke-width"),
+                    points: points.map((point: Array<number>) => new Point(point[0], point[1]))
+                })
+            });
+
+            shape.remove();
+            slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
+            slide.$store.commit("styleEditorObject", graphic);
+            slide.$store.commit("focusGraphic", graphic);
         }
     }
 });
@@ -85,14 +98,13 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
         event.stopPropagation();
         event.preventDefault();
-
-        const bounds: DOMRect = slide.$el.getBoundingClientRect();
-        const shape: SVG.Rect = canvas.rect();
-        let zoom: number = slide.$store.getters.canvasZoom;
-        const start: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
-        shape.move(start.x, start.y);
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
+
+        let zoom: number = slide.$store.getters.canvasZoom;
+        const bounds: DOMRect = slide.$el.getBoundingClientRect();
+        const start: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+        const shape: SVG.Rect = canvas.rect().move(start.x, start.y);
 
         // Preview drawing rectangle
         function preview(event: MouseEvent): void {

@@ -1,3 +1,5 @@
+import Point from "./Point";
+
 export default class StyleModel {
     public fill?: string;
     public stroke?: string;
@@ -8,6 +10,7 @@ export default class StyleModel {
     public height?: number;
     public message?: string;
     public rotation?: number;
+    public points?: Array<Point>;
 
     constructor(
         {
@@ -19,7 +22,8 @@ export default class StyleModel {
             width,
             height,
             message,
-            rotation
+            rotation,
+            points
         }:
         {
             fill?: string,
@@ -30,7 +34,8 @@ export default class StyleModel {
             width?: number,
             height?: number,
             message?: string,
-            rotation?: number
+            rotation?: number,
+            points?: Array<Point>
         } = {}
     ) {
         this.fill = fill;
@@ -42,5 +47,6 @@ export default class StyleModel {
         this.height = height;
         this.message = message;
         this.rotation = rotation;
+        this.points = points;
     }
 }
