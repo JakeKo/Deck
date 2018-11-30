@@ -49,6 +49,35 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
     }
 });
 
+const pencilTool: ToolModel = new ToolModel("pencil", {
+    canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
+    canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
+    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
+        event.stopPropagation();
+        event.preventDefault();
+        canvas.on("mousemove", preview);
+        canvas.on("mouseup", end);
+
+        let zoom: number = slide.$store.getters.canvasZoom;
+        const bounds: DOMRect = slide.$el.getBoundingClientRect();
+        const start: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+        const points: Array<Array<number>> = [[start.x, start.y]];
+        const shape: SVG.PolyLine = canvas.polyline(points);
+
+        function preview(event: MouseEvent): void {
+            zoom = slide.$store.getters.canvasZoom;
+            const client: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+            points.push([Math.round(client.x - start.x), Math.round(client.y - start.y)]);
+            shape.plot(points);
+        }
+
+        function end(): void {
+            canvas.off("mousemove", preview);
+            canvas.off("mouseup", end);
+        }
+    }
+});
+
 // Rectangle tool handlers
 const rectangleTool: ToolModel = new ToolModel("rectangle", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
@@ -58,7 +87,7 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
         event.preventDefault();
 
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
-        const shape: SVG.Element = canvas.rect();
+        const shape: SVG.Rect = canvas.rect();
         let zoom: number = slide.$store.getters.canvasZoom;
         const start: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
         shape.move(start.x, start.y);
@@ -133,6 +162,7 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
 
 export default {
     cursorTool,
+    pencilTool,
     rectangleTool,
     textboxTool,
     generateId,
