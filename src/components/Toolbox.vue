@@ -2,27 +2,39 @@
 <template>
 <div id="toolbox" :style="toolboxStyle">    
     <div class="tool" @click="$store.commit('tool', 'cursor')">
-        <div class="tool-icon" :style="toolIconStyle('cursor')"></div>
+        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('cursor')">
+            <i class="fas fa-mouse-pointer" :style="toolIconStyle('cursor')"></i>
+        </div>
     </div>
 
     <div class="tool" @click="$store.commit('tool', 'rectangle')">
-        <div class="tool-icon" :style="toolIconStyle('rectangle')"></div>
+        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('rectangle')">
+            <i class="fas fa-square" :style="toolIconStyle('rectangle')"></i>
+        </div>
     </div>
     
     <div class="tool" @click="$store.commit('tool', 'textbox')">
-        <div class="tool-icon" :style="toolIconStyle('textbox')"></div>
+        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('textbox')">
+            <i class="fas fa-font" :style="toolIconStyle('textbox')"></i>
+        </div>
     </div>
     
     <div class="tool" @click="$store.commit('zoom')">
-        <div class="tool-icon" :style="toolIconStyle('')"></div>
+        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('')">
+            <i class="fas fa-search-plus" :style="toolIconStyle('')"></i>
+        </div>
     </div>
     
     <div class="tool" @click="$store.commit('unzoom')">
-        <div class="tool-icon" :style="toolIconStyle('')"></div>
+        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('')">
+            <i class="fas fa-search-minus" :style="toolIconStyle('')"></i>
+        </div>
     </div>
     
     <div class="tool" @click="$store.dispatch('export')">
-        <div class="tool-icon" :style="toolIconStyle('')"></div>
+        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('')">
+            <i class="fas fa-file-export" :style="toolIconStyle('')"></i>
+        </div>
     </div>
 </div>
 </template>
@@ -40,9 +52,17 @@ export default class Toolbox extends Vue {
         };
     }
 
-    private toolIconStyle(toolName: string): any {
+    private toolIconWrapperStyle(toolName: string): any {
+        const isActive = this.$store.getters.tool.name === toolName;
         return {
-            background: this.$store.getters.tool.name === toolName ? "blue" : this.$store.getters.theme.tertiary
+            border: `3px solid ${isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`
+        };
+    }
+
+    private toolIconStyle(toolName: string): any {
+        const isActive = this.$store.getters.tool.name === toolName;
+        return {
+            color: isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary
         };
     }
 }
@@ -63,9 +83,12 @@ export default class Toolbox extends Vue {
     cursor: pointer;
 }
 
-.tool-icon {
+.tool-icon-wrapper {
     height: 36px;
     width: 36px;
     border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 </style>

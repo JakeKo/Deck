@@ -8,7 +8,9 @@
             :id="slide.id"
             :key="slide.id"
         ></slide-preview>
-        <div><div id="new-slide-button" @click="newSlideHandler" :style="newSlideButtonStyle">+</div></div>
+        <div><div id="new-slide-button" @click="newSlideHandler" :style="newSlideButtonStyle">
+            <i class="fas fa-plus"></i>
+        </div></div>
     </div>
 </div>
 </template>
@@ -34,7 +36,7 @@ export default class Roadmap extends Vue {
 
     get newSlideButtonStyle(): any {
         return {
-            border: `1px solid ${this.$store.getters.theme.tertiary}`,
+            border: `2px solid ${this.$store.getters.theme.tertiary}`,
             color: this.$store.getters.theme.tertiary,
             background: this.$store.getters.theme.primary
         };
@@ -99,6 +101,5 @@ export default class Roadmap extends Vue {
     flex-shrink: 0;
     justify-content: center;
     align-items: center;
-    font-size: 48px;
 }
 </style>

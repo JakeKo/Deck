@@ -27,7 +27,7 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
         // Preview moving shape
         function preview(event: MouseEvent): void {
             zoom = slide.$store.getters.canvasZoom;
-            svg.move(event.clientX / zoom - offset.x, event.clientY / zoom - offset.y);
+            svg.move(Math.round(event.clientX / zoom - offset.x), Math.round(event.clientY / zoom - offset.y));
         }
 
         // End moving shape
@@ -55,11 +55,12 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
         event.stopPropagation();
+        event.preventDefault();
 
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
         const shape: SVG.Element = canvas.rect();
         let zoom: number = slide.$store.getters.canvasZoom;
-        const start: Point = new Point(event.clientX / zoom - bounds.left, event.clientY / zoom - bounds.top);
+        const start: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
         shape.move(start.x, start.y);
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
@@ -67,7 +68,7 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
         // Preview drawing rectangle
         function preview(event: MouseEvent): void {
             zoom = slide.$store.getters.canvasZoom;
-            const client: Point = new Point(event.clientX / zoom - bounds.left, event.clientY / zoom - bounds.top);
+            const client: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
             const width: number = client.x - start.x;
             const height: number = client.y - start.y;
 
@@ -110,13 +111,16 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "text"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any) => (event: MouseEvent): void => {
+        event.stopPropagation();
+        event.preventDefault();
+
         const bounds: DOMRect = slide.$el.getBoundingClientRect();
         const zoom: number = slide.$store.getters.canvasZoom;
         const graphic = new GraphicModel({
             type: "textbox",
             styleModel: new StyleModel({
-                x: event.clientX / zoom - bounds.left,
-                y: event.clientY / zoom - bounds.top,
+                x: Math.round(event.clientX / zoom - bounds.left),
+                y: Math.round(event.clientY / zoom - bounds.top),
                 message: "lorem ipsum\ndolor sit amet"
             })
         });

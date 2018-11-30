@@ -15,9 +15,9 @@ export default class SlidePreview extends Vue {
     public id?: string;
 
     get style(): any {
+        const isActive = this.id === this.$store.getters.activeSlide.id;
         return {
-            border: `1px solid ${this.id === this.$store.getters.activeSlide.id ?
-                this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`
+            border: `2px solid ${isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`
         };
     }
 
