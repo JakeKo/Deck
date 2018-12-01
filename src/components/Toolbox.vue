@@ -1,74 +1,31 @@
 /* tslint:disable */
 <template>
-<div id="toolbox" :style="toolboxStyle">    
-    <div class="tool" @click="$store.commit('tool', 'cursor')">
-        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('cursor')">
-            <i class="fas fa-mouse-pointer" :style="toolIconStyle('cursor')"></i>
-        </div>
-    </div>
-    
-    <div class="tool" @click="$store.commit('tool', 'pencil')">
-        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('pencil')">
-            <i class="fas fa-pen" :style="toolIconStyle('pencil')"></i>
-        </div>
-    </div>
-
-    <div class="tool" @click="$store.commit('tool', 'rectangle')">
-        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('rectangle')">
-            <i class="fas fa-square" :style="toolIconStyle('rectangle')"></i>
-        </div>
-    </div>
-    
-    <div class="tool" @click="$store.commit('tool', 'textbox')">
-        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('textbox')">
-            <i class="fas fa-font" :style="toolIconStyle('textbox')"></i>
-        </div>
-    </div>
-    
-    <div class="tool" @click="$store.commit('zoom')">
-        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('')">
-            <i class="fas fa-search-plus" :style="toolIconStyle('')"></i>
-        </div>
-    </div>
-    
-    <div class="tool" @click="$store.commit('unzoom')">
-        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('')">
-            <i class="fas fa-search-minus" :style="toolIconStyle('')"></i>
-        </div>
-    </div>
-    
-    <div class="tool" @click="$store.dispatch('export')">
-        <div class="tool-icon-wrapper" :style="toolIconWrapperStyle('')">
-            <i class="fas fa-file-export" :style="toolIconStyle('')"></i>
-        </div>
-    </div>
+<div id="toolbox" :style="toolboxStyle">
+    <tool :mount="() => $store.commit('tool', 'cursor')" :toolName="'cursor'" :icon="'fas fa-mouse-pointer'" :isActive="$store.getters.tool.name === 'cursor'"></tool>
+    <tool :mount="() => $store.commit('tool', 'pencil')" :toolName="'pencil'" :icon="'fas fa-pen'" :isActive="$store.getters.tool.name === 'pencil'"></tool>
+    <tool :mount="() => $store.commit('tool', 'rectangle')" :toolName="'rectangle'" :icon="'fas fa-square'" :isActive="$store.getters.tool.name === 'rectangle'"></tool>
+    <tool :mount="() => $store.commit('tool', 'textbox')" :toolName="'textbox'" :icon="'fas fa-font'" :isActive="$store.getters.tool.name === 'textbox'"></tool>
+    <tool :mount="() => $store.commit('zoom')" :toolName="'zoom'" :icon="'fas fa-search-plus'" :isActive="$store.getters.tool.name === 'zoom'"></tool>
+    <tool :mount="() => $store.commit('unzoom')" :toolName="'unzoom'" :icon="'fas fa-search-minus'" :isActive="$store.getters.tool.name === 'unzoom'"></tool>
+    <tool :mount="() => $store.dispatch('export')" :toolName="'export'" :icon="'fas fa-file-export'" :isActive="$store.getters.tool.name === 'export'"></tool>
 </div>
 </template>
 
 <script lang="ts">
 /* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
+import Tool from "./Tool.vue";
 
-@Component
+@Component({
+    components: {
+        Tool
+    }
+})
 export default class Toolbox extends Vue {
     get toolboxStyle(): any {
         return {
             borderRight: `1px solid ${this.$store.getters.theme.tertiary}`,
             width: `${this.$store.getters.toolboxWidth}px`
-        };
-    }
-
-    private toolIconWrapperStyle(toolName: string): any {
-        const isActive = this.$store.getters.tool.name === toolName;
-        return {
-            border: `3px solid ${isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`
-        };
-    }
-
-    private toolIconStyle(toolName: string): any {
-        const isActive = this.$store.getters.tool.name === toolName;
-        return {
-            color: isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary
         };
     }
 }
@@ -78,23 +35,5 @@ export default class Toolbox extends Vue {
 <style lang="scss" scoped>
 #toolbox {
     flex-direction: column;
-}
-
-.tool {
-    width: 100%;
-    height: 64px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-.tool-icon-wrapper {
-    height: 36px;
-    width: 36px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 </style>

@@ -21,7 +21,7 @@ describe("Toolbox", () => {
     it("has four tools", () => {
         const wrapper = shallowMount(Toolbox, { store, localVue });
         
-        expect(wrapper.findAll(".tool").length).toBe(6);
+        expect(wrapper.findAll(".tool").length).toBe(7);
     });
 
     it("has one active tool", () => {
