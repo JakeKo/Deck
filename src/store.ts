@@ -37,6 +37,7 @@ export default new Vuex.Store({
         tools: {
             cursor: Utilities.cursorTool,
             pencil: Utilities.pencilTool,
+            pen: Utilities.penTool,
             rectangle: Utilities.rectangleTool,
             textbox: Utilities.textboxTool
         } as { [key: string]: ToolModel },

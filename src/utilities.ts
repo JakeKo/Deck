@@ -91,6 +91,111 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
     }
 });
 
+const penTool: ToolModel = new ToolModel("pen", {
+    canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
+    canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
+    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
+        event.stopPropagation();
+        event.preventDefault();
+        canvas.off("mousemove");
+        canvas.on("mousemove", preview);
+        canvas.off("mouseup");
+        canvas.on("mouseup", setFirstControlPoint);
+
+        let zoom: number = slide.$store.getters.canvasZoom;
+        const bounds: DOMRect = slide.$el.getBoundingClientRect();
+        const start: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+        const shape: SVG.Path = canvas.path(toBezierString([[start]])).fill("none").stroke("black").attr("stroke-width", 3);
+
+        let currentCurve: Array<Point | undefined>;
+        const curves: Array<Array<Point | undefined>> = [[start]];
+        startNewCurve();
+
+        function startNewCurve(): void {
+            currentCurve = [undefined, undefined, undefined];
+            curves.push(currentCurve);
+        }
+
+        function setFirstControlPoint(event: MouseEvent): void {
+            canvas.off("mouseup", setFirstControlPoint);
+            canvas.off("mousedown");
+            canvas.on("mousedown", setEndpoint);
+            console.log("setFirstControlPoint");
+
+            zoom = slide.$store.getters.canvasZoom;
+            currentCurve[0] = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+        }
+
+        function setEndpoint(event: MouseEvent): void {
+            canvas.off("mousedown", setEndpoint);
+            canvas.off("mouseup");
+            canvas.on("mouseup", setSecondControlPoint);
+            console.log("setEndpoint");
+
+            zoom = slide.$store.getters.canvasZoom;
+            currentCurve[2] = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+        }
+
+        function setSecondControlPoint(event: MouseEvent): void {
+            canvas.off("mouseup", setSecondControlPoint);
+            console.log("setSecondControlPoint");
+
+            zoom = slide.$store.getters.canvasZoom;
+            const position: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+            currentCurve[1] = new Point(currentCurve[2]!.x * 2 - position.x, currentCurve[2]!.y * 2 - position.y);
+            startNewCurve();
+            setFirstControlPoint(event);
+        }
+
+        function preview(event: MouseEvent): void {
+            zoom = slide.$store.getters.canvasZoom;
+            const position: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+
+            // Replace all undefined points with the current mouse position
+            const resolvedCurves: Array<Array<Point>> = curves.map<Array<Point>>((curve: Array<Point | undefined>) =>
+                [
+                    curve[0] || position,
+                    curve[1] || (curve[2] ? new Point(curve[2]!.x * 2 - position.x, curve[2]!.y * 2 - position.y) : position),
+                    curve[2] || position
+                ]
+            );
+
+            shape.plot(toBezierString(resolvedCurves));
+        }
+
+        function end(): void {
+            canvas.off("mousemove", preview);
+            canvas.off("mouseup", end);
+
+            const graphic = new GraphicModel({
+                type: "polyline",
+                styleModel: new StyleModel({
+                    fill: shape.attr("fill"),
+                    stroke: shape.attr("stroke"),
+                    strokeWidth: shape.attr("stroke-width")
+                })
+            });
+
+            shape.remove();
+            slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
+            slide.$store.commit("styleEditorObject", graphic);
+            slide.$store.commit("focusGraphic", graphic);
+        }
+
+        function toBezierString(curves: Array<Array<Point>>): string {
+            let bezierString = `M ${curves[0][0].x},${curves[0][0].y}`;
+
+            for (let i = 1; i < curves.length; i++) {
+                const curve: Array<Point> = curves[i];
+                bezierString += " C";
+                curve.forEach((point: Point) => bezierString += ` ${point.x},${point.y}`);
+            }
+
+            return bezierString;
+        }
+    }
+});
+
 // Rectangle tool handlers
 const rectangleTool: ToolModel = new ToolModel("rectangle", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
@@ -175,6 +280,7 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
 export default {
     cursorTool,
     pencilTool,
+    penTool,
     rectangleTool,
     textboxTool,
     generateId,
@@ -233,6 +339,11 @@ function objectToHtml(object: any, lineCount: number, indentDepth: number): Edit
     let propertyCount = 0;
 
     for (const property in object) {
+        // TODO: Block displaying points in a more robust fashion
+        if (property === "points") {
+            continue;
+        }
+
         const value = object[property];
 
         if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") {

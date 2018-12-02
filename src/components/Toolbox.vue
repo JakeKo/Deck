@@ -3,6 +3,7 @@
 <div id="toolbox" :style="toolboxStyle">
     <tool :mount="() => $store.commit('tool', 'cursor')" :toolName="'cursor'" :icon="'fas fa-mouse-pointer'" :isActive="$store.getters.tool.name === 'cursor'"></tool>
     <tool :mount="() => $store.commit('tool', 'pencil')" :toolName="'pencil'" :icon="'fas fa-pen'" :isActive="$store.getters.tool.name === 'pencil'"></tool>
+    <tool :mount="() => $store.commit('tool', 'pen')" :toolName="'pen'" :icon="'fas fa-pen-nib'" :isActive="$store.getters.tool.name === 'pen'"></tool>
     <tool :mount="() => $store.commit('tool', 'rectangle')" :toolName="'rectangle'" :icon="'fas fa-square'" :isActive="$store.getters.tool.name === 'rectangle'"></tool>
     <tool :mount="() => $store.commit('tool', 'textbox')" :toolName="'textbox'" :icon="'fas fa-font'" :isActive="$store.getters.tool.name === 'textbox'"></tool>
     <tool :mount="() => $store.commit('zoom')" :toolName="'zoom'" :icon="'fas fa-search-plus'" :isActive="$store.getters.tool.name === 'zoom'"></tool>
