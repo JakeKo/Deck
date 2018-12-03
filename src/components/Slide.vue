@@ -78,6 +78,22 @@ export default class Slide extends Vue {
                 "stroke": style.stroke,
                 "stroke-width": style.strokeWidth
             });
+        } else if (graphic.type === "curve") {
+            let points: string = `M ${style.points![0].x},${style.points![0].y}`;
+            for (let i = 1; i < style.points!.length; i++) {
+                if ((i - 1 % 3) === 0) {
+                    points += " C";
+                }
+                points += ` ${style.points![i].x},${style.points![i].y}`;
+            }
+
+            console.log(points);
+
+            return this.canvas.path(points).attr({
+                "fill": style.fill,
+                "stroke": style.stroke,
+                "stroke-width": style.strokeWidth
+            });
         }
 
         throw `Undefined type of graphic: ${graphic.type}`;

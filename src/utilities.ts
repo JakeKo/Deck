@@ -6,6 +6,12 @@ import GraphicModel from "./models/GraphicModel";
 import ToolModel from "./models/ToolModel";
 import StyleModel from "./models/StyleModel";
 
+const getMousePosition = (slide: any, event: MouseEvent): Point => {
+    const zoom: number = slide.$store.getters.canvasZoom;
+    const bounds: DOMRect = slide.$el.getBoundingClientRect();
+    return new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+};
+
 // Cursor Tool handlers
 const cursorTool: ToolModel = new ToolModel("cursor", {
     graphicMouseOver: (svg: SVG.Element) => (): any => svg.style("cursor", "pointer"),
@@ -42,10 +48,12 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
         }
     },
     canvasMouseDown: (slide: any) => (): void => {
-        if (slide.$store.getters.focusedGraphicId !== "") {
-            slide.$store.commit("focusGraphic", { id: "" });
-            slide.$store.commit("styleEditorObject", undefined);
+        if (slide.$store.getters.focusedGraphicId === "") {
+            return;
         }
+
+        slide.$store.commit("focusGraphic", { id: "" });
+        slide.$store.commit("styleEditorObject", undefined);
     }
 });
 
@@ -58,15 +66,13 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
-        let zoom: number = slide.$store.getters.canvasZoom;
-        const bounds: DOMRect = slide.$el.getBoundingClientRect();
-        const points: Array<Array<number>> = [[Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top)]];
-        const shape: SVG.PolyLine = canvas.polyline(points).fill("none").stroke("black").attr("stroke-width", 3);
+        const points: Array<Point> = [getMousePosition(slide, event)];
+        const shape: SVG.PolyLine = canvas.polyline(points.map<Array<number>>((point: Point) => [point.x, point.y]))
+            .fill("none").stroke("black").attr("stroke-width", 3);
 
         function preview(event: MouseEvent): void {
-            zoom = slide.$store.getters.canvasZoom;
-            points.push([Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top)]);
-            shape.plot(points);
+            points.push(getMousePosition(slide, event));
+            shape.plot(points.map<Array<number>>((point: Point) => [point.x, point.y]));
         }
 
         function end(): void {
@@ -79,7 +85,7 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
                     fill: shape.attr("fill"),
                     stroke: shape.attr("stroke"),
                     strokeWidth: shape.attr("stroke-width"),
-                    points: points.map((point: Array<number>) => new Point(point[0], point[1]))
+                    points: points
                 })
             });
 
@@ -97,19 +103,17 @@ const penTool: ToolModel = new ToolModel("pen", {
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
         event.stopPropagation();
         event.preventDefault();
-        canvas.off("mousemove");
-        canvas.on("mousemove", preview);
-        canvas.off("mouseup");
-        canvas.on("mouseup", setFirstControlPoint);
 
-        let zoom: number = slide.$store.getters.canvasZoom;
-        const bounds: DOMRect = slide.$el.getBoundingClientRect();
-        const start: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+        const start: Point = getMousePosition(slide, event);
         const shape: SVG.Path = canvas.path(toBezierString([[start]])).fill("none").stroke("black").attr("stroke-width", 3);
+        const controlPointShape: SVG.Line = canvas.line([[0, 0], [0, 0]]).fill("none").stroke(slide.$store.getters.theme.information).remove();
 
         let currentCurve: Array<Point | undefined>;
         const curves: Array<Array<Point | undefined>> = [[start]];
         startNewCurve();
+        canvas.on("mousemove", preview);
+        canvas.on("mouseup", setFirstControlPoint);
+        document.addEventListener("keydown", end);
 
         function startNewCurve(): void {
             currentCurve = [undefined, undefined, undefined];
@@ -120,36 +124,45 @@ const penTool: ToolModel = new ToolModel("pen", {
             canvas.off("mouseup", setFirstControlPoint);
             canvas.off("mousedown");
             canvas.on("mousedown", setEndpoint);
-            console.log("setFirstControlPoint");
 
-            zoom = slide.$store.getters.canvasZoom;
-            currentCurve[0] = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+            currentCurve[0] = getMousePosition(slide, event);
         }
 
         function setEndpoint(event: MouseEvent): void {
+            event.stopPropagation();
+            event.preventDefault();
             canvas.off("mousedown", setEndpoint);
             canvas.off("mouseup");
             canvas.on("mouseup", setSecondControlPoint);
-            console.log("setEndpoint");
+            canvas.on("mousemove", previewControlPoint);
 
-            zoom = slide.$store.getters.canvasZoom;
-            currentCurve[2] = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+            currentCurve[2] = getMousePosition(slide, event);
         }
 
         function setSecondControlPoint(event: MouseEvent): void {
             canvas.off("mouseup", setSecondControlPoint);
-            console.log("setSecondControlPoint");
+            canvas.off("mousemove", previewControlPoint);
 
-            zoom = slide.$store.getters.canvasZoom;
-            const position: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+            const position: Point = getMousePosition(slide, event);
             currentCurve[1] = new Point(currentCurve[2]!.x * 2 - position.x, currentCurve[2]!.y * 2 - position.y);
             startNewCurve();
             setFirstControlPoint(event);
+            controlPointShape.remove();
+        }
+
+        function previewControlPoint(event: MouseEvent): void {
+            canvas.add(controlPointShape);
+            const position: Point = getMousePosition(slide, event);
+            const endpoint: Point | undefined = currentCurve[2];
+
+            controlPointShape.plot([
+                [endpoint!.x * 2 - position.x, endpoint!.y * 2 - position.y],
+                [position.x, position.y]
+            ]).back();
         }
 
         function preview(event: MouseEvent): void {
-            zoom = slide.$store.getters.canvasZoom;
-            const position: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+            const position: Point = getMousePosition(slide, event);
 
             // Replace all undefined points with the current mouse position
             const resolvedCurves: Array<Array<Point>> = curves.map<Array<Point>>((curve: Array<Point | undefined>) =>
@@ -163,16 +176,29 @@ const penTool: ToolModel = new ToolModel("pen", {
             shape.plot(toBezierString(resolvedCurves));
         }
 
-        function end(): void {
+        function end(event: KeyboardEvent): void {
+            if (event.key !== "Escape" && event.key !== "Enter" && event.key !== "Tab") {
+                return;
+            }
+
+            document.removeEventListener("keydown", end);
             canvas.off("mousemove", preview);
-            canvas.off("mouseup", end);
+
+            const points: Array<Point> = [];
+            curves.filter((curve: Array<Point | undefined>) => curve.indexOf(undefined) < 0)
+                .forEach((curve: Array<Point | undefined>): void => {
+                    curve.forEach((point: Point | undefined) => {
+                        points.push(point || new Point(0, 0));
+                    });
+                });
 
             const graphic = new GraphicModel({
-                type: "polyline",
+                type: "curve",
                 styleModel: new StyleModel({
                     fill: shape.attr("fill"),
                     stroke: shape.attr("stroke"),
-                    strokeWidth: shape.attr("stroke-width")
+                    strokeWidth: shape.attr("stroke-width"),
+                    points
                 })
             });
 
@@ -206,15 +232,12 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
-        let zoom: number = slide.$store.getters.canvasZoom;
-        const bounds: DOMRect = slide.$el.getBoundingClientRect();
-        const start: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+        const start: Point = getMousePosition(slide, event);
         const shape: SVG.Rect = canvas.rect().move(start.x, start.y);
 
         // Preview drawing rectangle
         function preview(event: MouseEvent): void {
-            zoom = slide.$store.getters.canvasZoom;
-            const client: Point = new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+            const client: Point = getMousePosition(slide, event);
             const width: number = client.x - start.x;
             const height: number = client.y - start.y;
 
@@ -260,13 +283,12 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
         event.stopPropagation();
         event.preventDefault();
 
-        const bounds: DOMRect = slide.$el.getBoundingClientRect();
-        const zoom: number = slide.$store.getters.canvasZoom;
+        const position = getMousePosition(slide, event);
         const graphic = new GraphicModel({
             type: "textbox",
             styleModel: new StyleModel({
-                x: Math.round(event.clientX / zoom - bounds.left),
-                y: Math.round(event.clientY / zoom - bounds.top),
+                x: position.x,
+                y: position.y,
                 message: "lorem ipsum\ndolor sit amet"
             })
         });
