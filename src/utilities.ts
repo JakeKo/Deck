@@ -97,13 +97,14 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
     }
 });
 
-let active: boolean = false;
+let penToolIsActive: boolean = false;
 const penTool: ToolModel = new ToolModel("pen", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
-        if (active) { return; }
-        else { active = true; }
+        // Prevent any action on canvas click if a bezier curve is being drawn
+        if (penToolIsActive) { return; }
+        else { penToolIsActive = true; }
 
         event.stopPropagation();
         event.preventDefault();
@@ -112,17 +113,19 @@ const penTool: ToolModel = new ToolModel("pen", {
         canvas.on("mouseup", setFirstControlPoint);
 
         const start: Point = getMousePosition(slide, event);
-        const curves: Array<Array<Point>> = [[start]];
-        let currentCurve: Array<Array<Point | undefined>> = [[start], [undefined, undefined, undefined]];
-        const shape: SVG.Path = canvas.path(toBezierString(curves)).fill("none").stroke("black").attr("stroke-width", 3);
-        const currentCurveShape: SVG.Path = canvas.path(toBezierString(resolveCurve(currentCurve, start))).fill("none").stroke("black").attr("stroke-width", 3);
-        const controlPointShape: SVG.Line = canvas.line([start.toArray(), start.toArray()]).fill("none").stroke(slide.$store.getters.theme.information).remove();
+        const curve: Array<Array<Point>> = [[start]];
+        const curveSegment: Array<Array<Point | undefined>> = [[start], [undefined, undefined, undefined]];
+
+        // Create SVGs for the primary curve, the editable curve segment, and the control point preview
+        const curveGraphic: SVG.Path = canvas.path(toBezierString(curve)).fill("none").stroke("black").attr("stroke-width", 3);
+        const curveSegmentGraphic: SVG.Path = canvas.path(toBezierString(resolveCurve(curveSegment, start))).fill("none").stroke("black").attr("stroke-width", 3);
+        const controlPointGraphic: SVG.PolyLine = canvas.polyline([]).fill("none");
 
         function setFirstControlPoint(event: MouseEvent): void {
             canvas.off("mouseup", setFirstControlPoint);
             canvas.on("mousedown", setEndpoint);
 
-            currentCurve[1][0] = getMousePosition(slide, event);
+            curveSegment[1][0] = getMousePosition(slide, event);
         }
 
         function setEndpoint(event: MouseEvent): void {
@@ -131,29 +134,31 @@ const penTool: ToolModel = new ToolModel("pen", {
             canvas.off("mousedown", setEndpoint);
             canvas.on("mouseup", setSecondControlPoint);
 
-            currentCurve[1][2] = getMousePosition(slide, event);
+            curveSegment[1][2] = getMousePosition(slide, event);
         }
 
         function setSecondControlPoint(event: MouseEvent): void {
             canvas.off("mouseup", setSecondControlPoint);
 
-            currentCurve[1][1] = getMousePosition(slide, event).reflect(currentCurve[1][2]);
-            curves.push(currentCurve[1] as Array<Point>);
-            currentCurve = [[currentCurve[1][2]], [undefined, undefined, undefined]];
+            // Complete the curve segment and add it to the final curve
+            curveSegment[1][1] = getMousePosition(slide, event).reflect(curveSegment[1][2]);
+            curve.push(curveSegment[1] as Array<Point>);
+            curveGraphic.plot(toBezierString(curve));
+
+            // Reset the curve segment and set the first control point
+            curveSegment[0] = [curveSegment[1][2]];
+            curveSegment[1] = [undefined, undefined, undefined];
             setFirstControlPoint(event);
-            controlPointShape.remove();
-            shape.plot(toBezierString(curves));
         }
 
         function preview(event: MouseEvent): void {
+            // Redraw the current curve segment as the mouse moves around
             const position: Point = getMousePosition(slide, event);
-            currentCurveShape.plot(toBezierString(resolveCurve(currentCurve, position)));
+            curveSegmentGraphic.plot(toBezierString(resolveCurve(curveSegment, position)));
 
-            // Draw the control point shape if the endpoint is defined
-            if (currentCurve[1][2] !== undefined) {
-                canvas.add(controlPointShape);
-                controlPointShape.plot([position.reflect(currentCurve[1][2]).toArray(), position.toArray()]);
-            }
+            // Display the control point shape if the endpoint is defined
+            controlPointGraphic.plot([position.reflect(curveSegment[1][2]).toArray(), position.toArray()])
+                .stroke(curveSegment[1][2] === undefined ? "none" : slide.$store.getters.theme.information);
         }
 
         function end(event: KeyboardEvent): void {
@@ -162,32 +167,33 @@ const penTool: ToolModel = new ToolModel("pen", {
                 return;
             }
 
-            active = false;
+            penToolIsActive = false;
             document.removeEventListener("keydown", end);
             canvas.off("mousemove", preview);
 
             // Flatten the representation of curves into a list of points
             // Remove the last curve because it will always have some undefned points
             const flattenedPoints: Array<Point | undefined> = [];
-            curves.forEach((curve: Array<Point | undefined>) => flattenedPoints.push(...curve));
+            curve.forEach((curve: Array<Point | undefined>) => flattenedPoints.push(...curve));
 
             const graphic = new GraphicModel({
                 type: "curve",
                 styleModel: new StyleModel({
-                    fill: shape.attr("fill"),
-                    stroke: shape.attr("stroke"),
-                    strokeWidth: shape.attr("stroke-width"),
+                    fill: curveGraphic.attr("fill"),
+                    stroke: curveGraphic.attr("stroke"),
+                    strokeWidth: curveGraphic.attr("stroke-width"),
                     points: flattenedPoints as Array<Point>
                 })
             });
 
             // Remove the shape visually, persist it to the slide, then refresh the style editor
-            shape.remove();
+            curveGraphic.remove();
             slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
             slide.$store.commit("styleEditorObject", graphic);
             slide.$store.commit("focusGraphic", graphic);
         }
 
+        // Convert a curve with possible undefined values to a curve with defined fallback values
         function resolveCurve(curve: Array<Array<Point | undefined>>, defaultPoint: Point): Array<Array<Point>> {
             return [
                 [curve[0][0] || defaultPoint],

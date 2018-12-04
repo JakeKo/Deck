@@ -19,7 +19,7 @@ export default class Point {
         return new Point(scalar * this.x, scalar * this.y);
     }
 
-    public reflect(origin: Point = new Point(0, 0)): Point {
+    public reflect(origin: Point = this): Point {
         return origin.scale(2).add(this.scale(-1));
     }
 }
