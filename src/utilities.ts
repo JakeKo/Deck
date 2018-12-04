@@ -97,100 +97,79 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
     }
 });
 
+let active: boolean = false;
 const penTool: ToolModel = new ToolModel("pen", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
+        if (active) { return; }
+        else { active = true; }
+
         event.stopPropagation();
         event.preventDefault();
-
-        const start: Point = getMousePosition(slide, event);
-        const shape: SVG.Path = canvas.path(toBezierString([[start]])).fill("none").stroke("black").attr("stroke-width", 3);
-        const controlPointShape: SVG.Line = canvas.line([[0, 0], [0, 0]]).fill("none").stroke(slide.$store.getters.theme.information).remove();
-
-        let currentCurve: Array<Point | undefined>;
-        const curves: Array<Array<Point | undefined>> = [[start]];
-        startNewCurve();
+        document.addEventListener("keydown", end);
         canvas.on("mousemove", preview);
         canvas.on("mouseup", setFirstControlPoint);
-        document.addEventListener("keydown", end);
 
-        function startNewCurve(): void {
-            currentCurve = [undefined, undefined, undefined];
-            curves.push(currentCurve);
-        }
+        const start: Point = getMousePosition(slide, event);
+        const curves: Array<Array<Point>> = [[start]];
+        let currentCurve: Array<Array<Point | undefined>> = [[start], [undefined, undefined, undefined]];
+        const shape: SVG.Path = canvas.path(toBezierString(curves)).fill("none").stroke("black").attr("stroke-width", 3);
+        const currentCurveShape: SVG.Path = canvas.path(toBezierString(resolveCurve(currentCurve, start))).fill("none").stroke("black").attr("stroke-width", 3);
+        const controlPointShape: SVG.Line = canvas.line([start.toArray(), start.toArray()]).fill("none").stroke(slide.$store.getters.theme.information).remove();
 
         function setFirstControlPoint(event: MouseEvent): void {
             canvas.off("mouseup", setFirstControlPoint);
-            canvas.off("mousedown");
             canvas.on("mousedown", setEndpoint);
 
-            currentCurve[0] = getMousePosition(slide, event);
+            currentCurve[1][0] = getMousePosition(slide, event);
         }
 
         function setEndpoint(event: MouseEvent): void {
             event.stopPropagation();
             event.preventDefault();
             canvas.off("mousedown", setEndpoint);
-            canvas.off("mouseup");
             canvas.on("mouseup", setSecondControlPoint);
-            canvas.on("mousemove", previewControlPoint);
 
-            currentCurve[2] = getMousePosition(slide, event);
+            currentCurve[1][2] = getMousePosition(slide, event);
         }
 
         function setSecondControlPoint(event: MouseEvent): void {
             canvas.off("mouseup", setSecondControlPoint);
-            canvas.off("mousemove", previewControlPoint);
 
-            const position: Point = getMousePosition(slide, event);
-            currentCurve[1] = new Point(currentCurve[2]!.x * 2 - position.x, currentCurve[2]!.y * 2 - position.y);
-            startNewCurve();
+            currentCurve[1][1] = getMousePosition(slide, event).reflect(currentCurve[1][2]);
+            curves.push(currentCurve[1] as Array<Point>);
+            currentCurve = [[currentCurve[1][2]], [undefined, undefined, undefined]];
             setFirstControlPoint(event);
             controlPointShape.remove();
-        }
-
-        function previewControlPoint(event: MouseEvent): void {
-            canvas.add(controlPointShape);
-            const position: Point = getMousePosition(slide, event);
-            const endpoint: Point | undefined = currentCurve[2];
-
-            controlPointShape.plot([
-                [endpoint!.x * 2 - position.x, endpoint!.y * 2 - position.y],
-                [position.x, position.y]
-            ]).back();
+            shape.plot(toBezierString(curves));
         }
 
         function preview(event: MouseEvent): void {
             const position: Point = getMousePosition(slide, event);
+            currentCurveShape.plot(toBezierString(resolveCurve(currentCurve, position)));
 
-            // Replace all undefined points with the current mouse position
-            const resolvedCurves: Array<Array<Point>> = curves.map<Array<Point>>((curve: Array<Point | undefined>) =>
-                [
-                    curve[0] || position,
-                    curve[1] || (curve[2] ? new Point(curve[2]!.x * 2 - position.x, curve[2]!.y * 2 - position.y) : position),
-                    curve[2] || position
-                ]
-            );
-
-            shape.plot(toBezierString(resolvedCurves));
+            // Draw the control point shape if the endpoint is defined
+            if (currentCurve[1][2] !== undefined) {
+                canvas.add(controlPointShape);
+                controlPointShape.plot([position.reflect(currentCurve[1][2]).toArray(), position.toArray()]);
+            }
         }
 
         function end(event: KeyboardEvent): void {
-            if (event.key !== "Escape" && event.key !== "Enter" && event.key !== "Tab") {
+            // Check if the pressed key is not one of the specified keys to end the curve drawing
+            if (["Escape", "Enter", "Tab"].indexOf(event.key) === -1) {
                 return;
             }
 
+            active = false;
             document.removeEventListener("keydown", end);
             canvas.off("mousemove", preview);
 
-            const points: Array<Point> = [];
-            curves.filter((curve: Array<Point | undefined>) => curve.indexOf(undefined) < 0)
-                .forEach((curve: Array<Point | undefined>): void => {
-                    curve.forEach((point: Point | undefined) => {
-                        points.push(point || new Point(0, 0));
-                    });
-                });
+            // Flatten the representation of curves into a list of points
+            // Remove the last curve because it will always have some undefned points
+            const flattenedPoints: Array<Point | undefined> = [];
+            curves.forEach((curve: Array<Point | undefined>) => flattenedPoints.push(...curve));
 
             const graphic = new GraphicModel({
                 type: "curve",
@@ -198,26 +177,35 @@ const penTool: ToolModel = new ToolModel("pen", {
                     fill: shape.attr("fill"),
                     stroke: shape.attr("stroke"),
                     strokeWidth: shape.attr("stroke-width"),
-                    points
+                    points: flattenedPoints as Array<Point>
                 })
             });
 
+            // Remove the shape visually, persist it to the slide, then refresh the style editor
             shape.remove();
             slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
             slide.$store.commit("styleEditorObject", graphic);
             slide.$store.commit("focusGraphic", graphic);
         }
 
+        function resolveCurve(curve: Array<Array<Point | undefined>>, defaultPoint: Point): Array<Array<Point>> {
+            return [
+                [curve[0][0] || defaultPoint],
+                [
+                    curve[1][0] || defaultPoint,
+                    curve[1][1] || (curve[1][2] ? defaultPoint.reflect(curve[1][2]) : defaultPoint),
+                    curve[1][2] || defaultPoint
+                ]
+            ];
+        }
+
+        // Turns an array of curves into bezier curve string format
         function toBezierString(curves: Array<Array<Point>>): string {
-            let bezierString = `M ${curves[0][0].x},${curves[0][0].y}`;
+            const points: string = curves.slice(1)
+                .map<string>((curve: Array<Point>): string => `C ${curve.map<string>((point: Point) => `${point.x},${point.y}`).join(" ")}`)
+                .join(" ");
 
-            for (let i = 1; i < curves.length; i++) {
-                const curve: Array<Point> = curves[i];
-                bezierString += " C";
-                curve.forEach((point: Point) => bezierString += ` ${point.x},${point.y}`);
-            }
-
-            return bezierString;
+            return `M ${curves[0][0].x},${curves[0][0].y} ${points}`;
         }
     }
 });
