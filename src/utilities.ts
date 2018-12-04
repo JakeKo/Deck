@@ -310,11 +310,50 @@ export default {
     penTool,
     rectangleTool,
     textboxTool,
+    renderGraphic,
     generateId,
     objectToHtml,
     htmlToObject,
     deckScript
 };
+
+function renderGraphic(graphic: GraphicModel, canvas: SVG.Doc): SVG.Element {
+    const style: StyleModel = graphic.styleModel;
+
+    if (graphic.type === "rectangle") {
+        return canvas.rect(style.width, style.height).attr({
+            "x": style.x,
+            "y": style.y,
+            "fill": style.fill,
+            "stroke": style.stroke,
+            "stroke-width": style.strokeWidth
+        });
+    } else if (graphic.type === "textbox") {
+        return canvas.text(style.message || "").attr({
+            "x": style.x,
+            "y": style.y
+        });
+    } else if (graphic.type === "polyline") {
+        return canvas.polyline(style.points!.map((point: Point) => [point.x, point.y])).attr({
+            "fill": style.fill,
+            "stroke": style.stroke,
+            "stroke-width": style.strokeWidth
+        });
+    } else if (graphic.type === "curve") {
+        let points: string = `M ${style.x},${style.y}`;
+        for (let i = 0; i < style.points!.length; i += 3) {
+            points += ` c ${style.points![i].x},${style.points![i].y} ${style.points![i + 1].x},${style.points![i + 1].y} ${style.points![i + 2].x},${style.points![i + 2].y}`;
+        }
+
+        return canvas.path(points).attr({
+            "fill": style.fill,
+            "stroke": style.stroke,
+            "stroke-width": style.strokeWidth
+        });
+    }
+
+    throw `Undefined type of graphic: ${graphic.type}`;
+}
 
 function generateId(): string {
     const s4 = () => Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();

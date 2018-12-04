@@ -4,7 +4,6 @@ import SlideModel from "./models/SlideModel";
 import Utilities from "./utilities";
 import Theme from "./models/Theme";
 import GraphicModel from "./models/GraphicModel";
-import StyleModel from "./models/StyleModel";
 import ToolModel from "./models/ToolModel";
 import * as SVG from "svg.js";
 
@@ -146,48 +145,42 @@ export default new Vuex.Store({
     },
     actions: {
         export: (store: any): void => {
-            const html: HTMLHtmlElement = document.createElement("html");
+            const exportFrame: HTMLElement = document.getElementById("export-frame")!;
 
-            html.appendChild(document.createElement("head"));
-            // Append metadata to head element
-
-            const body: HTMLBodyElement = document.createElement("body");
             store.getters.slides.forEach((slideModel: SlideModel) => {
-                // TODO: Resolve discrepancy in that svg.js wants the node to be on the page
                 const slide: HTMLDivElement = document.createElement("div");
                 slide.setAttribute("id", slideModel.id);
                 slide.setAttribute("class", "slide");
+                exportFrame.appendChild(slide);
 
                 const canvas: SVG.Doc = SVG(slideModel.id);
-                slideModel.graphics.forEach((graphic: GraphicModel) => {
-                    const style: StyleModel = graphic.styleModel;
-
-                    if (graphic.type === "rectangle") {
-                        return canvas.rect(style.width, style.height).attr({
-                            "x": style.x,
-                            "y": style.y,
-                            "fill": style.fill,
-                            "stroke": style.stroke,
-                            "stroke-width": style.strokeWidth
-                        });
-                    } else if (graphic.type === "textbox") {
-                        return canvas.text(style.message || "").attr({
-                            "x": style.x,
-                            "y": style.y
-                        });
-                    }
-                });
-
-                body.appendChild(slide);
+                slideModel.graphics.forEach((graphic: GraphicModel) => Utilities.renderGraphic(graphic, canvas));
             });
 
+            const html: HTMLHtmlElement = document.createElement("html");
+            const head: HTMLHeadElement = document.createElement("head");
+            const body: HTMLBodyElement = document.createElement("body");
+            html.appendChild(head);
             html.appendChild(body);
+
+            // Append metadata to head element
+            const meta: HTMLMetaElement = document.createElement("meta");
+            meta.name = "viewport";
+            meta.content = "width=device-width, initial-scale=1.0";
+            head.appendChild(meta);
+
+            // Append slide data to body element
+            body.innerHTML = exportFrame.innerHTML;
 
             const anchor: HTMLAnchorElement = document.createElement("a");
             const page: string = `${html.outerHTML}${Utilities.deckScript()}`;
             anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
             anchor.setAttribute("download", "deck.html");
             anchor.click();
+
+            while (exportFrame.firstChild) {
+                exportFrame.removeChild(exportFrame.firstChild);
+            }
         }
     }
 });
