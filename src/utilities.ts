@@ -27,12 +27,12 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
             slide.$store.commit("styleEditorObject", graphic);
         }
 
-        let zoom: number = slide.$store.getters.canvasZoom;
-        const offset = new Point(event.clientX / zoom - svg.x(), event.clientY / zoom - svg.y());
+        const zoom: number = slide.$store.getters.canvasZoom;
+        const offset: Point = new Point(event.clientX / zoom - svg.x(), event.clientY / zoom - svg.y());
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
-            zoom = slide.$store.getters.canvasZoom;
+            const zoom: number = slide.$store.getters.canvasZoom;
             svg.move(Math.round(event.clientX / zoom - offset.x), Math.round(event.clientY / zoom - offset.y));
         }
 
@@ -41,6 +41,11 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
             slide.canvas.off("mousemove", preview);
             slide.canvas.off("mouseup", end);
 
+            if (graphic.type === "curve") {
+                (svg as SVG.Path).plot((svg as SVG.Path).array().move(svg.x(), svg.y()));
+                console.log((svg as SVG.Path).array().value[0]);
+            }
+
             graphic.styleModel.x = svg.x();
             graphic.styleModel.y = svg.y();
             slide.$store.commit("styleEditorObject", undefined);
@@ -48,12 +53,10 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
         }
     },
     canvasMouseDown: (slide: any) => (): void => {
-        if (slide.$store.getters.focusedGraphicId === "") {
-            return;
+        if (slide.$store.getters.focusedGraphicId !== "") {
+            slide.$store.commit("focusGraphic", { id: "" });
+            slide.$store.commit("styleEditorObject", undefined);
         }
-
-        slide.$store.commit("focusGraphic", { id: "" });
-        slide.$store.commit("styleEditorObject", undefined);
     }
 });
 
@@ -67,12 +70,11 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
         canvas.on("mouseup", end);
 
         const points: Array<Point> = [getMousePosition(slide, event)];
-        const shape: SVG.PolyLine = canvas.polyline(points.map<Array<number>>((point: Point) => [point.x, point.y]))
-            .fill("none").stroke("black").attr("stroke-width", 3);
+        const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", 3);
 
         function preview(event: MouseEvent): void {
             points.push(getMousePosition(slide, event));
-            shape.plot(points.map<Array<number>>((point: Point) => [point.x, point.y]));
+            shape.plot(points.map<Array<number>>((point: Point) => point.toArray()));
         }
 
         function end(): void {
@@ -85,7 +87,7 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
                     fill: shape.attr("fill"),
                     stroke: shape.attr("stroke"),
                     strokeWidth: shape.attr("stroke-width"),
-                    points: points
+                    points
                 })
             });
 
@@ -117,8 +119,9 @@ const penTool: ToolModel = new ToolModel("pen", {
         const curveSegment: Array<Array<Point | undefined>> = [[start], [undefined, undefined, undefined]];
 
         // Create SVGs for the primary curve, the editable curve segment, and the control point preview
-        const curveGraphic: SVG.Path = canvas.path(toBezierString(curve)).fill("none").stroke("black").attr("stroke-width", 3);
-        const curveSegmentGraphic: SVG.Path = canvas.path(toBezierString(resolveCurve(curveSegment, start))).fill("none").stroke("black").attr("stroke-width", 3);
+        const curveGraphic: SVG.Path = canvas.path(toBezierString(curve, true)).fill("none").stroke("black").attr("stroke-width", 3);
+        const curveSegmentGraphic: SVG.Path = canvas.path(toBezierString(resolveCurve(curveSegment, start), false))
+            .fill("none").stroke("black").attr("stroke-width", 3);
         const controlPointGraphic: SVG.PolyLine = canvas.polyline([]).fill("none");
 
         function setFirstControlPoint(event: MouseEvent): void {
@@ -140,10 +143,10 @@ const penTool: ToolModel = new ToolModel("pen", {
         function setSecondControlPoint(event: MouseEvent): void {
             canvas.off("mouseup", setSecondControlPoint);
 
-            // Complete the curve segment and add it to the final curve
+            // Complete the curve segment and add the relative points it to the final curve
             curveSegment[1][1] = getMousePosition(slide, event).reflect(curveSegment[1][2]);
-            curve.push(curveSegment[1] as Array<Point>);
-            curveGraphic.plot(toBezierString(curve));
+            curve.push((curveSegment[1] as Array<Point>).map((point: Point) => point.add(curveSegment[0][0]!.scale(-1))));
+            curveGraphic.plot(toBezierString(curve, true));
 
             // Reset the curve segment and set the first control point
             curveSegment[0] = [curveSegment[1][2]];
@@ -154,11 +157,14 @@ const penTool: ToolModel = new ToolModel("pen", {
         function preview(event: MouseEvent): void {
             // Redraw the current curve segment as the mouse moves around
             const position: Point = getMousePosition(slide, event);
-            curveSegmentGraphic.plot(toBezierString(resolveCurve(curveSegment, position)));
+            curveSegmentGraphic.plot(toBezierString(resolveCurve(curveSegment, position), false));
 
             // Display the control point shape if the endpoint is defined
-            controlPointGraphic.plot([position.reflect(curveSegment[1][2]).toArray(), position.toArray()])
-                .stroke(curveSegment[1][2] === undefined ? "none" : slide.$store.getters.theme.information);
+            if (curveSegment[1][2] !== undefined) {
+                controlPointGraphic.plot([position.reflect(curveSegment[1][2]).toArray(), position.toArray()]).stroke(slide.$store.getters.theme.information);
+            } else {
+                controlPointGraphic.stroke("none");
+            }
         }
 
         function end(event: KeyboardEvent): void {
@@ -173,8 +179,8 @@ const penTool: ToolModel = new ToolModel("pen", {
 
             // Flatten the representation of curves into a list of points
             // Remove the last curve because it will always have some undefned points
-            const flattenedPoints: Array<Point | undefined> = [];
-            curve.forEach((curve: Array<Point | undefined>) => flattenedPoints.push(...curve));
+            const flattenedPoints: Array<Point> = [];
+            curve.forEach((curve: Array<Point | undefined>) => flattenedPoints.push(...(curve as Array<Point>)));
 
             const graphic = new GraphicModel({
                 type: "curve",
@@ -182,15 +188,20 @@ const penTool: ToolModel = new ToolModel("pen", {
                     fill: curveGraphic.attr("fill"),
                     stroke: curveGraphic.attr("stroke"),
                     strokeWidth: curveGraphic.attr("stroke-width"),
-                    points: flattenedPoints as Array<Point>
+                    points: flattenedPoints.slice(1),
+                    x: flattenedPoints[0].x,
+                    y: flattenedPoints[0].y
                 })
             });
 
-            // Remove the shape visually, persist it to the slide, then refresh the style editor
+            // Remove the shape visually - if it is more than just a point, persist it to the slide, then refresh the style editor
             curveGraphic.remove();
-            slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
-            slide.$store.commit("styleEditorObject", graphic);
-            slide.$store.commit("focusGraphic", graphic);
+
+            if (flattenedPoints.length > 1) {
+                slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
+                slide.$store.commit("styleEditorObject", graphic);
+                slide.$store.commit("focusGraphic", graphic);
+            }
         }
 
         // Convert a curve with possible undefined values to a curve with defined fallback values
@@ -206,9 +217,9 @@ const penTool: ToolModel = new ToolModel("pen", {
         }
 
         // Turns an array of curves into bezier curve string format
-        function toBezierString(curves: Array<Array<Point>>): string {
+        function toBezierString(curves: Array<Array<Point>>, relative: boolean): string {
             const points: string = curves.slice(1)
-                .map<string>((curve: Array<Point>): string => `C ${curve.map<string>((point: Point) => `${point.x},${point.y}`).join(" ")}`)
+                .map<string>((curve: Array<Point>): string => `${relative ? "c" : "C"} ${curve.map<string>((point: Point) => `${point.x},${point.y}`).join(" ")}`)
                 .join(" ");
 
             return `M ${curves[0][0].x},${curves[0][0].y} ${points}`;

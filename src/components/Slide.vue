@@ -79,9 +79,9 @@ export default class Slide extends Vue {
                 "stroke-width": style.strokeWidth
             });
         } else if (graphic.type === "curve") {
-            let points: string = `M ${style.points![0].x},${style.points![0].y}`;
-            for (let i = 1; i < style.points!.length; i += 3) {
-                points += ` C ${style.points![i].x},${style.points![i].y} ${style.points![i + 1].x},${style.points![i + 1].y} ${style.points![i + 2].x},${style.points![i + 2].y}`;
+            let points: string = `M ${style.x},${style.y}`;
+            for (let i = 0; i < style.points!.length; i += 3) {
+                points += ` c ${style.points![i].x},${style.points![i].y} ${style.points![i + 1].x},${style.points![i + 1].y} ${style.points![i + 2].x},${style.points![i + 2].y}`;
             }
 
             return this.canvas.path(points).attr({
