@@ -2,16 +2,16 @@ const Path = require("path");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 module.exports = {
-    mode: "development",
+    mode: "production",
     plugins: [new VueLoaderPlugin()],
-    devtool: "inline-source-map",
+    devtool: "sourcemap",
     output: {
-        publicPath: "/dist/"
+        path: Path.resolve(__dirname, "dist")
     },
     resolve: {
         extensions: [".ts", ".js", ".json", ".vue"],
         alias: {
-            vue: "vue/dist/vue.runtime.esm.js"
+            vue: "vue/dist/vue.runtime.min.js"
         }
     },
     module: {
