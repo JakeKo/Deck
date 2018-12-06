@@ -22,4 +22,8 @@ export default class Point {
     public reflect(origin: Point = this): Point {
         return origin.scale(2).add(this.scale(-1));
     }
+
+    public transform(transformation: (coordinate: number) => number) {
+        return new Point(transformation(this.x), transformation(this.y));
+    }
 }

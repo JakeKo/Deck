@@ -5,6 +5,7 @@
     <tool :mount="() => $store.commit('tool', 'pencil')" :toolName="'pencil'" :icon="'fas fa-pen'" :isActive="$store.getters.tool.name === 'pencil'"></tool>
     <tool :mount="() => $store.commit('tool', 'pen')" :toolName="'pen'" :icon="'fas fa-pen-nib'" :isActive="$store.getters.tool.name === 'pen'"></tool>
     <tool :mount="() => $store.commit('tool', 'rectangle')" :toolName="'rectangle'" :icon="'fas fa-square'" :isActive="$store.getters.tool.name === 'rectangle'"></tool>
+    <tool :mount="() => $store.commit('tool', 'ellipse')" :toolName="'ellipse'" :icon="'fas fa-circle'" :isActive="$store.getters.tool.name === 'ellipse'"></tool>
     <tool :mount="() => $store.commit('tool', 'textbox')" :toolName="'textbox'" :icon="'fas fa-font'" :isActive="$store.getters.tool.name === 'textbox'"></tool>
     <tool :mount="() => $store.commit('zoom')" :toolName="'zoom'" :icon="'fas fa-search-plus'" :isActive="$store.getters.tool.name === 'zoom'"></tool>
     <tool :mount="() => $store.commit('unzoom')" :toolName="'unzoom'" :icon="'fas fa-search-minus'" :isActive="$store.getters.tool.name === 'unzoom'"></tool>

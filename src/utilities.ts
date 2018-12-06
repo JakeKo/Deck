@@ -43,7 +43,6 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
 
             if (graphic.type === "curve") {
                 (svg as SVG.Path).plot((svg as SVG.Path).array().move(svg.x(), svg.y()));
-                console.log((svg as SVG.Path).array().value[0]);
             }
 
             graphic.styleModel.x = svg.x();
@@ -195,6 +194,8 @@ const penTool: ToolModel = new ToolModel("pen", {
             });
 
             // Remove the shape visually - if it is more than just a point, persist it to the slide, then refresh the style editor
+            controlPointGraphic.remove();
+            curveSegmentGraphic.remove();
             curveGraphic.remove();
 
             if (flattenedPoints.length > 1) {
@@ -242,19 +243,18 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
 
         // Preview drawing rectangle
         function preview(event: MouseEvent): void {
-            const client: Point = getMousePosition(slide, event);
-            const width: number = client.x - start.x;
-            const height: number = client.y - start.y;
+            // Determine dimensions for a rectangle or square (based on if shift is pressed)
+            const position: Point = getMousePosition(slide, event);
+            const rawDimensions: Point = position.add(start.scale(-1));
+            const minimumDimension = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
+            const dimensions: Point = slide.$store.getters.pressedKeys[16]
+                ? new Point(Math.sign(rawDimensions.x) * minimumDimension, Math.sign(rawDimensions.y) * minimumDimension)
+                : rawDimensions;
 
-            // Check if shift is pressed to toggle between rectangle and square
-            if (slide.$store.getters.pressedKeys[16]) {
-                const sideLength = Math.min(Math.abs(width), Math.abs(height));
-                shape.move(width < 0 ? start.x - sideLength : start.x, height < 0 ? start.y - sideLength : start.y);
-                shape.size(sideLength, sideLength);
-            } else {
-                shape.move(width < 0 ? client.x : start.x, height < 0 ? client.y : start.y);
-                shape.size(Math.sign(width) * width, Math.sign(height) * height);
-            }
+            // Check if the dimensions are negative and move (x, y) or resize
+            const move: Point = slide.$store.getters.pressedKeys[16] ? start.add(dimensions) : position;
+            shape.move(dimensions.x < 0 ? move.x : start.x, dimensions.y < 0 ? move.y : start.y);
+            shape.size(Math.abs(dimensions.x), Math.abs(dimensions.y));
         }
 
         // End drawing rectangle
@@ -272,6 +272,59 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
                     height: shape.height()
                 })
             });
+
+            shape.remove();
+            slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
+            slide.$store.commit("styleEditorObject", graphic);
+            slide.$store.commit("focusGraphic", graphic);
+        }
+    }
+});
+
+const ellipseTool: ToolModel = new ToolModel("ellipse", {
+    canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
+    canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
+    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
+        event.stopPropagation();
+        event.preventDefault();
+        canvas.on("mousemove", preview);
+        canvas.on("mouseup", end);
+
+        const start: Point = getMousePosition(slide, event);
+        const shape: SVG.Ellipse = canvas.ellipse().center(start.x, start.y);
+
+        // Preview drawing ellipse
+        function preview(event: MouseEvent): void {
+            // Determine dimensions for an ellipse or circle (based on if shift is pressed)
+            const position: Point = getMousePosition(slide, event);
+            const rawOffset: Point = position.add(start.scale(-1));
+            const minimumOffset = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
+            const resolvedOffset: Point = slide.$store.getters.pressedKeys[16]
+                ? new Point(Math.sign(rawOffset.x) * minimumOffset, Math.sign(rawOffset.y) * minimumOffset) : rawOffset;
+            const center: Point = start.add(start).add(resolvedOffset).scale(0.5);
+
+            // Check if the dimensions are negative and move (x, y) or resize
+            shape.center(center.x, center.y);
+            shape.size(Math.abs(resolvedOffset.x), Math.abs(resolvedOffset.y));
+        }
+
+        // End drawing ellipse
+        function end(): void {
+            canvas.off("mousemove", preview);
+            canvas.off("mouseup", end);
+
+            const graphic = new GraphicModel({
+                type: "ellipse",
+                styleModel: new StyleModel({
+                    fill: shape.attr("fill"),
+                    x: shape.cx(),
+                    y: shape.cy(),
+                    width: shape.width(),
+                    height: shape.height()
+                })
+            });
+
+            console.log(graphic);
 
             shape.remove();
             slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
@@ -309,6 +362,7 @@ export default {
     pencilTool,
     penTool,
     rectangleTool,
+    ellipseTool,
     textboxTool,
     renderGraphic,
     generateId,
@@ -321,35 +375,31 @@ function renderGraphic(graphic: GraphicModel, canvas: SVG.Doc): SVG.Element {
     const style: StyleModel = graphic.styleModel;
 
     if (graphic.type === "rectangle") {
-        return canvas.rect(style.width, style.height).attr({
-            "x": style.x,
-            "y": style.y,
-            "fill": style.fill,
-            "stroke": style.stroke,
-            "stroke-width": style.strokeWidth
-        });
+        return canvas.rect(style.width, style.height)
+            .move(style.x!, style.y!)
+            .fill(style.fill!);
     } else if (graphic.type === "textbox") {
-        return canvas.text(style.message || "").attr({
-            "x": style.x,
-            "y": style.y
-        });
+        return canvas.text(style.message || "")
+            .move(style.x!, style.y!);
     } else if (graphic.type === "polyline") {
-        return canvas.polyline(style.points!.map((point: Point) => [point.x, point.y])).attr({
-            "fill": style.fill,
-            "stroke": style.stroke,
-            "stroke-width": style.strokeWidth
-        });
+        return canvas.polyline(style.points!.map((point: Point) => [point.x, point.y]))
+            .fill(style.fill!)
+            .stroke(style.stroke!)
+            .attr("stroke-width", style.strokeWidth);
     } else if (graphic.type === "curve") {
         let points: string = `M ${style.x},${style.y}`;
         for (let i = 0; i < style.points!.length; i += 3) {
             points += ` c ${style.points![i].x},${style.points![i].y} ${style.points![i + 1].x},${style.points![i + 1].y} ${style.points![i + 2].x},${style.points![i + 2].y}`;
         }
 
-        return canvas.path(points).attr({
-            "fill": style.fill,
-            "stroke": style.stroke,
-            "stroke-width": style.strokeWidth
-        });
+        return canvas.path(points)
+            .fill(style.fill!)
+            .stroke(style.stroke!)
+            .attr("stroke-width", style.strokeWidth);
+    } else if (graphic.type === "ellipse") {
+        return canvas.ellipse(style.width, style.height)
+            .center(style.x!, style.y!)
+            .fill(style.fill!);
     }
 
     throw `Undefined type of graphic: ${graphic.type}`;

@@ -38,6 +38,7 @@ export default new Vuex.Store({
             pencil: Utilities.pencilTool,
             pen: Utilities.penTool,
             rectangle: Utilities.rectangleTool,
+            ellipse: Utilities.ellipseTool,
             textbox: Utilities.textboxTool
         } as { [key: string]: ToolModel },
         pressedKeys: { } as { [key: number]: boolean },
