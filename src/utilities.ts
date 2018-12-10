@@ -8,8 +8,9 @@ import StyleModel from "./models/StyleModel";
 
 const getMousePosition = (slide: any, event: MouseEvent): Point => {
     const zoom: number = slide.$store.getters.canvasZoom;
+    const resolution: number = slide.$store.getters.canvasResolution;
     const bounds: DOMRect = slide.$el.getBoundingClientRect();
-    return new Point(Math.round(event.clientX / zoom - bounds.left), Math.round(event.clientY / zoom - bounds.top));
+    return new Point(Math.round((event.clientX / zoom - bounds.left) * resolution), Math.round((event.clientY / zoom - bounds.top) * resolution));
 };
 
 // Cursor Tool handlers
@@ -27,13 +28,12 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
             slide.$store.commit("styleEditorObject", graphic);
         }
 
-        const zoom: number = slide.$store.getters.canvasZoom;
-        const offset: Point = new Point(event.clientX / zoom - svg.x(), event.clientY / zoom - svg.y());
+        const offset: Point = new Point(svg.x(), svg.y()).add(getMousePosition(slide, event).scale(-1));
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
-            const zoom: number = slide.$store.getters.canvasZoom;
-            svg.move(Math.round(event.clientX / zoom - offset.x), Math.round(event.clientY / zoom - offset.y));
+            const resolvedPosition: Point = getMousePosition(slide, event).add(offset);
+            svg.move(resolvedPosition.x, resolvedPosition.y);
         }
 
         // End moving shape
@@ -69,7 +69,8 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
         canvas.on("mouseup", end);
 
         const points: Array<Point> = [getMousePosition(slide, event)];
-        const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", 3);
+        const strokeWidth: number = slide.$store.getters.canvasResolution * 3;
+        const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", strokeWidth);
 
         function preview(event: MouseEvent): void {
             points.push(getMousePosition(slide, event));
@@ -118,10 +119,11 @@ const penTool: ToolModel = new ToolModel("pen", {
         const curveSegment: Array<Array<Point | undefined>> = [[start], [undefined, undefined, undefined]];
 
         // Create SVGs for the primary curve, the editable curve segment, and the control point preview
-        const curveGraphic: SVG.Path = canvas.path(toBezierString(curve, true)).fill("none").stroke("black").attr("stroke-width", 3);
+        const strokeWidth: number = slide.$store.getters.canvasResolution * 3;
+        const curveGraphic: SVG.Path = canvas.path(toBezierString(curve, true)).fill("none").stroke("black").attr("stroke-width", strokeWidth);
         const curveSegmentGraphic: SVG.Path = canvas.path(toBezierString(resolveCurve(curveSegment, start), false))
-            .fill("none").stroke("black").attr("stroke-width", 3);
-        const controlPointGraphic: SVG.PolyLine = canvas.polyline([]).fill("none");
+            .fill("none").stroke("black").attr("stroke-width", strokeWidth);
+        const controlPointGraphic: SVG.PolyLine = canvas.polyline([]).fill("none").attr("stroke-width", strokeWidth / 3);
 
         function setFirstControlPoint(event: MouseEvent): void {
             canvas.off("mouseup", setFirstControlPoint);
@@ -323,8 +325,6 @@ const ellipseTool: ToolModel = new ToolModel("ellipse", {
                     height: shape.height()
                 })
             });
-
-            console.log(graphic);
 
             shape.remove();
             slide.$store.commit("addGraphic", { slideId: slide.id, graphic });

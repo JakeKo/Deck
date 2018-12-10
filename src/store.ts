@@ -16,7 +16,12 @@ export default new Vuex.Store({
         canvas: {
             height: 2000,
             width: 4000,
-            zoom: 1
+            zoom: 1,
+            resolution: 2,
+            slide: {
+                height: 603,
+                width: 1072
+            }
         },
         styleEditor: {
             width: 300,
@@ -94,6 +99,15 @@ export default new Vuex.Store({
         },
         canvasZoom: (state: any): number => {
             return state.canvas.zoom;
+        },
+        canvasResolution: (state: any): number => {
+            return state.canvas.resolution;
+        },
+        slideHeight: (state: any): number => {
+            return state.canvas.slide.height;
+        },
+        slideWidth: (state: any): number => {
+            return state.canvas.slide.width;
         }
     },
     mutations: {

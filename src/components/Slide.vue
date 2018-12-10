@@ -33,13 +33,14 @@ export default class Slide extends Vue {
             boxShadow: `0 0 4px 0 ${this.$store.getters.theme.tertiary}`,
             background: this.$store.getters.theme.primary,
             display: this.id === this.$store.getters.activeSlide.id ? "block" : "none",
-            height: "603px",
-            width: "1072px"
+            height: `${this.$store.getters.slideHeight}px`,
+            width: `${this.$store.getters.slideWidth}px`
         };
     }
 
     public mounted(): void {
-        this.canvas = SVG(this.$el.id);
+        const canvasResolution: number = this.$store.getters.canvasResolution;
+        this.canvas = SVG(this.$el.id).viewbox(0, 0, canvasResolution * this.$store.getters.slideWidth, canvasResolution * this.$store.getters.slideHeight);
 
         this.canvas.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.canvasMouseOver(this.canvas)(event));
         this.canvas.on("mouseout", (event: MouseEvent) => this.$store.getters.tool.canvasMouseOut(this.canvas)(event));

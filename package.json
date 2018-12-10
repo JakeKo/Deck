@@ -8,7 +8,7 @@
 	"bugs": "https://github.com/JakeKo/Deck/issues",
 	"repository": "git+https://github.com/JakeKo/Deck.git",
 	"scripts": {
-        "build": "webpack --config webpack-prod.config.js",
+		"build": "webpack --config webpack-prod.config.js",
 		"serve": "webpack-dev-server --hot --inline",
 		"test": "mocha-webpack --webpack-config webpack-test.config.js --require test/setup.js test/*.spec.js"
 	},
