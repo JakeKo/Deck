@@ -28,7 +28,8 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
             slide.$store.commit("styleEditorObject", graphic);
         }
 
-        const offset: Point = new Point(svg.x(), svg.y()).add(getMousePosition(slide, event).scale(-1));
+        const start: Point = new Point(svg.x(), svg.y());
+        const offset: Point = start.add(getMousePosition(slide, event).scale(-1));
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
@@ -41,20 +42,28 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
             slide.canvas.off("mousemove", preview);
             slide.canvas.off("mouseup", end);
 
+            if (graphic.type === "polyline") {
+                const flattenedPoints: Array<Array<number>> = (svg as SVG.PolyLine).array().value as any as Array<Array<number>>;
+                graphic.styleModel.points = flattenedPoints.map<Point>((point: Array<number>): Point => new Point(point[0], point[1]));
+            }
+
             if (graphic.type === "curve") {
-                (svg as SVG.Path).plot((svg as SVG.Path).array().move(svg.x(), svg.y()));
+                (svg as SVG.Path).array().move(svg.x(), svg.y());
             }
 
             if (graphic.type === "ellipse") {
                 graphic.styleModel.x = svg.cx();
                 graphic.styleModel.y = svg.cy();
-            } else {
+            }
+
+            if (graphic.type === "rectangle" || graphic.type === "textbox") {
                 graphic.styleModel.x = svg.x();
                 graphic.styleModel.y = svg.y();
             }
 
             slide.$store.commit("styleEditorObject", undefined);
             slide.$store.commit("styleEditorObject", graphic);
+            slide.refreshCanvas();
         }
     },
     canvasMouseDown: (slide: any) => (): void => {

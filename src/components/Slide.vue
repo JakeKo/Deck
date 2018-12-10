@@ -23,7 +23,7 @@ export default class Slide extends Vue {
     private graphics!: GraphicModel[];
 
     @Watch("graphics")
-    private refreshCanvas(): void {
+    public refreshCanvas(): void {
         this.canvas.clear();
         this.graphics.forEach((graphic: GraphicModel) => this.initializeGraphic(graphic));
     }

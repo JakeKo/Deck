@@ -17,7 +17,7 @@ export default new Vuex.Store({
             height: 2000,
             width: 4000,
             zoom: 1,
-            resolution: 2,
+            resolution: 1,
             slide: {
                 height: 603,
                 width: 1072
