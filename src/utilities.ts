@@ -45,8 +45,14 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
                 (svg as SVG.Path).plot((svg as SVG.Path).array().move(svg.x(), svg.y()));
             }
 
-            graphic.styleModel.x = svg.x();
-            graphic.styleModel.y = svg.y();
+            if (graphic.type === "ellipse") {
+                graphic.styleModel.x = svg.cx();
+                graphic.styleModel.y = svg.cy();
+            } else {
+                graphic.styleModel.x = svg.x();
+                graphic.styleModel.y = svg.y();
+            }
+
             slide.$store.commit("styleEditorObject", undefined);
             slide.$store.commit("styleEditorObject", graphic);
         }
@@ -382,7 +388,7 @@ function renderGraphic(graphic: GraphicModel, canvas: SVG.Doc): SVG.Element {
         return canvas.text(style.message || "")
             .move(style.x!, style.y!);
     } else if (graphic.type === "polyline") {
-        return canvas.polyline(style.points!.map((point: Point) => [point.x, point.y]))
+        return canvas.polyline(style.points!.map((point: Point) => point.toArray()))
             .fill(style.fill!)
             .stroke(style.stroke!)
             .attr("stroke-width", style.strokeWidth);
