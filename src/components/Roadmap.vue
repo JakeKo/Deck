@@ -3,8 +3,7 @@
 <div id="roadmap" :style="roadmapStyle">
     <div class="stretcher-vertical top" @mousedown="stretch"></div>
     <div id="slide-previews">
-        <slide-preview
-            v-for="(slide) in $store.getters.slides"
+        <slide-preview v-for="(slide) in $store.getters.slides"
             :id="slide.id"
             :graphics="$store.getters.slides.find((s) => s.id === slide.id).graphics"
             :key="slide.id"
@@ -61,12 +60,9 @@ export default class Roadmap extends Vue {
     }
 
     private newSlideHandler(event: Event): void {
-        this.$store.commit("addSlide", this.$store.getters.lastSlide.id);
-        const slides: SlideModel[] = this.$store.getters.slides;
-        const activeSlideIndex: number = slides.findIndex((slide: SlideModel) => slide.id === this.$store.getters.activeSlide.id);
-        this.$store.commit("activeSlide", slides[activeSlideIndex + 1].id);
+        this.$store.commit("addSlide", this.$store.getters.slides.length);
+        this.$store.commit("activeSlide", this.$store.getters.lastSlide.id);
         this.$store.commit("styleEditorObject", undefined);
-
     }
 }
 /* tslint:disable */

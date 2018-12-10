@@ -22,14 +22,14 @@ export default class SlidePreview extends Vue {
     @Prop({ type: Array, default: () => new Array<GraphicModel>() })
     private graphics!: GraphicModel[];
 
-    @Watch("graphics")
+    @Watch("graphics", { deep: true })
     private refreshCanvas(): void {
         this.canvas.clear();
         this.graphics.forEach((graphic: GraphicModel) => Utilities.renderGraphic(graphic, this.canvas));
     }
 
     get slidePreviewStyle(): any {
-        const isActive = this.id === this.$store.getters.activeSlide.id;
+        const isActive: boolean = this.id === this.$store.getters.activeSlide.id;
         return {
             border: `2px solid ${isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`
         };
