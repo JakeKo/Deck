@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>
-    <div id="editor-block" :style="blockStyle">{{content}}</div>
+    <div :style="blockStyle">{{content}}</div>
 </template>
 
 <script lang="ts">

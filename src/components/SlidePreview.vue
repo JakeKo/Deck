@@ -1,8 +1,6 @@
 /* tslint:disable */
 <template>
-<transition name="slide-preview">
-    <div :id="`slide-preview_${id}`" class="slide-preview" :style="slidePreviewStyle" @click="onSlidePreviewClicked"></div>
-</transition>
+<div :id="`slide-preview_${id}`" class="slide-preview" :style="slidePreviewStyle" @click="onSlidePreviewClicked"></div>
 </template>
 
 <script lang="ts">
@@ -16,8 +14,8 @@ import * as SVG from "svg.js";
 export default class SlidePreview extends Vue {
     private canvas!: SVG.Doc;
 
-    @Prop({ type: String, required: true})
-    public id?: string;
+    @Prop({ type: String, required: true })
+    private id?: string;
 
     @Prop({ type: Array, default: () => new Array<GraphicModel>() })
     private graphics!: GraphicModel[];
@@ -30,12 +28,13 @@ export default class SlidePreview extends Vue {
 
     get slidePreviewStyle(): any {
         const isActive: boolean = this.id === this.$store.getters.activeSlide.id;
+
         return {
             border: `2px solid ${isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`
         };
     }
 
-    public mounted(): void {
+    private mounted(): void {
         const canvasResolution: number = this.$store.getters.canvasResolution;
         this.canvas = SVG(this.$el.id).viewbox(0, 0, canvasResolution * this.$store.getters.slideWidth, canvasResolution * this.$store.getters.slideHeight);
         this.refreshCanvas();

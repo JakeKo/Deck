@@ -48,7 +48,13 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
             }
 
             if (graphic.type === "curve") {
-                (svg as SVG.Path).array().move(svg.x(), svg.y());
+                const flattenedPoints: Array<Array<number>> = (svg as SVG.Path).array().value as any as Array<Array<number>>;
+                graphic.styleModel.points = [new Point(flattenedPoints[0][1], flattenedPoints[0][2])];
+                flattenedPoints.slice(1).forEach((point: Array<number>) => {
+                    graphic.styleModel.points!.push(new Point(point[1], point[2]));
+                    graphic.styleModel.points!.push(new Point(point[3], point[4]));
+                    graphic.styleModel.points!.push(new Point(point[5], point[6]));
+                });
             }
 
             if (graphic.type === "ellipse") {
@@ -134,11 +140,11 @@ const penTool: ToolModel = new ToolModel("pen", {
         const curveSegment: Array<Array<Point | undefined>> = [[start], [undefined, undefined, undefined]];
 
         // Create SVGs for the primary curve, the editable curve segment, and the control point preview
-        const strokeWidth: number = slide.$store.getters.canvasResolution * 3;
-        const curveGraphic: SVG.Path = canvas.path(toBezierString(curve, true)).fill("none").stroke("black").attr("stroke-width", strokeWidth);
-        const curveSegmentGraphic: SVG.Path = canvas.path(toBezierString(resolveCurve(curveSegment, start), false))
-            .fill("none").stroke("black").attr("stroke-width", strokeWidth);
-        const controlPointGraphic: SVG.PolyLine = canvas.polyline([]).fill("none").attr("stroke-width", strokeWidth / 3);
+        const resolution: number = slide.$store.getters.canvasResolution;
+        const curveGraphic: SVG.Path = canvas.path(toBezierString(curve)).fill("none").stroke("black").attr("stroke-width", resolution * 3);
+        const curveSegmentGraphic: SVG.Path = canvas.path(toBezierString(resolveCurve(curveSegment, start)))
+            .fill("none").stroke("black").attr("stroke-width", resolution * 3);
+        const controlPointGraphic: SVG.PolyLine = canvas.polyline([]).fill("none").attr("stroke-width", resolution);
 
         function setFirstControlPoint(event: MouseEvent): void {
             canvas.off("mouseup", setFirstControlPoint);
@@ -159,10 +165,10 @@ const penTool: ToolModel = new ToolModel("pen", {
         function setSecondControlPoint(event: MouseEvent): void {
             canvas.off("mouseup", setSecondControlPoint);
 
-            // Complete the curve segment and add the relative points it to the final curve
+            // Complete the curve segment and add it to the final curve
             curveSegment[1][1] = getMousePosition(slide, event).reflect(curveSegment[1][2]);
-            curve.push((curveSegment[1] as Array<Point>).map((point: Point) => point.add(curveSegment[0][0]!.scale(-1))));
-            curveGraphic.plot(toBezierString(curve, true));
+            curve.push(curveSegment[1] as Array<Point>);
+            curveGraphic.plot(toBezierString(curve));
 
             // Reset the curve segment and set the first control point
             curveSegment[0] = [curveSegment[1][2]];
@@ -173,7 +179,7 @@ const penTool: ToolModel = new ToolModel("pen", {
         function preview(event: MouseEvent): void {
             // Redraw the current curve segment as the mouse moves around
             const position: Point = getMousePosition(slide, event);
-            curveSegmentGraphic.plot(toBezierString(resolveCurve(curveSegment, position), false));
+            curveSegmentGraphic.plot(toBezierString(resolveCurve(curveSegment, position)));
 
             // Display the control point shape if the endpoint is defined
             if (curveSegment[1][2] !== undefined) {
@@ -195,8 +201,8 @@ const penTool: ToolModel = new ToolModel("pen", {
 
             // Flatten the representation of curves into a list of points
             // Remove the last curve because it will always have some undefned points
-            const flattenedPoints: Array<Point> = [];
-            curve.forEach((curve: Array<Point | undefined>) => flattenedPoints.push(...(curve as Array<Point>)));
+            const points: Array<Point> = [];
+            curve.forEach((c: Array<Point | undefined>) => points.push(...(c as Array<Point>)));
 
             const graphic = new GraphicModel({
                 type: "curve",
@@ -204,9 +210,7 @@ const penTool: ToolModel = new ToolModel("pen", {
                     fill: curveGraphic.attr("fill"),
                     stroke: curveGraphic.attr("stroke"),
                     strokeWidth: curveGraphic.attr("stroke-width"),
-                    points: flattenedPoints.slice(1),
-                    x: flattenedPoints[0].x,
-                    y: flattenedPoints[0].y
+                    points
                 })
             });
 
@@ -215,7 +219,7 @@ const penTool: ToolModel = new ToolModel("pen", {
             curveSegmentGraphic.remove();
             curveGraphic.remove();
 
-            if (flattenedPoints.length > 1) {
+            if (points.length > 1) {
                 slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
                 slide.$store.commit("styleEditorObject", graphic);
                 slide.$store.commit("focusGraphic", graphic);
@@ -235,9 +239,9 @@ const penTool: ToolModel = new ToolModel("pen", {
         }
 
         // Turns an array of curves into bezier curve string format
-        function toBezierString(curves: Array<Array<Point>>, relative: boolean): string {
+        function toBezierString(curves: Array<Array<Point>>): string {
             const points: string = curves.slice(1)
-                .map<string>((curve: Array<Point>): string => `${relative ? "c" : "C"} ${curve.map<string>((point: Point) => `${point.x},${point.y}`).join(" ")}`)
+                .map<string>((curve: Array<Point>): string => ` C ${curve.map<string>((point: Point) => `${point.x},${point.y}`).join(" ")}`)
                 .join(" ");
 
             return `M ${curves[0][0].x},${curves[0][0].y} ${points}`;
@@ -402,10 +406,14 @@ function renderGraphic(graphic: GraphicModel, canvas: SVG.Doc): SVG.Element {
             .stroke(style.stroke!)
             .attr("stroke-width", style.strokeWidth);
     } else if (graphic.type === "curve") {
-        let points: string = `M ${style.x},${style.y}`;
-        for (let i = 0; i < style.points!.length; i += 3) {
-            points += ` c ${style.points![i].x},${style.points![i].y} ${style.points![i + 1].x},${style.points![i + 1].y} ${style.points![i + 2].x},${style.points![i + 2].y}`;
-        }
+        let points: string = `M ${style.points![0].x},${style.points![0].y}`;
+        style.points!.slice(1).forEach((point: Point, index: number) => {
+            if (index % 3 === 0) {
+                points += " C";
+            }
+
+            points += ` ${point.x},${point.y}`;
+        });
 
         return canvas.path(points)
             .fill(style.fill!)

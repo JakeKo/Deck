@@ -3,8 +3,7 @@
 <div id="style-editor" :style="styleEditorStyle">
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
     <div id="style-editor-content">
-        <editor-line
-            v-for="editorLineModel in editorLineModels"
+        <editor-line v-for="editorLineModel in editorLineModels"
             :editorBlocks="editorLineModel.editorBlocks"
             :key="editorLineModel.id"
         ></editor-line>

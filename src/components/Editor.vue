@@ -24,6 +24,7 @@ import Slide from "./Slide.vue";
 export default class Editor extends Vue {
     @Watch("canvasZoom")
     private onCanvasZoomChanged(): void {
+        // Modify the zoom styling of the editor when the zoom is updated
         const percentageDown = this.$el.scrollTop / this.$el.scrollHeight;
         const percentageOver = this.$el.scrollLeft / this.$el.scrollWidth;
         document.getElementById("canvas")!.style.zoom = this.$store.getters.canvasZoom;
@@ -43,7 +44,8 @@ export default class Editor extends Vue {
         };
     }
 
-    public mounted(): void {
+    private mounted(): void {
+        // Scroll to the middle of the editor
         this.$el.scrollTop = (this.$store.getters.canvasHeight - this.$el.clientHeight) / 2;
         this.$el.scrollLeft = (this.$store.getters.canvasWidth - this.$el.clientWidth) / 2;
     }

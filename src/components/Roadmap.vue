@@ -3,14 +3,14 @@
 <div id="roadmap" :style="roadmapStyle">
     <div class="stretcher-vertical top" @mousedown="stretch"></div>
     <div id="slide-previews">
-        <slide-preview v-for="(slide) in $store.getters.slides"
+        <slide-preview v-for="slide in $store.getters.slides"
             :id="slide.id"
             :graphics="$store.getters.slides.find((s) => s.id === slide.id).graphics"
             :key="slide.id"
         ></slide-preview>
-        <div><div id="new-slide-button" @click="newSlideHandler" :style="newSlideButtonStyle">
+        <div id="new-slide-button" @click="newSlideHandler" :style="newSlideButtonStyle">
             <i class="fas fa-plus"></i>
-        </div></div>
+        </div>
     </div>
 </div>
 </template>
@@ -43,12 +43,12 @@ export default class Roadmap extends Vue {
     }
 
     private stretch(event: MouseEvent): void {
-        const self = this;
         event.stopPropagation();
         event.preventDefault();
         document.addEventListener("mousemove", preview);
         document.addEventListener("mouseup", end);
 
+        const self = this;
         function preview(event: MouseEvent): void {
             self.$store.commit("roadmapHeight", window.innerHeight - event.pageY);
         }

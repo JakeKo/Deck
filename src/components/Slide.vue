@@ -14,7 +14,7 @@ import Utilities from "../utilities";
 
 @Component
 export default class Slide extends Vue {
-    public canvas!: SVG.Doc;
+    private canvas!: SVG.Doc;
 
     @Prop({ type: String, required: true })
     private id!: string;
@@ -38,7 +38,7 @@ export default class Slide extends Vue {
         };
     }
 
-    public mounted(): void {
+    private mounted(): void {
         const canvasResolution: number = this.$store.getters.canvasResolution;
         this.canvas = SVG(this.$el.id).viewbox(0, 0, canvasResolution * this.$store.getters.slideWidth, canvasResolution * this.$store.getters.slideHeight);
 

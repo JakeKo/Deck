@@ -1,12 +1,11 @@
 /* tslint:disable */
 <template>
 <div id="editor-line">
-    <editor-block
-        v-for="(editorBlock) in editorBlocks"
+    <editor-block v-for="editorBlock in editorBlocks"
         :content="editorBlock.content"
         :blockStyle="editorBlock.style"
-        :key="editorBlock.id">
-    </editor-block>
+        :key="editorBlock.id"
+    ></editor-block>
 </div>
 </template>
 

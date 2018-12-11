@@ -22,7 +22,7 @@ export default class Tool extends Vue {
     @Prop({ type: String, required: true })
     public icon!: string;
 
-    @Prop({ type: Function, required: true})
+    @Prop({ type: Function, required: true })
     public mount!: Function;
 
     get toolIconStyle(): any {
