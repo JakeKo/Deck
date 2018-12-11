@@ -25,7 +25,7 @@ export default class ToolModel {
         graphicMouseOut?: (svg: SVG.Element) => (event: MouseEvent) => any;
         graphicMouseDown?: (slide: any, svg: SVG.Element, graphic: GraphicModel) => (event: MouseEvent) => any;
     }) {
-        const EMPTY_HANDLER = (): () => void => (): void => { return; };
+        const EMPTY_HANDLER: () => () => void = (): () => void => (): void => { return; };
 
         this.name = name;
         this.canvasMouseDown = canvasMouseDown || EMPTY_HANDLER;

@@ -29,7 +29,10 @@ export default new Vuex.Store({
             objectId: ""
         },
         roadmap: {
-            height: 96
+            height: 96,
+            slidePreview: {
+                height: 60
+            }
         },
         slides: new Array<SlideModel>(),
         theme: 0,
@@ -108,6 +111,9 @@ export default new Vuex.Store({
         },
         slideWidth: (state: any): number => {
             return state.canvas.slide.width;
+        },
+        slidePreviewHeight: (state: any): number => {
+            return state.roadmap.slidePreview.height;
         }
     },
     mutations: {
@@ -139,21 +145,24 @@ export default new Vuex.Store({
             }
         },
         roadmapHeight: (state: any, height: number): void => {
-            state.roadmap.height = height;
+            // Set roadmap height with arbitrary boundaries 64 <= height <= 256
+            state.roadmap.height = Math.max(Math.min(height, 256), 64);
+            // Set slide preview height within the roadmap
+            state.roadmap.slidePreview.height = state.roadmap.height - 36;
         },
         activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;
         },
-        pressedKeys: (state: any, { keyCode, isPressed }: { keyCode: number, isPressed: boolean }) => {
+        pressedKeys: (state: any, { keyCode, isPressed }: { keyCode: number, isPressed: boolean }): void => {
             state.pressedKeys[keyCode] = isPressed;
         },
-        focusGraphic: (state: any, graphic: GraphicModel) => {
+        focusGraphic: (state: any, graphic: GraphicModel): void => {
             state.focusedGraphicId = graphic.id;
         },
-        zoom: (state: any) => {
+        zoom: (state: any): void => {
             state.canvas.zoom += 0.25;
         },
-        unzoom: (state: any) => {
+        unzoom: (state: any): void => {
             state.canvas.zoom = Math.max(state.canvas.zoom - 0.25, 0.25);
         }
     },

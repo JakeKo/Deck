@@ -30,7 +30,9 @@ export default class SlidePreview extends Vue {
         const isActive: boolean = this.id === this.$store.getters.activeSlide.id;
 
         return {
-            border: `2px solid ${isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`
+            border: `2px solid ${isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`,
+            height: `${this.$store.getters.slidePreviewHeight}px`,
+            width: `${this.$store.getters.slidePreviewHeight * 16 / 9}px`
         };
     }
 
@@ -50,8 +52,6 @@ export default class SlidePreview extends Vue {
 
 <style lang="scss" scoped>
 .slide-preview {
-    max-height: 63px;
-    max-width: 112px;
     margin: 0 12px;
     cursor: pointer;
     flex-shrink: 0;

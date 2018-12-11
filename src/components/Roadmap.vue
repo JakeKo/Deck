@@ -38,7 +38,9 @@ export default class Roadmap extends Vue {
         return {
             border: `2px solid ${this.$store.getters.theme.tertiary}`,
             color: this.$store.getters.theme.tertiary,
-            background: this.$store.getters.theme.primary
+            background: this.$store.getters.theme.primary,
+            height: `${this.$store.getters.slidePreviewHeight}px`,
+            width: `${this.$store.getters.slidePreviewHeight * 16 / 9}px`
         };
     }
 
@@ -90,8 +92,6 @@ export default class Roadmap extends Vue {
 }
 
 #new-slide-button {
-    height: 63px;
-    width: 112px;
     margin: 0 24px 0 12px;
     cursor: pointer;
     display: flex;
