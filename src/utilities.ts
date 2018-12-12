@@ -376,6 +376,31 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
     }
 });
 
+const toPrettyString = (object: any, indentDepth: number): string => {
+    if (object === undefined) {
+        return "";
+    }
+
+    const propertiesString: Array<string> = [];
+    for (const property in object) {
+        const value: any = object[property];
+
+        if (typeof value === "number" || typeof value === "boolean") {
+            propertiesString.push(`${space(indentDepth)}"${property}": ${value}`);
+        } else if (typeof value === "string") {
+            propertiesString.push(`${space(indentDepth)}"${property}": "${value}"`);
+        } else if (typeof value === "object") {
+            propertiesString.push(`${space(indentDepth)}"${property}": ${toPrettyString(value, indentDepth + 1)}`);
+        }
+    }
+
+    return `{\n${propertiesString.join(",\n")}\n${space(indentDepth - 1)}}`;
+
+    function space (indentDepth: number): string {
+        return new Array(indentDepth * 4).fill(" ").join("");
+    }
+};
+
 export default {
     cursorTool,
     pencilTool,
@@ -383,10 +408,9 @@ export default {
     rectangleTool,
     ellipseTool,
     textboxTool,
+    toPrettyString,
     renderGraphic,
     generateId,
-    objectToHtml,
-    htmlToObject,
     deckScript
 };
 
@@ -408,11 +432,7 @@ function renderGraphic(graphic: GraphicModel, canvas: SVG.Doc): SVG.Element {
     } else if (graphic.type === "curve") {
         let points: string = `M ${style.points![0].x},${style.points![0].y}`;
         style.points!.slice(1).forEach((point: Point, index: number) => {
-            if (index % 3 === 0) {
-                points += " C";
-            }
-
-            points += ` ${point.x},${point.y}`;
+            points += `${index % 3 === 0 ? " C" : ""} ${point.x},${point.y}`;
         });
 
         return canvas.path(points)
@@ -431,109 +451,6 @@ function renderGraphic(graphic: GraphicModel, canvas: SVG.Doc): SVG.Element {
 function generateId(): string {
     const s4 = () => Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
     return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
-}
-
-function block(innerText: string): EditorBlockModel {
-    return new EditorBlockModel({ content: innerText });
-}
-
-function space(): EditorBlockModel {
-    return new EditorBlockModel({ style: { width: "7px" }});
-}
-
-function lineNumber(number: number): EditorBlockModel[] {
-    const elements: EditorBlockModel[] = [];
-    const padSize = 4 - number.toString().length;
-
-    for (let i = 0; i < padSize; i++) {
-        elements.push(space());
-    }
-
-    elements.push(block(number.toString()));
-    elements.push(block("|"));
-    elements.push(space());
-
-    return elements;
-}
-
-// Wraps a collection of blocks into a line, complete with a line number
-function line(number: number, indentDepth: number, elements: EditorBlockModel[]): EditorLineModel {
-    const line: EditorLineModel = new EditorLineModel();
-
-    // Add the line number, indent, then append elements
-    lineNumber(number).forEach((element: EditorBlockModel) => line.addBlock(element));
-
-    for (let i = 0; i < indentDepth * 2; i++) {
-        line.addBlock(space());
-    }
-
-    elements.forEach((element: EditorBlockModel) => line.addBlock(element));
-
-    return line;
-}
-
-function objectToHtml(object: any, lineCount: number, indentDepth: number): EditorLineModel[] {
-    const lines: EditorLineModel[] = [];
-    const actualPropertyCount = Object.keys(object).length - 1;
-    let propertyCount = 0;
-
-    for (const property in object) {
-        // TODO: Block displaying points in a more robust fashion
-        if (property === "points") {
-            continue;
-        }
-
-        const value = object[property];
-
-        if (typeof value === "number" || typeof value === "string" || typeof value === "boolean") {
-            const elements: EditorBlockModel[] = [block(property), block(":"), space(), block(value.toString())];
-            if (propertyCount < actualPropertyCount) {
-                elements.push(block(","));
-            }
-
-            lines.push(line(lineCount, indentDepth, elements));
-            lineCount++;
-        } else if (typeof value === "object") {
-            lines.push(line(lineCount, indentDepth, [block(property), block(":"), space(), block("{")]));
-            lineCount++;
-
-            // Recursively cast child objects to html
-            const propertyLines: EditorLineModel[] = objectToHtml(value, lineCount, indentDepth + 1);
-            propertyLines.forEach((line: EditorLineModel) => lines.push(line));
-            lineCount += propertyLines.length;
-
-            const elements = [block("}")];
-            if (propertyCount < actualPropertyCount) {
-                elements.push(block(","));
-            }
-
-            lines.push(line(lineCount, indentDepth, elements));
-            lineCount++;
-        }
-
-        propertyCount++;
-    }
-
-    return lines;
-}
-
-function htmlToObject(lines: EditorLineModel[]): any {
-    let objectString: string = "{";
-
-    lines.forEach((line) => {
-        // TODO: More robust ignorance of line numbers
-        line.editorBlocks.slice(5).forEach((block) => {
-            // TODO: More robust detection of properties that need quotes
-            if (block.content === ":" || block.content === "{" || block.content === "}" || block.content === "" || block.content === ",") {
-                objectString += block.content;
-            } else {
-                objectString += `"${block.content}"`;
-            }
-        });
-    });
-
-    objectString += "}";
-    return JSON.parse(objectString);
 }
 
 function deckScript(): string {
