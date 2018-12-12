@@ -1,12 +1,10 @@
-import EditorLineModel from "./models/EditorLineModel";
-import EditorBlockModel from "./models/EditorBlockModel";
 import * as SVG from "svg.js";
 import Point from "./models/Point";
 import GraphicModel from "./models/GraphicModel";
 import ToolModel from "./models/ToolModel";
 import StyleModel from "./models/StyleModel";
 
-const getMousePosition = (slide: any, event: MouseEvent): Point => {
+const getMousePosition: (slide: any, event: MouseEvent) => Point = (slide: any, event: MouseEvent): Point => {
     const zoom: number = slide.$store.getters.canvasZoom;
     const resolution: number = slide.$store.getters.canvasResolution;
     const bounds: DOMRect = slide.$el.getBoundingClientRect();
@@ -376,7 +374,7 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
     }
 });
 
-const toPrettyString = (object: any, indentDepth: number): string => {
+const toPrettyString: (object: any, indentDepth: number) => string = (object: any, indentDepth: number): string => {
     if (object === undefined) {
         return "";
     }
@@ -396,7 +394,7 @@ const toPrettyString = (object: any, indentDepth: number): string => {
 
     return `{\n${propertiesString.join(",\n")}\n${space(indentDepth - 1)}}`;
 
-    function space (indentDepth: number): string {
+    function space(indentDepth: number): string {
         return new Array(indentDepth * 4).fill(" ").join("");
     }
 };
