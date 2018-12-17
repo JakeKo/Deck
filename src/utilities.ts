@@ -72,7 +72,7 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
     },
     canvasMouseDown: (slide: any) => (): void => {
         if (slide.$store.getters.focusedGraphicId !== "") {
-            slide.$store.commit("focusGraphic", { id: "" });
+            slide.$store.commit("focusGraphic", undefined);
             slide.$store.commit("styleEditorObject", undefined);
         }
     }
@@ -87,6 +87,8 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
+        slide.$store.commit("focusGraphic", undefined);
+        slide.$store.commit("styleEditorObject", undefined);
         const points: Array<Point> = [getMousePosition(slide, event)];
         const strokeWidth: number = slide.$store.getters.canvasResolution * 3;
         const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", strokeWidth);
@@ -133,6 +135,8 @@ const penTool: ToolModel = new ToolModel("pen", {
         canvas.on("mousemove", preview);
         canvas.on("mouseup", setFirstControlPoint);
 
+        slide.$store.commit("focusGraphic", undefined);
+        slide.$store.commit("styleEditorObject", undefined);
         const start: Point = getMousePosition(slide, event);
         const curve: Array<Array<Point>> = [[start]];
         const curveSegment: Array<Array<Point | undefined>> = [[start], [undefined, undefined, undefined]];
@@ -257,6 +261,8 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
+        slide.$store.commit("focusGraphic", undefined);
+        slide.$store.commit("styleEditorObject", undefined);
         const start: Point = getMousePosition(slide, event);
         const shape: SVG.Rect = canvas.rect().move(start.x, start.y);
 
@@ -309,6 +315,8 @@ const ellipseTool: ToolModel = new ToolModel("ellipse", {
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
+        slide.$store.commit("focusGraphic", undefined);
+        slide.$store.commit("styleEditorObject", undefined);
         const start: Point = getMousePosition(slide, event);
         const shape: SVG.Ellipse = canvas.ellipse().center(start.x, start.y);
 
@@ -358,6 +366,8 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
         event.stopPropagation();
         event.preventDefault();
 
+        slide.$store.commit("focusGraphic", undefined);
+        slide.$store.commit("styleEditorObject", undefined);
         const position = getMousePosition(slide, event);
         const graphic = new GraphicModel({
             type: "textbox",
@@ -399,20 +409,7 @@ const toPrettyString: (object: any, indentDepth: number) => string = (object: an
     }
 };
 
-export default {
-    cursorTool,
-    pencilTool,
-    penTool,
-    rectangleTool,
-    ellipseTool,
-    textboxTool,
-    toPrettyString,
-    renderGraphic,
-    generateId,
-    deckScript
-};
-
-function renderGraphic(graphic: GraphicModel, canvas: SVG.Doc): SVG.Element {
+const renderGraphic: (graphic: GraphicModel, canvas: SVG.Doc) => SVG.Element = (graphic: GraphicModel, canvas: SVG.Doc): SVG.Element => {
     const style: StyleModel = graphic.styleModel;
 
     if (graphic.type === "rectangle") {
@@ -444,15 +441,14 @@ function renderGraphic(graphic: GraphicModel, canvas: SVG.Doc): SVG.Element {
     }
 
     throw `Undefined type of graphic: ${graphic.type}`;
-}
+};
 
-function generateId(): string {
+const generateId: () => string = (): string => {
     const s4 = () => Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
     return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
-}
+};
 
-function deckScript(): string {
-    return `<style>
+const deckScript: string = `<style>
 html,
 body {
     margin: 0;
@@ -533,4 +529,16 @@ function rewindSlide() {
     slides[slideIndex].style.display = "block";
 }
 </script>`;
-}
+
+export default {
+    cursorTool,
+    pencilTool,
+    penTool,
+    rectangleTool,
+    ellipseTool,
+    textboxTool,
+    toPrettyString,
+    renderGraphic,
+    generateId,
+    deckScript
+};

@@ -157,8 +157,8 @@ export default new Vuex.Store({
         pressedKeys: (state: any, { keyCode, isPressed }: { keyCode: number, isPressed: boolean }): void => {
             state.pressedKeys[keyCode] = isPressed;
         },
-        focusGraphic: (state: any, graphic: GraphicModel): void => {
-            state.focusedGraphicId = graphic.id;
+        focusGraphic: (state: any, graphic?: GraphicModel): void => {
+            state.focusedGraphicId = graphic === undefined ? undefined : graphic.id;
         },
         zoom: (state: any): void => {
             state.canvas.zoom += 0.25;
@@ -202,7 +202,7 @@ export default new Vuex.Store({
             body.innerHTML = exportFrame.innerHTML;
 
             const anchor: HTMLAnchorElement = document.createElement("a");
-            const page: string = `${html.outerHTML}${Utilities.deckScript()}`;
+            const page: string = `${html.outerHTML}${Utilities.deckScript}`;
             anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
             anchor.setAttribute("download", "deck.html");
             anchor.click();
