@@ -6,6 +6,7 @@ import Theme from "./models/Theme";
 import GraphicModel from "./models/GraphicModel";
 import ToolModel from "./models/ToolModel";
 import * as SVG from "svg.js";
+import StyleModel from "./models/StyleModel";
 
 Vue.use(Vuex);
 
@@ -65,7 +66,7 @@ export default new Vuex.Store({
             return state.slides[state.slides.length - 1];
         },
         activeSlide: (state: any): SlideModel => {
-            return state.slides.find((slide: SlideModel) => slide.id === state.activeSlideId)!;
+            return state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId)!;
         },
         styleEditorWidth: (state: any): number => {
             return state.styleEditor.width;
@@ -121,12 +122,12 @@ export default new Vuex.Store({
             state.slides.splice(index, 0, new SlideModel());
         },
         addGraphic: (state: any, { slideId, graphic }: { slideId: string, graphic: GraphicModel }): void => {
-            const slide: SlideModel = state.slides.find((slide: SlideModel) => slide.id === slideId);
+            const slide: SlideModel = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
             slide.graphics.push(graphic);
         },
         removeGraphic: (state: any, { slideId, graphicId }: { slideId: string, graphicId: string}): void => {
-            const slide: SlideModel = state.slides.find((slide: SlideModel) => slide.id === slideId);
-            slide.graphics = slide.graphics.filter((graphic: GraphicModel) => graphic.id !== graphicId);
+            const slide: SlideModel = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
+            slide.graphics = slide.graphics.filter((graphic: GraphicModel): boolean => graphic.id !== graphicId);
         },
         tool: (state: any, toolName: string): void => {
             state.currentTool = toolName;
@@ -164,6 +165,11 @@ export default new Vuex.Store({
         },
         unzoom: (state: any): void => {
             state.canvas.zoom = Math.max(state.canvas.zoom - 0.25, 0.25);
+        },
+        graphicStyle: (state: any, { graphicId, style }: { graphicId: string, style: any }): void => {
+            const activeSlide: SlideModel = state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId)!;
+            const graphic: GraphicModel = activeSlide.graphics.find((graphic: GraphicModel): boolean => graphic.id === graphicId)!;
+            graphic.styleModel = new StyleModel(style);
         }
     },
     actions: {

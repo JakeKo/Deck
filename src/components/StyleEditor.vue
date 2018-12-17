@@ -63,7 +63,8 @@ export default class StyleEditor extends Vue {
     private submit(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        console.log(JSON.parse(this.content));
+
+        this.$store.commit("graphicStyle", { graphicId: this.$store.getters.styleEditorObjectId, style: JSON.parse(this.content) });
     }
 }
 /* tslint:disable */

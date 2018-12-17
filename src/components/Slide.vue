@@ -22,7 +22,7 @@ export default class Slide extends Vue {
     @Prop({ type: Array, default: () => new Array<GraphicModel>() })
     private graphics!: GraphicModel[];
 
-    @Watch("graphics")
+    @Watch("graphics", { deep: true })
     public refreshCanvas(): void {
         this.canvas.clear();
         this.graphics.forEach((graphic: GraphicModel) => this.initializeGraphic(graphic));
