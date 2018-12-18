@@ -13,10 +13,10 @@
 <script lang="ts">
 /* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
-import Toolbox from "../components/Toolbox.vue";
-import Editor from "../components/Editor.vue";
-import Roadmap from "../components/Roadmap.vue";
-import StyleEditor from "../components/StyleEditor.vue";
+import Toolbox from "./components/Toolbox.vue";
+import Editor from "./components/Editor.vue";
+import Roadmap from "./components/Roadmap.vue";
+import StyleEditor from "./components/StyleEditor.vue";
 
 @Component({
     components: {
@@ -27,13 +27,13 @@ import StyleEditor from "../components/StyleEditor.vue";
     }
 })
 export default class App extends Vue {
-    public created(): void {
+    private created(): void {
         this.$store.commit("addSlide");
         this.$store.commit("activeSlide", this.$store.getters.firstSlide.id);
 
         document.addEventListener("keydown", (event: KeyboardEvent) => {
-            const isPressed = this.$store.getters.pressedKeys[event.keyCode];
-            const DELETE_KEY_CODE = 46, BACKSPACE_KEY_CODE = 8;
+            const isPressed: boolean = this.$store.getters.pressedKeys[event.keyCode];
+            const DELETE_KEY_CODE: number = 46, BACKSPACE_KEY_CODE: number = 8;
 
             if (!isPressed) {
                 this.$store.commit("pressedKeys", { keyCode: event.keyCode, isPressed: true });
@@ -41,13 +41,13 @@ export default class App extends Vue {
 
             if (event.keyCode === DELETE_KEY_CODE || event.keyCode === BACKSPACE_KEY_CODE) {
                 this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: this.$store.getters.focusedGraphicId });
-                this.$store.commit("focusGraphic", { id: "" });
+                this.$store.commit("focusGraphic", undefined);
                 this.$store.commit("styleEditorObject", undefined);
             }
         });
 
         document.addEventListener("keyup", (event: KeyboardEvent) => {
-            const isPressed = this.$store.getters.pressedKeys[event.keyCode];
+            const isPressed: boolean = this.$store.getters.pressedKeys[event.keyCode];
 
             if (isPressed) {
                 this.$store.commit("pressedKeys", { keyCode: event.keyCode, isPressed: false });

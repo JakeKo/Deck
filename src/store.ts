@@ -150,7 +150,7 @@ export default new Vuex.Store({
             // Set roadmap height with arbitrary boundaries 64 <= height <= 256
             state.roadmap.height = Math.max(Math.min(height, 256), 64);
             // Set slide preview height within the roadmap
-            state.roadmap.slidePreview.height = state.roadmap.height - 36;
+            state.roadmap.slidePreview.height = state.roadmap.height - 42;
         },
         activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;
@@ -162,10 +162,10 @@ export default new Vuex.Store({
             state.focusedGraphicId = graphic === undefined ? undefined : graphic.id;
         },
         zoom: (state: any): void => {
-            state.canvas.zoom += 0.25;
+            state.canvas.zoom += 0.05;
         },
         unzoom: (state: any): void => {
-            state.canvas.zoom = Math.max(state.canvas.zoom - 0.25, 0.25);
+            state.canvas.zoom = Math.max(state.canvas.zoom - 0.05, 0.25);
         },
         graphicStyle: (state: any, { graphicId, style }: { graphicId: string, style: any }): void => {
             const activeSlide: SlideModel = state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId)!;

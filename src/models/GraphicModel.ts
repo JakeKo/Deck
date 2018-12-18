@@ -14,10 +14,4 @@ export default class GraphicModel {
         this.type = type || "";
         this.styleModel = styleModel || new StyleModel();
     }
-
-    public reset(model: any): void {
-        // Note: Do not reset the id
-        this.type = model.type;
-        this.styleModel = new StyleModel(model.styleModel);
-    }
 }
