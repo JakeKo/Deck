@@ -1,3 +1,11 @@
 language: node_js
 node_js:
   - "10.13.0"
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $DECK_DEPLOYMENT_TOKEN
+  committer-from-gh: true
+  local-dir: ./dist/
+  on:
+    branch: master
