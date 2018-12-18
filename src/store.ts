@@ -7,6 +7,7 @@ import GraphicModel from "./models/GraphicModel";
 import ToolModel from "./models/ToolModel";
 import * as SVG from "svg.js";
 import StyleModel from "./models/StyleModel";
+import Point from "./models/Point";
 
 Vue.use(Vuex);
 
@@ -169,7 +170,14 @@ export default new Vuex.Store({
         graphicStyle: (state: any, { graphicId, style }: { graphicId: string, style: any }): void => {
             const activeSlide: SlideModel = state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId)!;
             const graphic: GraphicModel = activeSlide.graphics.find((graphic: GraphicModel): boolean => graphic.id === graphicId)!;
-            graphic.styleModel = new StyleModel(style);
+            const styleModel: StyleModel = new StyleModel(style);
+
+            // Points are not preserved in the style editor object
+            if (style.points !== undefined) {
+                styleModel.points = style.points.map((point: any): Point => new Point(point.x, point.y));
+            }
+
+            graphic.styleModel = styleModel;
         }
     },
     actions: {

@@ -2,7 +2,7 @@
 <template>
 <div id="style-editor" :style="styleEditorStyle">
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
-    <textarea id="style-editor-content" v-model="content"></textarea>
+    <textarea id="style-editor-content" v-model="content" @keydown="onKeyDown"></textarea>
     <div id="submit-button-container">
         <button id="submit-button" :style="submitButtonStyle" @click="submit">Apply</button>
     </div>
@@ -58,6 +58,13 @@ export default class StyleEditor extends Vue {
             document.removeEventListener("mousemove", preview);
             document.removeEventListener("mouseup", end);
         }
+    }
+
+    private onKeyDown(event: KeyboardEvent): void {
+        // Prevent keydowns in the style editor from affecting the slide or other elements
+        // For example - delete and backspace propagation must be stopped lest they remove a graphic
+        event.stopPropagation();
+        this.content = this.content; // TODO: Remove noop
     }
 
     private submit(event: Event): void {

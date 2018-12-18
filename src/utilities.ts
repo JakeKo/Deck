@@ -31,6 +31,9 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
+            event.stopPropagation();
+            event.preventDefault();
+
             const resolvedPosition: Point = getMousePosition(slide, event).add(offset);
             svg.move(resolvedPosition.x, resolvedPosition.y);
         }
@@ -396,7 +399,10 @@ const toPrettyString: (object: any, indentDepth: number) => string = (object: an
         if (typeof value === "number" || typeof value === "boolean") {
             propertiesString.push(`${space(indentDepth)}"${property}": ${value}`);
         } else if (typeof value === "string") {
-            propertiesString.push(`${space(indentDepth)}"${property}": "${value}"`);
+            propertiesString.push(`${space(indentDepth)}"${property}": ${JSON.stringify(value)}`);
+        } else if (Array.isArray(value)) {
+            const arrayString: Array<string> = value.map<string>((element: any): string => `${space(indentDepth + 1)}${toPrettyString(element, indentDepth + 2)}`);
+            propertiesString.push(`${space(indentDepth)}"${property}": [\n${arrayString.join(",\n")}\n${space(indentDepth)}]`);
         } else if (typeof value === "object") {
             propertiesString.push(`${space(indentDepth)}"${property}": ${toPrettyString(value, indentDepth + 1)}`);
         }
