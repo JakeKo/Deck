@@ -4,18 +4,21 @@
 	"description": "Deck is an open-source, well-armed, safe-to-swallow, and fluoride-free application for editing and presenting slide decks.",
 	"author": "Jacob Koperski",
 	"license": "MIT",
-	"homepage": "https://github.com/JakeKo/Deck#readme",
+	"homepage": "https://jakeko.github.io/Deck",
 	"bugs": "https://github.com/JakeKo/Deck/issues",
 	"repository": "git+https://github.com/JakeKo/Deck.git",
 	"scripts": {
-		"build": "webpack --config webpack-prod.config.js",
+		"build": "webpack --config webpack-prod.config.js && cp index.html ./dist/",
 		"serve": "webpack-dev-server --hot --inline",
-		"test": "mocha-webpack --webpack-config webpack-test.config.js --require test/setup.js test/*.spec.js"
+		"test": "mocha-webpack --webpack-config webpack-test.config.js --require test/setup.js test/*.spec.js",
+		"predeploy": "npm run build",
+		"deploy": "gh-pages -d dist"
 	},
 	"devDependencies": {
 		"@vue/test-utils": "^1.0.0-beta.25",
 		"css-loader": "^0.28.11",
 		"expect": "^23.6.0",
+		"gh-pages": "^2.0.1",
 		"jsdom": "^13.0.0",
 		"jsdom-global": "^3.0.2",
 		"mocha": "^5.2.0",
