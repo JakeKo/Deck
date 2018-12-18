@@ -64,6 +64,7 @@ export default class Roadmap extends Vue {
     private newSlideHandler(event: Event): void {
         this.$store.commit("addSlide", this.$store.getters.slides.length);
         this.$store.commit("activeSlide", this.$store.getters.lastSlide.id);
+        this.$store.commit("focusGraphic", undefined);
         this.$store.commit("styleEditorObject", undefined);
     }
 }

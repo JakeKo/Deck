@@ -14,7 +14,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         activeSlideId: "",
-        focusedGraphicId: "",
+        focusedGraphicId: undefined,
         canvas: {
             height: 2000,
             width: 4000,

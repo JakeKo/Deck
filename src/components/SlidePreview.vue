@@ -44,6 +44,7 @@ export default class SlidePreview extends Vue {
 
     private onSlidePreviewClicked(): void {
         this.$store.commit("activeSlide", this.id);
+        this.$store.commit("focusGraphic", undefined);
         this.$store.commit("styleEditorObject", undefined);
     }
 }

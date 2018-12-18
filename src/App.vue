@@ -6,7 +6,7 @@
         <editor></editor>
         <roadmap></roadmap>
     </div>
-    <style-editor></style-editor>
+    <style-editor v-show="$store.getters.focusedGraphicId"></style-editor>
 </div>
 </template>
 
@@ -56,8 +56,9 @@ export default class App extends Vue {
     }
 
     get workspaceStyle(): any {
+        const styleEditorHidden: boolean = this.$store.getters.focusedGraphicId === undefined;
         return {
-            width: `calc(100vw - ${this.$store.getters.toolboxWidth + this.$store.getters.styleEditorWidth}px)`
+            width: `calc(100vw - ${this.$store.getters.toolboxWidth + (styleEditorHidden ? 0 : this.$store.getters.styleEditorWidth)}px)`
         };
     }
 }
