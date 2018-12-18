@@ -388,27 +388,22 @@ const textboxTool: ToolModel = new ToolModel("textbox", {
 });
 
 const toPrettyString: (object: any, indentDepth: number) => string = (object: any, indentDepth: number): string => {
-    if (object === undefined) {
-        return "";
-    }
-
-    const propertiesString: Array<string> = [];
+    const properties: Array<string> = [];
     for (const property in object) {
         const value: any = object[property];
+        const prefix: string = Array.isArray(object) ? space(indentDepth) : `${space(indentDepth)}"${property}": `;
 
         if (typeof value === "number" || typeof value === "boolean") {
-            propertiesString.push(`${space(indentDepth)}"${property}": ${value}`);
+            properties.push(`${prefix}${value}`);
         } else if (typeof value === "string") {
-            propertiesString.push(`${space(indentDepth)}"${property}": ${JSON.stringify(value)}`);
-        } else if (Array.isArray(value)) {
-            const arrayString: Array<string> = value.map<string>((element: any): string => `${space(indentDepth + 1)}${toPrettyString(element, indentDepth + 2)}`);
-            propertiesString.push(`${space(indentDepth)}"${property}": [\n${arrayString.join(",\n")}\n${space(indentDepth)}]`);
-        } else if (typeof value === "object") {
-            propertiesString.push(`${space(indentDepth)}"${property}": ${toPrettyString(value, indentDepth + 1)}`);
+            properties.push(`${prefix}${JSON.stringify(value)}`);
+        } else if (Array.isArray(value) || typeof value === "object") {
+            properties.push(`${prefix}${toPrettyString(value, indentDepth + 1)}`);
         }
     }
 
-    return `{\n${propertiesString.join(",\n")}\n${space(indentDepth - 1)}}`;
+    const prettyString: string = `\n${properties.join(",\n")}\n${space(indentDepth - 1)}`;
+    return Array.isArray(object) ? `[${prettyString}]` : `{${prettyString}}`;
 
     function space(indentDepth: number): string {
         return new Array(indentDepth * 4).fill(" ").join("");
