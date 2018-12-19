@@ -1,7 +1,7 @@
 /* tslint:disable */
 <template>   
-<div id="tool">
-    <div id="tool-icon" :style="toolIconStyle" @click="mount">
+<div class="tool">
+    <div class="tool-icon" :style="toolIconStyle" @click="mount">
         <i :class="icon"></i>
     </div>
 </div>
@@ -36,21 +36,5 @@ export default class Tool extends Vue {
 </script>
 
 <style lang="scss" scoped>
-#tool {
-    width: 100%;
-    height: 64px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-#tool-icon {
-    height: 36px;
-    width: 36px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+@import "../styles/components";
 </style>
