@@ -6,7 +6,7 @@ module.exports = {
     plugins: [new VueLoaderPlugin()],
     devtool: "inline-source-map",
     output: {
-        publicPath: "/dist/"
+        publicPath: "/"
     },
     resolve: {
         extensions: [".ts", ".js", ".json", ".vue"],
