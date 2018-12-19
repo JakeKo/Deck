@@ -10,6 +10,9 @@
     <tool :mount="() => $store.commit('zoom')" :toolName="'zoom'" :icon="'fas fa-search-plus'" :isActive="$store.getters.tool.name === 'zoom'"></tool>
     <tool :mount="() => $store.commit('unzoom')" :toolName="'unzoom'" :icon="'fas fa-search-minus'" :isActive="$store.getters.tool.name === 'unzoom'"></tool>
     <tool :mount="() => $store.dispatch('export')" :toolName="'export'" :icon="'fas fa-file-export'" :isActive="$store.getters.tool.name === 'export'"></tool>
+    <a href="https://github.com/JakeKo/Deck/issues/new/choose" target="blank">
+        <tool :mount="() => {}" :toolName="'feedback'" :icon="'fas fa-info'" :isActive="true"></tool>
+    </a>
 </div>
 </template>
 
