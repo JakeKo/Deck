@@ -1,6 +1,6 @@
 /* tslint:disable */
 <template>   
-<div class="tool" :id="isActive ? 'active-tool' : ''" @click="mount">
+<div class="tool" :id="isActive ? 'active-tool' : ''" @click="$emit('click')">
     <i :class="icon"></i>
     {{toolName}}
 </div>
@@ -15,14 +15,11 @@ export default class Tool extends Vue {
     @Prop({ type: String, required: true })
     public toolName!: string;
 
-    @Prop({ type: Boolean, required: false, default: false })
+    @Prop({ type: Boolean, required: true })
     public isActive!: boolean;
 
     @Prop({ type: String, required: true })
     public icon!: string;
-
-    @Prop({ type: Function, required: true })
-    public mount!: Function;
 }
 /* tslint:disable */
 </script>
