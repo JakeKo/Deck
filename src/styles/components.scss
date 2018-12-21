@@ -1,3 +1,6 @@
+@import "./colors";
+@import "./fonts";
+
 .stretcher-vertical {
     position: absolute;
     width: 100%;
@@ -39,9 +42,18 @@
     align-items: center;
     cursor: pointer;
     padding: 8px 0;
-    font-family: "Segoe UI", "Tahoma", "Geneva", "Verdana", sans-serif;
+    font-family: $font-body;
+    color: $color-information;
+    background: $color-primary;
+    font-size: 12px;
 
     i {
-        font-size: 24px;
+        font-size: 20px;
+        padding: 4px 0;
+    }
+
+    &:hover {
+        background: $color-secondary;
+        color: $color-information;
     }
 }

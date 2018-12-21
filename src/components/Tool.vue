@@ -1,8 +1,8 @@
 /* tslint:disable */
 <template>   
-<div class="tool" @click="mount">
+<div class="tool" :id="isActive ? 'active-tool' : ''" @click="mount">
     <i :class="icon"></i>
-    <div>{{toolName}}</div>
+    {{toolName}}
 </div>
 </template>
 
@@ -29,4 +29,9 @@ export default class Tool extends Vue {
 
 <style lang="scss" scoped>
 @import "../styles/components";
+
+#active-tool {
+    background: $color-information;
+    color: $color-primary;
+}
 </style>
