@@ -1,9 +1,8 @@
 /* tslint:disable */
 <template>   
-<div class="tool">
-    <div class="tool-icon" :style="toolIconStyle" @click="mount">
-        <i :class="icon"></i>
-    </div>
+<div class="tool" @click="mount">
+    <i :class="icon"></i>
+    <div>{{toolName}}</div>
 </div>
 </template>
 
@@ -24,13 +23,6 @@ export default class Tool extends Vue {
 
     @Prop({ type: Function, required: true })
     public mount!: Function;
-
-    get toolIconStyle(): any {
-        return {
-            border: `3px solid ${this.isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary}`,
-            color: this.isActive ? this.$store.getters.theme.information : this.$store.getters.theme.tertiary
-        };
-    }
 }
 /* tslint:disable */
 </script>
