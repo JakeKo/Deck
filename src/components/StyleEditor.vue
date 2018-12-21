@@ -1,4 +1,3 @@
-/* tslint:disable */
 <template>
 <div id="style-editor" :style="styleEditorStyle">
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
@@ -10,7 +9,6 @@
 </template>
 
 <script lang="ts">
-/* tslint:enable */
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import Utilities from "../utilities";
 import StyleModel from "../models/StyleModel";
@@ -74,7 +72,6 @@ export default class StyleEditor extends Vue {
         this.$store.commit("graphicStyle", { graphicId: this.$store.getters.styleEditorObjectId, style: JSON.parse(this.content) });
     }
 }
-/* tslint:disable */
 </script>
 
 <style lang="scss" scoped>

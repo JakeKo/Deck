@@ -1,4 +1,3 @@
-/* tslint:disable */
 <template>
 <div id="toolbox" :style="toolboxStyle">
     <tool @click="$store.commit('tool', 'cursor')" :toolName="'cursor'" :icon="'fas fa-mouse-pointer'" :isActive="$store.getters.tool.name === 'cursor'"></tool>
@@ -17,7 +16,6 @@
 </template>
 
 <script lang="ts">
-/* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
 import Tool from "./Tool.vue";
 
@@ -33,7 +31,6 @@ export default class Toolbox extends Vue {
         };
     }
 }
-/* tslint:disable */
 </script>
 
 <style lang="scss" scoped>

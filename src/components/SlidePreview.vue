@@ -1,10 +1,8 @@
-/* tslint:disable */
 <template>
 <div :id="`slide-preview_${id}`" class="slide-preview" :style="slidePreviewStyle" @click="onSlidePreviewClicked"></div>
 </template>
 
 <script lang="ts">
-/* tslint:enable */
 import { Vue, Component, Watch, Prop } from "vue-property-decorator";
 import GraphicModel from "../models/GraphicModel";
 import Utilities from "../utilities";
@@ -48,7 +46,6 @@ export default class SlidePreview extends Vue {
         this.$store.commit("styleEditorObject", undefined);
     }
 }
-/* tslint:disable */
 </script>
 
 <style lang="scss" scoped>

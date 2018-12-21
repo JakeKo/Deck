@@ -1,4 +1,3 @@
-/* tslint:disable */
 <template>   
 <div class="tool" :id="isActive ? 'active-tool' : ''" @click="$emit('click')">
     <i :class="icon"></i>
@@ -7,7 +6,6 @@
 </template>
 
 <script lang="ts">
-/* tslint:enable */
 import { Vue, Component, Prop } from "vue-property-decorator";
 
 @Component
@@ -21,7 +19,6 @@ export default class Tool extends Vue {
     @Prop({ type: String, required: true })
     public icon!: string;
 }
-/* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
