@@ -1,7 +1,7 @@
 import * as SVG from "svg.js";
-import Point from "./models/Point";
-import GraphicModel from "./models/GraphicModel";
-import StyleModel from "./models/StyleModel";
+import Point from "../models/Point";
+import GraphicModel from "../models/GraphicModel";
+import StyleModel from "../models/StyleModel";
 
 const toPrettyString: (object: any, indentDepth: number) => string = (object: any, indentDepth: number): string => {
     const properties: Array<string> = [];
