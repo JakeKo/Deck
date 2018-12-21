@@ -10,7 +10,7 @@ import * as SVG from "svg.js";
 import GraphicModel from "../models/GraphicModel";
 import StyleModel from "../models/StyleModel";
 import Point from "../models/Point";
-import Utilities from "../utilities";
+import Utilities from "../utilities/miscellaneous";
 
 @Component
 export default class Slide extends Vue {

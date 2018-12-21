@@ -1,7 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import SlideModel from "./models/SlideModel";
-import Utilities from "./utilities";
+import Utilities from "./utilities/miscellaneous";
+import Tools from "./utilities/tools";
 import Theme from "./models/Theme";
 import GraphicModel from "./models/GraphicModel";
 import ToolModel from "./models/ToolModel";
@@ -44,12 +45,12 @@ export default new Vuex.Store({
         ],
         currentTool: "cursor",
         tools: {
-            cursor: Utilities.cursorTool,
-            pencil: Utilities.pencilTool,
-            pen: Utilities.penTool,
-            rectangle: Utilities.rectangleTool,
-            ellipse: Utilities.ellipseTool,
-            textbox: Utilities.textboxTool
+            cursor: Tools.cursorTool,
+            pencil: Tools.pencilTool,
+            pen: Tools.penTool,
+            rectangle: Tools.rectangleTool,
+            ellipse: Tools.ellipseTool,
+            textbox: Tools.textboxTool
         } as { [key: string]: ToolModel },
         pressedKeys: { } as { [key: number]: boolean },
         toolbox: {
