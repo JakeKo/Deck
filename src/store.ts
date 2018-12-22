@@ -54,7 +54,7 @@ export default new Vuex.Store({
         } as { [key: string]: ToolModel },
         pressedKeys: { } as { [key: number]: boolean },
         toolbox: {
-            width: 64
+            width: 72
         }
     },
     getters: {

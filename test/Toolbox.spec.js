@@ -41,7 +41,7 @@ describe("Toolbox", () => {
         // Act
 
         // Assert
-        expect(toolWrappers.filter((toolWrapper) => toolWrapper.props("isActive")).length).toBe(2);
-        expect(toolWrappers.filter((toolWrapper) => !toolWrapper.props("isActive")).length).toBe(8);
+        expect(toolWrappers.filter((toolWrapper) => toolWrapper.props("isActive")).length).toBe(1);
+        expect(toolWrappers.filter((toolWrapper) => !toolWrapper.props("isActive")).length).toBe(9);
     });
 });

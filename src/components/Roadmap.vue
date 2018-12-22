@@ -1,4 +1,3 @@
-/* tslint:disable */
 <template>
 <div id="roadmap" :style="roadmapStyle">
     <div class="stretcher-vertical top" @mousedown="stretch"></div>
@@ -16,7 +15,6 @@
 </template>
 
 <script lang="ts">
-/* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
 import SlidePreview from "./SlidePreview.vue";
 import SlideModel from "../models/SlideModel";
@@ -68,7 +66,6 @@ export default class Roadmap extends Vue {
         this.$store.commit("styleEditorObject", undefined);
     }
 }
-/* tslint:disable */
 </script>
 
 <style lang="scss" scoped>

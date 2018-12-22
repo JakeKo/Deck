@@ -1,10 +1,8 @@
-/* tslint:disable */
 <template>
 <div :id="`slide_${id}`" :style="slideStyle"></div>
 </template>
 
 <script lang="ts">
-/* tslint:enable */
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import GraphicModel from "../models/GraphicModel";
@@ -58,7 +56,6 @@ export default class Slide extends Vue {
         svg.on("mousedown", (event: MouseEvent) => this.$store.getters.tool.graphicMouseDown(this, svg, graphic)(event));
     }
 }
-/* tslint:disable */
 </script>
 
 <style lang="scss" scoped>

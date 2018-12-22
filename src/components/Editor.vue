@@ -1,4 +1,3 @@
-/* tslint:disable */
 <template>
 <div id="editor">
     <div id="canvas" :style="canvasStyle">
@@ -12,7 +11,6 @@
 </template>
 
 <script lang="ts">
-/* tslint:enable */
 import { Vue, Component, Watch } from "vue-property-decorator";
 import Slide from "./Slide.vue";
 
@@ -50,7 +48,6 @@ export default class Editor extends Vue {
         this.$el.scrollLeft = (this.$store.getters.canvasWidth - this.$el.clientWidth) / 2;
     }
 }
-/* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
