@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from "vue-property-decorator";
 import GraphicModel from "../models/GraphicModel";
-import Utilities from "../utilities";
+import Utilities from "../utilities/miscellaneous";
 import * as SVG from "svg.js";
 
 @Component

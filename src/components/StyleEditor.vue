@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
-import Utilities from "../utilities";
+import Utilities from "../utilities/miscellaneous";
 import StyleModel from "../models/StyleModel";
 
 @Component
