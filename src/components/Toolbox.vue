@@ -8,7 +8,7 @@
     <tool @click="$store.commit('tool', 'textbox')" :toolName="'textbox'" :icon="'fas fa-font'" :isActive="$store.getters.tool.name === 'textbox'"></tool>
     <tool @click="$store.commit('zoom')" :toolName="'zoom'" :icon="'fas fa-search-plus'" :isActive="false"></tool>
     <tool @click="$store.commit('unzoom')" :toolName="'unzoom'" :icon="'fas fa-search-minus'" :isActive="false"></tool>
-    <tool @click="$store.dispatch('export')" :toolName="'export'" :icon="'fas fa-file-export'" :isActive="false"></tool>
+    <tool @click="$store.dispatch('export')" :toolName="'export'" :icon="'fas fa-save'" :isActive="false"></tool>
     <a href="https://github.com/JakeKo/Deck/issues/new/choose" target="blank">
         <tool :toolName="'feedback'" :icon="'fas fa-info'" :isActive="false"></tool>
     </a>
