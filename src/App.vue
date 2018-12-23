@@ -32,25 +32,10 @@ export default class App extends Vue {
         this.$store.commit("activeSlide", this.$store.getters.firstSlide.id);
 
         document.addEventListener("keydown", (event: KeyboardEvent) => {
-            const isPressed: boolean = this.$store.getters.pressedKeys[event.keyCode];
-            const DELETE_KEY_CODE: number = 46, BACKSPACE_KEY_CODE: number = 8;
-
-            if (!isPressed) {
-                this.$store.commit("pressedKeys", { keyCode: event.keyCode, isPressed: true });
-            }
-
-            if (event.keyCode === DELETE_KEY_CODE || event.keyCode === BACKSPACE_KEY_CODE) {
+            if (event.key === "Delete" || event.key === "Backspace") {
                 this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: this.$store.getters.focusedGraphicId });
                 this.$store.commit("focusGraphic", undefined);
                 this.$store.commit("styleEditorObject", undefined);
-            }
-        });
-
-        document.addEventListener("keyup", (event: KeyboardEvent) => {
-            const isPressed: boolean = this.$store.getters.pressedKeys[event.keyCode];
-
-            if (isPressed) {
-                this.$store.commit("pressedKeys", { keyCode: event.keyCode, isPressed: false });
             }
         });
     }
