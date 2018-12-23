@@ -263,24 +263,28 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
         event.preventDefault();
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
+        document.addEventListener("keydown", toggleSquare);
+        document.addEventListener("keyup", toggleSquare);
 
         slide.$store.commit("focusGraphic", undefined);
         slide.$store.commit("styleEditorObject", undefined);
         const start: Point = getMousePosition(slide, event);
         const shape: SVG.Rect = canvas.rect().move(start.x, start.y);
+        let lastPosition: Point = new Point(event.clientX, event.clientY);
 
         // Preview drawing rectangle
         function preview(event: MouseEvent): void {
             // Determine dimensions for a rectangle or square (based on if shift is pressed)
+            lastPosition = new Point(event.clientX, event.clientY);
             const position: Point = getMousePosition(slide, event);
             const rawDimensions: Point = position.add(start.scale(-1));
-            const minimumDimension = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
-            const dimensions: Point = slide.$store.getters.pressedKeys[16]
+            const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
+            const dimensions: Point = event.shiftKey
                 ? new Point(Math.sign(rawDimensions.x) * minimumDimension, Math.sign(rawDimensions.y) * minimumDimension)
                 : rawDimensions;
 
             // Check if the dimensions are negative and move (x, y) or resize
-            const move: Point = slide.$store.getters.pressedKeys[16] ? start.add(dimensions) : position;
+            const move: Point = event.shiftKey ? start.add(dimensions) : position;
             shape.move(dimensions.x < 0 ? move.x : start.x, dimensions.y < 0 ? move.y : start.y);
             shape.size(Math.abs(dimensions.x), Math.abs(dimensions.y));
         }
@@ -289,8 +293,10 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
         function end(): void {
             canvas.off("mousemove", preview);
             canvas.off("mouseup", end);
+            document.removeEventListener("keydown", toggleSquare);
+            document.removeEventListener("keyup", toggleSquare);
 
-            const graphic = new GraphicModel({
+            const graphic: GraphicModel = new GraphicModel({
                 type: "rectangle",
                 styleModel: new StyleModel({
                     fill: shape.attr("fill"),
@@ -305,6 +311,16 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
             slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
             slide.$store.commit("styleEditorObject", graphic);
             slide.$store.commit("focusGraphic", graphic);
+        }
+
+        function toggleSquare(event: KeyboardEvent): void {
+            if (event.key === "Shift") {
+                preview(new MouseEvent("mousemove", {
+                    shiftKey: event.type === "keydown",
+                    clientX: lastPosition.x,
+                    clientY: lastPosition.y
+                }));
+            }
         }
     }
 });
