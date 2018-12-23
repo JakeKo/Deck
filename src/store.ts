@@ -52,7 +52,6 @@ export default new Vuex.Store({
             ellipse: Tools.ellipseTool,
             textbox: Tools.textboxTool
         } as { [key: string]: ToolModel },
-        pressedKeys: { } as { [key: number]: boolean },
         toolbox: {
             width: 72
         }
@@ -87,9 +86,6 @@ export default new Vuex.Store({
         },
         tool: (state: any): ToolModel => {
             return state.tools[state.currentTool];
-        },
-        pressedKeys: (state: any): any => {
-            return state.pressedKeys;
         },
         toolboxWidth: (state: any): number => {
             return state.toolbox.width;
@@ -155,9 +151,6 @@ export default new Vuex.Store({
         },
         activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;
-        },
-        pressedKeys: (state: any, { keyCode, isPressed }: { keyCode: number, isPressed: boolean }): void => {
-            state.pressedKeys[keyCode] = isPressed;
         },
         focusGraphic: (state: any, graphic?: GraphicModel): void => {
             state.focusedGraphicId = graphic === undefined ? undefined : graphic.id;
