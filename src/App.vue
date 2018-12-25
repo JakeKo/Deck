@@ -1,4 +1,3 @@
-/* tslint:disable */
 <template>
 <div id="app">
     <toolbox></toolbox>
@@ -11,16 +10,12 @@
 </template>
 
 <script lang="ts">
-/* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
 import Toolbox from "./components/Toolbox.vue";
 import Editor from "./components/Editor.vue";
 import Roadmap from "./components/Roadmap.vue";
 import StyleEditor from "./components/StyleEditor.vue";
-import GraphicModel from "./models/GraphicModel";
-import SlideModel from "./models/SlideModel";
 import Utilities from "./utilities/miscellaneous";
-import Point from "./models/Point";
 
 @Component({
     components: {
@@ -54,7 +49,6 @@ export default class App extends Vue {
         };
     }
 }
-/* tslint:disable */
 </script>
 
 <style lang="scss" scoped>
