@@ -1,4 +1,3 @@
-/* tslint:disable */
 <template>
 <div id="app">
     <toolbox></toolbox>
@@ -11,12 +10,12 @@
 </template>
 
 <script lang="ts">
-/* tslint:enable */
 import { Vue, Component } from "vue-property-decorator";
 import Toolbox from "./components/Toolbox.vue";
 import Editor from "./components/Editor.vue";
 import Roadmap from "./components/Roadmap.vue";
 import StyleEditor from "./components/StyleEditor.vue";
+import Utilities from "./utilities/miscellaneous";
 
 @Component({
     components: {
@@ -38,6 +37,9 @@ export default class App extends Vue {
                 this.$store.commit("styleEditorObject", undefined);
             }
         });
+
+        document.addEventListener("copy", Utilities.copyHandler(this));
+        document.addEventListener("paste", Utilities.pasteHandler(this));
     }
 
     get workspaceStyle(): any {
@@ -47,7 +49,6 @@ export default class App extends Vue {
         };
     }
 }
-/* tslint:disable */
 </script>
 
 <style lang="scss" scoped>

@@ -2,6 +2,7 @@ import * as SVG from "svg.js";
 import Point from "../models/Point";
 import GraphicModel from "../models/GraphicModel";
 import StyleModel from "../models/StyleModel";
+import SlideModel from "../models/SlideModel";
 
 const toPrettyString: (object: any, indentDepth: number) => string = (object: any, indentDepth: number): string => {
     const properties: Array<string> = [];
@@ -63,6 +64,46 @@ const renderGraphic: (graphic: GraphicModel, canvas: SVG.Doc) => SVG.Element = (
 const generateId: () => string = (): string => {
     const s4 = () => Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
     return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
+};
+
+// Overrides the default behavior of copy to copy the graphic model of the focused graphic
+const copyHandler: (app: any) => (event: Event) => void = (app: any): (event: Event) => void => (event: Event): void => {
+    // Cast event as clipboard event and prevent from copying any user selection
+    const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
+    clipboardEvent.preventDefault();
+
+    const focusedGraphicId: string | undefined = app.$store.getters.focusedGraphicId;
+    if (focusedGraphicId === undefined) {
+        return;
+    }
+
+    // Fetch the graphic model associated with the current focused graphic
+    const activeSlide: SlideModel = app.$store.getters.activeSlide;
+    const graphicModel: GraphicModel = activeSlide.graphics.find((graphicModel: GraphicModel) => graphicModel.id === focusedGraphicId)!;
+
+    // Set the clipboard data to the graphic model
+    clipboardEvent.clipboardData.setData("text/json", JSON.stringify(graphicModel));
+};
+
+// Override the default behavior of the paste to paste the copied graphic model
+const pasteHandler: (app: any) => (event: Event) => void = (app: any): (event: Event) => void => (event: Event): void => {
+    // Cast event as clipboard event
+    const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
+    clipboardEvent.preventDefault();
+
+    const activeSlide: SlideModel = app.$store.getters.activeSlide;
+    const clipboardData: any = JSON.parse(clipboardEvent.clipboardData.getData("text/json"));
+
+    // Correct some loss of data and generate a new id for the new graphic model
+    clipboardData.id = generateId();
+    if (clipboardData.styleModel.points !== undefined) {
+        clipboardData.styleModel.points = clipboardData.styleModel.points.map((point: { x: number, y: number}) => new Point(point.x, point.y));
+    }
+
+    const graphicModel: GraphicModel = new GraphicModel(clipboardData);
+    activeSlide.graphics.push(graphicModel);
+    app.$store.commit("focusGraphic", graphicModel);
+    app.$store.commit("styleEditorObject", graphicModel);
 };
 
 const deckScript: string = `<style>
@@ -151,5 +192,7 @@ export default {
     toPrettyString,
     renderGraphic,
     generateId,
+    copyHandler,
+    pasteHandler,
     deckScript
 };
