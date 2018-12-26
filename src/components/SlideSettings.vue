@@ -1,6 +1,5 @@
 <template>
-<div id="menu-bar">
-IOU Menus
+<div id="slide-settings">
 </div>
 </template>
 
@@ -8,7 +7,7 @@ IOU Menus
 import { Vue, Component } from "vue-property-decorator";
 
 @Component
-export default class MenuBar extends Vue {
+export default class SlideSettings extends Vue {
 
 }
 </script>
@@ -16,14 +15,11 @@ export default class MenuBar extends Vue {
 <style lang="scss" scoped>
 @import "../styles/components";
 
-#menu-bar {
+#slide-settings {
     background: $color-light;
-    border-bottom: 1px solid $color-tertiary;
-    height: 32px;
+    border-right: 1px solid $color-tertiary;
+    width: 32px;
     flex-shrink: 0;
-    color: $color-dark;
-    font-family: $font-body;
-    display: flex;
-    align-items: center;
+    height: 100%;
 }
 </style>

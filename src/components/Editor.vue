@@ -1,11 +1,14 @@
 <template>
-<div id="editor">
-    <div id="canvas" :style="canvasStyle">
-        <slide v-for="slide in $store.getters.slides" 
-            :key="slide.id"
-            :id="slide.id"
-            :graphics="slide.graphics"
-        ></slide>
+<div id="editor" :style="editorStyle">
+    <slide-settings></slide-settings>
+    <div id="canvas-container" ref="canvas-container">
+        <div id="canvas" :style="canvasStyle">
+            <slide v-for="slide in $store.getters.slides" 
+                :key="slide.id"
+                :id="slide.id"
+                :graphics="slide.graphics"
+            ></slide>
+        </div>
     </div>
 </div>
 </template>
@@ -13,21 +16,25 @@
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
 import Slide from "./Slide.vue";
+import SlideSettings from "./SlideSettings.vue";
 
 @Component({
     components: {
-        Slide
+        Slide,
+        SlideSettings
     }
 })
 export default class Editor extends Vue {
+    private container!: HTMLDivElement;
+
     @Watch("canvasZoom")
     private onCanvasZoomChanged(): void {
         // Modify the zoom styling of the editor when the zoom is updated
-        const percentageDown = this.$el.scrollTop / this.$el.scrollHeight;
-        const percentageOver = this.$el.scrollLeft / this.$el.scrollWidth;
+        const percentageDown = this.container.scrollTop / this.container.scrollHeight;
+        const percentageOver = this.container.scrollLeft / this.container.scrollWidth;
         document.getElementById("canvas")!.style.zoom = this.$store.getters.canvasZoom;
-        this.$el.scrollTop = this.$el.scrollHeight * percentageDown;
-        this.$el.scrollLeft = this.$el.scrollWidth * percentageOver;
+        this.container.scrollTop = this.container.scrollHeight * percentageDown;
+        this.container.scrollLeft = this.container.scrollWidth * percentageOver;
     }
 
     get canvasZoom(): number {
@@ -42,16 +49,27 @@ export default class Editor extends Vue {
         };
     }
 
+    get editorStyle(): any {
+        return {
+            height: `calc(100vh - ${this.$store.getters.roadmapHeight}px)`
+        };
+    }
+
     private mounted(): void {
         // Scroll to the middle of the editor
-        this.$el.scrollTop = (this.$store.getters.canvasHeight - this.$el.clientHeight) / 2;
-        this.$el.scrollLeft = (this.$store.getters.canvasWidth - this.$el.clientWidth) / 2;
+        this.container = this.$refs["canvas-container"] as HTMLDivElement;
+        this.container.scrollTop = (this.$store.getters.canvasHeight - this.container.clientHeight) / 2;
+        this.container.scrollLeft = (this.$store.getters.canvasWidth - this.container.clientWidth) / 2;
     }
 }
 </script>
 
 <style lang="scss" scoped>
 #editor {
+    display: flex;
+}
+
+#canvas-container {
     overflow: scroll;
 }
 

@@ -53,7 +53,7 @@ export default new Vuex.Store({
             textbox: Tools.textboxTool
         } as { [key: string]: ToolModel },
         toolbox: {
-            width: 72
+            width: 64
         }
     },
     getters: {

@@ -1,6 +1,6 @@
 <template>
 <div id="app">
-    <menu-bar></menu-bar>
+    <!-- <menu-bar></menu-bar> -->
     <div id="interface">
         <toolbox></toolbox>
         <div id="workspace" :style="workspaceStyle">
@@ -15,7 +15,7 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import Toolbox from "./components/Toolbox.vue";
-import MenuBar from "./components/MenuBar.vue";
+// import MenuBar from "./components/MenuBar.vue";
 import Editor from "./components/Editor.vue";
 import Roadmap from "./components/Roadmap.vue";
 import StyleEditor from "./components/StyleEditor.vue";
@@ -24,7 +24,7 @@ import Utilities from "./utilities/miscellaneous";
 @Component({
     components: {
         Toolbox,
-        MenuBar,
+        // MenuBar,
         Editor,
         Roadmap,
         StyleEditor
@@ -58,10 +58,7 @@ export default class App extends Vue {
 
 <style lang="scss" scoped>
 #app {
-    display: flex;
     height: 100vh;
-    overflow: hidden;
-    flex-direction: column;
 }
 
 #interface {
