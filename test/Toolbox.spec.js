@@ -30,7 +30,7 @@ describe("Toolbox", () => {
         // Act
 
         // Assert
-        expect(wrapper.findAll(Tool).length).toBe(10);
+        expect(wrapper.findAll(Tool).length).toBe(8);
     });
 
     it("has the correct number of active and inactive tools", () => {
@@ -42,6 +42,6 @@ describe("Toolbox", () => {
 
         // Assert
         expect(toolWrappers.filter((toolWrapper) => toolWrapper.props("isActive")).length).toBe(1);
-        expect(toolWrappers.filter((toolWrapper) => !toolWrapper.props("isActive")).length).toBe(9);
+        expect(toolWrappers.filter((toolWrapper) => !toolWrapper.props("isActive")).length).toBe(7);
     });
 });
