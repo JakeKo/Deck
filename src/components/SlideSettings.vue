@@ -1,9 +1,13 @@
 <template>
 <div id="slide-settings">
     <div class="slide-setting">
-        <i class="zoom-icon fas fa-search-plus" @click="$store.commit('canvasZoom', $store.getters.canvasZoom + 0.05)"></i>
+        <div class="zoom-icon">
+            <i class="fas fa-search-plus" @mousedown="modifyZoom(0.05)" @mouseup="loopModify = false"></i>
+        </div>
         <input id="zoom-field" type="number" :value="zoomValue" @blur="zoomValue = $event.target.valueAsNumber"/>
-        <i class="zoom-icon fas fa-search-minus" @click="$store.commit('canvasZoom', $store.getters.canvasZoom  - 0.05)"></i>
+        <div class="zoom-icon">
+            <i class="fas fa-search-minus" @mousedown="modifyZoom(-0.05)" @mouseup="loopModify = false"></i>
+        </div>
     </div>
 </div>
 </template>
@@ -13,12 +17,29 @@ import { Vue, Component } from "vue-property-decorator";
 
 @Component
 export default class SlideSettings extends Vue {
+    private loopModify: boolean = false;
+
     get zoomValue(): number {
         return Math.round(this.$store.getters.canvasZoom * 100);
     }
 
     set zoomValue(zoomValue: number) {
         this.$store.commit("canvasZoom", zoomValue / 100);
+    }
+
+    private modifyZoom(modification: number): void {
+        const modify: () => void = (): void => {
+            if (!this.loopModify) {
+                return;
+            }
+
+            this.$store.commit("canvasZoom", this.$store.getters.canvasZoom + modification);
+            setTimeout(modify, 250);
+        };
+
+        this.loopModify = true;
+        this.$store.commit("canvasZoom", this.$store.getters.canvasZoom + modification);
+        setTimeout(modify, 750);
     }
 }
 </script>
@@ -34,17 +55,21 @@ export default class SlideSettings extends Vue {
     height: 100%;
     display: flex;
     flex-direction: column;
+    padding: 8px 0;
 }
 
 .slide-setting {
     display: flex;
     flex-direction: column;
-    padding: 8px 0;
     align-items: center;
 }
 
 .zoom-icon {
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 4px 0;
 }
 
 #zoom-field {
@@ -52,7 +77,7 @@ export default class SlideSettings extends Vue {
     outline: none;
     border: none;
     text-align: center;
-    margin: 8px 0;
+    margin: 4px 0;
     padding: 2px 0;
     font-family: $font-body;
     font-size: 14px;
