@@ -1,17 +1,21 @@
 <template>
 <div id="app">
-    <toolbox></toolbox>
-    <div id="workspace" :style="workspaceStyle">
-        <editor></editor>
-        <roadmap></roadmap>
+    <!-- <menu-bar></menu-bar> -->
+    <div id="interface">
+        <toolbox></toolbox>
+        <div id="workspace" :style="workspaceStyle">
+            <editor></editor>
+            <roadmap></roadmap>
+        </div>
+        <style-editor v-show="$store.getters.focusedGraphicId"></style-editor>
     </div>
-    <style-editor v-show="$store.getters.focusedGraphicId"></style-editor>
 </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import Toolbox from "./components/Toolbox.vue";
+// import MenuBar from "./components/MenuBar.vue";
 import Editor from "./components/Editor.vue";
 import Roadmap from "./components/Roadmap.vue";
 import StyleEditor from "./components/StyleEditor.vue";
@@ -20,6 +24,7 @@ import Utilities from "./utilities/miscellaneous";
 @Component({
     components: {
         Toolbox,
+        // MenuBar,
         Editor,
         Roadmap,
         StyleEditor
@@ -53,9 +58,11 @@ export default class App extends Vue {
 
 <style lang="scss" scoped>
 #app {
-    display: flex;
     height: 100vh;
-    overflow: hidden;
+}
+
+#interface {
+    display: flex;
 }
 
 #workspace {

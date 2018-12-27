@@ -73,6 +73,7 @@ export default class Roadmap extends Vue {
 
 #roadmap {
     position: relative;
+    box-sizing: border-box;
 }
 
 #slide-previews {
