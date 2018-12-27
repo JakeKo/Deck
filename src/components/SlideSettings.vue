@@ -4,7 +4,9 @@
         <div class="zoom-icon">
             <i class="fas fa-search-plus" @mousedown="modifyZoom(0.05)" @mouseup="loopModify = false"></i>
         </div>
-        <input id="zoom-field" type="number" :value="zoomValue" @blur="zoomValue = $event.target.valueAsNumber"/>
+        
+        <input id="zoom-field" type="number" :value="zoomValue" @blur="zoomValue = $event.target.valueAsNumber" @keydown="$event.stopPropagation()" />
+        
         <div class="zoom-icon">
             <i class="fas fa-search-minus" @mousedown="modifyZoom(-0.05)" @mouseup="loopModify = false"></i>
         </div>
