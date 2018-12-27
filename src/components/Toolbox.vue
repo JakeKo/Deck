@@ -6,8 +6,6 @@
     <tool @click="$store.commit('tool', 'rectangle')" :toolName="'rectangle'" :icon="'fas fa-square'" :isActive="$store.getters.tool.name === 'rectangle'"></tool>
     <tool @click="$store.commit('tool', 'ellipse')" :toolName="'ellipse'" :icon="'fas fa-circle'" :isActive="$store.getters.tool.name === 'ellipse'"></tool>
     <tool @click="$store.commit('tool', 'textbox')" :toolName="'text'" :icon="'fas fa-font'" :isActive="$store.getters.tool.name === 'textbox'"></tool>
-    <tool @click="$store.commit('zoom')" :toolName="'zoom'" :icon="'fas fa-search-plus'" :isActive="false"></tool>
-    <tool @click="$store.commit('unzoom')" :toolName="'unzoom'" :icon="'fas fa-search-minus'" :isActive="false"></tool>
     <tool @click="$store.dispatch('export')" :toolName="'export'" :icon="'fas fa-save'" :isActive="false"></tool>
     <a href="https://github.com/JakeKo/Deck/issues/new/choose" target="blank">
         <tool :toolName="'feedback'" :icon="'fas fa-info'" :isActive="false"></tool>

@@ -155,11 +155,8 @@ export default new Vuex.Store({
         focusGraphic: (state: any, graphic?: GraphicModel): void => {
             state.focusedGraphicId = graphic === undefined ? undefined : graphic.id;
         },
-        zoom: (state: any): void => {
-            state.canvas.zoom += 0.05;
-        },
-        unzoom: (state: any): void => {
-            state.canvas.zoom = Math.max(state.canvas.zoom - 0.05, 0.25);
+        canvasZoom: (state: any, zoom: number): void => {
+            state.canvas.zoom = Math.max(zoom, 0.25);
         },
         graphicStyle: (state: any, { graphicId, style }: { graphicId: string, style: any }): void => {
             const activeSlide: SlideModel = state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId)!;
