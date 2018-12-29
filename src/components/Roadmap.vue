@@ -69,7 +69,7 @@ export default class Roadmap extends Vue {
 </script>
 
 <style lang="scss" scoped>
-@import "../styles/components";
+@import "../styles/application";
 
 #roadmap {
     position: relative;

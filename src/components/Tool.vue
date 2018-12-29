@@ -22,7 +22,7 @@ export default class Tool extends Vue {
 </script>
 
 <style lang="scss" scoped>
-@import "../styles/components";
+@import "../styles/application";
 
 #active-tool {
     background: $color-tertiary;

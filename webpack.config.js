@@ -1,10 +1,9 @@
 const Path = require("path");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
-// TODO: Add webpack HTML plugin
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
     mode: "development",
-    plugins: [new VueLoaderPlugin()],
     devtool: "inline-source-map",
     output: {
         publicPath: "/"
@@ -61,5 +60,29 @@ module.exports = {
                 }
             }
         ]
-    }
+    },
+    plugins: [
+        new VueLoaderPlugin(),
+        new HtmlWebpackPlugin({
+            title: "Deck",
+            favicon: "./favicon.ico",
+            meta: {
+                "viewport": "width=device-width, initial-scale=1.0",
+                "cache-control": { "http-equiv": "cache-control", "content": "private" },
+                "author": "Jacob Koperski",
+                "description": "Deck is an open-source, well-armed, safe-to-swallow, and fluoride-free application for editing and presenting slide decks.",
+                "copyright": "COPYRIGHT &copy; WILLIAM JACOB KOPERSKI 2018",
+                "og:title": "Jacob Koperski",
+                "og:image": "",
+                "og:description": "Deck is an open-source, well-armed, safe-to-swallow, and fluoride-free application for editing and presenting slide decks.",
+                "og:url": "https://jakeko.github.io/Deck/",
+                "og:type": "website",
+                "twitter:card": "summary",
+                "twitter:title": "Jacob Koperski",
+                "twitter:image": "",
+                "twitter:description": "Deck is an open-source, well-armed, safe-to-swallow, and fluoride-free application for editing and presenting slide decks."
+            },
+            
+        })
+    ]
 };

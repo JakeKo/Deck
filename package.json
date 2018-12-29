@@ -8,7 +8,7 @@
 	"bugs": "https://github.com/JakeKo/Deck/issues",
 	"repository": "git+https://github.com/JakeKo/Deck.git",
 	"scripts": {
-		"build": "webpack --config ./webpack-prod.config.js && cp ./index.html ./dist/ && cp ./favicon.ico ./dist/",
+		"build": "webpack --config ./webpack-prod.config.js",
 		"serve": "webpack-dev-server --hot --inline",
 		"test": "mocha-webpack --webpack-config ./webpack-test.config.js --require ./test/setup.js ./test/*.spec.js"
 	},
@@ -16,6 +16,7 @@
 		"@vue/test-utils": "^1.0.0-beta.25",
 		"css-loader": "^0.28.11",
 		"expect": "^23.6.0",
+		"html-webpack-plugin": "^3.2.0",
 		"jsdom": "^13.0.0",
 		"jsdom-global": "^3.0.2",
 		"mocha": "^5.2.0",

@@ -47,7 +47,7 @@ export default class SlideSettings extends Vue {
 </script>
 
 <style lang="scss" scoped>
-@import "../styles/components";
+@import "../styles/application";
 
 #slide-settings {
     background: $color-light;

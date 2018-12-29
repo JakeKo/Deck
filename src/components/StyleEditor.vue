@@ -68,7 +68,7 @@ export default class StyleEditor extends Vue {
 </script>
 
 <style lang="scss" scoped>
-@import "../styles/components";
+@import "../styles/application";
 
 #style-editor {
     position: relative;
