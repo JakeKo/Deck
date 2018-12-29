@@ -8,9 +8,9 @@
 	"bugs": "https://github.com/JakeKo/Deck/issues",
 	"repository": "git+https://github.com/JakeKo/Deck.git",
 	"scripts": {
-		"build": "webpack --config webpack-prod.config.js && cp index.html ./dist/",
+		"build": "webpack --config ./webpack-prod.config.js && cp ./index.html ./dist/ && cp ./favicon.ico ./dist/",
 		"serve": "webpack-dev-server --hot --inline",
-		"test": "mocha-webpack --webpack-config webpack-test.config.js --require test/setup.js test/*.spec.js"
+		"test": "mocha-webpack --webpack-config ./webpack-test.config.js --require ./test/setup.js ./test/*.spec.js"
 	},
 	"devDependencies": {
 		"@vue/test-utils": "^1.0.0-beta.25",

@@ -1,5 +1,6 @@
 const Path = require("path");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
+// TODO: Add webpack HTML plugin
 
 module.exports = {
     mode: "development",
