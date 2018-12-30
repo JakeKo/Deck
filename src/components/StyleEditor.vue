@@ -3,41 +3,31 @@
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
     <textarea id="style-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
     <div id="submit-button-container">
-        <button id="submit-button" :style="submitButtonStyle" @click="submit">Apply</button>
+        <button id="submit-button" @click="submit">Apply</button>
     </div>
 </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
-import Utilities from "../utilities/miscellaneous";
-import StyleModel from "../models/StyleModel";
+import Utilities from "../utilities/general";
 
 @Component
 export default class StyleEditor extends Vue {
     private content: string = "";
 
-    @Watch("object")
-    private onObjectChanged(): void {
+    @Watch("object") private onObjectChanged(): void {
         this.content = Utilities.toPrettyString(this.object, 1);
     }
 
     // Watch for changes to the style editor object
-    get object(): StyleModel {
+    get object(): any {
         return this.$store.getters.styleEditorObject;
     }
 
     get styleEditorStyle(): any {
         return {
-            background: this.$store.getters.theme.primary,
-            borderLeft: `1px solid ${this.$store.getters.theme.tertiary}`,
             width: `${this.$store.getters.styleEditorWidth}px`
-        };
-    }
-
-    get submitButtonStyle(): any {
-        return {
-            background: this.$store.getters.theme.tertiary
         };
     }
 
@@ -74,6 +64,8 @@ export default class StyleEditor extends Vue {
     position: relative;
     display: flex;
     flex-direction: column;
+    background: $color-primary;
+    border-left: 1px solid $color-tertiary;
 }
 
 #style-editor-content {
@@ -101,5 +93,6 @@ export default class StyleEditor extends Vue {
     cursor: pointer;
     border: none;
     outline: none;
+    background: $color-tertiary;
 }
 </style>

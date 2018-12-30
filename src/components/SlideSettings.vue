@@ -36,12 +36,12 @@ export default class SlideSettings extends Vue {
             }
 
             this.$store.commit("canvasZoom", this.$store.getters.canvasZoom + modification);
-            setTimeout(modify, 250);
+            setTimeout(modify, 150);
         };
 
         this.loopModify = true;
         this.$store.commit("canvasZoom", this.$store.getters.canvasZoom + modification);
-        setTimeout(modify, 750);
+        setTimeout(modify, 500);
     }
 }
 </script>
@@ -52,6 +52,7 @@ export default class SlideSettings extends Vue {
 #slide-settings {
     background: $color-light;
     border-right: 1px solid $color-tertiary;
+    box-sizing: border-box;
     width: 48px;
     flex-shrink: 0;
     height: 100%;

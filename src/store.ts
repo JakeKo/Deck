@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import SlideModel from "./models/SlideModel";
-import Utilities from "./utilities/miscellaneous";
+import Utilities from "./utilities/general";
 import Tools from "./utilities/tools";
 import Theme from "./models/Theme";
 import GraphicModel from "./models/GraphicModel";
@@ -21,10 +21,6 @@ export default new Vuex.Store({
             width: 4000,
             zoom: 1,
             resolution: 1,
-            slide: {
-                height: 603,
-                width: 1072
-            }
         },
         styleEditor: {
             width: 300,
@@ -104,12 +100,6 @@ export default new Vuex.Store({
         },
         canvasResolution: (state: any): number => {
             return state.canvas.resolution;
-        },
-        slideHeight: (state: any): number => {
-            return state.canvas.slide.height;
-        },
-        slideWidth: (state: any): number => {
-            return state.canvas.slide.width;
         },
         slidePreviewHeight: (state: any): number => {
             return state.roadmap.slidePreview.height;

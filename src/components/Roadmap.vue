@@ -4,10 +4,11 @@
     <div id="slide-previews">
         <slide-preview v-for="slide in $store.getters.slides"
             :id="slide.id"
+            :isActive="slide.id === $store.getters.activeSlide.id"
             :graphics="$store.getters.slides.find((s) => s.id === slide.id).graphics"
             :key="slide.id"
         ></slide-preview>
-        <div id="new-slide-button" @click="newSlideHandler" :style="newSlideButtonStyle">
+        <div id="new-slide-button" @click="addSlide" :style="newSlideButtonStyle">
             <i class="fas fa-plus"></i>
         </div>
     </div>
@@ -17,7 +18,6 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import SlidePreview from "./SlidePreview.vue";
-import SlideModel from "../models/SlideModel";
 
 @Component({
     components: {
@@ -27,16 +27,12 @@ import SlideModel from "../models/SlideModel";
 export default class Roadmap extends Vue {
     get roadmapStyle(): any {
         return {
-            height: `${this.$store.getters.roadmapHeight}px`,
-            borderTop: `1px solid ${this.$store.getters.theme.tertiary}`
+            height: `${this.$store.getters.roadmapHeight}px`
         };
     }
 
     get newSlideButtonStyle(): any {
         return {
-            border: `2px solid ${this.$store.getters.theme.tertiary}`,
-            color: this.$store.getters.theme.tertiary,
-            background: this.$store.getters.theme.primary,
             height: `${this.$store.getters.slidePreviewHeight}px`,
             width: `${this.$store.getters.slidePreviewHeight * 16 / 9}px`
         };
@@ -59,7 +55,7 @@ export default class Roadmap extends Vue {
         }
     }
 
-    private newSlideHandler(event: Event): void {
+    private addSlide(event: Event): void {
         this.$store.commit("addSlide", this.$store.getters.slides.length);
         this.$store.commit("activeSlide", this.$store.getters.lastSlide.id);
         this.$store.commit("focusGraphic", undefined);
@@ -74,6 +70,7 @@ export default class Roadmap extends Vue {
 #roadmap {
     position: relative;
     box-sizing: border-box;
+    border-top: 1px solid $color-tertiary
 }
 
 #slide-previews {
@@ -97,5 +94,8 @@ export default class Roadmap extends Vue {
     flex-shrink: 0;
     justify-content: center;
     align-items: center;
+    border: 2px solid $color-tertiary;
+    color: $color-tertiary;
+    background: $color-primary;
 }
 </style>
