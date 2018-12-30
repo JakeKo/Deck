@@ -11,7 +11,7 @@
 		"build": "webpack --config ./webpack-prod.config.js",
 		"serve": "webpack-dev-server --hot --inline",
 		"test": "mocha-webpack --webpack-config ./webpack-test.config.js --require ./test/setup.js ./test/*.spec.js",
-		"audit": "./node_modules/.bin/lighthouse https://jakeko.github.io/Deck/ --output json --output-path=./report.json"
+		"audit": "./node_modules/.bin/lighthouse https://jakeko.github.io/Deck/ --view"
 	},
 	"devDependencies": {
 		"@vue/test-utils": "^1.0.0-beta.25",
