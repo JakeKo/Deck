@@ -188,7 +188,7 @@ const penTool: ToolModel = new ToolModel("pen", {
 
             // Display the control point shape if the endpoint is defined
             if (curveSegment[1][2] !== undefined) {
-                controlPointGraphic.plot([position.reflect(curveSegment[1][2]).toArray(), position.toArray()]).stroke(slide.$store.getters.theme.information);
+                controlPointGraphic.plot([position.reflect(curveSegment[1][2]).toArray(), position.toArray()]).stroke("blue");
             } else {
                 controlPointGraphic.stroke("none");
             }

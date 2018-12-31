@@ -3,7 +3,6 @@ import Vuex from "vuex";
 import SlideModel from "./models/SlideModel";
 import Utilities from "./utilities/general";
 import Tools from "./utilities/tools";
-import Theme from "./models/Theme";
 import GraphicModel from "./models/GraphicModel";
 import ToolModel from "./models/ToolModel";
 import * as SVG from "svg.js";
@@ -34,11 +33,6 @@ export default new Vuex.Store({
             }
         },
         slides: new Array<SlideModel>(),
-        theme: 0,
-        themes: [
-            new Theme("light", "#FFFFFF", "#EEEEEE", "#DDDDDD", "#275DAD", "#2FBF71" ,"#ED7D3A", "#A22C29"),
-            new Theme("dark", "", "", "", "", "", "", "")
-        ],
         currentTool: "cursor",
         tools: {
             cursor: Tools.cursorTool,
@@ -76,9 +70,6 @@ export default new Vuex.Store({
         },
         roadmapHeight: (state: any): number => {
             return state.roadmap.height;
-        },
-        theme: (state: any): Theme => {
-            return state.themes[state.theme];
         },
         tool: (state: any): ToolModel => {
             return state.tools[state.currentTool];
