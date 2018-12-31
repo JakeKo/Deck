@@ -45,9 +45,6 @@ function modelPolyline(svg: SVG.PolyLine, points: Array<Point>): Graphic {
             stroke: svg.attr("stroke"),
             strokeWidth: svg.attr("stroke-width"),
             points: points
-        }),
-        focusStyle: new Style({
-            stroke: "blue"
         })
     });
 }
@@ -60,9 +57,6 @@ function modelCurve(svg: SVG.Path, points: Array<Point>): Graphic {
             stroke: svg.attr("stroke"),
             strokeWidth: svg.attr("stroke-width"),
             points: points
-        }),
-        focusStyle: new Style({
-            stroke: "blue"
         })
     });
 }
@@ -76,10 +70,6 @@ function modelRectangle(svg: SVG.Rect): Graphic {
             y: svg.y(),
             width: svg.width(),
             height: svg.height()
-        }),
-        focusStyle: new Style({
-            stroke: "blue",
-            strokeWidth: 3
         })
     });
 }
@@ -93,10 +83,6 @@ function modelEllipse(svg: SVG.Ellipse): Graphic {
             y: svg.cy(),
             width: svg.width(),
             height: svg.height()
-        }),
-        focusStyle: new Style({
-            stroke: "blue",
-            strokeWidth: 3
         })
     });
 }
@@ -108,9 +94,6 @@ function modelText(svg: SVG.Text): Graphic {
             x: svg.x(),
             y: svg.y(),
             message: svg.text()
-        }),
-        focusStyle: new Style({
-            stroke: "blue"
         })
     });
 }
