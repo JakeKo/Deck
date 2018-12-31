@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import Slide from "./models/Slide";
 import Utilities from "./utilities/general";
+import Graphics from "./utilities/graphics";
 import Tools from "./utilities/tools";
 import Graphic from "./models/Graphic";
 import Tool from "./models/Tool";
@@ -121,7 +122,7 @@ export default new Vuex.Store({
                 state.styleEditor.object = undefined;
             } else {
                 state.styleEditor.objectId = object.id;
-                state.styleEditor.object = object.styleModel;
+                state.styleEditor.object = object.style;
             }
         },
         roadmapHeight: (state: any, height: number): void => {
@@ -163,7 +164,7 @@ export default new Vuex.Store({
                 exportFrame.appendChild(slide);
 
                 const canvas: SVG.Doc = SVG(slideModel.id);
-                slideModel.graphics.forEach((graphic: Graphic) => Utilities.renderGraphic(graphic, canvas));
+                slideModel.graphics.forEach((graphic: Graphic) => Graphics.render(graphic, canvas));
             });
 
             const html: HTMLHtmlElement = document.createElement("html");

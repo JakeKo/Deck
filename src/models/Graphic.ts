@@ -9,7 +9,7 @@ export default class Graphic {
 
     constructor(
         { id, type, style, focusStyle }:
-        { id?: string, type?: string, style?: Style, focusStyle?: Style } = { }
+        { id?: string, type?: string, style?: Style, focusStyle?: Style} = { }
     ) {
         this.id = id || Utilities.generateId();
         this.type = type || "";

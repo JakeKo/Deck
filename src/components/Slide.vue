@@ -6,7 +6,7 @@
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import Graphic from "../models/Graphic";
-import Utilities from "../utilities/general";
+import Graphics from "../utilities/graphics";
 
 @Component
 export default class Slide extends Vue {
@@ -32,7 +32,7 @@ export default class Slide extends Vue {
     }
 
     private initializeGraphic(graphic: Graphic): void {
-        const svg: SVG.Element = Utilities.renderGraphic(graphic, this.canvas);
+        const svg: SVG.Element = Graphics.render(graphic, this.canvas);
 
         // Bind each event handler
         svg.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOver(svg)(event));

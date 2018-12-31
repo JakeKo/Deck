@@ -81,6 +81,7 @@ const cursorTool: Tool = new Tool("cursor", {
     }
 });
 
+// Event handlers for using the pencil tool
 const pencilTool: Tool = new Tool("pencil", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
@@ -90,12 +91,14 @@ const pencilTool: Tool = new Tool("pencil", {
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
+        // Unfocus the current graphic if any and set initial state of pencil drawing
         slide.$store.commit("focusGraphic", undefined);
         slide.$store.commit("styleEditorObject", undefined);
         const points: Array<Point> = [getMousePosition(slide, event)];
         const strokeWidth: number = slide.$store.getters.canvasResolution * 3;
         const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", strokeWidth);
 
+        // Add the current mouse position point to the list of points to plot
         function preview(event: MouseEvent): void {
             points.push(getMousePosition(slide, event));
             shape.plot(points.map<Array<number>>((point: Point) => point.toArray()));
@@ -105,13 +108,16 @@ const pencilTool: Tool = new Tool("pencil", {
             canvas.off("mousemove", preview);
             canvas.off("mouseup", end);
 
-            const graphic = new Graphic({
+            const graphic: Graphic = new Graphic({
                 type: "polyline",
                 style: new Style({
                     fill: shape.attr("fill"),
                     stroke: shape.attr("stroke"),
                     strokeWidth: shape.attr("stroke-width"),
                     points
+                }),
+                focusStyle: new Style({
+                    stroke: "blue"
                 })
             });
 
@@ -209,13 +215,16 @@ const penTool: Tool = new Tool("pen", {
             const points: Array<Point> = [];
             curve.forEach((c: Array<Point | undefined>) => points.push(...(c as Array<Point>)));
 
-            const graphic = new Graphic({
+            const graphic: Graphic = new Graphic({
                 type: "curve",
                 style: new Style({
                     fill: curveGraphic.attr("fill"),
                     stroke: curveGraphic.attr("stroke"),
                     strokeWidth: curveGraphic.attr("stroke-width"),
                     points
+                }),
+                focusStyle: new Style({
+                    stroke: "blue"
                 })
             });
 
@@ -304,6 +313,10 @@ const rectangleTool: Tool = new Tool("rectangle", {
                     y: shape.y(),
                     width: shape.width(),
                     height: shape.height()
+                }),
+                focusStyle: new Style({
+                    stroke: "blue",
+                    strokeWidth: 3
                 })
             });
 
@@ -373,6 +386,10 @@ const ellipseTool: Tool = new Tool("ellipse", {
                     y: shape.cy(),
                     width: shape.width(),
                     height: shape.height()
+                }),
+                focusStyle: new Style({
+                    stroke: "blue",
+                    strokeWidth: 3
                 })
             });
 
@@ -403,13 +420,16 @@ const textboxTool: Tool = new Tool("textbox", {
 
         slide.$store.commit("focusGraphic", undefined);
         slide.$store.commit("styleEditorObject", undefined);
-        const position = getMousePosition(slide, event);
-        const graphic = new Graphic({
+        const position: Point = getMousePosition(slide, event);
+        const graphic: Graphic = new Graphic({
             type: "textbox",
             style: new Style({
                 x: position.x,
                 y: position.y,
                 message: "lorem ipsum\ndolor sit amet"
+            }),
+            focusStyle: new Style({
+                stroke: "blue"
             })
         });
 

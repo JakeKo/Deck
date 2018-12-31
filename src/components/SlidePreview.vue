@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from "vue-property-decorator";
 import Graphic from "../models/Graphic";
-import Utilities from "../utilities/general";
+import Graphics from "../utilities/graphics";
 import * as SVG from "svg.js";
 
 @Component
@@ -18,7 +18,7 @@ export default class SlidePreview extends Vue {
     // Re-render the canvas any time a graphic is created, removed, or modified
     @Watch("graphics", { deep: true }) private refreshCanvas(): void {
         this.canvas.clear();
-        this.graphics.forEach((graphic: Graphic) => Utilities.renderGraphic(graphic, this.canvas));
+        this.graphics.forEach((graphic: Graphic) => Graphics.render(graphic, this.canvas));
     }
 
     get slidePreviewStyle(): any {
