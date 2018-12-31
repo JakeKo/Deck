@@ -1,6 +1,6 @@
 import Point from "./Point";
 
-export default class StyleModel {
+export default class Style {
     public fill?: string;
     public stroke?: string;
     public strokeWidth?: number;

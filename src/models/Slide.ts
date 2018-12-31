@@ -1,7 +1,7 @@
 import Utilities from "../utilities/general";
 import Graphic from "./Graphic";
 
-export default class SlideModel {
+export default class Slide {
     public id: string;
     public graphics: Array<Graphic>;
 

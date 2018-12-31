@@ -1,7 +1,7 @@
 import * as SVG from "svg.js";
 import Graphic from "./Graphic";
 
-export default class ToolModel {
+export default class Tool {
     public name: string;
     public canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent) => any;
     public canvasMouseOver: (canvas: SVG.Doc) => (event: MouseEvent) => any;
