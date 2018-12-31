@@ -1,29 +1,43 @@
 import Point from "../models/Point";
 import Tool from "../models/Tool";
 import Graphic from "../models/Graphic";
-import Style from "../models/Style";
+import Graphics from "./graphics";
 import * as SVG from "svg.js";
 
-const getMousePosition: (slide: any, event: MouseEvent) => Point = (slide: any, event: MouseEvent): Point => {
+function getMousePosition(slide: any, event: MouseEvent): Point {
     const zoom: number = slide.$store.getters.canvasZoom;
     const resolution: number = slide.$store.getters.canvasResolution;
     const bounds: DOMRect = slide.$el.getBoundingClientRect();
     return new Point(Math.round((event.clientX / zoom - bounds.left) * resolution), Math.round((event.clientY / zoom - bounds.top) * resolution));
-};
+}
+
+function addGraphic(slide: any, graphic: Graphic): void {
+    slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
+    slide.$store.commit("styleEditorObject", graphic);
+    slide.$store.commit("focusGraphic", graphic);
+}
+
+function focusGraphic(slide: any, graphic?: Graphic): void {
+    slide.$store.commit("focusGraphic", graphic);
+    slide.$store.commit("styleEditorObject", graphic);
+}
+
+function isolateEvent(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+}
 
 // Cursor Tool handlers
 const cursorTool: Tool = new Tool("cursor", {
     graphicMouseOver: (svg: SVG.Element) => (): any => svg.style("cursor", "pointer"),
     graphicMouseOut: (svg: SVG.Element) => (): any => svg.style("cursor", "default"),
     graphicMouseDown: (slide: any, svg: SVG.Element, graphic: Graphic) => (event: MouseEvent): any => {
-        event.stopPropagation();
-        event.preventDefault();
+        isolateEvent(event);
         slide.canvas.on("mousemove", preview);
         slide.canvas.on("mouseup", end);
 
         if (slide.$store.getters.focusedGraphicId !== graphic.id) {
-            slide.$store.commit("focusGraphic", graphic);
-            slide.$store.commit("styleEditorObject", graphic);
+            focusGraphic(slide, graphic);
         }
 
         const start: Point = new Point(svg.x(), svg.y());
@@ -31,8 +45,7 @@ const cursorTool: Tool = new Tool("cursor", {
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
-            event.stopPropagation();
-            event.preventDefault();
+            isolateEvent(event);
 
             const resolvedPosition: Point = getMousePosition(slide, event).add(offset);
             svg.move(resolvedPosition.x, resolvedPosition.y);
@@ -63,7 +76,7 @@ const cursorTool: Tool = new Tool("cursor", {
                 graphic.style.y = svg.cy();
             }
 
-            if (graphic.type === "rectangle" || graphic.type === "textbox") {
+            if (graphic.type === "rectangle" || graphic.type === "text") {
                 graphic.style.x = svg.x();
                 graphic.style.y = svg.y();
             }
@@ -75,8 +88,7 @@ const cursorTool: Tool = new Tool("cursor", {
     },
     canvasMouseDown: (slide: any) => (): void => {
         if (slide.$store.getters.focusedGraphicId !== "") {
-            slide.$store.commit("focusGraphic", undefined);
-            slide.$store.commit("styleEditorObject", undefined);
+            focusGraphic(slide, undefined);
         }
     }
 });
@@ -86,17 +98,15 @@ const pencilTool: Tool = new Tool("pencil", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
-        event.stopPropagation();
-        event.preventDefault();
+        isolateEvent(event);
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
         // Unfocus the current graphic if any and set initial state of pencil drawing
-        slide.$store.commit("focusGraphic", undefined);
-        slide.$store.commit("styleEditorObject", undefined);
+        focusGraphic(slide, undefined);
         const points: Array<Point> = [getMousePosition(slide, event)];
-        const strokeWidth: number = slide.$store.getters.canvasResolution * 3;
-        const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", strokeWidth);
+        const resolution: number = slide.$store.getters.canvasResolution;
+        const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", resolution * 3);
 
         // Add the current mouse position point to the list of points to plot
         function preview(event: MouseEvent): void {
@@ -107,24 +117,8 @@ const pencilTool: Tool = new Tool("pencil", {
         function end(): void {
             canvas.off("mousemove", preview);
             canvas.off("mouseup", end);
-
-            const graphic: Graphic = new Graphic({
-                type: "polyline",
-                style: new Style({
-                    fill: shape.attr("fill"),
-                    stroke: shape.attr("stroke"),
-                    strokeWidth: shape.attr("stroke-width"),
-                    points
-                }),
-                focusStyle: new Style({
-                    stroke: "blue"
-                })
-            });
-
             shape.remove();
-            slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
-            slide.$store.commit("styleEditorObject", graphic);
-            slide.$store.commit("focusGraphic", graphic);
+            addGraphic(slide, Graphics.modelPolyline(shape, points));
         }
     }
 });
@@ -138,14 +132,12 @@ const penTool: Tool = new Tool("pen", {
         if (penToolIsActive) { return; }
         else { penToolIsActive = true; }
 
-        event.stopPropagation();
-        event.preventDefault();
+        isolateEvent(event);
         document.addEventListener("keydown", end);
         canvas.on("mousemove", preview);
         canvas.on("mouseup", setFirstControlPoint);
 
-        slide.$store.commit("focusGraphic", undefined);
-        slide.$store.commit("styleEditorObject", undefined);
+        focusGraphic(slide, undefined);
         const start: Point = getMousePosition(slide, event);
         const curve: Array<Array<Point>> = [[start]];
         const curveSegment: Array<Array<Point | undefined>> = [[start], [undefined, undefined, undefined]];
@@ -165,8 +157,7 @@ const penTool: Tool = new Tool("pen", {
         }
 
         function setEndpoint(event: MouseEvent): void {
-            event.stopPropagation();
-            event.preventDefault();
+            isolateEvent(event);
             canvas.off("mousedown", setEndpoint);
             canvas.on("mouseup", setSecondControlPoint);
 
@@ -211,22 +202,8 @@ const penTool: Tool = new Tool("pen", {
             canvas.off("mousemove", preview);
 
             // Flatten the representation of curves into a list of points
-            // Remove the last curve because it will always have some undefned points
             const points: Array<Point> = [];
             curve.forEach((c: Array<Point | undefined>) => points.push(...(c as Array<Point>)));
-
-            const graphic: Graphic = new Graphic({
-                type: "curve",
-                style: new Style({
-                    fill: curveGraphic.attr("fill"),
-                    stroke: curveGraphic.attr("stroke"),
-                    strokeWidth: curveGraphic.attr("stroke-width"),
-                    points
-                }),
-                focusStyle: new Style({
-                    stroke: "blue"
-                })
-            });
 
             // Remove the shape visually - if it is more than just a point, persist it to the slide, then refresh the style editor
             controlPointGraphic.remove();
@@ -234,9 +211,7 @@ const penTool: Tool = new Tool("pen", {
             curveGraphic.remove();
 
             if (points.length > 1) {
-                slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
-                slide.$store.commit("styleEditorObject", graphic);
-                slide.$store.commit("focusGraphic", graphic);
+                addGraphic(slide, Graphics.modelCurve(curveGraphic, points));
             }
         }
 
@@ -268,15 +243,13 @@ const rectangleTool: Tool = new Tool("rectangle", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
-        event.stopPropagation();
-        event.preventDefault();
+        isolateEvent(event);
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
         document.addEventListener("keydown", toggleSquare);
         document.addEventListener("keyup", toggleSquare);
 
-        slide.$store.commit("focusGraphic", undefined);
-        slide.$store.commit("styleEditorObject", undefined);
+        focusGraphic(slide, undefined);
         const start: Point = getMousePosition(slide, event);
         const shape: SVG.Rect = canvas.rect().move(start.x, start.y);
         let lastPosition: Point = new Point(event.clientX, event.clientY);
@@ -304,26 +277,8 @@ const rectangleTool: Tool = new Tool("rectangle", {
             canvas.off("mouseup", end);
             document.removeEventListener("keydown", toggleSquare);
             document.removeEventListener("keyup", toggleSquare);
-
-            const graphic: Graphic = new Graphic({
-                type: "rectangle",
-                style: new Style({
-                    fill: shape.attr("fill"),
-                    x: shape.x(),
-                    y: shape.y(),
-                    width: shape.width(),
-                    height: shape.height()
-                }),
-                focusStyle: new Style({
-                    stroke: "blue",
-                    strokeWidth: 3
-                })
-            });
-
             shape.remove();
-            slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
-            slide.$store.commit("styleEditorObject", graphic);
-            slide.$store.commit("focusGraphic", graphic);
+            addGraphic(slide, Graphics.modelRectangle(shape));
         }
 
         function toggleSquare(event: KeyboardEvent): void {
@@ -342,15 +297,13 @@ const ellipseTool: Tool = new Tool("ellipse", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
-        event.stopPropagation();
-        event.preventDefault();
+        isolateEvent(event);
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
         document.addEventListener("keydown", toggleCircle);
         document.addEventListener("keyup", toggleCircle);
 
-        slide.$store.commit("focusGraphic", undefined);
-        slide.$store.commit("styleEditorObject", undefined);
+        focusGraphic(slide, undefined);
         const start: Point = getMousePosition(slide, event);
         const shape: SVG.Ellipse = canvas.ellipse().center(start.x, start.y);
         let lastPosition: Point = new Point(event.clientX, event.clientY);
@@ -377,26 +330,8 @@ const ellipseTool: Tool = new Tool("ellipse", {
             canvas.off("mouseup", end);
             document.removeEventListener("keydown", toggleCircle);
             document.removeEventListener("keyup", toggleCircle);
-
-            const graphic: Graphic = new Graphic({
-                type: "ellipse",
-                style: new Style({
-                    fill: shape.attr("fill"),
-                    x: shape.cx(),
-                    y: shape.cy(),
-                    width: shape.width(),
-                    height: shape.height()
-                }),
-                focusStyle: new Style({
-                    stroke: "blue",
-                    strokeWidth: 3
-                })
-            });
-
             shape.remove();
-            slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
-            slide.$store.commit("styleEditorObject", graphic);
-            slide.$store.commit("focusGraphic", graphic);
+            addGraphic(slide, Graphics.modelEllipse(shape));
         }
 
         function toggleCircle(event: KeyboardEvent): void {
@@ -414,28 +349,12 @@ const ellipseTool: Tool = new Tool("ellipse", {
 const textboxTool: Tool = new Tool("textbox", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "text"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
-    canvasMouseDown: (slide: any) => (event: MouseEvent): void => {
-        event.stopPropagation();
-        event.preventDefault();
-
-        slide.$store.commit("focusGraphic", undefined);
-        slide.$store.commit("styleEditorObject", undefined);
+    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
+        isolateEvent(event);
+        focusGraphic(slide, undefined);
         const position: Point = getMousePosition(slide, event);
-        const graphic: Graphic = new Graphic({
-            type: "textbox",
-            style: new Style({
-                x: position.x,
-                y: position.y,
-                message: "lorem ipsum\ndolor sit amet"
-            }),
-            focusStyle: new Style({
-                stroke: "blue"
-            })
-        });
-
-        slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
-        slide.$store.commit("styleEditorObject", graphic);
-        slide.$store.commit("focusGraphic", graphic);
+        const svg: SVG.Text = canvas.text("lorem ipsum\ndolor sit amet").move(position.x, position.y).remove();
+        addGraphic(slide, Graphics.modelText(svg));
     }
 });
 

@@ -3,14 +3,14 @@ import Style from "../models/Style";
 import Point from "../models/Point";
 import * as SVG from "svg.js";
 
-const render: (graphic: Graphic, canvas: SVG.Doc) => SVG.Element = (graphic: Graphic, canvas: SVG.Doc): SVG.Element => {
+function render(graphic: Graphic, canvas: SVG.Doc): SVG.Element {
     const style: Style = graphic.style;
 
     if (graphic.type === "rectangle") {
         return canvas.rect(style.width, style.height)
             .move(style.x!, style.y!)
             .fill(style.fill!);
-    } else if (graphic.type === "textbox") {
+    } else if (graphic.type === "text") {
         return canvas.text(style.message || "")
             .move(style.x!, style.y!);
     } else if (graphic.type === "polyline") {
@@ -35,8 +35,91 @@ const render: (graphic: Graphic, canvas: SVG.Doc) => SVG.Element = (graphic: Gra
     }
 
     throw `Undefined type of graphic: ${graphic.type}`;
-};
+}
+
+function modelPolyline(svg: SVG.PolyLine, points: Array<Point>): Graphic {
+    return new Graphic({
+        type: "polyline",
+        style: new Style({
+            fill: svg.attr("fill"),
+            stroke: svg.attr("stroke"),
+            strokeWidth: svg.attr("stroke-width"),
+            points: points
+        }),
+        focusStyle: new Style({
+            stroke: "blue"
+        })
+    });
+}
+
+function modelCurve(svg: SVG.Path, points: Array<Point>): Graphic {
+    return new Graphic({
+        type: "curve",
+        style: new Style({
+            fill: svg.attr("fill"),
+            stroke: svg.attr("stroke"),
+            strokeWidth: svg.attr("stroke-width"),
+            points: points
+        }),
+        focusStyle: new Style({
+            stroke: "blue"
+        })
+    });
+}
+
+function modelRectangle(svg: SVG.Rect): Graphic {
+    return new Graphic({
+        type: "rectangle",
+        style: new Style({
+            fill: svg.attr("fill"),
+            x: svg.x(),
+            y: svg.y(),
+            width: svg.width(),
+            height: svg.height()
+        }),
+        focusStyle: new Style({
+            stroke: "blue",
+            strokeWidth: 3
+        })
+    });
+}
+
+function modelEllipse(svg: SVG.Ellipse): Graphic {
+    return new Graphic({
+        type: "ellipse",
+        style: new Style({
+            fill: svg.attr("fill"),
+            x: svg.cx(),
+            y: svg.cy(),
+            width: svg.width(),
+            height: svg.height()
+        }),
+        focusStyle: new Style({
+            stroke: "blue",
+            strokeWidth: 3
+        })
+    });
+}
+
+function modelText(svg: SVG.Text): Graphic {
+    return new Graphic({
+        type: "text",
+        style: new Style({
+            x: svg.x(),
+            y: svg.y(),
+            message: svg.text()
+        }),
+        focusStyle: new Style({
+            stroke: "blue"
+        })
+    });
+}
 
 export default {
-    render
+    render,
+    modelPolyline,
+    modelCurve,
+    modelRectangle,
+    modelEllipse,
+    modelText
 };
