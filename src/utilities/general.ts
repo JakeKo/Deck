@@ -1,5 +1,5 @@
 import * as SVG from "svg.js";
-import Point from "../models/Point";
+import PointModel from "../models/PointModel";
 import GraphicModel from "../models/GraphicModel";
 import StyleModel from "../models/StyleModel";
 import SlideModel from "../models/SlideModel";
@@ -38,13 +38,13 @@ const renderGraphic: (graphic: GraphicModel, canvas: SVG.Doc) => SVG.Element = (
         return canvas.text(style.message || "")
             .move(style.x!, style.y!);
     } else if (graphic.type === "polyline") {
-        return canvas.polyline(style.points!.map((point: Point) => point.toArray()))
+        return canvas.polyline(style.points!.map((point: PointModel) => point.toArray()))
             .fill(style.fill!)
             .stroke(style.stroke!)
             .attr("stroke-width", style.strokeWidth);
     } else if (graphic.type === "curve") {
         let points: string = `M ${style.points![0].x},${style.points![0].y}`;
-        style.points!.slice(1).forEach((point: Point, index: number) => {
+        style.points!.slice(1).forEach((point: PointModel, index: number) => {
             points += `${index % 3 === 0 ? " C" : ""} ${point.x},${point.y}`;
         });
 
@@ -97,7 +97,7 @@ const pasteHandler: (app: any) => (event: Event) => void = (app: any): (event: E
     // Correct some loss of data and generate a new id for the new graphic model
     clipboardData.id = generateId();
     if (clipboardData.styleModel.points !== undefined) {
-        clipboardData.styleModel.points = clipboardData.styleModel.points.map((point: { x: number, y: number}) => new Point(point.x, point.y));
+        clipboardData.styleModel.points = clipboardData.styleModel.points.map((point: { x: number, y: number}) => new PointModel(point.x, point.y));
     }
 
     const graphicModel: GraphicModel = new GraphicModel(clipboardData);

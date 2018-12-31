@@ -19,7 +19,7 @@ import Toolbox from "./components/Toolbox.vue";
 import Editor from "./components/Editor.vue";
 import Roadmap from "./components/Roadmap.vue";
 import StyleEditor from "./components/StyleEditor.vue";
-import Utilities from "./utilities/miscellaneous";
+import Utilities from "./utilities/general";
 
 @Component({
     components: {

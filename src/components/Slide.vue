@@ -1,44 +1,28 @@
 <template>
-<div :id="`slide_${id}`" :style="slideStyle"></div>
+<div :id="`slide_${id}`" :class="{ 'slide': true, 'active-slide': isActive }"></div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import GraphicModel from "../models/GraphicModel";
-import StyleModel from "../models/StyleModel";
-import Point from "../models/Point";
-import Utilities from "../utilities/miscellaneous";
+import Utilities from "../utilities/general";
 
 @Component
 export default class Slide extends Vue {
     private canvas!: SVG.Doc;
+    @Prop({ type: String, required: true }) private id!: string;
+    @Prop({ type: Boolean, required: true }) private isActive!: boolean;
+    @Prop({ type: Array, required: true }) private graphics!: GraphicModel[];
 
-    @Prop({ type: String, required: true })
-    private id!: string;
-
-    @Prop({ type: Array, default: () => new Array<GraphicModel>() })
-    private graphics!: GraphicModel[];
-
-    @Watch("graphics", { deep: true })
-    public refreshCanvas(): void {
+    @Watch("graphics", { deep: true }) private refreshCanvas(): void {
         this.canvas.clear();
         this.graphics.forEach((graphic: GraphicModel) => this.initializeGraphic(graphic));
     }
 
-    get slideStyle(): any {
-        return {
-            boxShadow: `0 0 4px 0 ${this.$store.getters.theme.tertiary}`,
-            background: this.$store.getters.theme.primary,
-            display: this.id === this.$store.getters.activeSlide.id ? "block" : "none",
-            height: `${this.$store.getters.slideHeight}px`,
-            width: `${this.$store.getters.slideWidth}px`
-        };
-    }
-
     private mounted(): void {
         const canvasResolution: number = this.$store.getters.canvasResolution;
-        this.canvas = SVG(this.$el.id).viewbox(0, 0, canvasResolution * this.$store.getters.slideWidth, canvasResolution * this.$store.getters.slideHeight);
+        this.canvas = SVG(this.$el.id).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
 
         this.canvas.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.canvasMouseOver(this.canvas)(event));
         this.canvas.on("mouseout", (event: MouseEvent) => this.$store.getters.tool.canvasMouseOut(this.canvas)(event));
@@ -59,6 +43,20 @@ export default class Slide extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import "../styles/colors";
+
+.slide {
+    box-shadow: 0 0 4px 0 $color-tertiary;
+    background: $color-primary;
+    display: none;
+    height: 603px;
+    width: 1072px;
+}
+
+.active-slide {
+    display: block !important;
+}
+
 svg {
     height: 100%;
     width: 100%;

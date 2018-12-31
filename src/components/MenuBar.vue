@@ -14,7 +14,7 @@ export default class MenuBar extends Vue {
 </script>
 
 <style lang="scss" scoped>
-@import "../styles/components";
+@import "../styles/application";
 
 #menu-bar {
     background: $color-light;

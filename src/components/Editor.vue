@@ -7,6 +7,7 @@
                 :key="slide.id"
                 :id="slide.id"
                 :graphics="slide.graphics"
+                :isActive="slide.id === $store.getters.activeSlide.id"
             ></slide>
         </div>
     </div>
@@ -27,8 +28,7 @@ import SlideSettings from "./SlideSettings.vue";
 export default class Editor extends Vue {
     private container!: HTMLDivElement;
 
-    @Watch("canvasZoom")
-    private onCanvasZoomChanged(): void {
+    @Watch("canvasZoom") private onCanvasZoomChanged(): void {
         // Modify the zoom styling of the editor when the zoom is updated
         const percentageDown = this.container.scrollTop / this.container.scrollHeight;
         const percentageOver = this.container.scrollLeft / this.container.scrollWidth;
@@ -44,8 +44,7 @@ export default class Editor extends Vue {
     get canvasStyle(): any {
         return {
             width: `${this.$store.getters.canvasWidth}px`,
-            height: `${this.$store.getters.canvasHeight}px`,
-            background: this.$store.getters.theme.secondary
+            height: `${this.$store.getters.canvasHeight}px`
         };
     }
 
@@ -65,6 +64,8 @@ export default class Editor extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import "../styles/colors";
+
 #editor {
     display: flex;
 }
@@ -88,5 +89,6 @@ export default class Editor extends Vue {
     display: flex;
     justify-content: center;
     align-items: center;
+    background: $color-secondary;
 }
 </style>

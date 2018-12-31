@@ -1,14 +1,13 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import SlideModel from "./models/SlideModel";
-import Utilities from "./utilities/miscellaneous";
+import Utilities from "./utilities/general";
 import Tools from "./utilities/tools";
-import Theme from "./models/Theme";
 import GraphicModel from "./models/GraphicModel";
 import ToolModel from "./models/ToolModel";
 import * as SVG from "svg.js";
 import StyleModel from "./models/StyleModel";
-import Point from "./models/Point";
+import PointModel from "./models/PointModel";
 
 Vue.use(Vuex);
 
@@ -21,10 +20,6 @@ export default new Vuex.Store({
             width: 4000,
             zoom: 1,
             resolution: 1,
-            slide: {
-                height: 603,
-                width: 1072
-            }
         },
         styleEditor: {
             width: 300,
@@ -38,11 +33,6 @@ export default new Vuex.Store({
             }
         },
         slides: new Array<SlideModel>(),
-        theme: 0,
-        themes: [
-            new Theme("light", "#FFFFFF", "#EEEEEE", "#DDDDDD", "#275DAD", "#2FBF71" ,"#ED7D3A", "#A22C29"),
-            new Theme("dark", "", "", "", "", "", "", "")
-        ],
         currentTool: "cursor",
         tools: {
             cursor: Tools.cursorTool,
@@ -81,9 +71,6 @@ export default new Vuex.Store({
         roadmapHeight: (state: any): number => {
             return state.roadmap.height;
         },
-        theme: (state: any): Theme => {
-            return state.themes[state.theme];
-        },
         tool: (state: any): ToolModel => {
             return state.tools[state.currentTool];
         },
@@ -104,12 +91,6 @@ export default new Vuex.Store({
         },
         canvasResolution: (state: any): number => {
             return state.canvas.resolution;
-        },
-        slideHeight: (state: any): number => {
-            return state.canvas.slide.height;
-        },
-        slideWidth: (state: any): number => {
-            return state.canvas.slide.width;
         },
         slidePreviewHeight: (state: any): number => {
             return state.roadmap.slidePreview.height;
@@ -165,7 +146,7 @@ export default new Vuex.Store({
 
             // Points are not preserved in the style editor object
             if (style.points !== undefined) {
-                styleModel.points = style.points.map((point: any): Point => new Point(point.x, point.y));
+                styleModel.points = style.points.map((point: any): PointModel => new PointModel(point.x, point.y));
             }
 
             graphic.styleModel = styleModel;

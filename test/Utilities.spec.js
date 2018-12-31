@@ -1,4 +1,4 @@
-import Utilities from "../src/utilities/miscellaneous";
+import Utilities from "../src/utilities/general";
 
 describe("Utilities", () => {
     it("generates unique ids", () => {

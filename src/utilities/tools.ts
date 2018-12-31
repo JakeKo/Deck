@@ -1,14 +1,14 @@
-import Point from "../models/Point";
+import PointModel from "../models/PointModel";
 import ToolModel from "../models/ToolModel";
 import GraphicModel from "../models/GraphicModel";
 import StyleModel from "../models/StyleModel";
 import * as SVG from "svg.js";
 
-const getMousePosition: (slide: any, event: MouseEvent) => Point = (slide: any, event: MouseEvent): Point => {
+const getMousePosition: (slide: any, event: MouseEvent) => PointModel = (slide: any, event: MouseEvent): PointModel => {
     const zoom: number = slide.$store.getters.canvasZoom;
     const resolution: number = slide.$store.getters.canvasResolution;
     const bounds: DOMRect = slide.$el.getBoundingClientRect();
-    return new Point(Math.round((event.clientX / zoom - bounds.left) * resolution), Math.round((event.clientY / zoom - bounds.top) * resolution));
+    return new PointModel(Math.round((event.clientX / zoom - bounds.left) * resolution), Math.round((event.clientY / zoom - bounds.top) * resolution));
 };
 
 // Cursor Tool handlers
@@ -26,15 +26,15 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
             slide.$store.commit("styleEditorObject", graphic);
         }
 
-        const start: Point = new Point(svg.x(), svg.y());
-        const offset: Point = start.add(getMousePosition(slide, event).scale(-1));
+        const start: PointModel = new PointModel(svg.x(), svg.y());
+        const offset: PointModel = start.add(getMousePosition(slide, event).scale(-1));
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
             event.stopPropagation();
             event.preventDefault();
 
-            const resolvedPosition: Point = getMousePosition(slide, event).add(offset);
+            const resolvedPosition: PointModel = getMousePosition(slide, event).add(offset);
             svg.move(resolvedPosition.x, resolvedPosition.y);
         }
 
@@ -45,16 +45,16 @@ const cursorTool: ToolModel = new ToolModel("cursor", {
 
             if (graphic.type === "polyline") {
                 const flattenedPoints: Array<Array<number>> = (svg as SVG.PolyLine).array().value as any as Array<Array<number>>;
-                graphic.styleModel.points = flattenedPoints.map<Point>((point: Array<number>): Point => new Point(point[0], point[1]));
+                graphic.styleModel.points = flattenedPoints.map<PointModel>((point: Array<number>): PointModel => new PointModel(point[0], point[1]));
             }
 
             if (graphic.type === "curve") {
                 const flattenedPoints: Array<Array<number>> = (svg as SVG.Path).array().value as any as Array<Array<number>>;
-                graphic.styleModel.points = [new Point(flattenedPoints[0][1], flattenedPoints[0][2])];
+                graphic.styleModel.points = [new PointModel(flattenedPoints[0][1], flattenedPoints[0][2])];
                 flattenedPoints.slice(1).forEach((point: Array<number>) => {
-                    graphic.styleModel.points!.push(new Point(point[1], point[2]));
-                    graphic.styleModel.points!.push(new Point(point[3], point[4]));
-                    graphic.styleModel.points!.push(new Point(point[5], point[6]));
+                    graphic.styleModel.points!.push(new PointModel(point[1], point[2]));
+                    graphic.styleModel.points!.push(new PointModel(point[3], point[4]));
+                    graphic.styleModel.points!.push(new PointModel(point[5], point[6]));
                 });
             }
 
@@ -92,13 +92,13 @@ const pencilTool: ToolModel = new ToolModel("pencil", {
 
         slide.$store.commit("focusGraphic", undefined);
         slide.$store.commit("styleEditorObject", undefined);
-        const points: Array<Point> = [getMousePosition(slide, event)];
+        const points: Array<PointModel> = [getMousePosition(slide, event)];
         const strokeWidth: number = slide.$store.getters.canvasResolution * 3;
         const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", strokeWidth);
 
         function preview(event: MouseEvent): void {
             points.push(getMousePosition(slide, event));
-            shape.plot(points.map<Array<number>>((point: Point) => point.toArray()));
+            shape.plot(points.map<Array<number>>((point: PointModel) => point.toArray()));
         }
 
         function end(): void {
@@ -140,9 +140,9 @@ const penTool: ToolModel = new ToolModel("pen", {
 
         slide.$store.commit("focusGraphic", undefined);
         slide.$store.commit("styleEditorObject", undefined);
-        const start: Point = getMousePosition(slide, event);
-        const curve: Array<Array<Point>> = [[start]];
-        const curveSegment: Array<Array<Point | undefined>> = [[start], [undefined, undefined, undefined]];
+        const start: PointModel = getMousePosition(slide, event);
+        const curve: Array<Array<PointModel>> = [[start]];
+        const curveSegment: Array<Array<PointModel | undefined>> = [[start], [undefined, undefined, undefined]];
 
         // Create SVGs for the primary curve, the editable curve segment, and the control point preview
         const resolution: number = slide.$store.getters.canvasResolution;
@@ -172,7 +172,7 @@ const penTool: ToolModel = new ToolModel("pen", {
 
             // Complete the curve segment and add it to the final curve
             curveSegment[1][1] = getMousePosition(slide, event).reflect(curveSegment[1][2]);
-            curve.push(curveSegment[1] as Array<Point>);
+            curve.push(curveSegment[1] as Array<PointModel>);
             curveGraphic.plot(toBezierString(curve));
 
             // Reset the curve segment and set the first control point
@@ -183,12 +183,12 @@ const penTool: ToolModel = new ToolModel("pen", {
 
         function preview(event: MouseEvent): void {
             // Redraw the current curve segment as the mouse moves around
-            const position: Point = getMousePosition(slide, event);
+            const position: PointModel = getMousePosition(slide, event);
             curveSegmentGraphic.plot(toBezierString(resolveCurve(curveSegment, position)));
 
             // Display the control point shape if the endpoint is defined
             if (curveSegment[1][2] !== undefined) {
-                controlPointGraphic.plot([position.reflect(curveSegment[1][2]).toArray(), position.toArray()]).stroke(slide.$store.getters.theme.information);
+                controlPointGraphic.plot([position.reflect(curveSegment[1][2]).toArray(), position.toArray()]).stroke("blue");
             } else {
                 controlPointGraphic.stroke("none");
             }
@@ -206,8 +206,8 @@ const penTool: ToolModel = new ToolModel("pen", {
 
             // Flatten the representation of curves into a list of points
             // Remove the last curve because it will always have some undefned points
-            const points: Array<Point> = [];
-            curve.forEach((c: Array<Point | undefined>) => points.push(...(c as Array<Point>)));
+            const points: Array<PointModel> = [];
+            curve.forEach((c: Array<PointModel | undefined>) => points.push(...(c as Array<PointModel>)));
 
             const graphic = new GraphicModel({
                 type: "curve",
@@ -232,7 +232,7 @@ const penTool: ToolModel = new ToolModel("pen", {
         }
 
         // Convert a curve with possible undefined values to a curve with defined fallback values
-        function resolveCurve(curve: Array<Array<Point | undefined>>, defaultPoint: Point): Array<Array<Point>> {
+        function resolveCurve(curve: Array<Array<PointModel | undefined>>, defaultPoint: PointModel): Array<Array<PointModel>> {
             return [
                 [curve[0][0] || defaultPoint],
                 [
@@ -244,9 +244,9 @@ const penTool: ToolModel = new ToolModel("pen", {
         }
 
         // Turns an array of curves into bezier curve string format
-        function toBezierString(curves: Array<Array<Point>>): string {
+        function toBezierString(curves: Array<Array<PointModel>>): string {
             const points: string = curves.slice(1)
-                .map<string>((curve: Array<Point>): string => ` C ${curve.map<string>((point: Point) => `${point.x},${point.y}`).join(" ")}`)
+                .map<string>((curve: Array<PointModel>): string => ` C ${curve.map<string>((point: PointModel) => `${point.x},${point.y}`).join(" ")}`)
                 .join(" ");
 
             return `M ${curves[0][0].x},${curves[0][0].y} ${points}`;
@@ -268,23 +268,23 @@ const rectangleTool: ToolModel = new ToolModel("rectangle", {
 
         slide.$store.commit("focusGraphic", undefined);
         slide.$store.commit("styleEditorObject", undefined);
-        const start: Point = getMousePosition(slide, event);
+        const start: PointModel = getMousePosition(slide, event);
         const shape: SVG.Rect = canvas.rect().move(start.x, start.y);
-        let lastPosition: Point = new Point(event.clientX, event.clientY);
+        let lastPosition: PointModel = new PointModel(event.clientX, event.clientY);
 
         // Preview drawing rectangle
         function preview(event: MouseEvent): void {
             // Determine dimensions for a rectangle or square (based on if shift is pressed)
-            lastPosition = new Point(event.clientX, event.clientY);
-            const position: Point = getMousePosition(slide, event);
-            const rawDimensions: Point = position.add(start.scale(-1));
+            lastPosition = new PointModel(event.clientX, event.clientY);
+            const position: PointModel = getMousePosition(slide, event);
+            const rawDimensions: PointModel = position.add(start.scale(-1));
             const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
-            const dimensions: Point = event.shiftKey
-                ? new Point(Math.sign(rawDimensions.x) * minimumDimension, Math.sign(rawDimensions.y) * minimumDimension)
+            const dimensions: PointModel = event.shiftKey
+                ? new PointModel(Math.sign(rawDimensions.x) * minimumDimension, Math.sign(rawDimensions.y) * minimumDimension)
                 : rawDimensions;
 
             // Check if the dimensions are negative and move (x, y) or resize
-            const move: Point = event.shiftKey ? start.add(dimensions) : position;
+            const move: PointModel = event.shiftKey ? start.add(dimensions) : position;
             shape.move(dimensions.x < 0 ? move.x : start.x, dimensions.y < 0 ? move.y : start.y);
             shape.size(Math.abs(dimensions.x), Math.abs(dimensions.y));
         }
@@ -338,20 +338,20 @@ const ellipseTool: ToolModel = new ToolModel("ellipse", {
 
         slide.$store.commit("focusGraphic", undefined);
         slide.$store.commit("styleEditorObject", undefined);
-        const start: Point = getMousePosition(slide, event);
+        const start: PointModel = getMousePosition(slide, event);
         const shape: SVG.Ellipse = canvas.ellipse().center(start.x, start.y);
-        let lastPosition: Point = new Point(event.clientX, event.clientY);
+        let lastPosition: PointModel = new PointModel(event.clientX, event.clientY);
 
         // Preview drawing ellipse
         function preview(event: MouseEvent): void {
             // Determine dimensions for an ellipse or circle (based on if shift is pressed)
-            lastPosition = new Point(event.clientX, event.clientY);
-            const position: Point = getMousePosition(slide, event);
-            const rawOffset: Point = position.add(start.scale(-1));
+            lastPosition = new PointModel(event.clientX, event.clientY);
+            const position: PointModel = getMousePosition(slide, event);
+            const rawOffset: PointModel = position.add(start.scale(-1));
             const minimumOffset: number = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
-            const resolvedOffset: Point = event.shiftKey
-                ? new Point(Math.sign(rawOffset.x) * minimumOffset, Math.sign(rawOffset.y) * minimumOffset) : rawOffset;
-            const center: Point = start.add(start).add(resolvedOffset).scale(0.5);
+            const resolvedOffset: PointModel = event.shiftKey
+                ? new PointModel(Math.sign(rawOffset.x) * minimumOffset, Math.sign(rawOffset.y) * minimumOffset) : rawOffset;
+            const center: PointModel = start.add(start).add(resolvedOffset).scale(0.5);
 
             // Check if the dimensions are negative and move (x, y) or resize
             shape.center(center.x, center.y);
