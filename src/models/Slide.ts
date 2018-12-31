@@ -1,15 +1,15 @@
 import Utilities from "../utilities/general";
-import GraphicModel from "./GraphicModel";
+import Graphic from "./Graphic";
 
 export default class SlideModel {
     public id: string;
-    public graphics: Array<GraphicModel>;
+    public graphics: Array<Graphic>;
 
     constructor(
         { id, graphics }:
-        { id?: string, graphics?: Array<GraphicModel> } = { }
+        { id?: string, graphics?: Array<Graphic> } = { }
     ) {
         this.id = id || Utilities.generateId();
-        this.graphics = graphics || new Array<GraphicModel>();
+        this.graphics = graphics || new Array<Graphic>();
     }
 }

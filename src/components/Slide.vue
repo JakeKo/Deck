@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import * as SVG from "svg.js";
-import GraphicModel from "../models/GraphicModel";
+import Graphic from "../models/Graphic";
 import Utilities from "../utilities/general";
 
 @Component
@@ -13,11 +13,11 @@ export default class Slide extends Vue {
     private canvas!: SVG.Doc;
     @Prop({ type: String, required: true }) private id!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
-    @Prop({ type: Array, required: true }) private graphics!: GraphicModel[];
+    @Prop({ type: Array, required: true }) private graphics!: Graphic[];
 
     @Watch("graphics", { deep: true }) private refreshCanvas(): void {
         this.canvas.clear();
-        this.graphics.forEach((graphic: GraphicModel) => this.initializeGraphic(graphic));
+        this.graphics.forEach((graphic: Graphic) => this.initializeGraphic(graphic));
     }
 
     private mounted(): void {
@@ -31,7 +31,7 @@ export default class Slide extends Vue {
         this.refreshCanvas();
     }
 
-    private initializeGraphic(graphic: GraphicModel): void {
+    private initializeGraphic(graphic: Graphic): void {
         const svg: SVG.Element = Utilities.renderGraphic(graphic, this.canvas);
 
         // Bind each event handler

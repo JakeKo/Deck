@@ -1,13 +1,13 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import SlideModel from "./models/SlideModel";
+import Slide from "./models/Slide";
 import Utilities from "./utilities/general";
 import Tools from "./utilities/tools";
-import GraphicModel from "./models/GraphicModel";
-import ToolModel from "./models/ToolModel";
+import Graphic from "./models/Graphic";
+import Tool from "./models/Tool";
 import * as SVG from "svg.js";
-import StyleModel from "./models/StyleModel";
-import PointModel from "./models/PointModel";
+import Style from "./models/Style";
+import Point from "./models/Point";
 
 Vue.use(Vuex);
 
@@ -32,7 +32,7 @@ export default new Vuex.Store({
                 height: 60
             }
         },
-        slides: new Array<SlideModel>(),
+        slides: new Array<Slide>(),
         currentTool: "cursor",
         tools: {
             cursor: Tools.cursorTool,
@@ -41,23 +41,23 @@ export default new Vuex.Store({
             rectangle: Tools.rectangleTool,
             ellipse: Tools.ellipseTool,
             textbox: Tools.textboxTool
-        } as { [key: string]: ToolModel },
+        } as { [key: string]: Tool },
         toolbox: {
             width: 64
         }
     },
     getters: {
-        slides: (state: any): SlideModel[] => {
+        slides: (state: any): Slide[] => {
             return state.slides;
         },
-        firstSlide: (state: any): SlideModel => {
+        firstSlide: (state: any): Slide => {
             return state.slides[0];
         },
-        lastSlide: (state: any): SlideModel => {
+        lastSlide: (state: any): Slide => {
             return state.slides[state.slides.length - 1];
         },
-        activeSlide: (state: any): SlideModel => {
-            return state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId)!;
+        activeSlide: (state: any): Slide => {
+            return state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
         },
         styleEditorWidth: (state: any): number => {
             return state.styleEditor.width;
@@ -71,7 +71,7 @@ export default new Vuex.Store({
         roadmapHeight: (state: any): number => {
             return state.roadmap.height;
         },
-        tool: (state: any): ToolModel => {
+        tool: (state: any): Tool => {
             return state.tools[state.currentTool];
         },
         toolboxWidth: (state: any): number => {
@@ -98,15 +98,15 @@ export default new Vuex.Store({
     },
     mutations: {
         addSlide: (state: any, index: number): void => {
-            state.slides.splice(index, 0, new SlideModel());
+            state.slides.splice(index, 0, new Slide());
         },
-        addGraphic: (state: any, { slideId, graphic }: { slideId: string, graphic: GraphicModel }): void => {
-            const slide: SlideModel = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
+        addGraphic: (state: any, { slideId, graphic }: { slideId: string, graphic: Graphic }): void => {
+            const slide: Slide = state.slides.find((slide: Slide): boolean => slide.id === slideId);
             slide.graphics.push(graphic);
         },
         removeGraphic: (state: any, { slideId, graphicId }: { slideId: string, graphicId: string}): void => {
-            const slide: SlideModel = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
-            slide.graphics = slide.graphics.filter((graphic: GraphicModel): boolean => graphic.id !== graphicId);
+            const slide: Slide = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+            slide.graphics = slide.graphics.filter((graphic: Graphic): boolean => graphic.id !== graphicId);
         },
         tool: (state: any, toolName: string): void => {
             state.currentTool = toolName;
@@ -133,37 +133,37 @@ export default new Vuex.Store({
         activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;
         },
-        focusGraphic: (state: any, graphic?: GraphicModel): void => {
+        focusGraphic: (state: any, graphic?: Graphic): void => {
             state.focusedGraphicId = graphic === undefined ? undefined : graphic.id;
         },
         canvasZoom: (state: any, zoom: number): void => {
             state.canvas.zoom = Math.max(zoom, 0.25);
         },
         graphicStyle: (state: any, { graphicId, style }: { graphicId: string, style: any }): void => {
-            const activeSlide: SlideModel = state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId)!;
-            const graphic: GraphicModel = activeSlide.graphics.find((graphic: GraphicModel): boolean => graphic.id === graphicId)!;
-            const styleModel: StyleModel = new StyleModel(style);
+            const activeSlide: Slide = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
+            const graphic: Graphic = activeSlide.graphics.find((graphic: Graphic): boolean => graphic.id === graphicId)!;
+            const styleModel: Style = new Style(style);
 
             // Points are not preserved in the style editor object
             if (style.points !== undefined) {
-                styleModel.points = style.points.map((point: any): PointModel => new PointModel(point.x, point.y));
+                styleModel.points = style.points.map((point: any): Point => new Point(point.x, point.y));
             }
 
-            graphic.styleModel = styleModel;
+            graphic.style = styleModel;
         }
     },
     actions: {
         export: (store: any): void => {
             const exportFrame: HTMLElement = document.getElementById("export-frame")!;
 
-            store.getters.slides.forEach((slideModel: SlideModel) => {
+            store.getters.slides.forEach((slideModel: Slide) => {
                 const slide: HTMLDivElement = document.createElement("div");
                 slide.setAttribute("id", slideModel.id);
                 slide.setAttribute("class", "slide");
                 exportFrame.appendChild(slide);
 
                 const canvas: SVG.Doc = SVG(slideModel.id);
-                slideModel.graphics.forEach((graphic: GraphicModel) => Utilities.renderGraphic(graphic, canvas));
+                slideModel.graphics.forEach((graphic: Graphic) => Utilities.renderGraphic(graphic, canvas));
             });
 
             const html: HTMLHtmlElement = document.createElement("html");

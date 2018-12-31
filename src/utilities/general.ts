@@ -1,8 +1,8 @@
 import * as SVG from "svg.js";
-import PointModel from "../models/PointModel";
-import GraphicModel from "../models/GraphicModel";
-import StyleModel from "../models/StyleModel";
-import SlideModel from "../models/SlideModel";
+import Point from "../models/Point";
+import Graphic from "../models/Graphic";
+import Style from "../models/Style";
+import Slide from "../models/Slide";
 
 const toPrettyString: (object: any, indentDepth: number) => string = (object: any, indentDepth: number): string => {
     const properties: Array<string> = [];
@@ -27,8 +27,8 @@ const toPrettyString: (object: any, indentDepth: number) => string = (object: an
     }
 };
 
-const renderGraphic: (graphic: GraphicModel, canvas: SVG.Doc) => SVG.Element = (graphic: GraphicModel, canvas: SVG.Doc): SVG.Element => {
-    const style: StyleModel = graphic.styleModel;
+const renderGraphic: (graphic: Graphic, canvas: SVG.Doc) => SVG.Element = (graphic: Graphic, canvas: SVG.Doc): SVG.Element => {
+    const style: Style = graphic.style;
 
     if (graphic.type === "rectangle") {
         return canvas.rect(style.width, style.height)
@@ -38,13 +38,13 @@ const renderGraphic: (graphic: GraphicModel, canvas: SVG.Doc) => SVG.Element = (
         return canvas.text(style.message || "")
             .move(style.x!, style.y!);
     } else if (graphic.type === "polyline") {
-        return canvas.polyline(style.points!.map((point: PointModel) => point.toArray()))
+        return canvas.polyline(style.points!.map((point: Point) => point.toArray()))
             .fill(style.fill!)
             .stroke(style.stroke!)
             .attr("stroke-width", style.strokeWidth);
     } else if (graphic.type === "curve") {
         let points: string = `M ${style.points![0].x},${style.points![0].y}`;
-        style.points!.slice(1).forEach((point: PointModel, index: number) => {
+        style.points!.slice(1).forEach((point: Point, index: number) => {
             points += `${index % 3 === 0 ? " C" : ""} ${point.x},${point.y}`;
         });
 
@@ -78,8 +78,8 @@ const copyHandler: (app: any) => (event: Event) => void = (app: any): (event: Ev
     }
 
     // Fetch the graphic model associated with the current focused graphic
-    const activeSlide: SlideModel = app.$store.getters.activeSlide;
-    const graphicModel: GraphicModel = activeSlide.graphics.find((graphicModel: GraphicModel) => graphicModel.id === focusedGraphicId)!;
+    const activeSlide: Slide = app.$store.getters.activeSlide;
+    const graphicModel: Graphic = activeSlide.graphics.find((graphicModel: Graphic) => graphicModel.id === focusedGraphicId)!;
 
     // Set the clipboard data to the graphic model
     clipboardEvent.clipboardData.setData("text/json", JSON.stringify(graphicModel));
@@ -91,16 +91,16 @@ const pasteHandler: (app: any) => (event: Event) => void = (app: any): (event: E
     const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
     clipboardEvent.preventDefault();
 
-    const activeSlide: SlideModel = app.$store.getters.activeSlide;
+    const activeSlide: Slide = app.$store.getters.activeSlide;
     const clipboardData: any = JSON.parse(clipboardEvent.clipboardData.getData("text/json"));
 
     // Correct some loss of data and generate a new id for the new graphic model
     clipboardData.id = generateId();
     if (clipboardData.styleModel.points !== undefined) {
-        clipboardData.styleModel.points = clipboardData.styleModel.points.map((point: { x: number, y: number}) => new PointModel(point.x, point.y));
+        clipboardData.styleModel.points = clipboardData.styleModel.points.map((point: { x: number, y: number}) => new Point(point.x, point.y));
     }
 
-    const graphicModel: GraphicModel = new GraphicModel(clipboardData);
+    const graphicModel: Graphic = new Graphic(clipboardData);
     activeSlide.graphics.push(graphicModel);
     app.$store.commit("focusGraphic", graphicModel);
     app.$store.commit("styleEditorObject", graphicModel);

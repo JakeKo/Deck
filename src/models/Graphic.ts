@@ -1,17 +1,17 @@
 import Utilities from "../utilities/general";
-import StyleModel from "./StyleModel";
+import Style from "./Style";
 
 export default class GraphicModel {
     public id: string;
     public type: string;
-    public styleModel: StyleModel;
+    public style: Style;
 
     constructor(
-        { id, type, styleModel }:
-        { id?: string, type?: string, styleModel?: StyleModel } = { }
+        { id, type, style }:
+        { id?: string, type?: string, style?: Style } = { }
     ) {
         this.id = id || Utilities.generateId();
         this.type = type || "";
-        this.styleModel = styleModel || new StyleModel();
+        this.style = style || new Style();
     }
 }

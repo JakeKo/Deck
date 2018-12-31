@@ -1,4 +1,4 @@
-import PointModel from "./PointModel";
+import Point from "./Point";
 
 export default class StyleModel {
     public fill?: string;
@@ -10,7 +10,7 @@ export default class StyleModel {
     public height?: number;
     public message?: string;
     public rotation?: number;
-    public points?: Array<PointModel>;
+    public points?: Array<Point>;
 
     constructor(
         {
@@ -35,7 +35,7 @@ export default class StyleModel {
             height?: number,
             message?: string,
             rotation?: number,
-            points?: Array<PointModel>
+            points?: Array<Point>
         } = {}
     ) {
         this.fill = fill;
