@@ -13,11 +13,15 @@ function getMousePosition(slide: any, event: MouseEvent): Point {
 
 function addGraphic(slide: any, graphic: Graphic): void {
     slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
-    slide.$store.commit("styleEditorObject", graphic);
-    slide.$store.commit("focusGraphic", graphic);
+    focusGraphic(slide, graphic);
 }
 
 function focusGraphic(slide: any, graphic?: Graphic): void {
+    if (graphic !== undefined) {
+        const boundingBox: Graphic = Graphics.modelBoundingBox(graphic);
+        slide.$store.commit("addGraphic", { slideId: slide.id, graphic: boundingBox });
+    }
+
     slide.$store.commit("focusGraphic", graphic);
     slide.$store.commit("styleEditorObject", graphic);
 }
@@ -33,6 +37,7 @@ const cursorTool: Tool = new Tool("cursor", {
     graphicMouseOut: (svg: SVG.Element) => (): any => svg.style("cursor", "default"),
     graphicMouseDown: (slide: any, svg: SVG.Element, graphic: Graphic) => (event: MouseEvent): any => {
         isolateEvent(event);
+
         slide.canvas.on("mousemove", preview);
         slide.canvas.on("mouseup", end);
 
