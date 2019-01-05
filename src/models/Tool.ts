@@ -1,5 +1,5 @@
 import * as SVG from "svg.js";
-import Graphic from "./Graphic";
+import IGraphic from "./IGraphic";
 
 export default class Tool {
     public name: string;
@@ -8,7 +8,7 @@ export default class Tool {
     public canvasMouseOut: (canvas: SVG.Doc) => (event: MouseEvent) => any;
     public graphicMouseOver: (svg: SVG.Element) => (event: MouseEvent) => any;
     public graphicMouseOut: (svg: SVG.Element) => (event: MouseEvent) => any;
-    public graphicMouseDown: (slide: any, svg: SVG.Element, graphic: Graphic) => (event: MouseEvent) => any;
+    public graphicMouseDown: (slide: any, svg: SVG.Element, graphic: IGraphic) => (event: MouseEvent) => any;
 
     constructor(name: string, {
         canvasMouseDown,
@@ -23,7 +23,7 @@ export default class Tool {
         canvasMouseOut?: (canvas: SVG.Doc) => (event: MouseEvent) => any;
         graphicMouseOver?: (svg: SVG.Element) => (event: MouseEvent) => any;
         graphicMouseOut?: (svg: SVG.Element) => (event: MouseEvent) => any;
-        graphicMouseDown?: (slide: any, svg: SVG.Element, graphic: Graphic) => (event: MouseEvent) => any;
+        graphicMouseDown?: (slide: any, svg: SVG.Element, graphic: IGraphic) => (event: MouseEvent) => any;
     }) {
         const EMPTY_HANDLER: () => () => void = (): () => void => (): void => { return; };
 

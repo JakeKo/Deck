@@ -50,4 +50,16 @@ export default class Text implements IGraphic {
             .fill(this.fillColor)
             .rotate(this.rotation); // TODO: Infer 'center' of text
     }
+
+    public static model(svg: SVG.Text): Text {
+        return new Text({
+            origin: new Point(svg.x(), svg.y()),
+            content: svg.text(),
+            fontSize: svg.attr("font-size"),
+            fontWeight: svg.attr("font-weight"),
+            fontFamily: svg.attr("font-family"),
+            fillColor: svg.attr("fill"),
+            rotation: svg.attr("rotation")
+        });
+    }
 }

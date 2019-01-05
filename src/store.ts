@@ -1,13 +1,11 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import Slide from "./models/Slide";
 import Utilities from "./utilities/general";
-import Graphics from "./utilities/graphics";
 import Tools from "./utilities/tools";
-import Graphic from "./models/Graphic";
+import IGraphic from "./models/IGraphic";
+import Slide from "./models/Slide";
 import Tool from "./models/Tool";
 import * as SVG from "svg.js";
-import Style from "./models/Style";
 import Point from "./models/Point";
 
 Vue.use(Vuex);
@@ -101,13 +99,13 @@ export default new Vuex.Store({
         addSlide: (state: any, index: number): void => {
             state.slides.splice(index, 0, new Slide());
         },
-        addGraphic: (state: any, { slideId, graphic }: { slideId: string, graphic: Graphic }): void => {
+        addGraphic: (state: any, { slideId, graphic }: { slideId: string, graphic: IGraphic }): void => {
             const slide: Slide = state.slides.find((slide: Slide): boolean => slide.id === slideId);
             slide.graphics.push(graphic);
         },
         removeGraphic: (state: any, { slideId, graphicId }: { slideId: string, graphicId: string}): void => {
             const slide: Slide = state.slides.find((slide: Slide): boolean => slide.id === slideId);
-            slide.graphics = slide.graphics.filter((graphic: Graphic): boolean => graphic.id !== graphicId);
+            slide.graphics = slide.graphics.filter((graphic: IGraphic): boolean => graphic.id !== graphicId);
         },
         tool: (state: any, toolName: string): void => {
             state.currentTool = toolName;
@@ -134,23 +132,24 @@ export default new Vuex.Store({
         activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;
         },
-        focusGraphic: (state: any, graphic?: Graphic): void => {
+        focusGraphic: (state: any, graphic?: IGraphic): void => {
             state.focusedGraphicId = graphic === undefined ? undefined : graphic.id;
         },
         canvasZoom: (state: any, zoom: number): void => {
             state.canvas.zoom = Math.max(zoom, 0.25);
         },
         graphicStyle: (state: any, { graphicId, style }: { graphicId: string, style: any }): void => {
+            // TODO: Fix this shit
             const activeSlide: Slide = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
-            const graphic: Graphic = activeSlide.graphics.find((graphic: Graphic): boolean => graphic.id === graphicId)!;
-            const styleModel: Style = new Style(style);
+            const graphic: IGraphic = activeSlide.graphics.find((graphic: IGraphic): boolean => graphic.id === graphicId)!;
+            // const styleModel: Style = new Style(style);
 
             // Points are not preserved in the style editor object
             if (style.points !== undefined) {
-                styleModel.points = style.points.map((point: any): Point => new Point(point.x, point.y));
+                // styleModel.points = style.points.map((point: any): Point => new Point(point.x, point.y));
             }
 
-            graphic.style = styleModel;
+            // graphic.style = styleModel;
         }
     },
     actions: {
@@ -164,7 +163,7 @@ export default new Vuex.Store({
                 exportFrame.appendChild(slide);
 
                 const canvas: SVG.Doc = SVG(slideModel.id);
-                slideModel.graphics.forEach((graphic: Graphic) => Graphics.render(graphic, canvas));
+                slideModel.graphics.forEach((graphic: IGraphic): SVG.Element => graphic.render(canvas));
             });
 
             const html: HTMLHtmlElement = document.createElement("html");

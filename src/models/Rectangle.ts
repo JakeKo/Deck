@@ -47,4 +47,16 @@ export default class Rectangle implements IGraphic {
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation, this.origin.x + this.width, this.origin.y + this.height);
     }
+
+    public static model(svg: SVG.Rect): Rectangle {
+        return new Rectangle({
+            origin: new Point(svg.x(), svg.y()),
+            width: svg.width(),
+            height: svg.height(),
+            fillColor: svg.attr("fill"),
+            strokeColor: svg.attr("stroke"),
+            strokeWidth: svg.attr("stroke-width"),
+            rotation: svg.attr("rotation")
+        });
+    }
 }

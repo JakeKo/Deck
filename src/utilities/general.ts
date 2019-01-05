@@ -1,6 +1,10 @@
 import Point from "../models/Point";
-import Graphic from "../models/Graphic";
-import Slide from "../models/Slide";
+import IGraphic from "../models/IGraphic";
+import Rectangle from "../models/Rectangle";
+import Ellipse from "../models/Ellipse";
+import Curve from "../models/Curve";
+import Sketch from "../models/Sketch";
+import Text from "../models/Text";
 
 const toPrettyString: (object: any, indentDepth: number) => string = (object: any, indentDepth: number): string => {
     const properties: Array<string> = [];
@@ -41,12 +45,9 @@ const copyHandler: (app: any) => (event: Event) => void = (app: any): (event: Ev
         return;
     }
 
-    // Fetch the graphic model associated with the current focused graphic
-    const activeSlide: Slide = app.$store.getters.activeSlide;
-    const graphicModel: Graphic = activeSlide.graphics.find((graphicModel: Graphic) => graphicModel.id === focusedGraphicId)!;
-
-    // Set the clipboard data to the graphic model
-    clipboardEvent.clipboardData.setData("text/json", JSON.stringify(graphicModel));
+    // Set the clipboard data to the graphic model associated with the current focused graphic
+    const graphic: IGraphic = app.$store.getters.activeSlide.graphics.find((graphic: IGraphic) => graphic.id === focusedGraphicId)!;
+    clipboardEvent.clipboardData.setData("text/json", JSON.stringify({ model: graphic, type: typeof(graphic) }));
 };
 
 // Override the default behavior of the paste to paste the copied graphic model
@@ -55,19 +56,30 @@ const pasteHandler: (app: any) => (event: Event) => void = (app: any): (event: E
     const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
     clipboardEvent.preventDefault();
 
-    const activeSlide: Slide = app.$store.getters.activeSlide;
-    const clipboardData: any = JSON.parse(clipboardEvent.clipboardData.getData("text/json"));
-
-    // Correct some loss of data and generate a new id for the new graphic model
-    clipboardData.id = generateId();
-    if (clipboardData.styleModel.points !== undefined) {
-        clipboardData.styleModel.points = clipboardData.styleModel.points.map((point: { x: number, y: number}) => new Point(point.x, point.y));
+    const data: any = JSON.parse(clipboardEvent.clipboardData.getData("text/json"));
+    if (data.model === undefined) {
+        return;
     }
 
-    const graphicModel: Graphic = new Graphic(clipboardData);
-    activeSlide.graphics.push(graphicModel);
-    app.$store.commit("focusGraphic", graphicModel);
-    app.$store.commit("styleEditorObject", graphicModel);
+    let graphic: IGraphic;
+    data.model.id = generateId();
+    if (data.type === "Rectangle") {
+        graphic = new Rectangle(data.model);
+    } else if (data.type === "Ellipse") {
+        graphic = new Ellipse(data.model);
+    } else if (data.type === "Curve") {
+        data.model.points = data.model.points.map((point: { x: number, y: number }) => new Point(point.x, point.y));
+        graphic = new Curve(data.model);
+    } else if (data.type === "Sketch") {
+        data.model.points = data.model.points.map((point: { x: number, y: number }) => new Point(point.x, point.y));
+        graphic = new Sketch(data.model);
+    } else if (data.type === "Text") {
+        graphic = new Text(data.model);
+    }
+
+    app.$store.commit("addGraphic", { slideId: app.$store.getters.activeSlide.id, graphic: graphic! });
+    app.$store.commit("focusGraphic", graphic!);
+    app.$store.commit("styleEditorObject", graphic!);
 };
 
 const deckScript: string = `<style>

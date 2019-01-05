@@ -14,7 +14,7 @@ export default class Curve implements IGraphic {
 
     constructor(
         { id, points, fillColor, strokeColor, strokeWidth, rotation }:
-        { id?: string, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+            { id?: string, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.points = points || [];
@@ -55,5 +55,15 @@ export default class Curve implements IGraphic {
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation); // TODO: Evaluate the 'center' of the curve
+    }
+
+    public static model(svg: SVG.Path, points: Array<Point>): Curve {
+        return new Curve({
+            points: points,
+            fillColor: svg.attr("fill"),
+            strokeColor: svg.attr("stroke"),
+            strokeWidth: svg.attr("stroke-width"),
+            rotation: svg.attr("rotation")
+        });
     }
 }

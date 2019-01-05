@@ -1,7 +1,11 @@
 import Point from "../models/Point";
 import Tool from "../models/Tool";
-import Graphic from "../models/Graphic";
-import Graphics from "./graphics";
+import IGraphic from "../models/IGraphic";
+import Rectangle from "../models/Rectangle";
+import Ellipse from "../models/Ellipse";
+import Curve from "../models/Curve";
+import Sketch from "../models/Sketch";
+import Text from "../models/Text";
 import * as SVG from "svg.js";
 
 function getMousePosition(slide: any, event: MouseEvent): Point {
@@ -11,15 +15,14 @@ function getMousePosition(slide: any, event: MouseEvent): Point {
     return new Point(Math.round((event.clientX / zoom - bounds.left) * resolution), Math.round((event.clientY / zoom - bounds.top) * resolution));
 }
 
-function addGraphic(slide: any, graphic: Graphic): void {
+function addGraphic(slide: any, graphic: IGraphic): void {
     slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
     focusGraphic(slide, graphic);
 }
 
-function focusGraphic(slide: any, graphic?: Graphic): void {
+function focusGraphic(slide: any, graphic?: IGraphic): void {
     if (graphic !== undefined) {
-        const boundingBox: Graphic = Graphics.modelBoundingBox(graphic);
-        slide.$store.commit("addGraphic", { slideId: slide.id, graphic: boundingBox });
+        slide.$store.commit("addGraphic", { slideId: slide.id, graphic: graphic.getBoundingBox() });
     }
 
     slide.$store.commit("focusGraphic", graphic);
@@ -35,7 +38,7 @@ function isolateEvent(event: Event): void {
 const cursorTool: Tool = new Tool("cursor", {
     graphicMouseOver: (svg: SVG.Element) => (): any => svg.style("cursor", "pointer"),
     graphicMouseOut: (svg: SVG.Element) => (): any => svg.style("cursor", "default"),
-    graphicMouseDown: (slide: any, svg: SVG.Element, graphic: Graphic) => (event: MouseEvent): any => {
+    graphicMouseDown: (slide: any, svg: SVG.Element, graphic: IGraphic) => (event: MouseEvent): any => {
         isolateEvent(event);
 
         slide.canvas.on("mousemove", preview);
@@ -61,29 +64,24 @@ const cursorTool: Tool = new Tool("cursor", {
             slide.canvas.off("mousemove", preview);
             slide.canvas.off("mouseup", end);
 
-            if (graphic.type === "polyline") {
-                const flattenedPoints: Array<Array<number>> = (svg as SVG.PolyLine).array().value as any as Array<Array<number>>;
-                graphic.style.points = flattenedPoints.map<Point>((point: Array<number>): Point => new Point(point[0], point[1]));
-            }
-
-            if (graphic.type === "curve") {
+            // Update the graphic model based on the modifications made to the graphic render
+            if (graphic instanceof Rectangle) {
+                (graphic as Rectangle).origin = new Point(svg.x(), svg.y());
+            } else if (graphic instanceof Ellipse) {
+                (graphic as Ellipse).center = new Point(svg.cx(), svg.cy());
+            } else if (graphic instanceof Curve) {
                 const flattenedPoints: Array<Array<number>> = (svg as SVG.Path).array().value as any as Array<Array<number>>;
-                graphic.style.points = [new Point(flattenedPoints[0][1], flattenedPoints[0][2])];
+                (graphic as Curve).points = [new Point(flattenedPoints[0][1], flattenedPoints[0][2])];
                 flattenedPoints.slice(1).forEach((point: Array<number>) => {
-                    graphic.style.points!.push(new Point(point[1], point[2]));
-                    graphic.style.points!.push(new Point(point[3], point[4]));
-                    graphic.style.points!.push(new Point(point[5], point[6]));
+                    (graphic as Curve).points.push(new Point(point[1], point[2]));
+                    (graphic as Curve).points.push(new Point(point[3], point[4]));
+                    (graphic as Curve).points.push(new Point(point[5], point[6]));
                 });
-            }
-
-            if (graphic.type === "ellipse") {
-                graphic.style.x = svg.cx();
-                graphic.style.y = svg.cy();
-            }
-
-            if (graphic.type === "rectangle" || graphic.type === "text") {
-                graphic.style.x = svg.x();
-                graphic.style.y = svg.y();
+            } else if (graphic instanceof Sketch) {
+                const flattenedPoints: Array<Array<number>> = (svg as SVG.PolyLine).array().value as any as Array<Array<number>>;
+                (graphic as Sketch).points = flattenedPoints.map<Point>((point: Array<number>): Point => new Point(point[0], point[1]));
+            } else if (graphic instanceof Text) {
+                (graphic as Text).origin = new Point(svg.x(), svg.y());
             }
 
             slide.$store.commit("styleEditorObject", undefined);
@@ -123,7 +121,7 @@ const pencilTool: Tool = new Tool("pencil", {
             canvas.off("mousemove", preview);
             canvas.off("mouseup", end);
             shape.remove();
-            addGraphic(slide, Graphics.modelPolyline(shape, points));
+            addGraphic(slide, Sketch.model(shape, points));
         }
     }
 });
@@ -216,7 +214,7 @@ const penTool: Tool = new Tool("pen", {
             curveGraphic.remove();
 
             if (points.length > 1) {
-                addGraphic(slide, Graphics.modelCurve(curveGraphic, points));
+                addGraphic(slide, Curve.model(curveGraphic, points));
             }
         }
 
@@ -283,7 +281,7 @@ const rectangleTool: Tool = new Tool("rectangle", {
             document.removeEventListener("keydown", toggleSquare);
             document.removeEventListener("keyup", toggleSquare);
             shape.remove();
-            addGraphic(slide, Graphics.modelRectangle(shape));
+            addGraphic(slide, Rectangle.model(shape));
         }
 
         function toggleSquare(event: KeyboardEvent): void {
@@ -336,7 +334,7 @@ const ellipseTool: Tool = new Tool("ellipse", {
             document.removeEventListener("keydown", toggleCircle);
             document.removeEventListener("keyup", toggleCircle);
             shape.remove();
-            addGraphic(slide, Graphics.modelEllipse(shape));
+            addGraphic(slide, Ellipse.model(shape));
         }
 
         function toggleCircle(event: KeyboardEvent): void {
@@ -359,7 +357,7 @@ const textboxTool: Tool = new Tool("textbox", {
         focusGraphic(slide, undefined);
         const position: Point = getMousePosition(slide, event);
         const svg: SVG.Text = canvas.text("lorem ipsum\ndolor sit amet").move(position.x, position.y).remove();
-        addGraphic(slide, Graphics.modelText(svg));
+        addGraphic(slide, Text.model(svg));
     }
 });
 

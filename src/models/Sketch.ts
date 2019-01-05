@@ -14,7 +14,7 @@ export default class Sketch implements IGraphic {
 
     constructor(
         { id, points, fillColor, strokeColor, strokeWidth, rotation }:
-        { id?: string, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+            { id?: string, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.points = points || [];
@@ -56,5 +56,15 @@ export default class Sketch implements IGraphic {
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation, center.x, center.y);
-    }    
+    }
+
+    public static model(svg: SVG.PolyLine, points: Array<Point>): Sketch {
+        return new Sketch({
+            points: points,
+            fillColor: svg.attr("fill"),
+            strokeColor: svg.attr("stroke"),
+            strokeWidth: svg.attr("stroke-width"),
+            rotation: svg.attr("rotation")
+        });
+    }
 }
