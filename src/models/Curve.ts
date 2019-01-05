@@ -1,3 +1,4 @@
+import * as SVG from "svg.js";
 import Utilities from "../utilities/general";
 import IGraphic from "./IGraphic";
 import Rectangle from "./Rectangle";
@@ -23,7 +24,7 @@ export default class Curve implements IGraphic {
         this.rotation = rotation || 0;
     }
 
-    getBoundingBox(): Rectangle {
+    public getBoundingBox(): Rectangle {
         // Get the min and max of the points in the line to set the bounding box height and width
         const xCoordinates: Array<number> = this.points.map<number>((point: Point): number => point.x);
         const yCoordinates: Array<number> = this.points.map<number>((point: Point): number => point.y);
@@ -40,5 +41,19 @@ export default class Curve implements IGraphic {
             strokeWidth: 1,
             rotation: this.rotation
         });
+    }
+
+    public render(canvas: SVG.Doc): SVG.Path {
+        // Reformat points from an array of objects to the bezier curve string
+        let points: string = `M ${this.points[0].x},${this.points[0].y}`;
+        this.points.slice(1).forEach((point: Point, index: number) => {
+            points += `${index % 3 === 0 ? " C" : ""} ${point.x},${point.y}`;
+        });
+
+        return canvas
+            .path(points)
+            .fill(this.fillColor)
+            .stroke({ color: this.strokeColor, width: this.strokeWidth })
+            .rotate(this.rotation); // TODO: Evaluate the 'center' of the curve
     }
 }

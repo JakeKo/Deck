@@ -1,3 +1,4 @@
+import * as SVG from "svg.js";
 import Utilities from "../utilities/general";
 import IGraphic from "./IGraphic";
 import Rectangle from "./Rectangle";
@@ -27,7 +28,7 @@ export default class Text implements IGraphic {
         this.rotation = rotation || 0;
     }
 
-    getBoundingBox(): Rectangle {
+    public getBoundingBox(): Rectangle {
         const lines: Array<string> = this.content.split("\n");
 
         return new Rectangle({
@@ -39,5 +40,14 @@ export default class Text implements IGraphic {
             strokeWidth: 1,
             rotation: this.rotation
         });
+    }
+
+    public render(canvas: SVG.Doc): SVG.Text {
+        return canvas
+            .text(this.content)
+            .move(this.origin.x, this.origin.y)
+            .font({ size: this.fontSize, weight: this.fontWeight, family: this.fontFamily })
+            .fill(this.fillColor)
+            .rotate(this.rotation); // TODO: Infer 'center' of text
     }
 }

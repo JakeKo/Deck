@@ -1,3 +1,4 @@
+import * as SVG from "svg.js";
 import Utilities from "../utilities/general";
 import IGraphic from "./IGraphic";
 import Rectangle from "./Rectangle";
@@ -27,7 +28,7 @@ export default class Ellipse implements IGraphic {
         this.rotation = rotation || 0;
     }
 
-    getBoundingBox(): Rectangle {
+    public getBoundingBox(): Rectangle {
         return new Rectangle({
             // TODO: Handle different rotation behaviors between ellipse and rectangle
             origin: new Point(this.center.x - this.width * 0.5, this.center.y - this.height * 0.5),
@@ -38,5 +39,14 @@ export default class Ellipse implements IGraphic {
             strokeWidth: 1,
             rotation: this.rotation
         });
+    }
+
+    public render(canvas: SVG.Doc): SVG.Ellipse {
+        return canvas
+            .ellipse(this.width, this.height)
+            .center(this.center.x, this.center.y)
+            .fill(this.fillColor)
+            .stroke({ color: this.strokeColor, width: this.strokeWidth })
+            .rotate(this.rotation, this.center.x, this.center.y);
     }
 }

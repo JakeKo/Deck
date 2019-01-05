@@ -1,3 +1,4 @@
+import * as SVG from "svg.js";
 import Utilities from "../utilities/general";
 import IGraphic from "./IGraphic";
 import Rectangle from "./Rectangle";
@@ -23,7 +24,7 @@ export default class Sketch implements IGraphic {
         this.rotation = rotation || 0;
     }
 
-    getBoundingBox(): Rectangle {
+    public getBoundingBox(): Rectangle {
         // Get the min and max of the points in the line to set the bounding box height and width
         const xCoordinates: Array<number> = this.points.map<number>((point: Point): number => point.x);
         const yCoordinates: Array<number> = this.points.map<number>((point: Point): number => point.y);
@@ -41,4 +42,19 @@ export default class Sketch implements IGraphic {
             rotation: this.rotation
         });
     }
+
+    public render(canvas: SVG.Doc): SVG.PolyLine {
+        // Get the min and max of the points in the line to infer rotation center
+        const xCoordinates: Array<number> = this.points.map<number>((point: Point): number => point.x);
+        const yCoordinates: Array<number> = this.points.map<number>((point: Point): number => point.y);
+        const minimumPoint: Point = new Point(Math.min(...xCoordinates), Math.min(...yCoordinates));
+        const maximumPoint: Point = new Point(Math.max(...xCoordinates), Math.max(...yCoordinates));
+        const center: Point = minimumPoint.add(maximumPoint.add(minimumPoint.scale(-1)).scale(0.5));
+
+        return canvas
+            .polyline(this.points.map((point: Point) => point.toArray()))
+            .fill(this.fillColor)
+            .stroke({ color: this.strokeColor, width: this.strokeWidth })
+            .rotate(this.rotation, center.x, center.y);
+    }    
 }
