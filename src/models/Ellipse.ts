@@ -1,8 +1,9 @@
 import Utilities from "../utilities/general";
+import IGraphic from "./IGraphic";
 import Rectangle from "./Rectangle";
 import Point from "./Point";
 
-export default class Ellipse {
+export default class Ellipse implements IGraphic {
     public id: string;
     public center: Point;
     public width: number;
@@ -26,7 +27,7 @@ export default class Ellipse {
         this.rotation = rotation || 0;
     }
 
-    get boundingBox(): Rectangle {
+    getBoundingBox(): Rectangle {
         return new Rectangle({
             // TODO: Handle different rotation behaviors between ellipse and rectangle
             origin: new Point(this.center.x - this.width * 0.5, this.center.y - this.height * 0.5),

@@ -1,8 +1,9 @@
 import Utilities from "../utilities/general";
+import IGraphic from "./IGraphic";
 import Rectangle from "./Rectangle";
 import Point from "./Point";
 
-export default class Text {
+export default class Text implements IGraphic {
     public id: string;
     public origin: Point;
     public content: string;
@@ -26,7 +27,7 @@ export default class Text {
         this.rotation = rotation || 0;
     }
 
-    get boundingBox(): Rectangle {
+    getBoundingBox(): Rectangle {
         const lines: Array<string> = this.content.split("\n");
 
         return new Rectangle({

@@ -1,8 +1,9 @@
 import Utilities from "../utilities/general";
+import IGraphic from "./IGraphic";
 import Rectangle from "./Rectangle";
 import Point from "./Point";
 
-export default class Sketch {
+export default class Sketch implements IGraphic {
     public id: string;
     public points: Array<Point>;
     public fillColor: string;
@@ -22,7 +23,7 @@ export default class Sketch {
         this.rotation = rotation || 0;
     }
 
-    get boundingBox(): Rectangle {
+    getBoundingBox(): Rectangle {
         // Get the min and max of the points in the line to set the bounding box height and width
         const xCoordinates: Array<number> = this.points.map<number>((point: Point): number => point.x);
         const yCoordinates: Array<number> = this.points.map<number>((point: Point): number => point.y);

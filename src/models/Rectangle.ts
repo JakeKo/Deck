@@ -1,7 +1,8 @@
 import Utilities from "../utilities/general";
+import IGraphic from "./IGraphic";
 import Point from "./Point";
 
-export default class Rectangle {
+export default class Rectangle implements IGraphic {
     public id: string;
     public origin: Point;
     public width: number;
@@ -25,7 +26,7 @@ export default class Rectangle {
         this.rotation = rotation || 0;
     }
 
-    get boundingBox(): Rectangle {
+    getBoundingBox(): Rectangle {
         return new Rectangle({
             origin: this.origin,
             width: this.width,
