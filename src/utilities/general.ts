@@ -82,6 +82,41 @@ const pasteHandler: (app: any) => (event: Event) => void = (app: any): (event: E
     app.$store.commit("styleEditorObject", graphic!);
 };
 
+function parseGraphic(json: any): IGraphic {
+    if (json.id !== undefined && json.origin !== undefined && json.width !== undefined &&
+        json.height !== undefined && json.fillColor !== undefined && json.strokeColor !== undefined &&
+        json.strokeWidth !== undefined && json.rotation !== undefined) {
+        json.origin = new Point(json.origin.x, json.origin.y);
+        const rectangle: Rectangle = new Rectangle(json);
+        return rectangle;
+    } else if (json.id !== undefined && json.center !== undefined && json.width !== undefined &&
+        json.height !== undefined && json.fillColor !== undefined && json.strokeColor !== undefined &&
+        json.strokeWidth !== undefined && json.rotation !== undefined) {
+        json.center = new Point(json.center.x, json.center.y);
+        const ellipse: Ellipse = new Ellipse(json);
+        return ellipse;
+    } else if (json.id !== undefined && json.points !== undefined && json.fillColor !== undefined &&
+        json.strokeColor !== undefined && json.strokeWidth !== undefined && json.rotation !== undefined &&
+        json.degree !== undefined) {
+        json.points = json.points.map((point: { x: number, y: number }): Point => new Point(point.x, point.y));
+        const curve: Curve = new Curve(json);
+        return curve;
+    } else if (json.id !== undefined && json.points !== undefined && json.fillColor !== undefined &&
+        json.strokeColor !== undefined && json.strokeWidth !== undefined && json.rotation !== undefined) {
+        json.points = json.points.map((point: { x: number, y: number }): Point => new Point(point.x, point.y));
+        const sketch: Sketch = new Sketch(json);
+        return sketch;
+    } else if (json.id !== undefined && json.origin !== undefined && json.content !== undefined &&
+        json.fontSize !== undefined && json.fontWeight !== undefined && json.fontFamily !== undefined &&
+        json.fillColor !== undefined && json.rotation !== undefined) {
+        json.origin = new Point(json.origin.x, json.origin.y);
+        const text: Text = new Text(json);
+        return text;
+    }
+
+    throw `Undefined graphic ${json}`;
+}
+
 const deckScript: string = `<style>
 html,
 body {
@@ -169,5 +204,6 @@ export default {
     generateId,
     copyHandler,
     pasteHandler,
+    parseGraphic,
     deckScript
 };

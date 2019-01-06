@@ -11,10 +11,11 @@ export default class Curve implements IGraphic {
     public strokeColor: string;
     public strokeWidth: number;
     public rotation: number;
+    public degree: number;
 
     constructor(
-        { id, points, fillColor, strokeColor, strokeWidth, rotation }:
-            { id?: string, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+        { id, points, fillColor, strokeColor, strokeWidth, rotation, degree }:
+            { id?: string, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number, degree?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.points = points || [];
@@ -22,6 +23,7 @@ export default class Curve implements IGraphic {
         this.strokeColor = strokeColor || "#000000";
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
+        this.degree = degree || 3;
     }
 
     public getBoundingBox(): Rectangle {

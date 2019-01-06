@@ -11,6 +11,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import Utilities from "../utilities/general";
+import IGraphic from "../models/IGraphic";
 
 @Component
 export default class StyleEditor extends Vue {
@@ -52,7 +53,11 @@ export default class StyleEditor extends Vue {
         event.preventDefault();
         event.stopPropagation();
 
-        this.$store.commit("graphicStyle", { graphicId: this.$store.getters.styleEditorObjectId, style: JSON.parse(this.content) });
+        // TODO: Style editor content validation
+        const json: any = JSON.parse(this.content);
+        const graphic: IGraphic = Utilities.parseGraphic(json);
+
+        this.$store.commit("updateGraphic", graphic);
     }
 }
 </script>

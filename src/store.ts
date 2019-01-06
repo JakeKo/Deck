@@ -6,7 +6,6 @@ import IGraphic from "./models/IGraphic";
 import Slide from "./models/Slide";
 import Tool from "./models/Tool";
 import * as SVG from "svg.js";
-import Point from "./models/Point";
 
 Vue.use(Vuex);
 
@@ -22,8 +21,7 @@ export default new Vuex.Store({
         },
         styleEditor: {
             width: 300,
-            object: undefined,
-            objectId: ""
+            object: undefined
         },
         roadmap: {
             height: 96,
@@ -113,15 +111,8 @@ export default new Vuex.Store({
         styleEditorWidth: (state: any, width: number): void => {
             state.styleEditor.width = width;
         },
-        styleEditorObject: (state: any, object: any): void => {
-            // Object is of type any because styleEditor.object is initialized as undefined
-            if (object === undefined) {
-                state.styleEditor.objectId = "";
-                state.styleEditor.object = undefined;
-            } else {
-                state.styleEditor.objectId = object.id;
-                state.styleEditor.object = object.style;
-            }
+        styleEditorObject: (state: any, object?: IGraphic): void => {
+            state.styleEditor.object = object;
         },
         roadmapHeight: (state: any, height: number): void => {
             // Set roadmap height with arbitrary boundaries 64 <= height <= 256
@@ -138,18 +129,17 @@ export default new Vuex.Store({
         canvasZoom: (state: any, zoom: number): void => {
             state.canvas.zoom = Math.max(zoom, 0.25);
         },
-        graphicStyle: (state: any, { graphicId, style }: { graphicId: string, style: any }): void => {
-            // TODO: Fix this shit
+        updateGraphic: (state: any, graphic: IGraphic): void => {
             const activeSlide: Slide = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
-            const graphic: IGraphic = activeSlide.graphics.find((graphic: IGraphic): boolean => graphic.id === graphicId)!;
-            // const styleModel: Style = new Style(style);
+            const index: number = activeSlide.graphics.findIndex((g: IGraphic): boolean => g.id === graphic.id);
 
-            // Points are not preserved in the style editor object
-            if (style.points !== undefined) {
-                // styleModel.points = style.points.map((point: any): Point => new Point(point.x, point.y));
+            console.log(index);
+            if (index === -1) {
+                console.error("Someone fucked with the graphic id. Don't fuck with the graphic id.");
             }
 
-            // graphic.style = styleModel;
+            // Update the graphic
+            activeSlide.graphics.splice(index, 1, graphic);
         }
     },
     actions: {
