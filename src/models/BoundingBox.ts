@@ -1,8 +1,9 @@
 import * as SVG from "svg.js";
 import Utilities from "../utilities/general";
 import Point from "./Point";
+import IGraphic from "./IGraphic";
 
-export default class BoundingBox {
+export default class BoundingBox implements IGraphic {
     public id: string = Utilities.generateId();
     public origin: Point;
     public width: number;
@@ -17,6 +18,11 @@ export default class BoundingBox {
         this.width = width;
         this.height = height;
         this.rotation = rotation;
+    }
+
+    // Note: Filler method so BoundingBox can be an IGraphic
+    public getBoundingBox(): BoundingBox {
+        return this;
     }
 
     public render(canvas: SVG.Doc): SVG.Rect {

@@ -7,8 +7,6 @@ import Curve from "../models/Curve";
 import Sketch from "../models/Sketch";
 import Text from "../models/Text";
 import * as SVG from "svg.js";
-import Slide from "../models/Slide";
-import BoundingBox from "../models/BoundingBox";
 
 function getMousePosition(slide: any, event: MouseEvent): Point {
     const zoom: number = slide.$store.getters.canvasZoom;
@@ -24,10 +22,8 @@ function addGraphic(slide: any, graphic: IGraphic): void {
 
 function focusGraphic(slide: any, graphic?: IGraphic): void {
     if (slide.$store.getters.focusedGraphic !== undefined) {
-        const activeSlide: Slide = slide.$store.getters.activeSlide;
-        // TODO: Statically bind bounding box id with graphic id
-        const boundingBox: BoundingBox = activeSlide.graphics.find((graphic: IGraphic): boolean => graphic instanceof BoundingBox) as any as BoundingBox;
-        slide.$store.commit("removeGraphic", { slideId: slide.id, graphicId: boundingBox.id });
+        const boundingBoxId: number = slide.$store.getters.focusedGraphic.getBoundingBox().id;
+        slide.$store.commit("removeGraphic", { slideId: slide.id, graphicId: boundingBoxId });
     }
 
     if (graphic !== undefined) {

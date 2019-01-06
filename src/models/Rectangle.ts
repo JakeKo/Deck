@@ -14,6 +14,8 @@ export default class Rectangle implements IGraphic {
     public strokeWidth: number;
     public rotation: number;
 
+    private boundingBox: BoundingBox;
+
     constructor(
         { id, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
         { id?: string, origin?: Point, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
@@ -26,15 +28,17 @@ export default class Rectangle implements IGraphic {
         this.strokeColor = strokeColor || "#000000";
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
+
+        this.boundingBox = new BoundingBox(new Point(0, 0), 0, 0, 0);
     }
 
     public getBoundingBox(): BoundingBox {
-        return new BoundingBox(
-            this.origin,
-            this.width,
-            this.height,
-            this.rotation
-        );
+        this.boundingBox.origin = this.origin;
+        this.boundingBox.width = this.width;
+        this.boundingBox.height = this.height;
+        this.boundingBox.rotation = this.rotation;
+
+        return this.boundingBox;
     }
 
     public render(canvas: SVG.Doc): SVG.Rect {
