@@ -18,7 +18,13 @@ export default class StyleEditor extends Vue {
     private content: string = "";
 
     @Watch("object") private onObjectChanged(): void {
-        this.content = Utilities.toPrettyString(this.object, 1);
+        const json: any = JSON.parse(JSON.stringify(this.object || {}));
+
+        // Set immutable properties to undefined
+        json.id = undefined;
+        json.boundingBox = undefined;
+
+        this.content = Utilities.toPrettyString(json, 1);
     }
 
     // Watch for changes to the style editor object

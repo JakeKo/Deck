@@ -134,11 +134,6 @@ export default new Vuex.Store({
             const activeSlide: Slide = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
             const index: number = activeSlide.graphics.findIndex((g: IGraphic): boolean => g.id === graphic.id);
 
-            console.log(index);
-            if (index === -1) {
-                console.error("Someone fucked with the graphic id. Don't fuck with the graphic id.");
-            }
-
             // Update the graphic
             activeSlide.graphics.splice(index, 1, graphic);
         }
