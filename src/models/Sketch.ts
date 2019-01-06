@@ -1,7 +1,7 @@
 import * as SVG from "svg.js";
 import Utilities from "../utilities/general";
 import IGraphic from "./IGraphic";
-import Rectangle from "./Rectangle";
+import BoundingBox from "./BoundingBox";
 import Point from "./Point";
 
 export default class Sketch implements IGraphic {
@@ -24,23 +24,19 @@ export default class Sketch implements IGraphic {
         this.rotation = rotation || 0;
     }
 
-    public getBoundingBox(): Rectangle {
+    public getBoundingBox(): BoundingBox {
         // Get the min and max of the points in the line to set the bounding box height and width
         const xCoordinates: Array<number> = this.points.map<number>((point: Point): number => point.x);
         const yCoordinates: Array<number> = this.points.map<number>((point: Point): number => point.y);
         const minimumPoint: Point = new Point(Math.min(...xCoordinates), Math.min(...yCoordinates));
         const maximumPoint: Point = new Point(Math.max(...xCoordinates), Math.max(...yCoordinates));
 
-        return new Rectangle({
-            // TODO: Handle different rotation behaviors between path and rectangle
-            origin: minimumPoint,
-            width: maximumPoint.x - minimumPoint.x,
-            height: maximumPoint.y - minimumPoint.y,
-            fillColor: "none",
-            strokeColor: "magenta",
-            strokeWidth: 1,
-            rotation: this.rotation
-        });
+        return new BoundingBox(
+            minimumPoint,
+            maximumPoint.x - minimumPoint.x,
+            maximumPoint.y - minimumPoint.y,
+            this.rotation
+        );
     }
 
     public render(canvas: SVG.Doc): SVG.PolyLine {

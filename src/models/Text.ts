@@ -1,7 +1,7 @@
 import * as SVG from "svg.js";
 import Utilities from "../utilities/general";
 import IGraphic from "./IGraphic";
-import Rectangle from "./Rectangle";
+import BoundingBox from "./BoundingBox";
 import Point from "./Point";
 
 export default class Text implements IGraphic {
@@ -28,18 +28,15 @@ export default class Text implements IGraphic {
         this.rotation = rotation || 0;
     }
 
-    public getBoundingBox(): Rectangle {
+    public getBoundingBox(): BoundingBox {
         const lines: Array<string> = this.content.split("\n");
 
-        return new Rectangle({
-            origin: this.origin,
-            width: Math.max(...lines.map<number>((line: string): number => line.length)) * 8,
-            height: lines.length * 20,
-            fillColor: "none",
-            strokeColor: "magenta",
-            strokeWidth: 1,
-            rotation: this.rotation
-        });
+        return new BoundingBox(
+            this.origin,
+            Math.max(...lines.map<number>((line: string): number => line.length)) * 8,
+            lines.length * 20,
+            this.rotation
+        );
     }
 
     public render(canvas: SVG.Doc): SVG.Text {

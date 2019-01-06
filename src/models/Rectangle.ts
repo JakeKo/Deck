@@ -1,6 +1,7 @@
 import * as SVG from "svg.js";
 import Utilities from "../utilities/general";
 import IGraphic from "./IGraphic";
+import BoundingBox from "./BoundingBox";
 import Point from "./Point";
 
 export default class Rectangle implements IGraphic {
@@ -27,16 +28,13 @@ export default class Rectangle implements IGraphic {
         this.rotation = rotation || 0;
     }
 
-    public getBoundingBox(): Rectangle {
-        return new Rectangle({
-            origin: this.origin,
-            width: this.width,
-            height: this.height,
-            fillColor: "none",
-            strokeColor: "magenta",
-            strokeWidth: 1,
-            rotation: this.rotation
-        });
+    public getBoundingBox(): BoundingBox {
+        return new BoundingBox(
+            this.origin,
+            this.width,
+            this.height,
+            this.rotation
+        );
     }
 
     public render(canvas: SVG.Doc): SVG.Rect {
