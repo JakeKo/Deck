@@ -7,7 +7,7 @@ export default class BoundingBox {
     public origin: Point;
     public width: number;
     public height: number;
-    public fillColor: string = "transparent";
+    public fillColor: string = "none";
     public strokeColor: string = "magenta";
     public strokeWidth: number = 1;
     public rotation: number;

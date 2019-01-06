@@ -44,7 +44,7 @@ const cursorTool: Tool = new Tool("cursor", {
         slide.canvas.on("mousemove", preview);
         slide.canvas.on("mouseup", end);
 
-        if (slide.$store.getters.focusedGraphicId !== graphic.id) {
+        if (slide.$store.getters.focusedGraphic !== undefined && slide.$store.getters.focusedGraphic.id !== graphic.id) {
             focusGraphic(slide, graphic);
         }
 
@@ -90,7 +90,7 @@ const cursorTool: Tool = new Tool("cursor", {
         }
     },
     canvasMouseDown: (slide: any) => (): void => {
-        if (slide.$store.getters.focusedGraphicId !== "") {
+        if (slide.$store.getters.focusedGraphic !== undefined) {
             focusGraphic(slide, undefined);
         }
     }

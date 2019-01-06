@@ -44,13 +44,13 @@ function copyHandler(app: any): (event: Event) => void {
         const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
         clipboardEvent.preventDefault();
 
-        const focusedGraphicId: string | undefined = app.$store.getters.focusedGraphicId;
-        if (focusedGraphicId === undefined) {
+        const focusedGraphic: IGraphic | undefined = app.$store.getters.focusedGraphic;
+        if (focusedGraphic === undefined) {
             return;
         }
 
         // Set the clipboard data to the graphic model associated with the current focused graphic
-        const graphic: IGraphic = app.$store.getters.activeSlide.graphics.find((graphic: IGraphic) => graphic.id === focusedGraphicId)!;
+        const graphic: IGraphic = app.$store.getters.activeSlide.graphics.find((graphic: IGraphic) => graphic.id === focusedGraphic.id)!;
         clipboardEvent.clipboardData.setData("text/json", JSON.stringify(graphic));
     };
 }

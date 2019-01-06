@@ -74,8 +74,9 @@ export default new Vuex.Store({
         toolboxWidth: (state: any): number => {
             return state.toolbox.width;
         },
-        focusedGraphicId: (state: any): string => {
-            return state.focusedGraphicId;
+        focusedGraphic: (state: any): IGraphic | undefined => {
+            const activeSlide: Slide = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
+            return activeSlide.graphics.find((graphic: IGraphic): boolean => graphic.id === state.focusedGraphicId);
         },
         canvasHeight: (state: any): number => {
             return state.canvas.height;
