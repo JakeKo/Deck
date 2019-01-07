@@ -59,7 +59,15 @@ export default class Curve implements IGraphic {
             .rotate(this.rotation); // TODO: Evaluate the 'center' of the curve
     }
 
-    public static model(svg: SVG.Path, points: Array<Point>): Curve {
+    public static model(svg: SVG.Path): Curve {
+        const path: Array<Array<number>> = svg.array().value as any as Array<Array<number>>;
+        const points: Array<Point> = [new Point(path[0][1], path[0][2])];
+        path.slice(1).forEach((curve: Array<number>): void => {
+            points.push(new Point(curve[1], curve[2]));
+            points.push(new Point(curve[3], curve[4]));
+            points.push(new Point(curve[5], curve[6]));
+        });
+
         return new Curve({
             points: points,
             fillColor: svg.attr("fill"),

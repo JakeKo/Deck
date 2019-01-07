@@ -116,20 +116,19 @@ const pencilTool: Tool = new Tool("pencil", {
         // Unfocus the current graphic if any and set initial state of pencil drawing
         focusGraphic(slide, undefined);
         const points: Array<Point> = [getMousePosition(slide, event)];
-        const resolution: number = slide.$store.getters.canvasResolution;
-        const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", resolution * 3);
+        const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", slide.$store.getters.canvasResolution * 3);
 
         // Add the current mouse position point to the list of points to plot
         function preview(event: MouseEvent): void {
             points.push(getMousePosition(slide, event));
-            shape.plot(points.map<Array<number>>((point: Point) => point.toArray()));
+            shape.plot(points.map<Array<number>>((point: Point): Array<number> => point.toArray()));
         }
 
         function end(): void {
             canvas.off("mousemove", preview);
             canvas.off("mouseup", end);
             shape.remove();
-            addGraphic(slide, Sketch.model(shape, points));
+            addGraphic(slide, Sketch.model(shape));
         }
     }
 });
@@ -222,7 +221,7 @@ const penTool: Tool = new Tool("pen", {
             curveGraphic.remove();
 
             if (points.length > 1) {
-                addGraphic(slide, Curve.model(curveGraphic, points));
+                addGraphic(slide, Curve.model(curveGraphic));
             }
         }
 
