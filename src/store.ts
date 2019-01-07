@@ -26,12 +26,6 @@ export default new Vuex.Store({
             object: undefined,
             objectId: ""
         },
-        roadmap: {
-            height: 96,
-            slidePreview: {
-                height: 60
-            }
-        },
         slides: new Array<SlideModel>(),
         currentTool: "cursor",
         tools: {
@@ -68,9 +62,6 @@ export default new Vuex.Store({
         styleEditorObjectId: (state: any): string => {
             return state.styleEditor.objectId;
         },
-        roadmapHeight: (state: any): number => {
-            return state.roadmap.height;
-        },
         tool: (state: any): ToolModel => {
             return state.tools[state.currentTool];
         },
@@ -91,9 +82,6 @@ export default new Vuex.Store({
         },
         canvasResolution: (state: any): number => {
             return state.canvas.resolution;
-        },
-        slidePreviewHeight: (state: any): number => {
-            return state.roadmap.slidePreview.height;
         }
     },
     mutations: {
@@ -123,12 +111,6 @@ export default new Vuex.Store({
                 state.styleEditor.objectId = object.id;
                 state.styleEditor.object = object.styleModel;
             }
-        },
-        roadmapHeight: (state: any, height: number): void => {
-            // Set roadmap height with arbitrary boundaries 64 <= height <= 256
-            state.roadmap.height = Math.max(Math.min(height, 256), 64);
-            // Set slide preview height within the roadmap
-            state.roadmap.slidePreview.height = state.roadmap.height - 42;
         },
         activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;

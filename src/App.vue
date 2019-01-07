@@ -35,7 +35,7 @@ export default class App extends Vue {
         this.$store.commit("addSlide");
         this.$store.commit("activeSlide", this.$store.getters.firstSlide.id);
 
-        document.addEventListener("keydown", (event: KeyboardEvent) => {
+        document.addEventListener("keydown", (event: KeyboardEvent): void => {
             if (event.key === "Delete" || event.key === "Backspace") {
                 this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: this.$store.getters.focusedGraphicId });
                 this.$store.commit("focusGraphic", undefined);
@@ -68,5 +68,6 @@ export default class App extends Vue {
 #workspace {
     display: flex;
     flex-direction: column;
+    height: 100vh;
 }
 </style>

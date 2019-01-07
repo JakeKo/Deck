@@ -1,5 +1,5 @@
 <template>
-<div id="editor" :style="editorStyle">
+<div id="editor">
     <slide-settings></slide-settings>
     <div id="canvas-container" ref="canvas-container">
         <div id="canvas" :style="canvasStyle">
@@ -48,12 +48,6 @@ export default class Editor extends Vue {
         };
     }
 
-    get editorStyle(): any {
-        return {
-            height: `calc(100vh - ${this.$store.getters.roadmapHeight}px)`
-        };
-    }
-
     private mounted(): void {
         // Scroll to the middle of the editor
         this.container = this.$refs["canvas-container"] as HTMLDivElement;
@@ -68,6 +62,7 @@ export default class Editor extends Vue {
 
 #editor {
     display: flex;
+    flex-grow: 1;
 }
 
 #canvas-container {

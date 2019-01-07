@@ -58,3 +58,12 @@
         background: $color-secondary;
     }
 }
+
+.slide-preview {
+    margin: 0 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 2px solid $color-tertiary;
+    height: 54px;
+    width: 96px;
+}

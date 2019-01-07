@@ -1,5 +1,5 @@
 <template>
-<div :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive }" :style="slidePreviewStyle" @click="onSlidePreviewClicked"></div>
+<div :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive }" @click="onSlidePreviewClicked"></div>
 </template>
 
 <script lang="ts">
@@ -21,13 +21,6 @@ export default class SlidePreview extends Vue {
         this.graphics.forEach((graphic: GraphicModel) => Utilities.renderGraphic(graphic, this.canvas));
     }
 
-    get slidePreviewStyle(): any {
-        return {
-            height: `${this.$store.getters.slidePreviewHeight}px`,
-            width: `${this.$store.getters.slidePreviewHeight * 16 / 9}px`
-        };
-    }
-
     // Instantiate the svg.js API on the slide preview and perform the initial render
     private mounted(): void {
         const canvasResolution: number = this.$store.getters.canvasResolution;
@@ -44,14 +37,7 @@ export default class SlidePreview extends Vue {
 </script>
 
 <style lang="scss" scoped>
-@import "../styles/colors";
-
-.slide-preview {
-    margin: 0 12px;
-    cursor: pointer;
-    flex-shrink: 0;
-    border: 2px solid $color-tertiary;
-}
+@import "../styles/application";
 
 // SVG canvas binding and styling breaks if active-slide-preview is an id
 .active-slide-preview {

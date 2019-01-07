@@ -1,5 +1,5 @@
 <template>
-<div id="roadmap" :style="roadmapStyle">
+<div id="roadmap">
     <div class="stretcher-vertical top" @mousedown="stretch"></div>
     <div id="slide-previews">
         <slide-preview v-for="slide in $store.getters.slides"
@@ -8,7 +8,7 @@
             :graphics="$store.getters.slides.find((s) => s.id === slide.id).graphics"
             :key="slide.id"
         ></slide-preview>
-        <div id="new-slide-button" @click="addSlide" :style="newSlideButtonStyle">
+        <div id="new-slide-button" class="slide-preview" @click="addSlide">
             <i class="fas fa-plus"></i>
         </div>
     </div>
@@ -25,28 +25,23 @@ import SlidePreview from "./SlidePreview.vue";
     }
 })
 export default class Roadmap extends Vue {
-    get roadmapStyle(): any {
-        return {
-            height: `${this.$store.getters.roadmapHeight}px`
-        };
-    }
-
-    get newSlideButtonStyle(): any {
-        return {
-            height: `${this.$store.getters.slidePreviewHeight}px`,
-            width: `${this.$store.getters.slidePreviewHeight * 16 / 9}px`
-        };
-    }
-
     private stretch(event: MouseEvent): void {
         event.stopPropagation();
         event.preventDefault();
         document.addEventListener("mousemove", preview);
         document.addEventListener("mouseup", end);
 
-        const self = this;
         function preview(event: MouseEvent): void {
-            self.$store.commit("roadmapHeight", window.innerHeight - event.pageY);
+            // Update the height of the roadmap
+            const height: number = Math.max(Math.min(window.innerHeight - event.pageY, 256), 64);
+            document.getElementById("roadmap")!.style.height = `${height}px`;
+
+            // Set the height and width of the slide previews based on the new height of the roadmap
+            const slidePreviews: HTMLCollection = document.getElementsByClassName("slide-preview");
+            for (let i = 0; i < slidePreviews.length; i++) {
+                (slidePreviews[i] as HTMLDivElement).style.height = `${height - 42}px`;
+                (slidePreviews[i] as HTMLDivElement).style.width = `${(height - 42) * 16 / 9}px`;
+            }
         }
 
         function end(): void {
@@ -70,7 +65,8 @@ export default class Roadmap extends Vue {
 #roadmap {
     position: relative;
     box-sizing: border-box;
-    border-top: 1px solid $color-tertiary
+    border-top: 1px solid $color-tertiary;
+    height: 96px;
 }
 
 #slide-previews {
@@ -88,14 +84,9 @@ export default class Roadmap extends Vue {
 }
 
 #new-slide-button {
-    margin: 0 24px 0 12px;
-    cursor: pointer;
     display: flex;
-    flex-shrink: 0;
     justify-content: center;
     align-items: center;
-    border: 2px solid $color-tertiary;
     color: $color-tertiary;
-    background: $color-primary;
 }
 </style>
