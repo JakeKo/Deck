@@ -37,8 +37,16 @@ export default class App extends Vue {
 
         document.addEventListener("keydown", (event: KeyboardEvent) => {
             if (event.key === "Delete" || event.key === "Backspace") {
-                const graphicId: string = this.$store.getters.focusedGraphic === undefined ? "" : this.$store.getters.focusedGraphic.id;
-                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphicId });
+                if (this.$store.getters.focusedGraphic === undefined) {
+                    return;
+                }
+
+                // Remove the bounding box graphic
+                const boundingBoxId: number = this.$store.getters.focusedGraphic.getBoundingBox().id;
+                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: boundingBoxId });
+
+                // Remove the focused graphic
+                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: this.$store.getters.focusedGraphic.id });
                 this.$store.commit("focusGraphic", undefined);
                 this.$store.commit("styleEditorObject", undefined);
             }

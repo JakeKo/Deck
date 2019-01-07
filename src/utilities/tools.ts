@@ -7,6 +7,7 @@ import Curve from "../models/Curve";
 import Sketch from "../models/Sketch";
 import Text from "../models/Text";
 import * as SVG from "svg.js";
+import BoundingBox from "../models/BoundingBox";
 
 function getMousePosition(slide: any, event: MouseEvent): Point {
     const zoom: number = slide.$store.getters.canvasZoom;
@@ -55,6 +56,7 @@ const cursorTool: Tool = new Tool("cursor", {
 
         const start: Point = new Point(svg.x(), svg.y());
         const offset: Point = start.add(getMousePosition(slide, event).scale(-1));
+        const boundingBox: BoundingBox = slide.$store.getters.activeSlide.graphics.find((g: IGraphic): boolean => g.id === graphic.getBoundingBox().id) as BoundingBox;
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
@@ -62,6 +64,7 @@ const cursorTool: Tool = new Tool("cursor", {
 
             const resolvedPosition: Point = getMousePosition(slide, event).add(offset);
             svg.move(resolvedPosition.x, resolvedPosition.y);
+            boundingBox.origin = resolvedPosition;
         }
 
         // End moving shape
