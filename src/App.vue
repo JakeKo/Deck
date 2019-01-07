@@ -7,7 +7,7 @@
             <editor></editor>
             <roadmap></roadmap>
         </div>
-        <style-editor v-show="$store.getters.focusedGraphicId"></style-editor>
+        <style-editor v-show="$store.getters.focusedGraphic !== undefined"></style-editor>
     </div>
 </div>
 </template>
@@ -37,7 +37,16 @@ export default class App extends Vue {
 
         document.addEventListener("keydown", (event: KeyboardEvent) => {
             if (event.key === "Delete" || event.key === "Backspace") {
-                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: this.$store.getters.focusedGraphicId });
+                if (this.$store.getters.focusedGraphic === undefined) {
+                    return;
+                }
+
+                // Remove the bounding box graphic
+                const boundingBoxId: number = this.$store.getters.focusedGraphic.getBoundingBox().id;
+                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: boundingBoxId });
+
+                // Remove the focused graphic
+                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: this.$store.getters.focusedGraphic.id });
                 this.$store.commit("focusGraphic", undefined);
                 this.$store.commit("styleEditorObject", undefined);
             }
@@ -48,7 +57,7 @@ export default class App extends Vue {
     }
 
     get workspaceStyle(): any {
-        const styleEditorHidden: boolean = this.$store.getters.focusedGraphicId === undefined;
+        const styleEditorHidden: boolean = this.$store.getters.focusedGraphic === undefined;
         return {
             width: `calc(100vw - ${this.$store.getters.toolboxWidth + (styleEditorHidden ? 0 : this.$store.getters.styleEditorWidth)}px)`
         };

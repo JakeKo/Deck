@@ -1,10 +1,12 @@
-import * as SVG from "svg.js";
-import PointModel from "../models/PointModel";
-import GraphicModel from "../models/GraphicModel";
-import StyleModel from "../models/StyleModel";
-import SlideModel from "../models/SlideModel";
+import Point from "../models/Point";
+import IGraphic from "../models/IGraphic";
+import Rectangle from "../models/Rectangle";
+import Ellipse from "../models/Ellipse";
+import Curve from "../models/Curve";
+import Sketch from "../models/Sketch";
+import Text from "../models/Text";
 
-const toPrettyString: (object: any, indentDepth: number) => string = (object: any, indentDepth: number): string => {
+function toPrettyString(object: any, indentDepth: number): string {
     const properties: Array<string> = [];
     for (const property in object) {
         const value: any = object[property];
@@ -25,86 +27,88 @@ const toPrettyString: (object: any, indentDepth: number) => string = (object: an
     function space(indentDepth: number): string {
         return new Array(indentDepth * 4).fill(" ").join("");
     }
-};
+}
 
-const renderGraphic: (graphic: GraphicModel, canvas: SVG.Doc) => SVG.Element = (graphic: GraphicModel, canvas: SVG.Doc): SVG.Element => {
-    const style: StyleModel = graphic.styleModel;
-
-    if (graphic.type === "rectangle") {
-        return canvas.rect(style.width, style.height)
-            .move(style.x!, style.y!)
-            .fill(style.fill!);
-    } else if (graphic.type === "textbox") {
-        return canvas.text(style.message || "")
-            .move(style.x!, style.y!);
-    } else if (graphic.type === "polyline") {
-        return canvas.polyline(style.points!.map((point: PointModel) => point.toArray()))
-            .fill(style.fill!)
-            .stroke(style.stroke!)
-            .attr("stroke-width", style.strokeWidth);
-    } else if (graphic.type === "curve") {
-        let points: string = `M ${style.points![0].x},${style.points![0].y}`;
-        style.points!.slice(1).forEach((point: PointModel, index: number) => {
-            points += `${index % 3 === 0 ? " C" : ""} ${point.x},${point.y}`;
-        });
-
-        return canvas.path(points)
-            .fill(style.fill!)
-            .stroke(style.stroke!)
-            .attr("stroke-width", style.strokeWidth);
-    } else if (graphic.type === "ellipse") {
-        return canvas.ellipse(style.width, style.height)
-            .center(style.x!, style.y!)
-            .fill(style.fill!);
+function generateId(): string {
+    function term(): string {
+        return Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
     }
 
-    throw `Undefined type of graphic: ${graphic.type}`;
-};
-
-const generateId: () => string = (): string => {
-    const s4 = () => Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
-    return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
-};
+    return `${term()}${term()}-${term()}-${term()}-${term()}-${term()}${term()}${term()}`;
+}
 
 // Overrides the default behavior of copy to copy the graphic model of the focused graphic
-const copyHandler: (app: any) => (event: Event) => void = (app: any): (event: Event) => void => (event: Event): void => {
-    // Cast event as clipboard event and prevent from copying any user selection
-    const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
-    clipboardEvent.preventDefault();
+function copyHandler(app: any): (event: Event) => void {
+    return function (event: Event): void {
+        // Cast event as clipboard event and prevent from copying any user selection
+        const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
+        clipboardEvent.preventDefault();
 
-    const focusedGraphicId: string | undefined = app.$store.getters.focusedGraphicId;
-    if (focusedGraphicId === undefined) {
-        return;
-    }
+        const focusedGraphic: IGraphic | undefined = app.$store.getters.focusedGraphic;
+        if (focusedGraphic === undefined) {
+            return;
+        }
 
-    // Fetch the graphic model associated with the current focused graphic
-    const activeSlide: SlideModel = app.$store.getters.activeSlide;
-    const graphicModel: GraphicModel = activeSlide.graphics.find((graphicModel: GraphicModel) => graphicModel.id === focusedGraphicId)!;
-
-    // Set the clipboard data to the graphic model
-    clipboardEvent.clipboardData.setData("text/json", JSON.stringify(graphicModel));
-};
+        // Set the clipboard data to the graphic model associated with the current focused graphic
+        const graphic: IGraphic = app.$store.getters.activeSlide.graphics.find((graphic: IGraphic) => graphic.id === focusedGraphic.id)!;
+        clipboardEvent.clipboardData.setData("text/json", JSON.stringify(graphic));
+    };
+}
 
 // Override the default behavior of the paste to paste the copied graphic model
-const pasteHandler: (app: any) => (event: Event) => void = (app: any): (event: Event) => void => (event: Event): void => {
-    // Cast event as clipboard event
-    const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
-    clipboardEvent.preventDefault();
+function pasteHandler(app: any): (event: Event) => void {
+    return function (event: Event): void {
+        // Cast event as clipboard event
+        const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
+        clipboardEvent.preventDefault();
 
-    const activeSlide: SlideModel = app.$store.getters.activeSlide;
-    const clipboardData: any = JSON.parse(clipboardEvent.clipboardData.getData("text/json"));
+        const data: any = JSON.parse(clipboardEvent.clipboardData.getData("text/json"));
+        if (data === undefined) {
+            return;
+        }
 
-    // Correct some loss of data and generate a new id for the new graphic model
-    clipboardData.id = generateId();
-    if (clipboardData.styleModel.points !== undefined) {
-        clipboardData.styleModel.points = clipboardData.styleModel.points.map((point: { x: number, y: number}) => new PointModel(point.x, point.y));
+        const graphic: IGraphic = parseGraphic(data);
+        graphic.id = generateId();
+        app.$store.commit("addGraphic", { slideId: app.$store.getters.activeSlide.id, graphic: graphic });
+        app.$store.commit("focusGraphic", graphic);
+        app.$store.commit("styleEditorObject", graphic);
+    };
+}
+
+function parseGraphic(json: any): IGraphic {
+    if (json.origin !== undefined && json.width !== undefined &&
+        json.height !== undefined && json.fillColor !== undefined && json.strokeColor !== undefined &&
+        json.strokeWidth !== undefined && json.rotation !== undefined) {
+        json.origin = new Point(json.origin.x, json.origin.y);
+        const rectangle: Rectangle = new Rectangle(json);
+        return rectangle;
+    } else if (json.center !== undefined && json.width !== undefined &&
+        json.height !== undefined && json.fillColor !== undefined && json.strokeColor !== undefined &&
+        json.strokeWidth !== undefined && json.rotation !== undefined) {
+        json.center = new Point(json.center.x, json.center.y);
+        const ellipse: Ellipse = new Ellipse(json);
+        return ellipse;
+    } else if (json.points !== undefined && json.fillColor !== undefined &&
+        json.strokeColor !== undefined && json.strokeWidth !== undefined && json.rotation !== undefined &&
+        json.degree !== undefined) {
+        json.points = json.points.map((point: { x: number, y: number }): Point => new Point(point.x, point.y));
+        const curve: Curve = new Curve(json);
+        return curve;
+    } else if (json.points !== undefined && json.fillColor !== undefined &&
+        json.strokeColor !== undefined && json.strokeWidth !== undefined && json.rotation !== undefined) {
+        json.points = json.points.map((point: { x: number, y: number }): Point => new Point(point.x, point.y));
+        const sketch: Sketch = new Sketch(json);
+        return sketch;
+    } else if (json.origin !== undefined && json.content !== undefined &&
+        json.fontSize !== undefined && json.fontWeight !== undefined && json.fontFamily !== undefined &&
+        json.fillColor !== undefined && json.rotation !== undefined) {
+        json.origin = new Point(json.origin.x, json.origin.y);
+        const text: Text = new Text(json);
+        return text;
     }
 
-    const graphicModel: GraphicModel = new GraphicModel(clipboardData);
-    activeSlide.graphics.push(graphicModel);
-    app.$store.commit("focusGraphic", graphicModel);
-    app.$store.commit("styleEditorObject", graphicModel);
-};
+    throw `Undefined graphic ${json}`;
+}
 
 const deckScript: string = `<style>
 html,
@@ -190,9 +194,9 @@ function rewindSlide() {
 
 export default {
     toPrettyString,
-    renderGraphic,
     generateId,
     copyHandler,
     pasteHandler,
+    parseGraphic,
     deckScript
 };
