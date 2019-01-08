@@ -23,6 +23,13 @@ export default class SlidePreview extends Vue {
 
     // Instantiate the svg.js API on the slide preview and perform the initial render
     private mounted(): void {
+        // Infer the height of the slide preview from other slide previews if possible
+        const slidePreview: HTMLDivElement = document.getElementsByClassName("slide-preview")[0] as HTMLDivElement;
+        if (slidePreview !== undefined) {
+            document.getElementById(`slide-preview_${this.id}`)!.style.height = slidePreview.style.height;
+            document.getElementById(`slide-preview_${this.id}`)!.style.width = slidePreview.style.width;
+        }
+
         const canvasResolution: number = this.$store.getters.canvasResolution;
         this.canvas = SVG(this.$el.id).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
         this.refreshCanvas();

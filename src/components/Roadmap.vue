@@ -31,16 +31,17 @@ export default class Roadmap extends Vue {
         document.addEventListener("mousemove", preview);
         document.addEventListener("mouseup", end);
 
+        const self: Roadmap = this;
         function preview(event: MouseEvent): void {
             // Update the height of the roadmap
             const height: number = Math.max(Math.min(window.innerHeight - event.pageY, 256), 64);
-            document.getElementById("roadmap")!.style.height = `${height}px`;
+            (self.$el as HTMLDivElement).style.height = `${height}px`;
 
             // Set the height and width of the slide previews based on the new height of the roadmap
-            const slidePreviews: HTMLCollection = document.getElementsByClassName("slide-preview");
-            for (let i = 0; i < slidePreviews.length; i++) {
-                (slidePreviews[i] as HTMLDivElement).style.height = `${height - 42}px`;
-                (slidePreviews[i] as HTMLDivElement).style.width = `${(height - 42) * 16 / 9}px`;
+            const slidePreviews: Array<HTMLDivElement> = Array.from(document.getElementsByClassName("slide-preview") as HTMLCollectionOf<HTMLDivElement>);
+            for (const slidePreview of slidePreviews) {
+                slidePreview.style.height = `${height - 42}px`;
+                slidePreview.style.width = `${(height - 42) * 16 / 9}px`;
             }
         }
 
