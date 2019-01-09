@@ -1,14 +1,14 @@
 import * as SVG from "svg.js";
-import GraphicModel from "./GraphicModel";
+import IGraphic from "./IGraphic";
 
-export default class ToolModel {
+export default class Tool {
     public name: string;
     public canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent) => any;
     public canvasMouseOver: (canvas: SVG.Doc) => (event: MouseEvent) => any;
     public canvasMouseOut: (canvas: SVG.Doc) => (event: MouseEvent) => any;
     public graphicMouseOver: (svg: SVG.Element) => (event: MouseEvent) => any;
     public graphicMouseOut: (svg: SVG.Element) => (event: MouseEvent) => any;
-    public graphicMouseDown: (slide: any, svg: SVG.Element, graphic: GraphicModel) => (event: MouseEvent) => any;
+    public graphicMouseDown: (slide: any, svg: SVG.Element, graphic: IGraphic) => (event: MouseEvent) => any;
 
     constructor(name: string, {
         canvasMouseDown,
@@ -23,7 +23,7 @@ export default class ToolModel {
         canvasMouseOut?: (canvas: SVG.Doc) => (event: MouseEvent) => any;
         graphicMouseOver?: (svg: SVG.Element) => (event: MouseEvent) => any;
         graphicMouseOut?: (svg: SVG.Element) => (event: MouseEvent) => any;
-        graphicMouseDown?: (slide: any, svg: SVG.Element, graphic: GraphicModel) => (event: MouseEvent) => any;
+        graphicMouseDown?: (slide: any, svg: SVG.Element, graphic: IGraphic) => (event: MouseEvent) => any;
     }) {
         const EMPTY_HANDLER: () => () => void = (): () => void => (): void => { return; };
 

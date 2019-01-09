@@ -5,19 +5,18 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import * as SVG from "svg.js";
-import GraphicModel from "../models/GraphicModel";
-import Utilities from "../utilities/general";
+import IGraphic from "../models/IGraphic";
 
 @Component
 export default class Slide extends Vue {
     private canvas!: SVG.Doc;
     @Prop({ type: String, required: true }) private id!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
-    @Prop({ type: Array, required: true }) private graphics!: GraphicModel[];
+    @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
 
     @Watch("graphics", { deep: true }) private refreshCanvas(): void {
         this.canvas.clear();
-        this.graphics.forEach((graphic: GraphicModel) => this.initializeGraphic(graphic));
+        this.graphics.forEach((graphic: IGraphic) => this.initializeGraphic(graphic));
     }
 
     private mounted(): void {
@@ -31,8 +30,8 @@ export default class Slide extends Vue {
         this.refreshCanvas();
     }
 
-    private initializeGraphic(graphic: GraphicModel): void {
-        const svg: SVG.Element = Utilities.renderGraphic(graphic, this.canvas);
+    private initializeGraphic(graphic: IGraphic): void {
+        const svg: SVG.Element = graphic.render(this.canvas);
 
         // Bind each event handler
         svg.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOver(svg)(event));
