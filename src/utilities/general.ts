@@ -6,73 +6,12 @@ import Curve from "../models/Curve";
 import Sketch from "../models/Sketch";
 import Text from "../models/Text";
 
-function toPrettyString(object: any, indentDepth: number): string {
-    const properties: Array<string> = [];
-    for (const property in object) {
-        const value: any = object[property];
-        const prefix: string = Array.isArray(object) ? space(indentDepth) : `${space(indentDepth)}"${property}": `;
-
-        if (typeof value === "number" || typeof value === "boolean") {
-            properties.push(`${prefix}${value}`);
-        } else if (typeof value === "string") {
-            properties.push(`${prefix}${JSON.stringify(value)}`);
-        } else if (Array.isArray(value) || typeof value === "object") {
-            properties.push(`${prefix}${toPrettyString(value, indentDepth + 1)}`);
-        }
-    }
-
-    const prettyString: string = `\n${properties.join(",\n")}\n${space(indentDepth - 1)}`;
-    return Array.isArray(object) ? `[${prettyString}]` : `{${prettyString}}`;
-
-    function space(indentDepth: number): string {
-        return new Array(indentDepth * 4).fill(" ").join("");
-    }
-}
-
 function generateId(): string {
     function term(): string {
         return Math.floor((Math.random() + 1) * 0x10000).toString(16).substring(1).toLocaleUpperCase();
     }
 
     return `${term()}${term()}-${term()}-${term()}-${term()}-${term()}${term()}${term()}`;
-}
-
-// Overrides the default behavior of copy to copy the graphic model of the focused graphic
-function copyHandler(app: any): (event: Event) => void {
-    return function (event: Event): void {
-        // Cast event as clipboard event and prevent from copying any user selection
-        const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
-        clipboardEvent.preventDefault();
-
-        const focusedGraphic: IGraphic | undefined = app.$store.getters.focusedGraphic;
-        if (focusedGraphic === undefined) {
-            return;
-        }
-
-        // Set the clipboard data to the graphic model associated with the current focused graphic
-        const graphic: IGraphic = app.$store.getters.activeSlide.graphics.find((graphic: IGraphic) => graphic.id === focusedGraphic.id)!;
-        clipboardEvent.clipboardData.setData("text/json", JSON.stringify(graphic));
-    };
-}
-
-// Override the default behavior of the paste to paste the copied graphic model
-function pasteHandler(app: any): (event: Event) => void {
-    return function (event: Event): void {
-        // Cast event as clipboard event
-        const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
-        clipboardEvent.preventDefault();
-
-        const data: any = JSON.parse(clipboardEvent.clipboardData.getData("text/json"));
-        if (data === undefined) {
-            return;
-        }
-
-        const graphic: IGraphic = parseGraphic(data);
-        graphic.id = generateId();
-        app.$store.commit("addGraphic", { slideId: app.$store.getters.activeSlide.id, graphic: graphic });
-        app.$store.commit("focusGraphic", graphic);
-        app.$store.commit("styleEditorObject", graphic);
-    };
 }
 
 function parseGraphic(json: any): IGraphic {
@@ -193,10 +132,7 @@ function rewindSlide() {
 </script>`;
 
 export default {
-    toPrettyString,
     generateId,
-    copyHandler,
-    pasteHandler,
     parseGraphic,
     deckScript
 };
