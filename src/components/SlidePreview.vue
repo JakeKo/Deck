@@ -1,8 +1,5 @@
 <template>
-<div class="slide-preview-container">
-    <!-- <div class="slide-reordering-hook"></div> -->
-    <div :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive }" @mousedown="focusSlide"></div>
-</div>
+<div :id="uid" :class="{ 'slide-preview': true, 'active-slide-preview': isActive }" @mousedown="focusSlide"></div>
 </template>
 
 <script lang="ts">
@@ -24,17 +21,21 @@ export default class SlidePreview extends Vue {
         this.graphics.forEach((graphic: IGraphic): SVG.Element => graphic.render(this.canvas));
     }
 
-    // Instantiate the svg.js API on the slide preview and perform the initial render
+    get uid(): string {
+        return `slide-preview_${this.id}`;
+    }
+
     private mounted(): void {
         // Infer the height of the slide preview from other slide previews if possible
-        const slidePreview: HTMLDivElement = document.getElementsByClassName("slide-preview")[0] as HTMLDivElement;
+        const slidePreview: HTMLElement = document.getElementsByClassName("slide-preview")[0] as HTMLElement;
         if (slidePreview !== undefined) {
-            document.getElementById(`slide-preview_${this.id}`)!.style.height = slidePreview.style.height;
-            document.getElementById(`slide-preview_${this.id}`)!.style.width = slidePreview.style.width;
+            document.getElementById(this.uid)!.style.height = slidePreview.style.height;
+            document.getElementById(this.uid)!.style.width = slidePreview.style.width;
         }
 
+        // Instantiate the svg.js API on the slide preview and perform the initial render
         const canvasResolution: number = this.$store.getters.canvasResolution;
-        this.canvas = SVG(`slide-preview_${this.id}`).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
+        this.canvas = SVG(this.uid).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
         this.refreshCanvas();
     }
 
@@ -43,20 +44,21 @@ export default class SlidePreview extends Vue {
         this.$store.commit("focusGraphic", undefined);
         this.$store.commit("styleEditorObject", undefined);
 
-        const slidePreview: HTMLElement = document.getElementById(`slide-preview_${this.id}`)!;
-        const slideInteractionInterval: number = window.setTimeout(reorderSlidePreview, 150);
-        slidePreview.addEventListener("mouseup", interrupt);
         const self = this;
+        const beginSlideReorder: number = window.setTimeout(reorderSlidePreview, 150);
+        const slidePreview: HTMLElement = this.$el as HTMLElement;
+        slidePreview.addEventListener("mouseup", interrupt);
 
+        // Interrupt the slide reordering handlers if the mouse is lifted before the reordering begins
         function interrupt(): void {
-            window.clearTimeout(slideInteractionInterval);
+            window.clearTimeout(beginSlideReorder);
             slidePreview.removeEventListener("mouseup", interrupt);
         }
 
         function reorderSlidePreview(): void {
             // Determine the offset of the mouse relative to the slide preview (accounting for the horizontal margin)
-            const bounds: DOMRect = slidePreview.getBoundingClientRect() as DOMRect;
-            const offset: Point = new Point(bounds.x - event.clientX - 12, bounds.y - event.clientY);
+            const bounds: ClientRect | DOMRect = slidePreview.getBoundingClientRect();
+            const offset: Point = new Point(bounds.left - event.clientX - 12, bounds.top - event.clientY);
 
             document.addEventListener("mousemove", moveSlidePreview);
             document.addEventListener("mouseup", placeSlidePreview);
@@ -83,14 +85,13 @@ export default class SlidePreview extends Vue {
 
                 const slidePreviews: Array<Element> = Array.from(document.getElementsByClassName("slide-preview"));
                 const source: number = slidePreviews.findIndex((s: Element): boolean => s === slidePreview);
-                const slidePreviewWidth: number = 124;
 
                 // Get the horiontal midpoint of each slide preview to divide the slide reordering regions
                 const displacements: Array<number> = slidePreviews.slice(0, slidePreviews.length - 1)
-                    .filter((slidePreview: Element): boolean => slidePreview.id !== `slide-preview_${self.id}`)
+                    .filter((slidePreview: Element): boolean => slidePreview.id !== self.uid)
                     .map((slidePreview: Element, index: number): number => {
-                        const bounds: DOMRect = slidePreview.getBoundingClientRect() as DOMRect;
-                        return bounds.x + bounds.width / 2 - (index >= source ? slidePreviewWidth : 0);
+                        const bounds: ClientRect | DOMRect = slidePreview.getBoundingClientRect();
+                        return bounds.left + bounds.width / 2 - (index >= source ? 124 : 0);
                     }).sort();
 
                 // Evaluate the slide destination as the region where the mouse is

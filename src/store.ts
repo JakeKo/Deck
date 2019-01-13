@@ -90,10 +90,6 @@ export default new Vuex.Store({
             state.slides.splice(index, 0, new Slide());
         },
         reorderSlide: (state: any, { source, destination }: { source: number, destination: number }): void => {
-            if (destination === source) {
-                return;
-            }
-
             const slide: Slide = state.slides[source];
             state.slides.splice(destination + (destination > source ? 1 : 0), 0, slide);
             state.slides.splice(source + (destination > source ? 0 : 1), 1);
