@@ -8,8 +8,11 @@
             :graphics="$store.getters.slides.find((s) => s.id === slide.id).graphics"
             :key="slide.id"
         ></slide-preview>
-        <div id="new-slide-button" class="slide-preview" @click="addSlide">
-            <i class="fas fa-plus"></i>
+        <div class="slide-preview-container">
+            <!-- <div class="slide-reordering-hook"></div> -->
+            <div id="new-slide-button" class="slide-preview" @click="addSlide">
+                <i class="fas fa-plus"></i>
+            </div>
         </div>
     </div>
 </div>
@@ -42,6 +45,12 @@ export default class Roadmap extends Vue {
             for (const slidePreview of slidePreviews) {
                 slidePreview.style.height = `${height - 42}px`;
                 slidePreview.style.width = `${(height - 42) * 16 / 9}px`;
+            }
+
+            // Set the height of the slide reordering hooks based on the new height of the roadmap
+            const slideReorderingHooks: Array<HTMLDivElement> = Array.from(document.getElementsByClassName("slide-reordering-hook") as HTMLCollectionOf<HTMLDivElement>);
+            for (const slideReorderingHook of slideReorderingHooks) {
+                slideReorderingHook.style.height = `${height - 42}px`;
             }
         }
 

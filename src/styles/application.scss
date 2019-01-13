@@ -66,4 +66,14 @@
     border: 2px solid $color-tertiary;
     height: 54px;
     width: 96px;
+    background: $color-light;
+}
+
+.slide-reordering-hook {
+    width: 8px;
+    height: 54px;
+}
+
+.slide-preview-container {
+    display: flex;
 }
