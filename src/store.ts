@@ -23,12 +23,6 @@ export default new Vuex.Store({
             width: 300,
             object: undefined
         },
-        roadmap: {
-            height: 96,
-            slidePreview: {
-                height: 60
-            }
-        },
         slides: new Array<Slide>(),
         currentTool: "cursor",
         tools: {
@@ -89,14 +83,16 @@ export default new Vuex.Store({
         },
         canvasResolution: (state: any): number => {
             return state.canvas.resolution;
-        },
-        slidePreviewHeight: (state: any): number => {
-            return state.roadmap.slidePreview.height;
         }
     },
     mutations: {
         addSlide: (state: any, index: number): void => {
             state.slides.splice(index, 0, new Slide());
+        },
+        reorderSlide: (state: any, { source, destination }: { source: number, destination: number }): void => {
+            const slide: Slide = state.slides[source];
+            state.slides.splice(destination + (destination > source ? 1 : 0), 0, slide);
+            state.slides.splice(source + (destination > source ? 0 : 1), 1);
         },
         addGraphic: (state: any, { slideId, graphic }: { slideId: string, graphic: IGraphic }): void => {
             const slide: Slide = state.slides.find((slide: Slide): boolean => slide.id === slideId);
@@ -114,12 +110,6 @@ export default new Vuex.Store({
         },
         styleEditorObject: (state: any, object?: IGraphic): void => {
             state.styleEditor.object = object;
-        },
-        roadmapHeight: (state: any, height: number): void => {
-            // Set roadmap height with arbitrary boundaries 64 <= height <= 256
-            state.roadmap.height = Math.max(Math.min(height, 256), 64);
-            // Set slide preview height within the roadmap
-            state.roadmap.slidePreview.height = state.roadmap.height - 42;
         },
         activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;

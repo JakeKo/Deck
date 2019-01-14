@@ -13,6 +13,29 @@ import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import Utilities from "../utilities/general";
 import IGraphic from "../models/IGraphic";
 
+function toPrettyString(object: any, indentDepth: number): string {
+    const properties: Array<string> = [];
+    for (const property in object) {
+        const value: any = object[property];
+        const prefix: string = Array.isArray(object) ? space(indentDepth) : `${space(indentDepth)}"${property}": `;
+
+        if (typeof value === "number" || typeof value === "boolean") {
+            properties.push(`${prefix}${value}`);
+        } else if (typeof value === "string") {
+            properties.push(`${prefix}${JSON.stringify(value)}`);
+        } else if (Array.isArray(value) || typeof value === "object") {
+            properties.push(`${prefix}${toPrettyString(value, indentDepth + 1)}`);
+        }
+    }
+
+    const prettyString: string = `\n${properties.join(",\n")}\n${space(indentDepth - 1)}`;
+    return Array.isArray(object) ? `[${prettyString}]` : `{${prettyString}}`;
+
+    function space(indentDepth: number): string {
+        return new Array(indentDepth * 4).fill(" ").join("");
+    }
+}
+
 @Component
 export default class StyleEditor extends Vue {
     private content: string = "";
@@ -24,7 +47,7 @@ export default class StyleEditor extends Vue {
         json.id = undefined;
         json.boundingBox = undefined;
 
-        this.content = Utilities.toPrettyString(json, 1);
+        this.content = toPrettyString(json, 1);
     }
 
     // Watch for changes to the style editor object
