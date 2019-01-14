@@ -6,6 +6,7 @@ import Point from "./Point";
 
 export default class Sketch implements IGraphic {
     public id: string;
+    public isFocused: boolean = false;
     public points: Array<Point>;
     public fillColor: string;
     public strokeColor: string;

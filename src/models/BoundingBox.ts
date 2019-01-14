@@ -5,6 +5,7 @@ import IGraphic from "./IGraphic";
 
 export default class BoundingBox implements IGraphic {
     public id: string = Utilities.generateId();
+    public isFocused: boolean = false;
     public origin: Point;
     public width: number;
     public height: number;

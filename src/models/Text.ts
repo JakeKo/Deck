@@ -6,6 +6,7 @@ import Point from "./Point";
 
 export default class Text implements IGraphic {
     public id: string;
+    public isFocused: boolean = false;
     public origin: Point;
     public content: string;
     public fontSize: number;

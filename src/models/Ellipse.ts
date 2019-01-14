@@ -6,6 +6,7 @@ import Point from "./Point";
 
 export default class Ellipse implements IGraphic {
     public id: string;
+    public isFocused: boolean = false;
     public center: Point;
     public width: number;
     public height: number;
