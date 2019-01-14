@@ -22,15 +22,6 @@ function addGraphic(slide: any, graphic: IGraphic): void {
 }
 
 function focusGraphic(slide: any, graphic?: IGraphic): void {
-    if (slide.$store.getters.focusedGraphic !== undefined) {
-        const boundingBoxId: number = slide.$store.getters.focusedGraphic.getBoundingBox().id;
-        slide.$store.commit("removeGraphic", { slideId: slide.id, graphicId: boundingBoxId });
-    }
-
-    if (graphic !== undefined) {
-        slide.$store.commit("addGraphic", { slideId: slide.id, graphic: graphic.getBoundingBox() });
-    }
-
     slide.$store.commit("focusGraphic", graphic);
     slide.$store.commit("styleEditorObject", graphic);
 }
@@ -56,7 +47,7 @@ const cursorTool: Tool = new Tool("cursor", {
 
         const start: Point = new Point(svg.x(), svg.y());
         const offset: Point = start.add(getMousePosition(slide, event).scale(-1));
-        const boundingBox: BoundingBox = slide.$store.getters.activeSlide.graphics.find((g: IGraphic): boolean => g.id === graphic.getBoundingBox().id) as BoundingBox;
+        const boundingBox: BoundingBox = slide.$store.getters.activeSlide.graphics.find((g: IGraphic): boolean => g.id === graphic.boundingBoxId) as BoundingBox;
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
@@ -109,26 +100,33 @@ const pencilTool: Tool = new Tool("pencil", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
-        isolateEvent(event);
+        event.stopPropagation();
+        event.preventDefault();
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
         // Unfocus the current graphic if any and set initial state of pencil drawing
-        focusGraphic(slide, undefined);
+        slide.$store.commit("focusGraphic", undefined);
+        slide.$store.commit("styleEditorObject", undefined);
         const points: Array<Point> = [getMousePosition(slide, event)];
         const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", slide.$store.getters.canvasResolution * 3);
 
-        // Add the current mouse position point to the list of points to plot
+        // Add the current mouse position to the list of points to plot
         function preview(event: MouseEvent): void {
             points.push(getMousePosition(slide, event));
             shape.plot(points.map<Array<number>>((point: Point): Array<number> => point.toArray()));
         }
 
+        // Unbind handlers and commit graphic to the application
         function end(): void {
             canvas.off("mousemove", preview);
             canvas.off("mouseup", end);
             shape.remove();
-            addGraphic(slide, Sketch.model(shape));
+
+            const sketch: Sketch = Sketch.model(shape);
+            slide.$store.commit("addGraphic", { slideId: slide.id, graphic: sketch });
+            slide.$store.commit("focusGraphic", sketch);
+            slide.$store.commit("styleEditorObject", sketch);
         }
     }
 });

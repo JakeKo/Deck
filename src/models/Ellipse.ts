@@ -6,7 +6,7 @@ import Point from "./Point";
 
 export default class Ellipse implements IGraphic {
     public id: string;
-    public isFocused: boolean = false;
+    public boundingBoxId: string;
     public center: Point;
     public width: number;
     public height: number;
@@ -15,13 +15,12 @@ export default class Ellipse implements IGraphic {
     public strokeWidth: number;
     public rotation: number;
 
-    private boundingBox: BoundingBox;
-
     constructor(
         { id, center, width, height, fillColor, strokeColor, strokeWidth, rotation }:
         { id?: string, center?: Point, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
+        this.boundingBoxId = Utilities.generateId();
         this.center = center || new Point(0, 0);
         this.width = width || 50;
         this.height = height || 50;
@@ -29,17 +28,10 @@ export default class Ellipse implements IGraphic {
         this.strokeColor = strokeColor || "#000000";
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
-
-        this.boundingBox = new BoundingBox(new Point(0, 0), 0, 0, 0);
     }
 
-    public getBoundingBox(): BoundingBox {
-        this.boundingBox.origin = new Point(this.center.x - this.width * 0.5, this.center.y - this.height * 0.5);
-        this.boundingBox.width = this.width;
-        this.boundingBox.height = this.height;
-        this.boundingBox.rotation = this.rotation;
-
-        return this.boundingBox;
+    get boundingBox(): BoundingBox {
+        return new BoundingBox(this.boundingBoxId, new Point(this.center.x - this.width * 0.5, this.center.y - this.height * 0.5), this.width, this.height, this.rotation);
     }
 
     public render(canvas: SVG.Doc): SVG.Ellipse {

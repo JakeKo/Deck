@@ -37,6 +37,11 @@ export default class Slide extends Vue {
         svg.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOver(svg)(event));
         svg.on("mouseout", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOut(svg)(event));
         svg.on("mousedown", (event: MouseEvent) => this.$store.getters.tool.graphicMouseDown(this, svg, graphic)(event));
+
+        // Render the bounding box if the graphic is focused
+        if (this.$store.getters.focusedGraphic === graphic) {
+            graphic.boundingBox.render(this.canvas);
+        }
     }
 }
 </script>
