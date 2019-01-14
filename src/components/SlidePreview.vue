@@ -81,9 +81,9 @@ export default class SlidePreview extends Vue {
                 document.removeEventListener("mousemove", moveSlidePreview);
                 document.removeEventListener("mouseup", placeSlidePreview);
 
-                slidePreview.style.position = "relative";
-                slidePreview.style.top = "0";
-                slidePreview.style.left = "0";
+                slidePreview.style.position = "static";
+                slidePreview.style.top = "initial";
+                slidePreview.style.left = "initial";
 
                 const slidePreviews: Array<Element> = Array.from(document.getElementsByClassName("slide-preview"));
                 const source: number = slidePreviews.findIndex((s: Element): boolean => s === slidePreview);
