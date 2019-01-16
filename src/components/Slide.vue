@@ -14,7 +14,7 @@ export default class Slide extends Vue {
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
 
-    @Watch("graphics", { deep: true }) private refreshCanvas(): void {
+    @Watch("graphics", { deep: true }) public refreshCanvas(): void {
         this.canvas.clear();
         this.graphics.forEach((graphic: IGraphic) => this.initializeGraphic(graphic));
     }

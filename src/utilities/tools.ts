@@ -20,9 +20,13 @@ function addGraphic(slide: any, graphic: IGraphic): void {
     focusGraphic(slide, graphic);
 }
 
-function focusGraphic(slide: any, graphic?: IGraphic): void {
+function focusGraphic(slide: any, graphic?: IGraphic, refresh: boolean = true): void {
     slide.$store.commit("focusGraphic", graphic);
     slide.$store.commit("styleEditorObject", graphic);
+
+    if (refresh) {
+        slide.refreshCanvas();
+    }
 }
 
 function isolateEvent(event: Event): void {
@@ -41,7 +45,7 @@ const cursorTool: Tool = new Tool("cursor", {
         slide.canvas.on("mouseup", end);
 
         if (slide.$store.getters.focusedGraphic === undefined || slide.$store.getters.focusedGraphic.id !== graphic.id) {
-            focusGraphic(slide, graphic);
+            focusGraphic(slide, graphic, false);
         }
 
         const start: Point = new Point(svg.x(), svg.y());
@@ -97,14 +101,12 @@ const pencilTool: Tool = new Tool("pencil", {
     canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
     canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
     canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
-        event.stopPropagation();
-        event.preventDefault();
+        isolateEvent(event);
         canvas.on("mousemove", preview);
         canvas.on("mouseup", end);
 
         // Unfocus the current graphic if any and set initial state of pencil drawing
-        slide.$store.commit("focusGraphic", undefined);
-        slide.$store.commit("styleEditorObject", undefined);
+        focusGraphic(slide, undefined);
         const points: Array<Point> = [getMousePosition(slide, event)];
         const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", slide.$store.getters.canvasResolution * 3);
 
