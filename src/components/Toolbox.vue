@@ -7,7 +7,7 @@
     <tool @click="$store.commit('tool', 'ellipse')" :toolName="'ellipse'" :icon="'fas fa-circle'" :isActive="$store.getters.tool.name === 'ellipse'"></tool>
     <tool @click="$store.commit('tool', 'textbox')" :toolName="'text'" :icon="'fas fa-font'" :isActive="$store.getters.tool.name === 'textbox'"></tool>
     <tool @click="$store.dispatch('export')" :toolName="'export'" :icon="'fas fa-save'" :isActive="false"></tool>
-    <a href="https://github.com/JakeKo/Deck/issues/new/choose" target="blank">
+    <a href="https://github.com/JakeKo/Deck/issues/new/choose" target="blank" style="text-decoration: none">
         <tool :toolName="'feedback'" :icon="'fas fa-info'" :isActive="false"></tool>
     </a>
 </div>
