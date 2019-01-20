@@ -1,5 +1,5 @@
 <template>
-<div id="toolbox" :style="toolboxStyle">
+<div id="toolbox">
     <tool @click="$store.commit('tool', 'cursor')" :toolName="'cursor'" :icon="'fas fa-mouse-pointer'" :isActive="$store.getters.tool.name === 'cursor'"></tool>
     <tool @click="$store.commit('tool', 'pencil')" :toolName="'pencil'" :icon="'fas fa-pen'" :isActive="$store.getters.tool.name === 'pencil'"></tool>
     <tool @click="$store.commit('tool', 'pen')" :toolName="'pen'" :icon="'fas fa-pen-nib'" :isActive="$store.getters.tool.name === 'pen'"></tool>
@@ -22,13 +22,7 @@ import Tool from "./Tool.vue";
         Tool
     }
 })
-export default class Toolbox extends Vue {
-    get toolboxStyle(): any {
-        return {
-            width: `${this.$store.getters.toolboxWidth}px`
-        };
-    }
-}
+export default class Toolbox extends Vue { }
 </script>
 
 <style lang="scss" scoped>
@@ -37,5 +31,7 @@ export default class Toolbox extends Vue {
 #toolbox {
     border-right: 1px solid $color-tertiary;
     flex-direction: column;
+    flex-shrink: 0;
+    width: 64px;
 }
 </style>

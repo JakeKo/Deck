@@ -1,13 +1,11 @@
 <template>
 <div id="app">
-    <div id="interface">
-        <toolbox></toolbox>
-        <div id="workspace" :style="workspaceStyle">
-            <editor></editor>
-            <roadmap></roadmap>
-        </div>
-        <style-editor v-show="$store.getters.focusedGraphic !== undefined"></style-editor>
+    <toolbox></toolbox>
+    <div id="workspace">
+        <editor></editor>
+        <roadmap></roadmap>
     </div>
+    <style-editor v-show="$store.getters.focusedGraphic !== undefined"></style-editor>
 </div>
 </template>
 
@@ -83,22 +81,13 @@ export default class App extends Vue {
             this.$store.commit("styleEditorObject", graphic);
         });
     }
-
-    get workspaceStyle(): any {
-        const styleEditorHidden: boolean = this.$store.getters.focusedGraphic === undefined;
-        return {
-            width: `calc(100vw - ${this.$store.getters.toolboxWidth + (styleEditorHidden ? 0 : this.$store.getters.styleEditorWidth)}px)`
-        };
-    }
 }
 </script>
 
 <style lang="scss" scoped>
 #app {
     height: 100vh;
-}
-
-#interface {
+    width: 100vw;
     display: flex;
 }
 
@@ -106,5 +95,6 @@ export default class App extends Vue {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    min-width: 0; // Override min-width default for flex items
 }
 </style>

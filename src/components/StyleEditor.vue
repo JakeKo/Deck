@@ -1,5 +1,5 @@
 <template>
-<div id="style-editor" :style="styleEditorStyle">
+<div id="style-editor">
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
     <textarea id="style-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
     <div id="submit-button-container">
@@ -46,6 +46,7 @@ export default class StyleEditor extends Vue {
         // Set immutable properties to undefined
         json.id = undefined;
         json.boundingBox = undefined;
+        json.points = undefined;
 
         this.content = toPrettyString(json, 1);
     }
@@ -53,12 +54,6 @@ export default class StyleEditor extends Vue {
     // Watch for changes to the style editor object
     get object(): any {
         return this.$store.getters.styleEditorObject;
-    }
-
-    get styleEditorStyle(): any {
-        return {
-            width: `${this.$store.getters.styleEditorWidth}px`
-        };
     }
 
     private stretch(event: MouseEvent): void {
@@ -69,7 +64,7 @@ export default class StyleEditor extends Vue {
 
         const self = this;
         function preview(event: MouseEvent): void {
-            self.$store.commit("styleEditorWidth", window.innerWidth - event.pageX);
+            (self.$el as HTMLElement).style.width = `${window.innerWidth - event.pageX}px`;
         }
 
         function end(): void {
@@ -100,14 +95,15 @@ export default class StyleEditor extends Vue {
     flex-direction: column;
     background: $color-primary;
     border-left: 1px solid $color-tertiary;
+    flex-shrink: 0;
+    width: 256px;
 }
 
 #style-editor-content {
-    height: calc(100% - 96px);
     font-family: monospace;
     border: none;
     outline: none;
-    height: 100%;
+    flex-grow: 1;
     width: 100%;
     resize: none;
     box-sizing: border-box;
