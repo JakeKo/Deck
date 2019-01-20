@@ -6,6 +6,7 @@ const appContainer: HTMLDivElement = document.createElement<"div">("div");
 appContainer.setAttribute("id", "app-container");
 
 const exportFrame: HTMLDivElement = document.createElement<"div">("div");
+exportFrame.setAttribute("id", "export-frame");
 exportFrame.style.display = "none";
 
 const body: HTMLBodyElement = document.getElementsByTagName("body")[0];
