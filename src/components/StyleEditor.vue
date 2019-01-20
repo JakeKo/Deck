@@ -97,6 +97,7 @@ export default class StyleEditor extends Vue {
     border-left: 1px solid $color-tertiary;
     flex-shrink: 0;
     width: 256px;
+    min-width: 96px;
 }
 
 #style-editor-content {
