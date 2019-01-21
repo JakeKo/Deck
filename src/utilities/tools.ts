@@ -68,7 +68,7 @@ const cursorTool: Tool = new Tool("cursor", {
             if (graphic instanceof Rectangle) {
                 (graphic as Rectangle).origin = new Point(svg.x(), svg.y());
             } else if (graphic instanceof Ellipse) {
-                (graphic as Ellipse).center = new Point(svg.cx(), svg.cy());
+                (graphic as Ellipse).origin = new Point(svg.cx(), svg.cy());
             } else if (graphic instanceof Curve) {
                 const flattenedPoints: Array<Array<number>> = (svg as SVG.Path).array().value as any as Array<Array<number>>;
                 (graphic as Curve).points = [new Point(flattenedPoints[0][1], flattenedPoints[0][2])];

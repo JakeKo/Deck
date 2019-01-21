@@ -21,6 +21,7 @@ describe("Utilities", () => {
     it("parses rectangles", () => {
         // Arrange
         const graphic = {
+            type: "rectangle",
             origin: { x: 0, y: 0 },
             width: 50,
             height: 100,
@@ -50,7 +51,8 @@ describe("Utilities", () => {
     it("parses ellipses", () => {
         // Arrange
         const graphic = {
-            center: { x: 0, y: 0 },
+            type: "ellipse",
+            origin: { x: 0, y: 0 },
             width: 50,
             height: 100,
             fillColor: "blue",
@@ -58,7 +60,7 @@ describe("Utilities", () => {
             strokeWidth: 5,
             rotation: 45
         }, expectedEllipse = new Ellipse({
-            center: new Point(0, 0),
+            origin: new Point(0, 0),
             width: 50,
             height: 100,
             fillColor: "blue",
@@ -79,6 +81,7 @@ describe("Utilities", () => {
     it("parses sketches", () => {
         // Arrange
         const graphic = {
+            type: "sketch",
             points: [ { x: 0, y: 10 }, { x: 5, y: 15 }],
             fillColor: "blue",
             strokeColor: "pink",
@@ -104,19 +107,18 @@ describe("Utilities", () => {
     it("parses curves", () => {
         // Arrange
         const graphic = {
+            type: "curve",
             points: [ { x: 0, y: 10 }, { x: 5, y: 15 }],
             fillColor: "blue",
             strokeColor: "pink",
             strokeWidth: 5,
-            rotation: 45,
-            degree: 2
+            rotation: 45
         }, expectedCurve = new Curve({
             points: [ new Point(0, 10), new Point(5, 15) ],
             fillColor: "blue",
             strokeColor: "pink",
             strokeWidth: 5,
-            rotation: 45,
-            degree: 2
+            rotation: 45
         });
 
         // Act
@@ -131,6 +133,7 @@ describe("Utilities", () => {
     it("parses textboxes", () => {
         // Arrange
         const graphic = {
+            type: "text",
             origin: { x: 0, y: 10 },
             content: "Hello World!",
             fontSize: "12px",

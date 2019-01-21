@@ -6,6 +6,7 @@ import Point from "./Point";
 
 export default class Rectangle implements IGraphic {
     public id: string;
+    public type: string = "rectangle";
     public boundingBoxId: string;
     public origin: Point;
     public width: number;

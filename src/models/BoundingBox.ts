@@ -4,6 +4,7 @@ import IGraphic from "./IGraphic";
 
 export default class BoundingBox implements IGraphic {
     public id: string;
+    public type: string = "bounding-box";
     public boundingBoxId: string;
     public origin: Point;
     public width: number;

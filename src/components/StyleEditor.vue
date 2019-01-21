@@ -46,7 +46,9 @@ export default class StyleEditor extends Vue {
         // Set immutable properties to undefined
         json.id = undefined;
         json.boundingBox = undefined;
+        json.boundingBoxId = undefined;
         json.points = undefined;
+        json.type = undefined;
 
         this.content = toPrettyString(json, 1);
     }

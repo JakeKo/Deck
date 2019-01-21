@@ -6,17 +6,17 @@ import Point from "./Point";
 
 export default class Curve implements IGraphic {
     public id: string;
+    public type: string = "curve";
     public boundingBoxId: string;
     public points: Array<Point>;
     public fillColor: string;
     public strokeColor: string;
     public strokeWidth: number;
     public rotation: number;
-    public degree: number;
 
     constructor(
-        { id, points, fillColor, strokeColor, strokeWidth, rotation, degree }:
-        { id?: string, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number, degree?: number } = {}
+        { id, points, fillColor, strokeColor, strokeWidth, rotation }:
+        { id?: string, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
@@ -25,7 +25,6 @@ export default class Curve implements IGraphic {
         this.strokeColor = strokeColor || "#000000";
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
-        this.degree = degree || 3;
     }
 
     get boundingBox(): BoundingBox {

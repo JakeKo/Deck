@@ -6,6 +6,7 @@ import Point from "./Point";
 
 export default class Text implements IGraphic {
     public id: string;
+    public type: string = "text";
     public boundingBoxId: string;
     public origin: Point;
     public content: string;

@@ -6,6 +6,7 @@ import Point from "./Point";
 
 export default class Sketch implements IGraphic {
     public id: string;
+    public type: string = "sketch";
     public boundingBoxId: string;
     public points: Array<Point>;
     public fillColor: string;
