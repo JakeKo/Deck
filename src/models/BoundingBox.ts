@@ -1,10 +1,11 @@
 import * as SVG from "svg.js";
-import Utilities from "../utilities/general";
 import Point from "./Point";
 import IGraphic from "./IGraphic";
 
 export default class BoundingBox implements IGraphic {
-    public id: string = Utilities.generateId();
+    public id: string;
+    public type: string = "bounding-box";
+    public boundingBoxId: string;
     public origin: Point;
     public width: number;
     public height: number;
@@ -13,7 +14,9 @@ export default class BoundingBox implements IGraphic {
     public strokeWidth: number = 1;
     public rotation: number;
 
-    constructor(origin: Point, width: number, height: number, rotation: number) {
+    constructor(id: string, origin: Point, width: number, height: number, rotation: number) {
+        this.id = id;
+        this.boundingBoxId = id;
         this.origin = origin;
         this.width = width;
         this.height = height;
@@ -21,7 +24,7 @@ export default class BoundingBox implements IGraphic {
     }
 
     // Note: Filler method so BoundingBox can be an IGraphic
-    public getBoundingBox(): BoundingBox {
+    get boundingBox(): BoundingBox {
         return this;
     }
 

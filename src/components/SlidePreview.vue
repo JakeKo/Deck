@@ -19,8 +19,7 @@ export default class SlidePreview extends Vue {
     // Re-render the canvas any time a graphic is created, removed, or modified
     @Watch("graphics", { deep: true }) private refreshCanvas(): void {
         this.canvas.clear();
-        this.graphics.filter((graphic: IGraphic): boolean => !(graphic instanceof BoundingBox))
-            .forEach((graphic: IGraphic): SVG.Element => graphic.render(this.canvas));
+        this.graphics.forEach((graphic: IGraphic): SVG.Element => graphic.render(this.canvas));
     }
 
     get uid(): string {

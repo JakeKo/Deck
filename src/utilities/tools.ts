@@ -7,7 +7,6 @@ import Curve from "../models/Curve";
 import Sketch from "../models/Sketch";
 import Text from "../models/Text";
 import * as SVG from "svg.js";
-import BoundingBox from "../models/BoundingBox";
 
 function getMousePosition(slide: any, event: MouseEvent): Point {
     const zoom: number = slide.$store.getters.canvasZoom;
@@ -21,18 +20,13 @@ function addGraphic(slide: any, graphic: IGraphic): void {
     focusGraphic(slide, graphic);
 }
 
-function focusGraphic(slide: any, graphic?: IGraphic): void {
-    if (slide.$store.getters.focusedGraphic !== undefined) {
-        const boundingBoxId: number = slide.$store.getters.focusedGraphic.getBoundingBox().id;
-        slide.$store.commit("removeGraphic", { slideId: slide.id, graphicId: boundingBoxId });
-    }
-
-    if (graphic !== undefined) {
-        slide.$store.commit("addGraphic", { slideId: slide.id, graphic: graphic.getBoundingBox() });
-    }
-
+function focusGraphic(slide: any, graphic?: IGraphic, refresh: boolean = true): void {
     slide.$store.commit("focusGraphic", graphic);
     slide.$store.commit("styleEditorObject", graphic);
+
+    if (refresh) {
+        slide.refreshCanvas();
+    }
 }
 
 function isolateEvent(event: Event): void {
@@ -51,12 +45,11 @@ const cursorTool: Tool = new Tool("cursor", {
         slide.canvas.on("mouseup", end);
 
         if (slide.$store.getters.focusedGraphic === undefined || slide.$store.getters.focusedGraphic.id !== graphic.id) {
-            focusGraphic(slide, graphic);
+            focusGraphic(slide, graphic, false);
         }
 
         const start: Point = new Point(svg.x(), svg.y());
         const offset: Point = start.add(getMousePosition(slide, event).scale(-1));
-        const boundingBox: BoundingBox = slide.$store.getters.activeSlide.graphics.find((g: IGraphic): boolean => g.id === graphic.getBoundingBox().id) as BoundingBox;
 
         // Preview moving shape
         function preview(event: MouseEvent): void {
@@ -64,7 +57,6 @@ const cursorTool: Tool = new Tool("cursor", {
 
             const resolvedPosition: Point = getMousePosition(slide, event).add(offset);
             svg.move(resolvedPosition.x, resolvedPosition.y);
-            boundingBox.origin = resolvedPosition;
         }
 
         // End moving shape
@@ -76,7 +68,7 @@ const cursorTool: Tool = new Tool("cursor", {
             if (graphic instanceof Rectangle) {
                 (graphic as Rectangle).origin = new Point(svg.x(), svg.y());
             } else if (graphic instanceof Ellipse) {
-                (graphic as Ellipse).center = new Point(svg.cx(), svg.cy());
+                (graphic as Ellipse).origin = new Point(svg.cx(), svg.cy());
             } else if (graphic instanceof Curve) {
                 const flattenedPoints: Array<Array<number>> = (svg as SVG.Path).array().value as any as Array<Array<number>>;
                 (graphic as Curve).points = [new Point(flattenedPoints[0][1], flattenedPoints[0][2])];
@@ -118,17 +110,22 @@ const pencilTool: Tool = new Tool("pencil", {
         const points: Array<Point> = [getMousePosition(slide, event)];
         const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", slide.$store.getters.canvasResolution * 3);
 
-        // Add the current mouse position point to the list of points to plot
+        // Add the current mouse position to the list of points to plot
         function preview(event: MouseEvent): void {
             points.push(getMousePosition(slide, event));
             shape.plot(points.map<Array<number>>((point: Point): Array<number> => point.toArray()));
         }
 
+        // Unbind handlers and commit graphic to the application
         function end(): void {
             canvas.off("mousemove", preview);
             canvas.off("mouseup", end);
             shape.remove();
-            addGraphic(slide, Sketch.model(shape));
+
+            const sketch: Sketch = Sketch.model(shape);
+            slide.$store.commit("addGraphic", { slideId: slide.id, graphic: sketch });
+            slide.$store.commit("focusGraphic", sketch);
+            slide.$store.commit("styleEditorObject", sketch);
         }
     }
 });

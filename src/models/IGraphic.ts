@@ -3,6 +3,8 @@ import BoundingBox from "./BoundingBox";
 
 export default interface IGraphic {
     id: string;
-    getBoundingBox(): BoundingBox;
+    type: string;
+    boundingBoxId: string;
+    boundingBox: BoundingBox;
     render(canvas: SVG.Doc): SVG.Element;
 }

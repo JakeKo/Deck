@@ -1,14 +1,14 @@
 <template>
 <div id="slide-settings">
     <div class="slide-setting">
-        <div class="zoom-icon">
-            <i class="fas fa-search-plus" @mousedown="modifyZoom(0.05)" @mouseup="loopModify = false"></i>
+        <div class="zoom-icon" @mousedown="modifyZoom(0.05)" @mouseup="loopModify = false">
+            <i class="fas fa-search-plus"></i>
         </div>
         
-        <input id="zoom-field" type="number" :value="zoomValue" @blur="zoomValue = $event.target.valueAsNumber" @keydown="$event.stopPropagation()" />
+        <input id="zoom-field" type="number" :value="zoomValue" @blur="zoomValue = $event.target.valueAsNumber" @keydown="$event.stopPropagation()" autocomplete="false"/>
         
-        <div class="zoom-icon">
-            <i class="fas fa-search-minus" @mousedown="modifyZoom(-0.05)" @mouseup="loopModify = false"></i>
+        <div class="zoom-icon" @mousedown="modifyZoom(-0.05)" @mouseup="loopModify = false">
+            <i class="fas fa-search-minus"></i>
         </div>
     </div>
 </div>
@@ -30,14 +30,15 @@ export default class SlideSettings extends Vue {
     }
 
     private modifyZoom(modification: number): void {
-        const modify: () => void = (): void => {
-            if (!this.loopModify) {
+        const self: SlideSettings = this;
+        function modify(): void {
+            if (!self.loopModify) {
                 return;
             }
 
-            this.$store.commit("canvasZoom", this.$store.getters.canvasZoom + modification);
+            self.$store.commit("canvasZoom", self.$store.getters.canvasZoom + modification);
             setTimeout(modify, 150);
-        };
+        }
 
         this.loopModify = true;
         this.$store.commit("canvasZoom", this.$store.getters.canvasZoom + modification);
@@ -55,7 +56,7 @@ export default class SlideSettings extends Vue {
     box-sizing: border-box;
     width: 48px;
     flex-shrink: 0;
-    height: 100%;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     padding: 8px 0;

@@ -20,7 +20,6 @@ export default new Vuex.Store({
             resolution: 1,
         },
         styleEditor: {
-            width: 300,
             object: undefined
         },
         slides: new Array<Slide>(),
@@ -32,10 +31,7 @@ export default new Vuex.Store({
             rectangle: Tools.rectangleTool,
             ellipse: Tools.ellipseTool,
             textbox: Tools.textboxTool
-        } as { [key: string]: Tool },
-        toolbox: {
-            width: 64
-        }
+        } as { [key: string]: Tool }
     },
     getters: {
         slides: (state: any): Slide[] => {
@@ -50,9 +46,6 @@ export default new Vuex.Store({
         activeSlide: (state: any): Slide => {
             return state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
         },
-        styleEditorWidth: (state: any): number => {
-            return state.styleEditor.width;
-        },
         styleEditorObject: (state: any): any => {
             return state.styleEditor.object;
         },
@@ -64,9 +57,6 @@ export default new Vuex.Store({
         },
         tool: (state: any): Tool => {
             return state.tools[state.currentTool];
-        },
-        toolboxWidth: (state: any): number => {
-            return state.toolbox.width;
         },
         focusedGraphic: (state: any): IGraphic | undefined => {
             const activeSlide: Slide = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
@@ -104,9 +94,6 @@ export default new Vuex.Store({
         },
         tool: (state: any, toolName: string): void => {
             state.currentTool = toolName;
-        },
-        styleEditorWidth: (state: any, width: number): void => {
-            state.styleEditor.width = width;
         },
         styleEditorObject: (state: any, object?: IGraphic): void => {
             state.styleEditor.object = object;

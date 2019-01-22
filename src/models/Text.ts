@@ -6,6 +6,8 @@ import Point from "./Point";
 
 export default class Text implements IGraphic {
     public id: string;
+    public type: string = "text";
+    public boundingBoxId: string;
     public origin: Point;
     public content: string;
     public fontSize: number;
@@ -14,13 +16,12 @@ export default class Text implements IGraphic {
     public fillColor: string;
     public rotation: number;
 
-    private boundingBox: BoundingBox;
-
     constructor(
         { id, origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }:
         { id?: string, origin?: Point, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
+        this.boundingBoxId = Utilities.generateId();
         this.origin = origin || new Point(0, 0);
         this.content = content || "lorem ipsum dolor sit amet";
         this.fontSize = fontSize || 12;
@@ -28,19 +29,11 @@ export default class Text implements IGraphic {
         this.fontFamily = fontFamily || "Arial";
         this.fillColor = fillColor || "#000000";
         this.rotation = rotation || 0;
-
-        this.boundingBox = new BoundingBox(new Point(0, 0), 0, 0, 0);
     }
 
-    public getBoundingBox(): BoundingBox {
+    get boundingBox(): BoundingBox {
         const lines: Array<string> = this.content.split("\n");
-
-        this.boundingBox.origin = this.origin;
-        this.boundingBox.width = Math.max(...lines.map<number>((line: string): number => line.length)) * 8;
-        this.boundingBox.height = lines.length * 20;
-        this.boundingBox.rotation = this.rotation;
-
-        return this.boundingBox;
+        return new BoundingBox(this.boundingBoxId, this.origin, Math.max(...lines.map<number>((line: string): number => line.length)) * 8, lines.length * 20, this.rotation);
     }
 
     public render(canvas: SVG.Doc): SVG.Text {

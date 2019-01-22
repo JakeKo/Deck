@@ -6,6 +6,8 @@ import Point from "./Point";
 
 export default class Rectangle implements IGraphic {
     public id: string;
+    public type: string = "rectangle";
+    public boundingBoxId: string;
     public origin: Point;
     public width: number;
     public height: number;
@@ -14,13 +16,12 @@ export default class Rectangle implements IGraphic {
     public strokeWidth: number;
     public rotation: number;
 
-    private boundingBox: BoundingBox;
-
     constructor(
         { id, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
         { id?: string, origin?: Point, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
+        this.boundingBoxId = Utilities.generateId();
         this.origin = origin || new Point(0, 0);
         this.width = width || 50;
         this.height = height || 50;
@@ -28,17 +29,10 @@ export default class Rectangle implements IGraphic {
         this.strokeColor = strokeColor || "#000000";
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
-
-        this.boundingBox = new BoundingBox(new Point(0, 0), 0, 0, 0);
     }
 
-    public getBoundingBox(): BoundingBox {
-        this.boundingBox.origin = this.origin;
-        this.boundingBox.width = this.width;
-        this.boundingBox.height = this.height;
-        this.boundingBox.rotation = this.rotation;
-
-        return this.boundingBox;
+    get boundingBox(): BoundingBox {
+        return new BoundingBox(this.boundingBoxId, this.origin, this.width, this.height, this.rotation);
     }
 
     public render(canvas: SVG.Doc): SVG.Rect {

@@ -1,5 +1,5 @@
 <template>
-<div id="style-editor" :style="styleEditorStyle">
+<div id="style-editor">
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
     <textarea id="style-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
     <div id="submit-button-container">
@@ -12,6 +12,9 @@
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import Utilities from "../utilities/general";
 import IGraphic from "../models/IGraphic";
+import Sketch from "../models/Sketch";
+import Curve from "../models/Curve";
+import Point from "../models/Point";
 
 function toPrettyString(object: any, indentDepth: number): string {
     const properties: Array<string> = [];
@@ -41,24 +44,20 @@ export default class StyleEditor extends Vue {
     private content: string = "";
 
     @Watch("object") private onObjectChanged(): void {
-        const json: any = JSON.parse(JSON.stringify(this.object || {}));
-
         // Set immutable properties to undefined
+        const json: any = JSON.parse(JSON.stringify(this.object || {}));
         json.id = undefined;
         json.boundingBox = undefined;
+        json.boundingBoxId = undefined;
+        json.points = undefined;
+        json.type = undefined;
 
         this.content = toPrettyString(json, 1);
     }
 
     // Watch for changes to the style editor object
-    get object(): any {
+    get object(): IGraphic {
         return this.$store.getters.styleEditorObject;
-    }
-
-    get styleEditorStyle(): any {
-        return {
-            width: `${this.$store.getters.styleEditorWidth}px`
-        };
     }
 
     private stretch(event: MouseEvent): void {
@@ -69,7 +68,7 @@ export default class StyleEditor extends Vue {
 
         const self = this;
         function preview(event: MouseEvent): void {
-            self.$store.commit("styleEditorWidth", window.innerWidth - event.pageX);
+            (self.$el as HTMLElement).style.width = `${window.innerWidth - event.pageX}px`;
         }
 
         function end(): void {
@@ -84,8 +83,14 @@ export default class StyleEditor extends Vue {
 
         // TODO: Style editor content validation
         const json: any = JSON.parse(this.content);
-        const graphic: IGraphic = Utilities.parseGraphic(json);
+        json.id = this.object.id;
+        json.type = this.object.type;
+        if (this.object instanceof Sketch || this.object instanceof Curve) {
+            json.points = (this.object as Sketch).points.map<Array<any>>((point: Point): any => ({ x: point.x, y: point.y }));
+        }
 
+        const graphic: IGraphic = Utilities.parseGraphic(json);
+        graphic.boundingBoxId = this.object.boundingBoxId;
         this.$store.commit("updateGraphic", graphic);
     }
 }
@@ -100,14 +105,16 @@ export default class StyleEditor extends Vue {
     flex-direction: column;
     background: $color-primary;
     border-left: 1px solid $color-tertiary;
+    flex-shrink: 0;
+    width: 256px;
+    min-width: 96px;
 }
 
 #style-editor-content {
-    height: calc(100% - 96px);
     font-family: monospace;
     border: none;
     outline: none;
-    height: 100%;
+    flex-grow: 1;
     width: 100%;
     resize: none;
     box-sizing: border-box;

@@ -6,7 +6,9 @@ import Point from "./Point";
 
 export default class Ellipse implements IGraphic {
     public id: string;
-    public center: Point;
+    public type: string = "ellipse";
+    public boundingBoxId: string;
+    public origin: Point;
     public width: number;
     public height: number;
     public fillColor: string;
@@ -14,45 +16,37 @@ export default class Ellipse implements IGraphic {
     public strokeWidth: number;
     public rotation: number;
 
-    private boundingBox: BoundingBox;
-
     constructor(
-        { id, center, width, height, fillColor, strokeColor, strokeWidth, rotation }:
-        { id?: string, center?: Point, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+        { id, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
+        { id?: string, origin?: Point, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
-        this.center = center || new Point(0, 0);
+        this.boundingBoxId = Utilities.generateId();
+        this.origin = origin || new Point(0, 0);
         this.width = width || 50;
         this.height = height || 50;
         this.fillColor = fillColor || "#EEEEEE";
         this.strokeColor = strokeColor || "#000000";
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
-
-        this.boundingBox = new BoundingBox(new Point(0, 0), 0, 0, 0);
     }
 
-    public getBoundingBox(): BoundingBox {
-        this.boundingBox.origin = new Point(this.center.x - this.width * 0.5, this.center.y - this.height * 0.5);
-        this.boundingBox.width = this.width;
-        this.boundingBox.height = this.height;
-        this.boundingBox.rotation = this.rotation;
-
-        return this.boundingBox;
+    get boundingBox(): BoundingBox {
+        return new BoundingBox(this.boundingBoxId, new Point(this.origin.x - this.width * 0.5, this.origin.y - this.height * 0.5), this.width, this.height, this.rotation);
     }
 
     public render(canvas: SVG.Doc): SVG.Ellipse {
         return canvas
             .ellipse(this.width, this.height)
-            .center(this.center.x, this.center.y)
+            .center(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.center.x, this.center.y);
+            .rotate(this.rotation, this.origin.x, this.origin.y);
     }
 
     public static model(svg: SVG.Ellipse): Ellipse {
         return new Ellipse({
-            center: new Point(svg.cx(), svg.cy()),
+            origin: new Point(svg.cx(), svg.cy()),
             width: svg.width(),
             height: svg.height(),
             fillColor: svg.attr("fill"),
