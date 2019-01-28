@@ -1,16 +1,20 @@
 <template>
 <div id="app">
-    <toolbox></toolbox>
-    <div id="workspace">
-        <editor></editor>
-        <roadmap></roadmap>
+    <menu-bar></menu-bar>
+    <div id="interface">
+        <toolbox></toolbox>
+        <div id="workspace">
+            <editor></editor>
+            <roadmap></roadmap>
+        </div>
+        <style-editor v-show="$store.getters.focusedGraphic !== undefined"></style-editor>
     </div>
-    <style-editor v-show="$store.getters.focusedGraphic !== undefined"></style-editor>
 </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
+import MenuBar from "./components/MenuBar.vue";
 import Toolbox from "./components/Toolbox.vue";
 import Editor from "./components/Editor.vue";
 import Roadmap from "./components/Roadmap.vue";
@@ -20,6 +24,7 @@ import IGraphic from "./models/IGraphic";
 
 @Component({
     components: {
+        MenuBar,
         Toolbox,
         Editor,
         Roadmap,
@@ -89,12 +94,19 @@ export default class App extends Vue {
     height: 100vh;
     width: 100vw;
     display: flex;
+    flex-direction: column;
+}
+
+#interface {
+    flex-grow: 1;
+    flex-basis: 0;
+    display: flex;
 }
 
 #workspace {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
     min-width: 0; // Override min-width default for flex items
 }
 </style>
