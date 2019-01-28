@@ -149,13 +149,19 @@ export default new Vuex.Store({
             anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
             anchor.setAttribute("download", "deck.html");
             anchor.click();
+            anchor.remove();
 
             while (exportFrame.firstChild) {
                 exportFrame.removeChild(exportFrame.firstChild);
             }
         },
         save: (store: any): void => {
-            console.log("saving");
+            const anchor: HTMLAnchorElement = document.createElement("a");
+            const json: string = JSON.stringify(store.getters.slides);
+            anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(json)}`);
+            anchor.setAttribute("download", "deck.json");
+            anchor.click();
+            anchor.remove();
         }
     }
 });
