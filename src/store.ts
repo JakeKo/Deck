@@ -88,7 +88,7 @@ export default new Vuex.Store({
             const slide: Slide = state.slides.find((slide: Slide): boolean => slide.id === slideId);
             slide.graphics.push(graphic);
         },
-        removeGraphic: (state: any, { slideId, graphicId }: { slideId: string, graphicId: string}): void => {
+        removeGraphic: (state: any, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
             const slide: Slide = state.slides.find((slide: Slide): boolean => slide.id === slideId);
             slide.graphics = slide.graphics.filter((graphic: IGraphic): boolean => graphic.id !== graphicId);
         },
@@ -144,15 +144,26 @@ export default new Vuex.Store({
             // Append slide data to body element
             body.innerHTML = exportFrame.innerHTML;
 
-            const anchor: HTMLAnchorElement = document.createElement("a");
             const page: string = `${html.outerHTML}${Utilities.deckScript}`;
+
+            const anchor: HTMLAnchorElement = document.createElement("a");
             anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
             anchor.setAttribute("download", "deck.html");
             anchor.click();
+            anchor.remove();
 
             while (exportFrame.firstChild) {
                 exportFrame.removeChild(exportFrame.firstChild);
             }
+        },
+        save: (store: any): void => {
+            const json: string = JSON.stringify(store.getters.slides);
+
+            const anchor: HTMLAnchorElement = document.createElement("a");
+            anchor.setAttribute("href", `data:text/json;charset=UTF-8,${encodeURIComponent(json)}`);
+            anchor.setAttribute("download", "deck.json");
+            anchor.click();
+            anchor.remove();
         }
     }
 });
