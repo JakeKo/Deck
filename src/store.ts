@@ -153,6 +153,9 @@ export default new Vuex.Store({
             while (exportFrame.firstChild) {
                 exportFrame.removeChild(exportFrame.firstChild);
             }
+        },
+        save: (store: any): void => {
+            console.log("saving");
         }
     }
 });
