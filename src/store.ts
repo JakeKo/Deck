@@ -160,7 +160,7 @@ export default new Vuex.Store({
             const json: string = JSON.stringify(store.getters.slides);
 
             const anchor: HTMLAnchorElement = document.createElement("a");
-            anchor.setAttribute("href", `data:text/json;charset=UTF-8,${encodeURIComponent(json)}`);
+            anchor.setAttribute("href", `data:application/json;charset=UTF-8,${encodeURIComponent(json)}`);
             anchor.setAttribute("download", "deck.json");
             anchor.click();
             anchor.remove();
