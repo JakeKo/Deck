@@ -6,8 +6,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { Vue, Component } from "vue-property-decorator";
+import Slide from "../models/Slide";
 
+@Component
 export default class MenuBar extends Vue {
     private uploadPresentation(event: Event): void {
         // Fetch the uploaded file and abort if no file was selected
@@ -19,7 +21,8 @@ export default class MenuBar extends Vue {
         // Create the file reader and set the event handler after reading is complete
         const fileReader: FileReader = new FileReader();
         fileReader.onloadend = (event: FileReaderProgressEvent): void => {
-            console.log(JSON.parse(event.target!.result));
+            const slides: Array<Slide> = JSON.parse(event.target!.result);
+            this.$store.dispatch("resetPresentation", slides);
         };
 
         // Asynchronously read the uploaded presentation as text

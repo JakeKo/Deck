@@ -164,6 +164,13 @@ export default new Vuex.Store({
             anchor.setAttribute("download", "deck.json");
             anchor.click();
             anchor.remove();
+        },
+        resetPresentation: (store: any, presentation: Array<Slide>): void => {
+            store.state.slides = [];
+
+            presentation.forEach((slide: Slide, index: number): void => {
+                store.commit("addSlide", index);
+            });
         }
     }
 });
