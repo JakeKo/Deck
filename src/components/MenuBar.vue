@@ -8,6 +8,8 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import Slide from "../models/Slide";
+import Utilities from "../utilities/general";
+import IGraphic from "../models/IGraphic";
 
 @Component
 export default class MenuBar extends Vue {
@@ -21,7 +23,13 @@ export default class MenuBar extends Vue {
         // Create the file reader and set the event handler after reading is complete
         const fileReader: FileReader = new FileReader();
         fileReader.onloadend = (event: FileReaderProgressEvent): void => {
-            const slides: Array<Slide> = JSON.parse(event.target!.result);
+            const json: any = JSON.parse(event.target!.result);
+
+            const slides: Array<Slide> = json.map((slide: any): Slide => new Slide({
+                id: slide.id,
+                graphics: slide.graphics.map((graphic: any): IGraphic => Utilities.parseGraphic(graphic))
+            }));
+
             this.$store.dispatch("resetPresentation", slides);
         };
 
