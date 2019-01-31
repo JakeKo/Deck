@@ -37,12 +37,6 @@ export default new Vuex.Store({
         slides: (state: any): Slide[] => {
             return state.slides;
         },
-        firstSlide: (state: any): Slide => {
-            return state.slides[0];
-        },
-        lastSlide: (state: any): Slide => {
-            return state.slides[state.slides.length - 1];
-        },
         activeSlide: (state: any): Slide => {
             return state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
         },
@@ -59,8 +53,8 @@ export default new Vuex.Store({
             return state.tools[state.currentTool];
         },
         focusedGraphic: (state: any): IGraphic | undefined => {
-            const activeSlide: Slide = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
-            return activeSlide.graphics.find((graphic: IGraphic): boolean => graphic.id === state.focusedGraphicId);
+            const activeSlide: Slide = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId);
+            return activeSlide === undefined ? undefined : activeSlide.graphics.find((graphic: IGraphic): boolean => graphic.id === state.focusedGraphicId);
         },
         canvasHeight: (state: any): number => {
             return state.canvas.height;
@@ -81,11 +75,28 @@ export default new Vuex.Store({
         },
         reorderSlide: (state: any, { source, destination }: { source: number, destination: number }): void => {
             const slide: Slide = state.slides[source];
+
+            if (slide === undefined) {
+                console.error(`ERROR: No slide exists at index ${source} to reorder`);
+                return;
+            }
+
             state.slides.splice(destination + (destination > source ? 1 : 0), 0, slide);
             state.slides.splice(source + (destination > source ? 0 : 1), 1);
         },
         addGraphic: (state: any, { slideId, graphic }: { slideId: string, graphic: IGraphic }): void => {
+            if (graphic === undefined) {
+                console.error("ERROR: Attempted to add an undefined graphic");
+                return;
+            }
+
             const slide: Slide = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+
+            if (slide === undefined) {
+                console.error(`ERROR: No slide exists with id: ${slideId}`);
+                return;
+            }
+
             slide.graphics.push(graphic);
         },
         removeGraphic: (state: any, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {

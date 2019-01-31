@@ -33,9 +33,6 @@ import IGraphic from "./models/IGraphic";
 })
 export default class App extends Vue {
     private created(): void {
-        this.$store.commit("addSlide");
-        this.$store.commit("activeSlide", this.$store.getters.firstSlide.id);
-
         document.addEventListener("keydown", (event: KeyboardEvent): void => {
             if (event.key === "Delete" || event.key === "Backspace") {
                 if (this.$store.getters.focusedGraphic === undefined) {

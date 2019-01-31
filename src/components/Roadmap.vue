@@ -4,7 +4,7 @@
     <div id="slide-previews">
         <slide-preview v-for="slide in $store.getters.slides"
             :id="slide.id"
-            :isActive="slide.id === $store.getters.activeSlide.id"
+            :isActive="$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id"
             :graphics="$store.getters.slides.find((s) => s.id === slide.id).graphics"
             :key="slide.id"
         ></slide-preview>
@@ -52,7 +52,7 @@ export default class Roadmap extends Vue {
 
     private addSlide(): void {
         this.$store.commit("addSlide", this.$store.getters.slides.length);
-        this.$store.commit("activeSlide", this.$store.getters.lastSlide.id);
+        this.$store.commit("activeSlide", this.$store.getters.slides[this.$store.getters.slides.length - 1].id);
         this.$store.commit("focusGraphic", undefined);
         this.$store.commit("styleEditorObject", undefined);
     }

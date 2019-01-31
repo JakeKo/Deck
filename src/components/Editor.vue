@@ -7,7 +7,7 @@
                 :key="slide.id"
                 :id="slide.id"
                 :graphics="slide.graphics"
-                :isActive="slide.id === $store.getters.activeSlide.id"
+                :isActive="$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id"
             ></slide>
         </div>
     </div>
