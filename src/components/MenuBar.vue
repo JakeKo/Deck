@@ -35,6 +35,7 @@ export default class MenuBar extends Vue {
 
         // Asynchronously read the uploaded presentation as text
         fileReader.readAsText(presentationFile);
+        (event.target as HTMLInputElement).value = "";
     }
 }
 </script>
