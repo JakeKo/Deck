@@ -30,7 +30,7 @@ export default class BoundingBox implements IGraphic {
 
     // Note: Filler method so BoundingBox can be an IGraphic
     public update(): void {
-
+        this.id = this.id;
     }
 
     public render(canvas: SVG.Doc): SVG.Rect {

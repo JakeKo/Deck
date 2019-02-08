@@ -26,9 +26,9 @@ export default class Slide extends Vue {
         this.canvas = SVG(this.$el.id).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
         this.slideWrapper = new SlideWrapper(this.id, this.canvas, this.$store);
 
-        this.canvas.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.canvasMouseOver(this.canvas)(event));
-        this.canvas.on("mouseout", (event: MouseEvent) => this.$store.getters.tool.canvasMouseOut(this.canvas)(event));
-        this.canvas.on("mousedown", (event: MouseEvent) => this.$store.getters.tool.canvasMouseDown(this, this.canvas)(event));
+        document.addEventListener("Deck.CanvasMouseOver", (event: Event): void => this.$store.getters.tool.canvasMouseOver(this.canvas)((event as CustomEvent).detail.baseEvent));
+        document.addEventListener("Deck.CanvasMouseOut", (event: Event): void => this.$store.getters.tool.canvasMouseOut(this.canvas)((event as CustomEvent).detail.baseEvent));
+        document.addEventListener("Deck.CanvasMouseDown", (event: Event): void => this.$store.getters.tool.canvasMouseDown(this, this.canvas)((event as CustomEvent).detail.baseEvent));
 
         this.refreshCanvas();
     }
