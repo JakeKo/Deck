@@ -6,11 +6,13 @@
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import IGraphic from "../models/IGraphic";
+import SlideWrapper from "../utilities/SlideWrapper";
 
 @Component
 export default class Slide extends Vue {
-    public canvas!: SVG.Doc;
-    @Prop({ type: String, required: true }) public id!: string;
+    private canvas!: SVG.Doc;
+    private slideWrapper!: SlideWrapper;
+    @Prop({ type: String, required: true }) private id!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
 
@@ -22,6 +24,7 @@ export default class Slide extends Vue {
     private mounted(): void {
         const canvasResolution: number = this.$store.getters.canvasResolution;
         this.canvas = SVG(this.$el.id).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
+        this.slideWrapper = new SlideWrapper(this.id, this.canvas, this.$store);
 
         this.canvas.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.canvasMouseOver(this.canvas)(event));
         this.canvas.on("mouseout", (event: MouseEvent) => this.$store.getters.tool.canvasMouseOut(this.canvas)(event));

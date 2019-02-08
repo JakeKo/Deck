@@ -23,7 +23,7 @@ export default class SlideWrapper {
 
     public getGraphic(id: string): IGraphic | undefined {
         const slide: Slide = this._store.getters.slides.find((s: Slide): boolean => s.id === this._slideId);
-        
+
         if (slide === undefined) {
             throw `ERROR: Could not find a slide with the id: "${id}"`;
         }
@@ -31,16 +31,18 @@ export default class SlideWrapper {
         return slide.graphics.find((graphic: IGraphic): boolean => graphic.id === id);
     }
 
-    // public updateGraphic(id: string, newGraphic: IGraphic): IGraphic {
-    //     // Update graphic in the store
+    public updateGraphic(id: string, newGraphic: IGraphic): void {
+        // Update graphic in the store
+        this._store.commit("updateGraphic", { graphic: newGraphic });
 
-    //     // Update graphic in the canvas
-    // }
+        // Update graphic in the canvas
+        // TODO
+    }
 
     public removeGraphic(id: string): void {
         // Remove graphic from the store
         this._store.commit("removeGraphic", { slideId: this._slideId, graphicId: id });
-        
+
         // Remove graphic from the canvas
         const svg: SVG.Element = SVG.get(id);
         if (svg !== undefined) {
