@@ -28,6 +28,10 @@ export default class BoundingBox implements IGraphic {
         return this;
     }
 
+    public update(): void {
+
+    }
+
     public render(canvas: SVG.Doc): SVG.Rect {
         return canvas
             .rect(this.width, this.height)

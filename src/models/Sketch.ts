@@ -16,7 +16,7 @@ export default class Sketch implements IGraphic {
 
     constructor(
         { id, points, fillColor, strokeColor, strokeWidth, rotation }:
-        { id?: string, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+            { id?: string, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
@@ -35,6 +35,31 @@ export default class Sketch implements IGraphic {
         const maximumPoint: Point = new Point(Math.max(...xCoordinates), Math.max(...yCoordinates));
 
         return new BoundingBox(this.boundingBoxId, minimumPoint, maximumPoint.x - minimumPoint.x, maximumPoint.y - minimumPoint.y, this.rotation);
+    }
+
+    public update(
+        { points, fillColor, strokeColor, strokeWidth, rotation }:
+            { points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+    ): void {
+        if (points !== undefined) {
+            this.points = points;
+        }
+
+        if (fillColor !== undefined) {
+            this.fillColor = fillColor;
+        }
+
+        if (strokeColor !== undefined) {
+            this.strokeColor = strokeColor;
+        }
+
+        if (strokeWidth !== undefined) {
+            this.strokeWidth = strokeWidth;
+        }
+
+        if (rotation !== undefined) {
+            this.rotation = rotation;
+        }
     }
 
     public render(canvas: SVG.Doc): SVG.PolyLine {

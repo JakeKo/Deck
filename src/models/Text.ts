@@ -18,7 +18,7 @@ export default class Text implements IGraphic {
 
     constructor(
         { id, origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }:
-        { id?: string, origin?: Point, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
+            { id?: string, origin?: Point, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
@@ -34,6 +34,39 @@ export default class Text implements IGraphic {
     get boundingBox(): BoundingBox {
         const lines: Array<string> = this.content.split("\n");
         return new BoundingBox(this.boundingBoxId, this.origin, Math.max(...lines.map<number>((line: string): number => line.length)) * 8, lines.length * 20, this.rotation);
+    }
+
+    public update(
+        { origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }:
+            { origin?: Point, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
+    ): void {
+        if (origin !== undefined) {
+            this.origin = origin;
+        }
+
+        if (content !== undefined) {
+            this.content = content;
+        }
+
+        if (fontSize !== undefined) {
+            this.fontSize = fontSize;
+        }
+
+        if (fontWeight !== undefined) {
+            this.fontWeight = fontWeight;
+        }
+
+        if (fontFamily !== undefined) {
+            this.fontFamily = fontFamily;
+        }
+
+        if (fillColor !== undefined) {
+            this.fillColor = fillColor;
+        }
+
+        if (rotation !== undefined) {
+            this.rotation = rotation;
+        }
     }
 
     public render(canvas: SVG.Doc): SVG.Text {
