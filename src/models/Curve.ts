@@ -48,7 +48,8 @@ export default class Curve implements IGraphic {
             .path(points)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation); // TODO: Evaluate the 'center' of the curve
+            .rotate(this.rotation)
+            .id(this.id);
     }
 
     public static model(svg: SVG.Path): Curve {

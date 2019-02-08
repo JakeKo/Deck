@@ -41,7 +41,8 @@ export default class Ellipse implements IGraphic {
             .center(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x, this.origin.y);
+            .rotate(this.rotation, this.origin.x, this.origin.y)
+            .id(this.id);
     }
 
     public static model(svg: SVG.Ellipse): Ellipse {

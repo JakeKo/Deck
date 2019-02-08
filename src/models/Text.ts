@@ -42,7 +42,8 @@ export default class Text implements IGraphic {
             .move(this.origin.x, this.origin.y)
             .font({ size: this.fontSize, weight: this.fontWeight, family: this.fontFamily })
             .fill(this.fillColor)
-            .rotate(this.rotation); // TODO: Infer 'center' of text
+            .rotate(this.rotation)
+            .id(this.id);
     }
 
     public static model(svg: SVG.Text): Text {

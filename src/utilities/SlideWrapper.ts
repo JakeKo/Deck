@@ -14,7 +14,10 @@ export default class SlideWrapper {
     }
 
     public addGraphic(graphic: IGraphic): void {
+        // Add graphic to the store
         this._store.commit("addGraphic", { slideId: this._slideId, graphic: graphic });
+
+        // Add graphic to the canvas
         graphic.render(this._canvas);
     }
 
@@ -29,12 +32,16 @@ export default class SlideWrapper {
     }
 
     // public updateGraphic(id: string, newGraphic: IGraphic): IGraphic {
+    //     // Update graphic in the store
 
+    //     // Update graphic in the canvas
     // }
 
     public removeGraphic(id: string): void {
+        // Remove graphic from the store
         this._store.commit("removeGraphic", { slideId: this._slideId, graphicId: id });
         
+        // Remove graphic from the canvas
         const svg: SVG.Element = SVG.get(id);
         if (svg !== undefined) {
             svg.remove();

@@ -49,7 +49,8 @@ export default class Sketch implements IGraphic {
             .polyline(this.points.map((point: Point) => point.toArray()))
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, center.x, center.y);
+            .rotate(this.rotation, center.x, center.y)
+            .id(this.id);
     }
 
     public static model(svg: SVG.PolyLine): Sketch {
