@@ -9,8 +9,8 @@ import IGraphic from "../models/IGraphic";
 
 @Component
 export default class Slide extends Vue {
-    private canvas!: SVG.Doc;
-    @Prop({ type: String, required: true }) private id!: string;
+    public canvas!: SVG.Doc;
+    @Prop({ type: String, required: true }) public id!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
 
