@@ -31,12 +31,25 @@ export default class SlideWrapper {
         return slide.graphics.find((graphic: IGraphic): boolean => graphic.id === id);
     }
 
-    public updateGraphic(id: string, newGraphic: IGraphic): void {
+    public updateGraphic(id: string, newGraphic: any): void {
         // Update graphic in the store
         this._store.commit("updateGraphic", { graphic: newGraphic });
 
         // Update graphic in the canvas
-        // TODO
+        const graphic: IGraphic | undefined = this.getGraphic(id);
+
+        if (graphic === undefined) {
+            throw `ERROR: Could not find a graphic with the id: "${id}"`;
+        }
+
+        graphic.update(newGraphic);
+
+        // Update the bounding box rendering if the graphic is focused
+        const focusedGraphic: IGraphic | undefined = this._store.getters.focusedGraphic;
+        if (focusedGraphic !== undefined && focusedGraphic.id === graphic.id) {
+            SVG.get(graphic.boundingBoxId).remove();
+            graphic.boundingBox.render(this._canvas);
+        }
     }
 
     public removeGraphic(id: string): void {

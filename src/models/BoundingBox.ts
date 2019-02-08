@@ -28,6 +28,7 @@ export default class BoundingBox implements IGraphic {
         return this;
     }
 
+    // Note: Filler method so BoundingBox can be an IGraphic
     public update(): void {
 
     }
