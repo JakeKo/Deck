@@ -11,6 +11,26 @@ export default class SlideWrapper {
         this._slideId = slideId;
         this._canvas = canvas;
         this._store = store;
+        
+        this._canvas.on("mousmove", (event: MouseEvent): void => {
+            document.dispatchEvent(new CustomEvent("Deck.CanvasMouseMove", { detail: { event: event, slideId: this._slideId } }));
+        });
+        
+        this._canvas.on("mouseover", (event: MouseEvent): void => {
+            document.dispatchEvent(new CustomEvent("Deck.CanvasMouseOver", { detail: { event: event, slideId: this._slideId } }));
+        });
+        
+        this._canvas.on("mouseout", (event: MouseEvent): void => {
+            document.dispatchEvent(new CustomEvent("Deck.CanvasMouseOut", { detail: { event: event, slideId: this._slideId } }));
+        });
+        
+        this._canvas.on("mouseup", (event: MouseEvent): void => {
+            document.dispatchEvent(new CustomEvent("Deck.CanvasMouseUp", { detail: { event: event, slideId: this._slideId } }));
+        });
+
+        this._canvas.on("mousedown", (event: MouseEvent): void => {
+            document.dispatchEvent(new CustomEvent("Deck.CanvasMouseDown", { detail: { event: event, slideId: this._slideId } }));
+        });
     }
 
     public addGraphic(graphic: IGraphic): void {
