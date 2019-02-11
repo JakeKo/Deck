@@ -7,17 +7,17 @@ import Curve from "../models/Curve";
 import Sketch from "../models/Sketch";
 import Text from "../models/Text";
 import * as SVG from "svg.js";
+import SlideWrapper from "./SlideWrapper";
 
-function getMousePosition(slide: any, event: MouseEvent): Point {
-    const zoom: number = slide.$store.getters.canvasZoom;
-    const resolution: number = slide.$store.getters.canvasResolution;
-    const bounds: DOMRect = slide.$el.getBoundingClientRect();
-    return new Point(Math.round((event.clientX / zoom - bounds.left) * resolution), Math.round((event.clientY / zoom - bounds.top) * resolution));
-}
-
-function addGraphic(slide: any, graphic: IGraphic): void {
-    slide.$store.commit("addGraphic", { slideId: slide.id, graphic });
-    focusGraphic(slide, graphic);
+function getMousePosition(event: CustomEvent, store: any): Point {
+    const mouseEvent: MouseEvent = event.detail.baseEvent as MouseEvent;
+    const zoom: number = store.getters.canvasZoom;
+    const resolution: number = store.getters.canvasResolution;
+    // const bounds: DOMRect = el.getBoundingClientRect();
+    return new Point(mouseEvent.clientX, mouseEvent.clientY)
+        .scale(1 / zoom)
+        // .add(new Point(-bounds.left, -bounds.top))
+        .scale(resolution).transform(Math.round);
 }
 
 function focusGraphic(slide: any, graphic?: IGraphic, refresh: boolean = true): void {
@@ -98,103 +98,101 @@ const cursorTool: Tool = new Tool("cursor", {
 
 // Event handlers for using the pencil tool
 const pencilTool: Tool = new Tool("pencil", {
-    canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
-    canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
-    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
-        isolateEvent(event);
-        canvas.on("mousemove", preview);
-        canvas.on("mouseup", end);
+    canvasMouseOver: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("crosshair"),
+    canvasMouseOut: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("default"),
+    canvasMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent): void => {
+        document.addEventListener("Deck.CanvasMouseMove", preview);
+        document.addEventListener("Deck.CanvasMouseUp", end);
 
         // Unfocus the current graphic if any and set initial state of pencil drawing
-        focusGraphic(slide, undefined);
-        const points: Array<Point> = [getMousePosition(slide, event)];
-        const shape: SVG.PolyLine = canvas.polyline([points[0].toArray()]).fill("none").stroke("black").attr("stroke-width", slide.$store.getters.canvasResolution * 3);
+        slideWrapper.store.commit("focusGraphic", undefined);
+        slideWrapper.store.commit("styleEditorObject", undefined);
+        const sketch: Sketch = new Sketch({ points: [getMousePosition(event, slideWrapper.store)], fillColor: "none", strokeColor: "black", strokeWidth: 3 });
+        slideWrapper.addGraphic(sketch);
 
         // Add the current mouse position to the list of points to plot
-        function preview(event: MouseEvent): void {
-            points.push(getMousePosition(slide, event));
-            shape.plot(points.map<Array<number>>((point: Point): Array<number> => point.toArray()));
+        function preview(event: Event): void {
+            sketch.points.push(getMousePosition(event as CustomEvent, slideWrapper.store));
+            slideWrapper.updateGraphic(sketch.id, sketch);
         }
 
         // Unbind handlers and commit graphic to the application
         function end(): void {
-            canvas.off("mousemove", preview);
-            canvas.off("mouseup", end);
-            shape.remove();
+            document.removeEventListener("Deck.CanvasMouseMove", preview);
+            document.removeEventListener("Deck.CanvasMouseUp", end);
 
-            const sketch: Sketch = Sketch.model(shape);
-            slide.$store.commit("addGraphic", { slideId: slide.id, graphic: sketch });
-            slide.$store.commit("focusGraphic", sketch);
-            slide.$store.commit("styleEditorObject", sketch);
+            slideWrapper.store.commit("focusGraphic", sketch);
+            slideWrapper.store.commit("styleEditorObject", sketch);
         }
     }
 });
 
 let penToolIsActive: boolean = false;
 const penTool: Tool = new Tool("pen", {
-    canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
-    canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
-    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
+    canvasMouseOver: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("crosshair"),
+    canvasMouseOut: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("default"),
+    canvasMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent): void => {
         // Prevent any action on canvas click if a bezier curve is being drawn
         if (penToolIsActive) { return; }
         else { penToolIsActive = true; }
 
-        isolateEvent(event);
         document.addEventListener("keydown", end);
-        canvas.on("mousemove", preview);
-        canvas.on("mouseup", setFirstControlPoint);
+        document.addEventListener("Deck.CanvasMouseMove", preview);
+        document.addEventListener("Deck.CanvasMouseUp", setFirstControlPoint);
 
-        focusGraphic(slide, undefined);
-        const start: Point = getMousePosition(slide, event);
-        const curve: Array<Array<Point>> = [[start]];
-        const curveSegment: Array<Array<Point | undefined>> = [[start], [undefined, undefined, undefined]];
+        slideWrapper.store.commit("focusGraphic", undefined);
+        slideWrapper.store.commit("styleEditorObject", undefined);
 
         // Create SVGs for the primary curve, the editable curve segment, and the control point preview
-        const resolution: number = slide.$store.getters.canvasResolution;
-        const curveGraphic: SVG.Path = canvas.path(toBezierString(curve)).fill("none").stroke("black").attr("stroke-width", resolution * 3);
-        const curveSegmentGraphic: SVG.Path = canvas.path(toBezierString(resolveCurve(curveSegment, start)))
-            .fill("none").stroke("black").attr("stroke-width", resolution * 3);
-        const controlPointGraphic: SVG.PolyLine = canvas.polyline([]).fill("none").attr("stroke-width", resolution);
+        const start: Point = getMousePosition(event, slideWrapper.store);
+        const resolution: number = slideWrapper.store.getters.canvasResolution;
 
-        function setFirstControlPoint(event: MouseEvent): void {
-            canvas.off("mouseup", setFirstControlPoint);
-            canvas.on("mousedown", setEndpoint);
+        const curve: Curve = new Curve({ points: [start], fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
+        const segment: Curve = new Curve({ points: [ start, Point.undefined, Point.undefined, Point.undefined ],
+            fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
+        const handle: Sketch = new Sketch({ points: [], fillColor: "none", strokeWidth: resolution });
 
-            curveSegment[1][0] = getMousePosition(slide, event);
+        slideWrapper.addGraphic(curve);
+        slideWrapper.addGraphic(segment);
+        slideWrapper.addGraphic(handle);
+
+        function setFirstControlPoint(event: Event): void {
+            document.removeEventListener("Deck.CanvasMouseUp", setFirstControlPoint);
+            document.addEventListener("Deck.CanvasMouseDown", setEndpoint);
+
+            segment.points[1] = getMousePosition(event as CustomEvent, slideWrapper.store);
         }
 
-        function setEndpoint(event: MouseEvent): void {
-            isolateEvent(event);
-            canvas.off("mousedown", setEndpoint);
-            canvas.on("mouseup", setSecondControlPoint);
+        function setEndpoint(event: Event): void {
+            document.removeEventListener("Deck.CanvasMouseDown", setEndpoint);
+            document.addEventListener("Deck.CanvasMouseUp", setSecondControlPoint);
 
-            curveSegment[1][2] = getMousePosition(slide, event);
+            segment.points[3] = getMousePosition(event as CustomEvent, slideWrapper.store);
         }
 
-        function setSecondControlPoint(event: MouseEvent): void {
-            canvas.off("mouseup", setSecondControlPoint);
+        function setSecondControlPoint(event: Event): void {
+            document.removeEventListener("Deck.CanvasMouseUp", setSecondControlPoint);
 
             // Complete the curve segment and add it to the final curve
-            curveSegment[1][1] = getMousePosition(slide, event).reflect(curveSegment[1][2]);
-            curve.push(curveSegment[1] as Array<Point>);
-            curveGraphic.plot(toBezierString(curve));
+            segment.points[2] = getMousePosition(event as CustomEvent, slideWrapper.store).reflect(segment.points[3]);
+            curve.points.push(...segment.points.slice(1));
 
             // Reset the curve segment and set the first control point
-            curveSegment[0] = [curveSegment[1][2]];
-            curveSegment[1] = [undefined, undefined, undefined];
+            segment.points = [ segment.points[3], Point.undefined, Point.undefined, Point.undefined ];
             setFirstControlPoint(event);
         }
 
-        function preview(event: MouseEvent): void {
+        function preview(event: Event): void {
             // Redraw the current curve segment as the mouse moves around
-            const position: Point = getMousePosition(slide, event);
-            curveSegmentGraphic.plot(toBezierString(resolveCurve(curveSegment, position)));
+            const position: Point = getMousePosition(event as CustomEvent, slideWrapper.store);
+            slideWrapper.updateGraphic(segment.id, { points: resolveCurve(segment.points, position) });
 
             // Display the control point shape if the endpoint is defined
-            if (curveSegment[1][2] !== undefined) {
-                controlPointGraphic.plot([position.reflect(curveSegment[1][2]).toArray(), position.toArray()]).stroke("blue");
+            if (segment.points[3] !== Point.undefined) {
+                handle.points = [ position.reflect(segment.points[3]), position];
+                handle.strokeColor = "blue";
             } else {
-                controlPointGraphic.stroke("none");
+                handle.strokeColor = "none";
             }
         }
 
@@ -206,162 +204,158 @@ const penTool: Tool = new Tool("pen", {
 
             penToolIsActive = false;
             document.removeEventListener("keydown", end);
-            canvas.off("mousemove", preview);
-
-            // Flatten the representation of curves into a list of points
-            const points: Array<Point> = [];
-            curve.forEach((c: Array<Point | undefined>) => points.push(...(c as Array<Point>)));
-
-            // Remove the shape visually - if it is more than just a point, persist it to the slide, then refresh the style editor
-            controlPointGraphic.remove();
-            curveSegmentGraphic.remove();
-            curveGraphic.remove();
-
-            if (points.length > 1) {
-                addGraphic(slide, Curve.model(curveGraphic));
-            }
+            document.removeEventListener("Deck.CanvasMouseMove", preview);
         }
 
         // Convert a curve with possible undefined values to a curve with defined fallback values
-        function resolveCurve(curve: Array<Array<Point | undefined>>, defaultPoint: Point): Array<Array<Point>> {
+        function resolveCurve(curve: Array<Point>, defaultPoint: Point): Array<Point> {
             return [
-                [curve[0][0] || defaultPoint],
-                [
-                    curve[1][0] || defaultPoint,
-                    curve[1][1] || (curve[1][2] ? defaultPoint.reflect(curve[1][2]) : defaultPoint),
-                    curve[1][2] || defaultPoint
-                ]
+                curve[0] === Point.undefined ? defaultPoint : curve[0],
+                curve[1] === Point.undefined ? defaultPoint : curve[1],
+                curve[2] === Point.undefined ? (curve[3] !== Point.undefined ? defaultPoint.reflect(curve[3]) : defaultPoint) : curve[2],
+                curve[3] === Point.undefined ? defaultPoint : curve[3],
             ];
-        }
-
-        // Turns an array of curves into bezier curve string format
-        function toBezierString(curves: Array<Array<Point>>): string {
-            const points: string = curves.slice(1)
-                .map<string>((curve: Array<Point>): string => ` C ${curve.map<string>((point: Point) => `${point.x},${point.y}`).join(" ")}`)
-                .join(" ");
-
-            return `M ${curves[0][0].x},${curves[0][0].y} ${points}`;
         }
     }
 });
 
 // Rectangle tool handlers
 const rectangleTool: Tool = new Tool("rectangle", {
-    canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
-    canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
-    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
-        isolateEvent(event);
-        canvas.on("mousemove", preview);
-        canvas.on("mouseup", end);
+    canvasMouseOver: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("crosshair"),
+    canvasMouseOut: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("default"),
+    canvasMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent): void => {
+        document.addEventListener("Deck.CanvasMouseMove", preview);
+        document.addEventListener("Deck.CanvasMouseUp", end);
         document.addEventListener("keydown", toggleSquare);
         document.addEventListener("keyup", toggleSquare);
 
-        focusGraphic(slide, undefined);
-        const start: Point = getMousePosition(slide, event);
-        const shape: SVG.Rect = canvas.rect().move(start.x, start.y);
-        let lastPosition: Point = new Point(event.clientX, event.clientY);
+        slideWrapper.store.commit("focusGraphic", undefined);
+        slideWrapper.store.commit("styleEditorObject", undefined);
+        const start: Point = getMousePosition(event, slideWrapper.store);
+        const rectangle: Rectangle = new Rectangle({ origin: start });
+        slideWrapper.addGraphic(rectangle);
+        let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
 
         // Preview drawing rectangle
-        function preview(event: MouseEvent): void {
+        function preview(event: Event): void {
             // Determine dimensions for a rectangle or square (based on if shift is pressed)
-            lastPosition = new Point(event.clientX, event.clientY);
-            const position: Point = getMousePosition(slide, event);
+            const mouseEvent: MouseEvent = (event as CustomEvent).detail.baseEvent as MouseEvent;
+            lastPosition = new Point(mouseEvent.clientX, mouseEvent.clientY);
+
+            const position: Point = getMousePosition(event as CustomEvent, slideWrapper.store);
             const rawDimensions: Point = position.add(start.scale(-1));
             const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
-            const dimensions: Point = event.shiftKey
+            const dimensions: Point = mouseEvent.shiftKey
                 ? new Point(Math.sign(rawDimensions.x) * minimumDimension, Math.sign(rawDimensions.y) * minimumDimension)
                 : rawDimensions;
 
             // Check if the dimensions are negative and move (x, y) or resize
-            const move: Point = event.shiftKey ? start.add(dimensions) : position;
-            shape.move(dimensions.x < 0 ? move.x : start.x, dimensions.y < 0 ? move.y : start.y);
-            shape.size(Math.abs(dimensions.x), Math.abs(dimensions.y));
+            const move: Point = mouseEvent.shiftKey ? start.add(dimensions) : position;
+            rectangle.origin.x = dimensions.x < 0 ? move.x : start.x;
+            rectangle.origin.y = dimensions.y < 0 ? move.y : start.y;
+            rectangle.width = Math.abs(dimensions.x);
+            rectangle.height = Math.abs(dimensions.y);
+            slideWrapper.updateGraphic(rectangle.id, rectangle);
         }
 
         // End drawing rectangle
         function end(): void {
-            canvas.off("mousemove", preview);
-            canvas.off("mouseup", end);
+            document.removeEventListener("Deck.CanvasMouseMove", preview);
+            document.removeEventListener("Deck.CanvasMouseUp", end);
             document.removeEventListener("keydown", toggleSquare);
             document.removeEventListener("keyup", toggleSquare);
-            shape.remove();
-            addGraphic(slide, Rectangle.model(shape));
         }
 
         function toggleSquare(event: KeyboardEvent): void {
-            if (event.key === "Shift") {
-                preview(new MouseEvent("mousemove", {
-                    shiftKey: event.type === "keydown",
-                    clientX: lastPosition.x,
-                    clientY: lastPosition.y
-                }));
+            if (event.key !== "Shift") {
+                return;
             }
+
+            document.dispatchEvent(new CustomEvent("Deck.CanvasMouseMove", {
+                detail: {
+                    baseEvent: new MouseEvent("mousemove", {
+                        shiftKey: event.type === "keydown",
+                        clientX: lastPosition.x,
+                        clientY: lastPosition.y
+                    }),
+                    slideId: slideWrapper.slideId
+                }
+            }));
         }
     }
 });
 
 const ellipseTool: Tool = new Tool("ellipse", {
-    canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "crosshair"),
-    canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
-    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
-        isolateEvent(event);
-        canvas.on("mousemove", preview);
-        canvas.on("mouseup", end);
+    canvasMouseOver: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("crosshair"),
+    canvasMouseOut: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("default"),
+    canvasMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent): void => {
+        document.addEventListener("Deck.CanvasMouseMove", preview);
+        document.addEventListener("Deck.CanvasMouseUp", end);
         document.addEventListener("keydown", toggleCircle);
         document.addEventListener("keyup", toggleCircle);
 
-        focusGraphic(slide, undefined);
-        const start: Point = getMousePosition(slide, event);
-        const shape: SVG.Ellipse = canvas.ellipse().center(start.x, start.y);
-        let lastPosition: Point = new Point(event.clientX, event.clientY);
+        slideWrapper.store.commit("focusGraphic", undefined);
+        slideWrapper.store.commit("styleEditorObject", undefined);
+        const start: Point = getMousePosition(event, slideWrapper.store);
+        const ellipse: Ellipse = new Ellipse({ origin: start });
+        let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
 
         // Preview drawing ellipse
-        function preview(event: MouseEvent): void {
+        function preview(event: Event): void {
             // Determine dimensions for an ellipse or circle (based on if shift is pressed)
-            lastPosition = new Point(event.clientX, event.clientY);
-            const position: Point = getMousePosition(slide, event);
+            const mouseEvent: MouseEvent = (event as CustomEvent).detail.baseEvent as MouseEvent;
+            lastPosition = new Point(mouseEvent.clientX, mouseEvent.clientY);
+            const position: Point = getMousePosition(event as CustomEvent, slideWrapper.store);
             const rawOffset: Point = position.add(start.scale(-1));
             const minimumOffset: number = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
-            const resolvedOffset: Point = event.shiftKey
+            const resolvedOffset: Point = mouseEvent.shiftKey
                 ? new Point(Math.sign(rawOffset.x) * minimumOffset, Math.sign(rawOffset.y) * minimumOffset) : rawOffset;
             const center: Point = start.add(start).add(resolvedOffset).scale(0.5);
 
             // Check if the dimensions are negative and move (x, y) or resize
-            shape.center(center.x, center.y);
-            shape.size(Math.abs(resolvedOffset.x), Math.abs(resolvedOffset.y));
+            ellipse.origin.x = center.x;
+            ellipse.origin.y = center.y;
+            ellipse.width = Math.abs(resolvedOffset.x);
+            ellipse.height = Math.abs(resolvedOffset.y);
+            slideWrapper.updateGraphic(ellipse.id, ellipse);
         }
 
         // End drawing ellipse
         function end(): void {
-            canvas.off("mousemove", preview);
-            canvas.off("mouseup", end);
+            document.removeEventListener("Deck.CanvasMouseMove", preview);
+            document.removeEventListener("Deck.CanvasMouseUp", end);
             document.removeEventListener("keydown", toggleCircle);
             document.removeEventListener("keyup", toggleCircle);
-            shape.remove();
-            addGraphic(slide, Ellipse.model(shape));
         }
 
         function toggleCircle(event: KeyboardEvent): void {
-            if (event.key === "Shift") {
-                preview(new MouseEvent("mousemove", {
-                    shiftKey: event.type === "keydown",
-                    clientX: lastPosition.x,
-                    clientY: lastPosition.y
-                }));
+            if (event.key !== "Shift") {
+                return;
             }
+
+            document.dispatchEvent(new CustomEvent("Deck.CanvasMouseMove", {
+                detail: {
+                    baseEvent: new MouseEvent("mousemove", {
+                        shiftKey: event.type === "keydown",
+                        clientX: lastPosition.x,
+                        clientY: lastPosition.y
+                    }),
+                    slideId: slideWrapper.slideId
+                }
+            }));
         }
     }
 });
 
 const textboxTool: Tool = new Tool("textbox", {
-    canvasMouseOver: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "text"),
-    canvasMouseOut: (canvas: SVG.Doc) => (): any => canvas.style("cursor", "default"),
-    canvasMouseDown: (slide: any, canvas: SVG.Doc) => (event: MouseEvent): void => {
-        isolateEvent(event);
-        focusGraphic(slide, undefined);
-        const position: Point = getMousePosition(slide, event);
-        const svg: SVG.Text = canvas.text("lorem ipsum\ndolor sit amet").move(position.x, position.y).remove();
-        addGraphic(slide, Text.model(svg));
+    canvasMouseOver: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("text"),
+    canvasMouseOut: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("default"),
+    canvasMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent): void => {
+        slideWrapper.store.commit("focusGraphic", undefined);
+        slideWrapper.store.commit("styleEditorObject", undefined);
+
+        const text: Text = new Text({ origin: getMousePosition(event, slideWrapper.store), content: "lorem ipsum\ndolor sit amet" });
+        slideWrapper.addGraphic(text);
     }
 });
 

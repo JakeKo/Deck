@@ -16,21 +16,16 @@ export default class Slide extends Vue {
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
 
-    @Watch("graphics", { deep: true }) public refreshCanvas(): void {
-        this.canvas.clear();
-        this.graphics.forEach((graphic: IGraphic) => this.initializeGraphic(graphic));
-    }
-
     private mounted(): void {
         const canvasResolution: number = this.$store.getters.canvasResolution;
         this.canvas = SVG(this.$el.id).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
         this.slideWrapper = new SlideWrapper(this.id, this.canvas, this.$store);
 
-        document.addEventListener("Deck.CanvasMouseOver", (event: Event): void => this.$store.getters.tool.canvasMouseOver(this.canvas)((event as CustomEvent).detail.baseEvent));
-        document.addEventListener("Deck.CanvasMouseOut", (event: Event): void => this.$store.getters.tool.canvasMouseOut(this.canvas)((event as CustomEvent).detail.baseEvent));
-        document.addEventListener("Deck.CanvasMouseDown", (event: Event): void => this.$store.getters.tool.canvasMouseDown(this, this.canvas)((event as CustomEvent).detail.baseEvent));
+        document.addEventListener("Deck.CanvasMouseOver", (event: Event): void => this.$store.getters.tool.canvasMouseOver(this.slideWrapper)(event));
+        document.addEventListener("Deck.CanvasMouseOut", (event: Event): void => this.$store.getters.tool.canvasMouseOut(this.slideWrapper)(event));
+        document.addEventListener("Deck.CanvasMouseDown", (event: Event): void => this.$store.getters.tool.canvasMouseDown(this.slideWrapper)(event));
 
-        this.refreshCanvas();
+        this.graphics.forEach((graphic: IGraphic) => this.initializeGraphic(graphic));
     }
 
     private initializeGraphic(graphic: IGraphic): void {
