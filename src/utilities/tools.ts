@@ -117,8 +117,8 @@ const pencilTool: Tool = new Tool("pencil", {
             document.removeEventListener("Deck.CanvasMouseMove", preview);
             document.removeEventListener("Deck.CanvasMouseUp", end);
 
-            slideWrapper.store.commit("focusGraphic", sketch);
-            slideWrapper.store.commit("styleEditorObject", sketch);
+            slideWrapper.store.commit("focusGraphic", slideWrapper.getGraphic(sketch.id));
+            slideWrapper.store.commit("styleEditorObject", slideWrapper.getGraphic(sketch.id));
         }
     }
 });
@@ -143,12 +143,10 @@ const penTool: Tool = new Tool("pen", {
         const start: Point = getMousePosition(event, slideWrapper.store);
         const resolution: number = slideWrapper.store.getters.canvasResolution;
 
+        let segmentPoints: Array<Point> = [start, Point.undefined, Point.undefined, Point.undefined];
         const curve: Curve = new Curve({ points: [start], fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
-        const segment: Curve = new Curve({
-            points: [start, Point.undefined, Point.undefined, Point.undefined],
-            fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3
-        });
-        const handle: Sketch = new Sketch({ points: [], fillColor: "none", strokeWidth: resolution });
+        const segment: Curve = new Curve({ points: resolveCurve(segmentPoints, start), fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
+        const handle: Sketch = new Sketch({ points: [], fillColor: "none", strokeColor: "blue", strokeWidth: resolution });
 
         slideWrapper.addGraphic(curve);
         slideWrapper.addGraphic(segment);
@@ -158,40 +156,44 @@ const penTool: Tool = new Tool("pen", {
             document.removeEventListener("Deck.CanvasMouseUp", setFirstControlPoint);
             document.addEventListener("Deck.CanvasMouseDown", setEndpoint);
 
-            segment.points[1] = getMousePosition(event as CustomEvent, slideWrapper.store);
+            segmentPoints[1] = getMousePosition(event as CustomEvent, slideWrapper.store);
         }
 
         function setEndpoint(event: Event): void {
             document.removeEventListener("Deck.CanvasMouseDown", setEndpoint);
             document.addEventListener("Deck.CanvasMouseUp", setSecondControlPoint);
 
-            segment.points[3] = getMousePosition(event as CustomEvent, slideWrapper.store);
+            segmentPoints[3] = getMousePosition(event as CustomEvent, slideWrapper.store);
         }
 
         function setSecondControlPoint(event: Event): void {
             document.removeEventListener("Deck.CanvasMouseUp", setSecondControlPoint);
 
             // Complete the curve segment and add it to the final curve
-            segment.points[2] = getMousePosition(event as CustomEvent, slideWrapper.store).reflect(segment.points[3]);
-            curve.points.push(...segment.points.slice(1));
+            segmentPoints[2] = getMousePosition(event as CustomEvent, slideWrapper.store).reflect(segmentPoints[3]);
+            curve.points.push(...segmentPoints.slice(1));
 
             // Reset the curve segment and set the first control point
-            segment.points = [segment.points[3], Point.undefined, Point.undefined, Point.undefined];
+            segmentPoints = [segmentPoints[3], Point.undefined, Point.undefined, Point.undefined];
             setFirstControlPoint(event);
         }
 
         function preview(event: Event): void {
             // Redraw the current curve segment as the mouse moves around
             const position: Point = getMousePosition(event as CustomEvent, slideWrapper.store);
-            slideWrapper.updateGraphic(segment.id, { points: resolveCurve(segment.points, position) });
+            segment.points = resolveCurve(segmentPoints, position);
+            slideWrapper.updateGraphic(segment.id, segment);
+            slideWrapper.updateGraphic(curve.id, curve);
 
             // Display the control point shape if the endpoint is defined
-            if (segment.points[3] !== Point.undefined) {
+            if (segmentPoints[3] !== Point.undefined) {
                 handle.points = [position.reflect(segment.points[3]), position];
                 handle.strokeColor = "blue";
             } else {
                 handle.strokeColor = "none";
             }
+
+            slideWrapper.updateGraphic(handle.id, handle);
         }
 
         function end(event: KeyboardEvent): void {
@@ -201,6 +203,8 @@ const penTool: Tool = new Tool("pen", {
             }
 
             penToolIsActive = false;
+            slideWrapper.removeGraphic(handle.id);
+            slideWrapper.removeGraphic(segment.id);
             document.removeEventListener("keydown", end);
             document.removeEventListener("Deck.CanvasMouseMove", preview);
         }
