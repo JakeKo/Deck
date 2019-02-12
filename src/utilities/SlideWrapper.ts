@@ -13,7 +13,7 @@ export default class SlideWrapper {
         this.slideId = slideId;
         this._canvas = canvas;
 
-        this._canvas.on("mousmove", (event: MouseEvent): void => {
+        this._canvas.on("mousemove", (event: MouseEvent): void => {
             event.preventDefault();
             event.stopPropagation();
             document.dispatchEvent(new CustomEvent("Deck.CanvasMouseMove", { detail: { baseEvent: event, slideId: this.slideId } }));
@@ -67,24 +67,8 @@ export default class SlideWrapper {
     }
 
     public updateGraphic(id: string, newGraphic: any): void {
-        // Update graphic in the store
-        this.store.commit("updateGraphic", { graphic: newGraphic });
-
-        // Update graphic in the canvas
-        const graphic: IGraphic | undefined = this.getGraphic(id);
-
-        if (graphic === undefined) {
-            throw `ERROR: Could not find a graphic with the id: "${id}"`;
-        }
-
-        graphic.update(newGraphic);
-
-        // Update the bounding box rendering if the graphic is focused
-        const focusedGraphic: IGraphic | undefined = this.store.getters.focusedGraphic;
-        if (focusedGraphic !== undefined && focusedGraphic.id === graphic.id) {
-            SVG.get(graphic.boundingBoxId).remove();
-            graphic.boundingBox.render(this._canvas);
-        }
+        this.removeGraphic(id);
+        this.addGraphic(newGraphic);
     }
 
     public removeGraphic(id: string): void {

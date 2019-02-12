@@ -14,10 +14,7 @@ function getMousePosition(event: CustomEvent, store: any): Point {
     const zoom: number = store.getters.canvasZoom;
     const resolution: number = store.getters.canvasResolution;
     // const bounds: DOMRect = el.getBoundingClientRect();
-    return new Point(mouseEvent.clientX, mouseEvent.clientY)
-        .scale(1 / zoom)
-        // .add(new Point(-bounds.left, -bounds.top))
-        .scale(resolution).transform(Math.round);
+    return new Point(Math.round((mouseEvent.clientX / zoom/* - bounds.left*/) * resolution), Math.round((mouseEvent.clientY / zoom/* - bounds.top*/) * resolution));
 }
 
 function focusGraphic(slide: any, graphic?: IGraphic, refresh: boolean = true): void {
@@ -148,8 +145,10 @@ const penTool: Tool = new Tool("pen", {
         const resolution: number = slideWrapper.store.getters.canvasResolution;
 
         const curve: Curve = new Curve({ points: [start], fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
-        const segment: Curve = new Curve({ points: [ start, Point.undefined, Point.undefined, Point.undefined ],
-            fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
+        const segment: Curve = new Curve({
+            points: [start, Point.undefined, Point.undefined, Point.undefined],
+            fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3
+        });
         const handle: Sketch = new Sketch({ points: [], fillColor: "none", strokeWidth: resolution });
 
         slideWrapper.addGraphic(curve);
@@ -178,7 +177,7 @@ const penTool: Tool = new Tool("pen", {
             curve.points.push(...segment.points.slice(1));
 
             // Reset the curve segment and set the first control point
-            segment.points = [ segment.points[3], Point.undefined, Point.undefined, Point.undefined ];
+            segment.points = [segment.points[3], Point.undefined, Point.undefined, Point.undefined];
             setFirstControlPoint(event);
         }
 
@@ -189,7 +188,7 @@ const penTool: Tool = new Tool("pen", {
 
             // Display the control point shape if the endpoint is defined
             if (segment.points[3] !== Point.undefined) {
-                handle.points = [ position.reflect(segment.points[3]), position];
+                handle.points = [position.reflect(segment.points[3]), position];
                 handle.strokeColor = "blue";
             } else {
                 handle.strokeColor = "none";
@@ -232,7 +231,7 @@ const rectangleTool: Tool = new Tool("rectangle", {
         slideWrapper.store.commit("focusGraphic", undefined);
         slideWrapper.store.commit("styleEditorObject", undefined);
         const start: Point = getMousePosition(event, slideWrapper.store);
-        const rectangle: Rectangle = new Rectangle({ origin: start });
+        const rectangle: Rectangle = new Rectangle({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
         slideWrapper.addGraphic(rectangle);
         let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
 
@@ -245,16 +244,13 @@ const rectangleTool: Tool = new Tool("rectangle", {
             const position: Point = getMousePosition(event as CustomEvent, slideWrapper.store);
             const rawDimensions: Point = position.add(start.scale(-1));
             const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
-            const dimensions: Point = mouseEvent.shiftKey
-                ? new Point(Math.sign(rawDimensions.x) * minimumDimension, Math.sign(rawDimensions.y) * minimumDimension)
-                : rawDimensions;
 
-            // Check if the dimensions are negative and move (x, y) or resize
-            const move: Point = mouseEvent.shiftKey ? start.add(dimensions) : position;
-            rectangle.origin.x = dimensions.x < 0 ? move.x : start.x;
-            rectangle.origin.y = dimensions.y < 0 ? move.y : start.y;
-            rectangle.width = Math.abs(dimensions.x);
-            rectangle.height = Math.abs(dimensions.y);
+            // Enforce that a shape has positive width and height i.e. move the x and y if the width or height are negative
+            rectangle.origin.x = rawDimensions.x < 0 ? start.x + (mouseEvent.shiftKey ? -minimumDimension : rawDimensions.x) : rectangle.origin.x;
+            rectangle.origin.y = rawDimensions.y < 0 ? start.y + (mouseEvent.shiftKey ? -minimumDimension : rawDimensions.y) : rectangle.origin.y;
+
+            rectangle.width = mouseEvent.shiftKey ? minimumDimension : Math.abs(rawDimensions.x);
+            rectangle.height = mouseEvent.shiftKey ? minimumDimension : Math.abs(rawDimensions.y);
             slideWrapper.updateGraphic(rectangle.id, rectangle);
         }
 
@@ -297,26 +293,26 @@ const ellipseTool: Tool = new Tool("ellipse", {
         slideWrapper.store.commit("focusGraphic", undefined);
         slideWrapper.store.commit("styleEditorObject", undefined);
         const start: Point = getMousePosition(event, slideWrapper.store);
-        const ellipse: Ellipse = new Ellipse({ origin: start });
+        const ellipse: Ellipse = new Ellipse({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
+        slideWrapper.addGraphic(ellipse);
         let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
 
         // Preview drawing ellipse
         function preview(event: Event): void {
-            // Determine dimensions for an ellipse or circle (based on if shift is pressed)
+            // Determine dimensions for a rectangle or square (based on if shift is pressed)
             const mouseEvent: MouseEvent = (event as CustomEvent).detail.baseEvent as MouseEvent;
             lastPosition = new Point(mouseEvent.clientX, mouseEvent.clientY);
+
             const position: Point = getMousePosition(event as CustomEvent, slideWrapper.store);
             const rawOffset: Point = position.add(start.scale(-1));
             const minimumOffset: number = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
-            const resolvedOffset: Point = mouseEvent.shiftKey
-                ? new Point(Math.sign(rawOffset.x) * minimumOffset, Math.sign(rawOffset.y) * minimumOffset) : rawOffset;
-            const center: Point = start.add(start).add(resolvedOffset).scale(0.5);
 
-            // Check if the dimensions are negative and move (x, y) or resize
-            ellipse.origin.x = center.x;
-            ellipse.origin.y = center.y;
-            ellipse.width = Math.abs(resolvedOffset.x);
-            ellipse.height = Math.abs(resolvedOffset.y);
+            // Enforce that a shape has positive width and height i.e. move the x and y if the width or height are negative
+            ellipse.origin.x = start.x + ((mouseEvent.shiftKey ? Math.sign(rawOffset.x) * minimumOffset : rawOffset.x) - start.x) * 0.5;
+            ellipse.origin.y = start.y + ((mouseEvent.shiftKey ? Math.sign(rawOffset.y) * minimumOffset : rawOffset.y) - start.y) * 0.5;
+
+            ellipse.width = mouseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.x);
+            ellipse.height = mouseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.y);
             slideWrapper.updateGraphic(ellipse.id, ellipse);
         }
 
