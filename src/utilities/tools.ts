@@ -13,8 +13,7 @@ function getMousePosition(event: CustomEvent, store: any): Point {
     const mouseEvent: MouseEvent = event.detail.baseEvent as MouseEvent;
     const zoom: number = store.getters.canvasZoom;
     const resolution: number = store.getters.canvasResolution;
-    // const bounds: DOMRect = el.getBoundingClientRect();
-    return new Point(Math.round((mouseEvent.clientX / zoom/* - bounds.left*/) * resolution), Math.round((mouseEvent.clientY / zoom/* - bounds.top*/) * resolution));
+    return new Point(Math.round((mouseEvent.offsetX / zoom) * resolution), Math.round((mouseEvent.offsetY / zoom) * resolution));
 }
 
 function focusGraphic(slide: any, graphic?: IGraphic, refresh: boolean = true): void {
@@ -234,6 +233,7 @@ const rectangleTool: Tool = new Tool("rectangle", {
         const rectangle: Rectangle = new Rectangle({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
         slideWrapper.addGraphic(rectangle);
         let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
+        let shiftPressed = false;
 
         // Preview drawing rectangle
         function preview(event: Event): void {
@@ -263,10 +263,11 @@ const rectangleTool: Tool = new Tool("rectangle", {
         }
 
         function toggleSquare(event: KeyboardEvent): void {
-            if (event.key !== "Shift") {
+            if (event.key !== "Shift" || (event.type === "keydown" && shiftPressed)) {
                 return;
             }
 
+            shiftPressed = event.type === "keydown";
             document.dispatchEvent(new CustomEvent("Deck.CanvasMouseMove", {
                 detail: {
                     baseEvent: new MouseEvent("mousemove", {
@@ -296,10 +297,11 @@ const ellipseTool: Tool = new Tool("ellipse", {
         const ellipse: Ellipse = new Ellipse({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
         slideWrapper.addGraphic(ellipse);
         let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
+        let shiftPressed = false;
 
         // Preview drawing ellipse
         function preview(event: Event): void {
-            // Determine dimensions for a rectangle or square (based on if shift is pressed)
+            // Determine dimensions for an ellipse or circle (based on if shift is pressed)
             const mouseEvent: MouseEvent = (event as CustomEvent).detail.baseEvent as MouseEvent;
             lastPosition = new Point(mouseEvent.clientX, mouseEvent.clientY);
 
@@ -308,8 +310,8 @@ const ellipseTool: Tool = new Tool("ellipse", {
             const minimumOffset: number = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
 
             // Enforce that a shape has positive width and height i.e. move the x and y if the width or height are negative
-            ellipse.origin.x = start.x + ((mouseEvent.shiftKey ? Math.sign(rawOffset.x) * minimumOffset : rawOffset.x) - start.x) * 0.5;
-            ellipse.origin.y = start.y + ((mouseEvent.shiftKey ? Math.sign(rawOffset.y) * minimumOffset : rawOffset.y) - start.y) * 0.5;
+            ellipse.origin.x = start.x + (mouseEvent.shiftKey ? Math.sign(rawOffset.x) * minimumOffset : rawOffset.x) * 0.5;
+            ellipse.origin.y = start.y + (mouseEvent.shiftKey ? Math.sign(rawOffset.y) * minimumOffset : rawOffset.y) * 0.5;
 
             ellipse.width = mouseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.x);
             ellipse.height = mouseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.y);
@@ -325,10 +327,11 @@ const ellipseTool: Tool = new Tool("ellipse", {
         }
 
         function toggleCircle(event: KeyboardEvent): void {
-            if (event.key !== "Shift") {
+            if (event.key !== "Shift" || (event.type === "keydown" && shiftPressed)) {
                 return;
             }
 
+            shiftPressed = event.type === "keydown";
             document.dispatchEvent(new CustomEvent("Deck.CanvasMouseMove", {
                 detail: {
                     baseEvent: new MouseEvent("mousemove", {
@@ -350,7 +353,7 @@ const textboxTool: Tool = new Tool("textbox", {
         slideWrapper.store.commit("focusGraphic", undefined);
         slideWrapper.store.commit("styleEditorObject", undefined);
 
-        const text: Text = new Text({ origin: getMousePosition(event, slideWrapper.store), content: "lorem ipsum\ndolor sit amet" });
+        const text: Text = new Text({ origin: getMousePosition(event, slideWrapper.store), content: "lorem ipsum\ndolor sit amet", fontSize: 24 });
         slideWrapper.addGraphic(text);
     }
 });
