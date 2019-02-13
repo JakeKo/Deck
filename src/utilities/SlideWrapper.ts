@@ -53,7 +53,32 @@ export default class SlideWrapper {
         this.store.commit("addGraphic", { slideId: this.slideId, graphic: graphic });
 
         // Add graphic to the canvas
-        graphic.render(this._canvas);
+        const svg: SVG.Element = graphic.render(this._canvas);
+
+        // Bind each event handler
+        svg.on("mouseover", (event: MouseEvent): void => {
+            event.preventDefault();
+            event.stopPropagation();
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseOver", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphic.id } }));
+        });
+
+        svg.on("mouseout", (event: MouseEvent): void => {
+            event.preventDefault();
+            event.stopPropagation();
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseOut", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphic.id } }));
+        });
+
+        svg.on("mouseup", (event: MouseEvent): void => {
+            event.preventDefault();
+            event.stopPropagation();
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseUp", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphic.id } }));
+        });
+
+        svg.on("mousedown", (event: MouseEvent): void => {
+            event.preventDefault();
+            event.stopPropagation();
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseDown", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphic.id } }));
+        });
     }
 
     public getGraphic(id: string): IGraphic | undefined {

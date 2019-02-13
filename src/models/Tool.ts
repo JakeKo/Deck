@@ -1,5 +1,3 @@
-import * as SVG from "svg.js";
-import IGraphic from "./IGraphic";
 import SlideWrapper from "../utilities/SlideWrapper";
 
 export default class Tool {
@@ -7,9 +5,9 @@ export default class Tool {
     public canvasMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
     public canvasMouseOver: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
     public canvasMouseOut: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
-    public graphicMouseOver: (svg: SVG.Element) => (event: MouseEvent) => any;
-    public graphicMouseOut: (svg: SVG.Element) => (event: MouseEvent) => any;
-    public graphicMouseDown: (slide: any, svg: SVG.Element, graphic: IGraphic) => (event: MouseEvent) => any;
+    public graphicMouseOver: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
+    public graphicMouseOut: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
+    public graphicMouseDown: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
 
     constructor(name: string, {
         canvasMouseDown,
@@ -19,12 +17,12 @@ export default class Tool {
         graphicMouseOut,
         graphicMouseDown
     }: {
-        canvasMouseDown?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
-        canvasMouseOver?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
-        canvasMouseOut?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
-        graphicMouseOver?: (svg: SVG.Element) => (event: MouseEvent) => any;
-        graphicMouseOut?: (svg: SVG.Element) => (event: MouseEvent) => any;
-        graphicMouseDown?: (slide: any, svg: SVG.Element, graphic: IGraphic) => (event: MouseEvent) => any;
+        canvasMouseDown?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
+        canvasMouseOver?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
+        canvasMouseOut?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
+        graphicMouseOver?: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
+        graphicMouseOut?: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
+        graphicMouseDown?: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void
     }) {
         const EMPTY_HANDLER: () => () => void = (): () => void => (): void => { return; };
 
