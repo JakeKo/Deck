@@ -8,7 +8,7 @@ import Sketch from "../models/Sketch";
 import Text from "../models/Text";
 import SlideWrapper from "./SlideWrapper";
 
-function getMousePosition(event: CustomEvent, store: any): Point {
+function getPosition(event: CustomEvent, store: any): Point {
     const mouseEvent: MouseEvent = event.detail.baseEvent as MouseEvent;
     const zoom: number = store.getters.canvasZoom;
     const resolution: number = store.getters.canvasResolution;
@@ -20,25 +20,25 @@ const cursorTool: Tool = new Tool("cursor", {
     graphicMouseOver: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("pointer"),
     graphicMouseOut: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("default"),
     graphicMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent): void => {
+        const graphic: IGraphic | undefined = slideWrapper.getGraphic(event.detail.graphicId);
+        if (graphic === undefined) {
+            console.error(`ERROR: Could not find a graphic with the id: ${event.detail.graphicId}`);
+            return;
+        }
+
+        slideWrapper.store.commit("focusGraphic", graphic);
+        slideWrapper.store.commit("styleEditorObject", graphic);
+
+        const initialPosition: Point = getPosition(event, slideWrapper.store);
+        const initialOrigin: Point = graphic.origin;
+
         document.addEventListener("Deck.CanvasMouseMove", preview);
         document.addEventListener("Deck.CanvasMouseUp", end);
         document.addEventListener("Deck.GraphicMouseUp", end);
 
-        const graphic: IGraphic | undefined = slideWrapper.getGraphic(event.detail.graphicId);
-        if (graphic === undefined) {
-            console.error(`ERROR: Could not find a graphic with the id: ${event.detail.graphicId}`);
-            document.removeEventListener("Deck.CanvasMouseMove", preview);
-            document.removeEventListener("Deck.CanvasMouseUp", end);
-            document.removeEventListener("Deck.GraphicMouseUp", end);
-            return;
-        }
-
-        const initialPosition: Point = getMousePosition(event, slideWrapper.store);
-        const initialOrigin: Point = graphic.origin;
-
         // Preview moving shape
         function preview(event: Event): void {
-            const position: Point = getMousePosition(event as CustomEvent, slideWrapper.store);
+            const position: Point = getPosition(event as CustomEvent, slideWrapper.store);
             const cursorOffset: Point = position.add(initialPosition.scale(-1));
             graphic!.origin = initialOrigin.add(cursorOffset);
             slideWrapper.updateGraphic(graphic!.id, graphic!);
@@ -50,7 +50,9 @@ const cursorTool: Tool = new Tool("cursor", {
             document.removeEventListener("Deck.CanvasMouseUp", end);
             document.removeEventListener("Deck.GraphicMouseUp", end);
 
+            slideWrapper.store.commit("focusGraphic", undefined);
             slideWrapper.store.commit("styleEditorObject", undefined);
+            slideWrapper.store.commit("focusGraphic", graphic);
             slideWrapper.store.commit("styleEditorObject", graphic);
         }
     }
@@ -68,12 +70,12 @@ const pencilTool: Tool = new Tool("pencil", {
         // Unfocus the current graphic if any and set initial state of pencil drawing
         slideWrapper.store.commit("focusGraphic", undefined);
         slideWrapper.store.commit("styleEditorObject", undefined);
-        const sketch: Sketch = new Sketch({ origin: getMousePosition(event, slideWrapper.store), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
+        const sketch: Sketch = new Sketch({ origin: getPosition(event, slideWrapper.store), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
         slideWrapper.addGraphic(sketch);
 
         // Add the current mouse position to the list of points to plot
         function preview(event: Event): void {
-            sketch.points.push(getMousePosition(event as CustomEvent, slideWrapper.store).add(sketch.origin.scale(-1)));
+            sketch.points.push(getPosition(event as CustomEvent, slideWrapper.store).add(sketch.origin.scale(-1)));
             slideWrapper.updateGraphic(sketch.id, sketch);
         }
 
@@ -83,8 +85,9 @@ const pencilTool: Tool = new Tool("pencil", {
             document.removeEventListener("Deck.CanvasMouseUp", end);
             document.removeEventListener("Deck.GraphicMouseUp", end);
 
-            slideWrapper.store.commit("focusGraphic", slideWrapper.getGraphic(sketch.id));
-            slideWrapper.store.commit("styleEditorObject", slideWrapper.getGraphic(sketch.id));
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: sketch });
+            slideWrapper.store.commit("focusGraphic", sketch);
+            slideWrapper.store.commit("styleEditorObject", sketch);
         }
     }
 });
@@ -107,7 +110,7 @@ const penTool: Tool = new Tool("pen", {
         slideWrapper.store.commit("styleEditorObject", undefined);
 
         // Create SVGs for the primary curve, the editable curve segment, and the control point preview
-        const start: Point = getMousePosition(event, slideWrapper.store);
+        const start: Point = getPosition(event, slideWrapper.store);
         const resolution: number = slideWrapper.store.getters.canvasResolution;
 
         let segmentPoints: Array<Point> = [Point.undefined, Point.undefined, Point.undefined];
@@ -125,7 +128,7 @@ const penTool: Tool = new Tool("pen", {
             document.addEventListener("Deck.CanvasMouseDown", setEndpoint);
             document.addEventListener("Deck.GraphicMouseDown", setEndpoint);
 
-            segmentPoints[0] = getMousePosition(event as CustomEvent, slideWrapper.store).add(segment.origin.scale(-1));
+            segmentPoints[0] = getPosition(event as CustomEvent, slideWrapper.store).add(segment.origin.scale(-1));
         }
 
         function setEndpoint(event: Event): void {
@@ -134,7 +137,7 @@ const penTool: Tool = new Tool("pen", {
             document.addEventListener("Deck.CanvasMouseUp", setSecondControlPoint);
             document.addEventListener("Deck.GraphicMouseUp", setSecondControlPoint);
 
-            segmentPoints[2] = getMousePosition(event as CustomEvent, slideWrapper.store).add(segment.origin.scale(-1));
+            segmentPoints[2] = getPosition(event as CustomEvent, slideWrapper.store).add(segment.origin.scale(-1));
         }
 
         function setSecondControlPoint(event: Event): void {
@@ -142,7 +145,7 @@ const penTool: Tool = new Tool("pen", {
             document.removeEventListener("Deck.GraphicMouseUp", setSecondControlPoint);
 
             // Complete the curve segment and add it to the final curve
-            segmentPoints[1] = getMousePosition(event as CustomEvent, slideWrapper.store).add(segment.origin.scale(-1)).reflect(segmentPoints[2]);
+            segmentPoints[1] = getPosition(event as CustomEvent, slideWrapper.store).add(segment.origin.scale(-1)).reflect(segmentPoints[2]);
             curve.points.push(...segmentPoints);
 
             // Reset the curve segment and set the first control point
@@ -153,7 +156,7 @@ const penTool: Tool = new Tool("pen", {
 
         function preview(event: Event): void {
             // Redraw the current curve segment as the mouse moves around
-            const position: Point = getMousePosition(event as CustomEvent, slideWrapper.store);
+            const position: Point = getPosition(event as CustomEvent, slideWrapper.store);
             segment.points = resolveCurve(segmentPoints, position.add(segment.origin.scale(-1)));
             slideWrapper.updateGraphic(segment.id, segment);
             slideWrapper.updateGraphic(curve.id, curve);
@@ -181,6 +184,10 @@ const penTool: Tool = new Tool("pen", {
             slideWrapper.removeGraphic(segment.id);
             document.removeEventListener("keydown", end);
             document.removeEventListener("Deck.CanvasMouseMove", preview);
+
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: curve });
+            slideWrapper.store.commit("focusGraphic", curve);
+            slideWrapper.store.commit("styleEditorObject", curve);
         }
 
         // Convert a curve with possible undefined values to a curve with defined fallback values
@@ -207,7 +214,7 @@ const rectangleTool: Tool = new Tool("rectangle", {
 
         slideWrapper.store.commit("focusGraphic", undefined);
         slideWrapper.store.commit("styleEditorObject", undefined);
-        const start: Point = getMousePosition(event, slideWrapper.store);
+        const start: Point = getPosition(event, slideWrapper.store);
         const rectangle: Rectangle = new Rectangle({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
         slideWrapper.addGraphic(rectangle);
         let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
@@ -219,7 +226,7 @@ const rectangleTool: Tool = new Tool("rectangle", {
             const mouseEvent: MouseEvent = (event as CustomEvent).detail.baseEvent as MouseEvent;
             lastPosition = new Point(mouseEvent.clientX, mouseEvent.clientY);
 
-            const position: Point = getMousePosition(event as CustomEvent, slideWrapper.store);
+            const position: Point = getPosition(event as CustomEvent, slideWrapper.store);
             const rawDimensions: Point = position.add(start.scale(-1));
             const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
 
@@ -239,6 +246,10 @@ const rectangleTool: Tool = new Tool("rectangle", {
             document.removeEventListener("Deck.GraphicMouseUp", end);
             document.removeEventListener("keydown", toggleSquare);
             document.removeEventListener("keyup", toggleSquare);
+
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: rectangle });
+            slideWrapper.store.commit("focusGraphic", rectangle);
+            slideWrapper.store.commit("styleEditorObject", rectangle);
         }
 
         function toggleSquare(event: KeyboardEvent): void {
@@ -273,7 +284,7 @@ const ellipseTool: Tool = new Tool("ellipse", {
 
         slideWrapper.store.commit("focusGraphic", undefined);
         slideWrapper.store.commit("styleEditorObject", undefined);
-        const start: Point = getMousePosition(event, slideWrapper.store);
+        const start: Point = getPosition(event, slideWrapper.store);
         const ellipse: Ellipse = new Ellipse({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
         slideWrapper.addGraphic(ellipse);
         let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
@@ -285,7 +296,7 @@ const ellipseTool: Tool = new Tool("ellipse", {
             const mouseEvent: MouseEvent = (event as CustomEvent).detail.baseEvent as MouseEvent;
             lastPosition = new Point(mouseEvent.clientX, mouseEvent.clientY);
 
-            const position: Point = getMousePosition(event as CustomEvent, slideWrapper.store);
+            const position: Point = getPosition(event as CustomEvent, slideWrapper.store);
             const rawOffset: Point = position.add(start.scale(-1));
             const minimumOffset: number = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
 
@@ -305,6 +316,10 @@ const ellipseTool: Tool = new Tool("ellipse", {
             document.removeEventListener("Deck.GraphicMouseUp", end);
             document.removeEventListener("keydown", toggleCircle);
             document.removeEventListener("keyup", toggleCircle);
+
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: ellipse });
+            slideWrapper.store.commit("focusGraphic", ellipse);
+            slideWrapper.store.commit("styleEditorObject", ellipse);
         }
 
         function toggleCircle(event: KeyboardEvent): void {
@@ -334,8 +349,12 @@ const textboxTool: Tool = new Tool("textbox", {
         slideWrapper.store.commit("focusGraphic", undefined);
         slideWrapper.store.commit("styleEditorObject", undefined);
 
-        const text: Text = new Text({ origin: getMousePosition(event, slideWrapper.store), content: "lorem ipsum\ndolor sit amet", fontSize: 24 });
+        const text: Text = new Text({ origin: getPosition(event, slideWrapper.store), content: "lorem ipsum\ndolor sit amet", fontSize: 24 });
         slideWrapper.addGraphic(text);
+
+        slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: text });
+        slideWrapper.store.commit("focusGraphic", text);
+        slideWrapper.store.commit("styleEditorObject", text);
     }
 });
 

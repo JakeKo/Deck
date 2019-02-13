@@ -76,7 +76,7 @@ export default class Text implements IGraphic {
             .font({ size: this.fontSize, weight: this.fontWeight, family: this.fontFamily })
             .fill(this.fillColor)
             .rotate(this.rotation)
-            .id(this.id);
+            .id(`graphic_${this.id}`);
     }
 
     public static model(svg: SVG.Text): Text {

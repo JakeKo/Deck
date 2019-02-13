@@ -49,9 +49,6 @@ export default class SlideWrapper {
     }
 
     public addGraphic(graphic: IGraphic): void {
-        // Add graphic to the store
-        this.store.commit("addGraphic", { slideId: this.slideId, graphic: graphic });
-
         // Add graphic to the canvas
         const svg: SVG.Element = graphic.render(this._canvas);
 
@@ -97,11 +94,8 @@ export default class SlideWrapper {
     }
 
     public removeGraphic(id: string): void {
-        // Remove graphic from the store
-        this.store.commit("removeGraphic", { slideId: this.slideId, graphicId: id });
-
         // Remove graphic from the canvas
-        const svg: SVG.Element = SVG.get(id);
+        const svg: SVG.Element = this._canvas.select(`#graphic_${id}`).first();
         if (svg !== undefined) {
             svg.remove();
         }

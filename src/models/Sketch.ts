@@ -83,7 +83,7 @@ export default class Sketch implements IGraphic {
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation, center.x, center.y)
-            .id(this.id);
+            .id(`graphic_${this.id}`);
     }
 
     public static model(svg: SVG.PolyLine): Sketch {
