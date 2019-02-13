@@ -14,6 +14,13 @@ function generateId(): string {
     return `${term()}${term()}-${term()}-${term()}-${term()}-${term()}${term()}${term()}`;
 }
 
+function getPosition(event: CustomEvent, store: any): Point {
+    const mouseEvent: MouseEvent = event.detail.baseEvent as MouseEvent;
+    const zoom: number = store.getters.canvasZoom;
+    const resolution: number = store.getters.canvasResolution;
+    return new Point(Math.round((mouseEvent.offsetX / zoom) * resolution), Math.round((mouseEvent.offsetY / zoom) * resolution));
+}
+
 function parseGraphic(json: any): IGraphic {
     if (json.type === "rectangle") {
         json.origin = new Point(json.origin.x, json.origin.y);
@@ -119,6 +126,7 @@ function rewindSlide() {
 
 export default {
     generateId,
+    getPosition,
     parseGraphic,
     deckScript
 };
