@@ -40,6 +40,6 @@ export default class BoundingBox implements IGraphic {
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation, this.origin.x + this.width, this.origin.y + this.height)
-            .id(this.id);
+            .id(`graphic_${this.id}`);
     }
 }

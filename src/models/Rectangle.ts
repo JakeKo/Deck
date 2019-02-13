@@ -35,39 +35,6 @@ export default class Rectangle implements IGraphic {
         return new BoundingBox(this.boundingBoxId, this.origin, this.width, this.height, this.rotation);
     }
 
-    public update(
-        { origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
-            { origin?: Point, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
-    ): void {
-        if (origin !== undefined) {
-            this.origin = origin;
-        }
-
-        if (width !== undefined) {
-            this.width = width;
-        }
-
-        if (height !== undefined) {
-            this.height = height;
-        }
-
-        if (fillColor !== undefined) {
-            this.fillColor = fillColor;
-        }
-
-        if (strokeColor !== undefined) {
-            this.strokeColor = strokeColor;
-        }
-
-        if (strokeWidth !== undefined) {
-            this.strokeWidth = strokeWidth;
-        }
-
-        if (rotation !== undefined) {
-            this.rotation = rotation;
-        }
-    }
-
     public render(canvas: SVG.Doc): SVG.Rect {
         return canvas
             .rect(this.width, this.height)
@@ -76,17 +43,5 @@ export default class Rectangle implements IGraphic {
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation, this.origin.x + this.width, this.origin.y + this.height)
             .id(`graphic_${this.id}`);
-    }
-
-    public static model(svg: SVG.Rect): Rectangle {
-        return new Rectangle({
-            origin: new Point(svg.x(), svg.y()),
-            width: svg.width(),
-            height: svg.height(),
-            fillColor: svg.attr("fill"),
-            strokeColor: svg.attr("stroke"),
-            strokeWidth: svg.attr("stroke-width"),
-            rotation: svg.attr("rotation")
-        });
     }
 }

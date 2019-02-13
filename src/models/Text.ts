@@ -36,39 +36,6 @@ export default class Text implements IGraphic {
         return new BoundingBox(this.boundingBoxId, this.origin, Math.max(...lines.map<number>((line: string): number => line.length)) * 8, lines.length * 20, this.rotation);
     }
 
-    public update(
-        { origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }:
-            { origin?: Point, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
-    ): void {
-        if (origin !== undefined) {
-            this.origin = origin;
-        }
-
-        if (content !== undefined) {
-            this.content = content;
-        }
-
-        if (fontSize !== undefined) {
-            this.fontSize = fontSize;
-        }
-
-        if (fontWeight !== undefined) {
-            this.fontWeight = fontWeight;
-        }
-
-        if (fontFamily !== undefined) {
-            this.fontFamily = fontFamily;
-        }
-
-        if (fillColor !== undefined) {
-            this.fillColor = fillColor;
-        }
-
-        if (rotation !== undefined) {
-            this.rotation = rotation;
-        }
-    }
-
     public render(canvas: SVG.Doc): SVG.Text {
         return canvas
             .text(this.content)
@@ -77,17 +44,5 @@ export default class Text implements IGraphic {
             .fill(this.fillColor)
             .rotate(this.rotation)
             .id(`graphic_${this.id}`);
-    }
-
-    public static model(svg: SVG.Text): Text {
-        return new Text({
-            origin: new Point(svg.x(), svg.y()),
-            content: svg.text(),
-            fontSize: svg.attr("font-size"),
-            fontWeight: svg.attr("font-weight"),
-            fontFamily: svg.attr("font-family"),
-            fillColor: svg.attr("fill"),
-            rotation: svg.attr("rotation")
-        });
     }
 }

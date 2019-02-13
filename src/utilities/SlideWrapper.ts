@@ -7,11 +7,13 @@ export default class SlideWrapper {
     public slideId: string;
 
     private _canvas: SVG.Doc;
+    private _focusedGraphicId: string | undefined;
 
     constructor(slideId: string, canvas: SVG.Doc, store: any) {
         this.store = store;
         this.slideId = slideId;
         this._canvas = canvas;
+        this._focusedGraphicId = undefined;
 
         this._canvas.on("mousemove", (event: MouseEvent): void => {
             event.preventDefault();
@@ -42,6 +44,37 @@ export default class SlideWrapper {
             event.stopPropagation();
             document.dispatchEvent(new CustomEvent("Deck.CanvasMouseDown", { detail: { baseEvent: event, slideId: this.slideId } }));
         });
+    }
+
+    public focusGraphic(id: string | undefined) {
+        // Unfocus the current graphic if there is one
+        if (this._focusedGraphicId !== undefined) {
+            const focusedGraphic: IGraphic | undefined = this.getGraphic(this._focusedGraphicId);
+
+            if (focusedGraphic === undefined) {
+                console.error(`ERROR: Could not find a graphic with the id ${this._focusedGraphicId}`);
+                return;
+            }
+
+            this.removeGraphic(focusedGraphic.boundingBoxId);
+        }
+
+        // Exit if no object is being focused
+        if (id === undefined) {
+            this._focusedGraphicId = undefined;
+            return;
+        }
+
+        // Try to focus the new graphic and render the bounding box
+        const graphicToFocus: IGraphic | undefined = this.getGraphic(id);
+        if (graphicToFocus === undefined) {
+            this._focusedGraphicId = undefined;
+            console.error(`ERROR: Could not find a graphic with the id ${id}`);
+            return;
+        }
+
+        this._focusedGraphicId = graphicToFocus.id;
+        this.addGraphic(graphicToFocus.boundingBox);
     }
 
     public setCursor(cursor: string): void {

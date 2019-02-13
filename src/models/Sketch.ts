@@ -42,31 +42,6 @@ export default class Sketch implements IGraphic {
         return new BoundingBox(this.boundingBoxId, minimumPoint, maximumPoint.x - minimumPoint.x, maximumPoint.y - minimumPoint.y, this.rotation);
     }
 
-    public update(
-        { points, fillColor, strokeColor, strokeWidth, rotation }:
-            { points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
-    ): void {
-        if (points !== undefined) {
-            this.points = points;
-        }
-
-        if (fillColor !== undefined) {
-            this.fillColor = fillColor;
-        }
-
-        if (strokeColor !== undefined) {
-            this.strokeColor = strokeColor;
-        }
-
-        if (strokeWidth !== undefined) {
-            this.strokeWidth = strokeWidth;
-        }
-
-        if (rotation !== undefined) {
-            this.rotation = rotation;
-        }
-    }
-
     public render(canvas: SVG.Doc): SVG.PolyLine {
         // Get the min and max of the points in the line to infer rotation center
         const absolutePoints: Array<Point> = this.points.map<Point>((point: Point): Point => this.origin.add(point));
@@ -84,15 +59,5 @@ export default class Sketch implements IGraphic {
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation, center.x, center.y)
             .id(`graphic_${this.id}`);
-    }
-
-    public static model(svg: SVG.PolyLine): Sketch {
-        return new Sketch({
-            points: (svg.array().value as any as Array<Array<number>>).map<Point>((point: Array<number>): Point => new Point(point[0], point[1])),
-            fillColor: svg.attr("fill"),
-            strokeColor: svg.attr("stroke"),
-            strokeWidth: svg.attr("stroke-width"),
-            rotation: svg.attr("rotation")
-        });
     }
 }

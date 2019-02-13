@@ -26,6 +26,7 @@ const cursorTool: Tool = new Tool("cursor", {
             return;
         }
 
+        slideWrapper.focusGraphic(graphic.id);
         slideWrapper.store.commit("focusGraphic", graphic);
         slideWrapper.store.commit("styleEditorObject", graphic);
 
@@ -42,6 +43,7 @@ const cursorTool: Tool = new Tool("cursor", {
             const cursorOffset: Point = position.add(initialPosition.scale(-1));
             graphic!.origin = initialOrigin.add(cursorOffset);
             slideWrapper.updateGraphic(graphic!.id, graphic!);
+            slideWrapper.focusGraphic(graphic!.id); // Update the bounding box on preview
         }
 
         // End moving shape
@@ -50,12 +52,11 @@ const cursorTool: Tool = new Tool("cursor", {
             document.removeEventListener("Deck.CanvasMouseUp", end);
             document.removeEventListener("Deck.GraphicMouseUp", end);
 
-            slideWrapper.store.commit("focusGraphic", undefined);
             slideWrapper.store.commit("styleEditorObject", undefined);
-            slideWrapper.store.commit("focusGraphic", graphic);
             slideWrapper.store.commit("styleEditorObject", graphic);
         }
-    }
+    },
+    canvasMouseDown: (slideWrapper: SlideWrapper) => (): void => slideWrapper.focusGraphic(undefined)
 });
 
 // Event handlers for using the pencil tool
@@ -88,6 +89,7 @@ const pencilTool: Tool = new Tool("pencil", {
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: sketch });
             slideWrapper.store.commit("focusGraphic", sketch);
             slideWrapper.store.commit("styleEditorObject", sketch);
+            slideWrapper.focusGraphic(sketch.id);
         }
     }
 });
@@ -188,6 +190,7 @@ const penTool: Tool = new Tool("pen", {
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: curve });
             slideWrapper.store.commit("focusGraphic", curve);
             slideWrapper.store.commit("styleEditorObject", curve);
+            slideWrapper.focusGraphic(curve.id);
         }
 
         // Convert a curve with possible undefined values to a curve with defined fallback values
@@ -250,6 +253,7 @@ const rectangleTool: Tool = new Tool("rectangle", {
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: rectangle });
             slideWrapper.store.commit("focusGraphic", rectangle);
             slideWrapper.store.commit("styleEditorObject", rectangle);
+            slideWrapper.focusGraphic(rectangle.id);
         }
 
         function toggleSquare(event: KeyboardEvent): void {
@@ -320,6 +324,7 @@ const ellipseTool: Tool = new Tool("ellipse", {
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: ellipse });
             slideWrapper.store.commit("focusGraphic", ellipse);
             slideWrapper.store.commit("styleEditorObject", ellipse);
+            slideWrapper.focusGraphic(ellipse.id);
         }
 
         function toggleCircle(event: KeyboardEvent): void {
@@ -355,6 +360,7 @@ const textboxTool: Tool = new Tool("textbox", {
         slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: text });
         slideWrapper.store.commit("focusGraphic", text);
         slideWrapper.store.commit("styleEditorObject", text);
+        slideWrapper.focusGraphic(text.id);
     }
 });
 

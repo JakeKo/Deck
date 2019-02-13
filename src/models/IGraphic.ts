@@ -8,6 +8,5 @@ export default interface IGraphic {
     origin: Point;
     boundingBoxId: string;
     boundingBox: BoundingBox;
-    update(properties: any): void;
     render(canvas: SVG.Doc): SVG.Element;
 }

@@ -42,31 +42,6 @@ export default class Curve implements IGraphic {
         return new BoundingBox(this.boundingBoxId, minimumPoint, maximumPoint.x - minimumPoint.x, maximumPoint.y - minimumPoint.y, this.rotation);
     }
 
-    public update(
-        { points, fillColor, strokeColor, strokeWidth, rotation }:
-            { points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
-    ): void {
-        if (points !== undefined) {
-            this.points = points;
-        }
-
-        if (fillColor !== undefined) {
-            this.fillColor = fillColor;
-        }
-
-        if (strokeColor !== undefined) {
-            this.strokeColor = strokeColor;
-        }
-
-        if (strokeWidth !== undefined) {
-            this.strokeWidth = strokeWidth;
-        }
-
-        if (rotation !== undefined) {
-            this.rotation = rotation;
-        }
-    }
-
     public render(canvas: SVG.Doc): SVG.Path {
         // Reformat points from an array of objects to the bezier curve string
         let points: string = `M ${this.origin.x},${this.origin.y}`;
@@ -80,23 +55,5 @@ export default class Curve implements IGraphic {
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation)
             .id(`graphic_${this.id}`);
-    }
-
-    public static model(svg: SVG.Path): Curve {
-        const path: Array<Array<number>> = svg.array().value as any as Array<Array<number>>;
-        const points: Array<Point> = [new Point(path[0][1], path[0][2])];
-        path.slice(1).forEach((curve: Array<number>): void => {
-            points.push(new Point(curve[1], curve[2]));
-            points.push(new Point(curve[3], curve[4]));
-            points.push(new Point(curve[5], curve[6]));
-        });
-
-        return new Curve({
-            points: points,
-            fillColor: svg.attr("fill"),
-            strokeColor: svg.attr("stroke"),
-            strokeWidth: svg.attr("stroke-width"),
-            rotation: svg.attr("rotation")
-        });
     }
 }
