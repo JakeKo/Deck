@@ -3,7 +3,7 @@ import Sketch from "../Sketch";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 
-export default class Pencil implements ICanvasTool {
+export default class PencilTool implements ICanvasTool {
     public name: string;
 
     constructor(name: string) {

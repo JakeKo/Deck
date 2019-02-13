@@ -4,7 +4,7 @@ import Point from "../Point";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 
-export default class Cursor implements ICanvasTool {
+export default class CursorTool implements ICanvasTool {
     public name: string;
 
     constructor(name: string) {

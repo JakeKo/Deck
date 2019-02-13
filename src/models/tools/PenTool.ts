@@ -5,7 +5,7 @@ import Sketch from "../Sketch";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 
-export default class Pen implements ICanvasTool {
+export default class PenTool implements ICanvasTool {
     public name: string;
 
     private _active: boolean;
@@ -16,7 +16,7 @@ export default class Pen implements ICanvasTool {
     }
 
     public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
-        const self: Pen = this;
+        const self: PenTool = this;
         return function(event: CustomEvent): void {
                 // Prevent any action on canvas click if a bezier curve is being drawn
             if (self._active) { return; }
