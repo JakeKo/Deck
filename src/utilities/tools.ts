@@ -15,26 +15,21 @@ function getMousePosition(event: CustomEvent, store: any): Point {
     return new Point(Math.round((mouseEvent.offsetX / zoom) * resolution), Math.round((mouseEvent.offsetY / zoom) * resolution));
 }
 
-function focusGraphic(slide: any, graphic?: IGraphic, refresh: boolean = true): void {
-    slide.$store.commit("focusGraphic", graphic);
-    slide.$store.commit("styleEditorObject", graphic);
-
-    if (refresh) {
-        slide.refreshCanvas();
-    }
-}
-
 // Cursor Tool handlers
 const cursorTool: Tool = new Tool("cursor", {
-    graphicMouseOver: (id: string, slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("pointer"),
-    graphicMouseOut: (id: string, slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("default"),
-    graphicMouseDown: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent): void => {
+    graphicMouseOver: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("pointer"),
+    graphicMouseOut: (slideWrapper: SlideWrapper) => (): void => slideWrapper.setCursor("default"),
+    graphicMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent): void => {
         document.addEventListener("Deck.CanvasMouseMove", preview);
         document.addEventListener("Deck.CanvasMouseUp", end);
+        document.addEventListener("Deck.GraphicMouseUp", end);
 
-        const graphic: IGraphic | undefined = slideWrapper.getGraphic(id);
+        const graphic: IGraphic | undefined = slideWrapper.getGraphic(event.detail.graphicId);
         if (graphic === undefined) {
-            console.error(`ERROR: Could not find a graphic with the id: ${id}`);
+            console.error(`ERROR: Could not find a graphic with the id: ${event.detail.graphicId}`);
+            document.removeEventListener("Deck.CanvasMouseMove", preview);
+            document.removeEventListener("Deck.CanvasMouseUp", end);
+            document.removeEventListener("Deck.GraphicMouseUp", end);
             return;
         }
 
@@ -53,14 +48,10 @@ const cursorTool: Tool = new Tool("cursor", {
         function end(): void {
             document.removeEventListener("Deck.CanvasMouseMove", preview);
             document.removeEventListener("Deck.CanvasMouseUp", end);
+            document.removeEventListener("Deck.GraphicMouseUp", end);
 
             slideWrapper.store.commit("styleEditorObject", undefined);
             slideWrapper.store.commit("styleEditorObject", graphic);
-        }
-    },
-    canvasMouseDown: (slide: any) => (): void => {
-        if (slide.$store.getters.focusedGraphic !== undefined) {
-            focusGraphic(slide, undefined);
         }
     }
 });
@@ -210,6 +201,7 @@ const rectangleTool: Tool = new Tool("rectangle", {
     canvasMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent): void => {
         document.addEventListener("Deck.CanvasMouseMove", preview);
         document.addEventListener("Deck.CanvasMouseUp", end);
+        document.addEventListener("Deck.GraphicMouseUp", end);
         document.addEventListener("keydown", toggleSquare);
         document.addEventListener("keyup", toggleSquare);
 
@@ -244,6 +236,7 @@ const rectangleTool: Tool = new Tool("rectangle", {
         function end(): void {
             document.removeEventListener("Deck.CanvasMouseMove", preview);
             document.removeEventListener("Deck.CanvasMouseUp", end);
+            document.removeEventListener("Deck.GraphicMouseUp", end);
             document.removeEventListener("keydown", toggleSquare);
             document.removeEventListener("keyup", toggleSquare);
         }
@@ -274,6 +267,7 @@ const ellipseTool: Tool = new Tool("ellipse", {
     canvasMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent): void => {
         document.addEventListener("Deck.CanvasMouseMove", preview);
         document.addEventListener("Deck.CanvasMouseUp", end);
+        document.addEventListener("Deck.GraphicMouseUp", end);
         document.addEventListener("keydown", toggleCircle);
         document.addEventListener("keyup", toggleCircle);
 
@@ -308,6 +302,7 @@ const ellipseTool: Tool = new Tool("ellipse", {
         function end(): void {
             document.removeEventListener("Deck.CanvasMouseMove", preview);
             document.removeEventListener("Deck.CanvasMouseUp", end);
+            document.removeEventListener("Deck.GraphicMouseUp", end);
             document.removeEventListener("keydown", toggleCircle);
             document.removeEventListener("keyup", toggleCircle);
         }

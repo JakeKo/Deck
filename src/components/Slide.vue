@@ -25,21 +25,11 @@ export default class Slide extends Vue {
         document.addEventListener("Deck.CanvasMouseOut", (event: Event): void => this.$store.getters.tool.canvasMouseOut(this.slideWrapper)(event));
         document.addEventListener("Deck.CanvasMouseDown", (event: Event): void => this.$store.getters.tool.canvasMouseDown(this.slideWrapper)(event));
 
-        this.graphics.forEach((graphic: IGraphic) => this.initializeGraphic(graphic));
-    }
+        document.addEventListener("Deck.GraphicMouseOver", (event: Event): void => this.$store.getters.tool.graphicMouseOver(this.slideWrapper)(event));
+        document.addEventListener("Deck.GraphicMouseOut", (event: Event): void => this.$store.getters.tool.graphicMouseOut(this.slideWrapper)(event));
+        document.addEventListener("Deck.GraphicMouseDown", (event: Event): void => this.$store.getters.tool.graphicMouseDown(this.slideWrapper)(event));
 
-    private initializeGraphic(graphic: IGraphic): void {
-        const svg: SVG.Element = graphic.render(this.canvas);
-
-        // Bind each event handler
-        svg.on("mouseover", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOver(svg)(event));
-        svg.on("mouseout", (event: MouseEvent) => this.$store.getters.tool.graphicMouseOut(svg)(event));
-        svg.on("mousedown", (event: MouseEvent) => this.$store.getters.tool.graphicMouseDown(this, svg, graphic)(event));
-
-        // Render the bounding box if the graphic is focused
-        if (this.$store.getters.focusedGraphic === graphic) {
-            graphic.boundingBox.render(this.canvas);
-        }
+        this.graphics.forEach((graphic: IGraphic) => this.slideWrapper.addGraphic(graphic));
     }
 }
 </script>

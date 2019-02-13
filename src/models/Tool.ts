@@ -5,9 +5,9 @@ export default class Tool {
     public canvasMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
     public canvasMouseOver: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
     public canvasMouseOut: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
-    public graphicMouseOver: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
-    public graphicMouseOut: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
-    public graphicMouseDown: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
+    public graphicMouseOver: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
+    public graphicMouseOut: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
+    public graphicMouseDown: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void;
 
     constructor(name: string, {
         canvasMouseDown,
@@ -20,9 +20,9 @@ export default class Tool {
         canvasMouseDown?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
         canvasMouseOver?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
         canvasMouseOut?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
-        graphicMouseOver?: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
-        graphicMouseOut?: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
-        graphicMouseDown?: (id: string, slideWrapper: SlideWrapper) => (event: CustomEvent) => void
+        graphicMouseOver?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
+        graphicMouseOut?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void,
+        graphicMouseDown?: (slideWrapper: SlideWrapper) => (event: CustomEvent) => void
     }) {
         const EMPTY_HANDLER: () => () => void = (): () => void => (): void => { return; };
 
