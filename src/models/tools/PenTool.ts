@@ -9,6 +9,9 @@ export default class PenTool implements ICanvasTool {
     public name: string;
 
     private _active: boolean;
+    private noop: () => void = (): void => { return; };
+    private cursor: string = "crosshair";
+    private defaultCursor: string = "default";
 
     constructor(name: string) {
         this.name = name;
@@ -17,8 +20,8 @@ export default class PenTool implements ICanvasTool {
 
     public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
         const self: PenTool = this;
-        return function(event: CustomEvent): void {
-                // Prevent any action on canvas click if a bezier curve is being drawn
+        return function (event: CustomEvent): void {
+            // Prevent any action on canvas click if a bezier curve is being drawn
             if (self._active) { return; }
             else { self._active = true; }
 
@@ -120,36 +123,32 @@ export default class PenTool implements ICanvasTool {
                     curve[2] === Point.undefined ? defaultPoint : curve[2],
                 ];
             }
-        }
+        };
     }
 
     public canvasMouseOver(slideWrapper: SlideWrapper): () => void {
-        return function() {
-            slideWrapper.setCursor("crosshair")
+        const self: PenTool = this;
+        return function () {
+            slideWrapper.setCursor(self.cursor);
         };
     }
 
     public canvasMouseOut(slideWrapper: SlideWrapper): () => void {
-        return function() {
-            slideWrapper.setCursor("default")
+        const self: PenTool = this;
+        return function () {
+            slideWrapper.setCursor(self.defaultCursor);
         };
     }
 
     public graphicMouseOver(): () => void {
-        return function(): void {
-            return;
-        }
+        return this.noop;
     }
 
     public graphicMouseOut(): () => void {
-        return function(): void {
-            return;
-        }
+        return this.noop;
     }
 
     public graphicMouseDown(): () => void {
-        return function(): void {
-            return;
-        }
+        return this.noop;
     }
 }

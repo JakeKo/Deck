@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from "vue-property-decorator";
+import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import IGraphic from "../models/IGraphic";
 import SlideWrapper from "../utilities/SlideWrapper";
@@ -29,7 +29,7 @@ export default class Slide extends Vue {
         document.addEventListener("Deck.GraphicMouseOut", (event: Event): void => this.$store.getters.tool.graphicMouseOut(this.slideWrapper)(event));
         document.addEventListener("Deck.GraphicMouseDown", (event: Event): void => this.$store.getters.tool.graphicMouseDown(this.slideWrapper)(event));
 
-        this.graphics.forEach((graphic: IGraphic) => this.slideWrapper.addGraphic(graphic));
+        this.graphics.forEach((graphic: IGraphic): void => this.slideWrapper.addGraphic(graphic));
     }
 }
 </script>
