@@ -1,7 +1,7 @@
 import ICanvasTool from "./ICanvasTool";
-import Curve from "../Curve";
+import Curve from "../graphics/Curve";
 import Point from "../Point";
-import Sketch from "../Sketch";
+import Sketch from "../graphics/Sketch";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 

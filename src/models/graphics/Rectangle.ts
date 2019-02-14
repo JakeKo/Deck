@@ -1,12 +1,12 @@
 import * as SVG from "svg.js";
-import Utilities from "../utilities/general";
+import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
 import BoundingBox from "./BoundingBox";
-import Point from "./Point";
+import Point from "../Point";
 
-export default class Ellipse implements IGraphic {
+export default class Rectangle implements IGraphic {
     public id: string;
-    public type: string = "ellipse";
+    public type: string = "rectangle";
     public boundingBoxId: string;
     public origin: Point;
     public width: number;
@@ -32,16 +32,16 @@ export default class Ellipse implements IGraphic {
     }
 
     get boundingBox(): BoundingBox {
-        return new BoundingBox(this.boundingBoxId, new Point(this.origin.x - this.width * 0.5, this.origin.y - this.height * 0.5), this.width, this.height, this.rotation);
+        return new BoundingBox(this.boundingBoxId, this.origin, this.width, this.height, this.rotation);
     }
 
-    public render(canvas: SVG.Doc): SVG.Ellipse {
+    public render(canvas: SVG.Doc): SVG.Rect {
         return canvas
-            .ellipse(this.width, this.height)
-            .center(this.origin.x, this.origin.y)
+            .rect(this.width, this.height)
+            .move(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x, this.origin.y)
+            .rotate(this.rotation, this.origin.x + this.width, this.origin.y + this.height)
             .id(`graphic_${this.id}`);
     }
 }

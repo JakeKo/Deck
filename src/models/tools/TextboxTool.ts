@@ -1,5 +1,5 @@
 import ICanvasTool from "./ICanvasTool";
-import Text from "../Text";
+import Text from "../graphics/Text";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 

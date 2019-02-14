@@ -1,10 +1,10 @@
 import Point from "../models/Point";
-import IGraphic from "../models/IGraphic";
-import Rectangle from "../models/Rectangle";
-import Ellipse from "../models/Ellipse";
-import Curve from "../models/Curve";
-import Sketch from "../models/Sketch";
-import Text from "../models/Text";
+import IGraphic from "../models/graphics/IGraphic";
+import Rectangle from "../models/graphics/Rectangle";
+import Ellipse from "../models/graphics/Ellipse";
+import Curve from "../models/graphics/Curve";
+import Sketch from "../models/graphics/Sketch";
+import Text from "../models/graphics/Text";
 
 function generateId(): string {
     function term(): string {

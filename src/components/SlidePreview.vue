@@ -4,10 +4,10 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from "vue-property-decorator";
-import IGraphic from "../models/IGraphic";
+import IGraphic from "../models/graphics/IGraphic";
 import * as SVG from "svg.js";
 import Point from "../models/Point";
-import BoundingBox from "../models/BoundingBox";
+import BoundingBox from "../models/graphics/BoundingBox";
 
 @Component
 export default class SlidePreview extends Vue {

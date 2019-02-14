@@ -1,5 +1,5 @@
 import ICanvasTool from "./ICanvasTool";
-import Sketch from "../Sketch";
+import Sketch from "../graphics/Sketch";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 

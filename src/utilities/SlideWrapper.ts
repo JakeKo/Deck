@@ -1,5 +1,5 @@
 import * as SVG from "svg.js";
-import IGraphic from "../models/IGraphic";
+import IGraphic from "../models/graphics/IGraphic";
 import Slide from "../models/Slide";
 
 export default class SlideWrapper {

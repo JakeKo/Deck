@@ -1,5 +1,5 @@
 import * as SVG from "svg.js";
-import Point from "./Point";
+import Point from "../Point";
 import IGraphic from "./IGraphic";
 
 export default class BoundingBox implements IGraphic {

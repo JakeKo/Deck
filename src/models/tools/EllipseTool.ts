@@ -1,5 +1,5 @@
 import ICanvasTool from "./ICanvasTool";
-import Ellipse from "../Ellipse";
+import Ellipse from "../graphics/Ellipse";
 import Point from "../Point";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";

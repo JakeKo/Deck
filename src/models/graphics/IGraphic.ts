@@ -1,6 +1,6 @@
 import * as SVG from "svg.js";
 import BoundingBox from "./BoundingBox";
-import Point from "./Point";
+import Point from "../Point";
 
 export default interface IGraphic {
     id: string;

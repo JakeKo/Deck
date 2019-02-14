@@ -9,7 +9,7 @@
 import { Vue, Component } from "vue-property-decorator";
 import Slide from "../models/Slide";
 import Utilities from "../utilities/general";
-import IGraphic from "../models/IGraphic";
+import IGraphic from "../models/graphics/IGraphic";
 
 @Component
 export default class MenuBar extends Vue {

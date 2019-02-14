@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import Utilities from "./utilities/general";
-import IGraphic from "./models/IGraphic";
+import IGraphic from "./models/graphics/IGraphic";
 import Slide from "./models/Slide";
 import * as SVG from "svg.js";
 

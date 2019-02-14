@@ -1,5 +1,5 @@
 import ICanvasTool from "./ICanvasTool";
-import Rectangle from "../Rectangle";
+import Rectangle from "../graphics/Rectangle";
 import Point from "../Point";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";

@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
-import IGraphic from "../models/IGraphic";
+import IGraphic from "../models/graphics/IGraphic";
 import SlideWrapper from "../utilities/SlideWrapper";
 
 @Component
