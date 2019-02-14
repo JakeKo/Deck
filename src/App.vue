@@ -34,14 +34,12 @@ import IGraphic from "./models/graphics/IGraphic";
 export default class App extends Vue {
     private created(): void {
         document.addEventListener("keydown", (event: KeyboardEvent): void => {
-            if (event.key === "Delete" || event.key === "Backspace") {
+            if (["Delete", "Backspace"].indexOf(event.key) !== -1) {
+                document.dispatchEvent(new CustomEvent("Deck.CanvasDeletePressed"));
+
                 if (this.$store.getters.focusedGraphic === undefined) {
                     return;
                 }
-
-                // Remove the bounding box graphic
-                const boundingBoxId: number = this.$store.getters.focusedGraphic.getBoundingBox().id;
-                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: boundingBoxId });
 
                 // Remove the focused graphic
                 this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: this.$store.getters.focusedGraphic.id });

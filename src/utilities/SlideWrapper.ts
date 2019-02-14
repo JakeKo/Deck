@@ -15,6 +15,17 @@ export default class SlideWrapper {
         this._canvas = canvas;
         this._focusedGraphicId = undefined;
 
+        document.addEventListener("Deck.CanvasDeletePressed", (): void => {
+            if (this.store.getters.activeSlide.id !== this.slideId || this._focusedGraphicId === undefined) {
+                return;
+            }
+
+            // Store the focusedGraphicId so we can first unfocus it, then delete it
+            const focusedGraphicId: string = this._focusedGraphicId;
+            this.focusGraphic(undefined);
+            this.removeGraphic(focusedGraphicId);
+        });
+
         this._canvas.on("mousemove", (event: MouseEvent): void => {
             event.preventDefault();
             event.stopPropagation();
