@@ -43,7 +43,7 @@ export default new Vuex.Store({
         slides: (state: any): Slide[] => {
             return state.slides;
         },
-        activeSlide: (state: any): Slide => {
+        activeSlide: (state: any): Slide | undefined => {
             return state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
         },
         styleEditorObject: (state: any): any => {

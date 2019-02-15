@@ -18,6 +18,8 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import Tool from "./Tool.vue";
+import Image from "../models/graphics/Image";
+import Point from "../models/Point";
 
 @Component({
     components: {
@@ -34,12 +36,25 @@ export default class Toolbox extends Vue {
 
         this.input.addEventListener("change", (event: Event): void => {
             // Fetch the uploaded file and abort if no file was selected
-            const image: File = (event.target as HTMLInputElement).files![0];
-            if (image === undefined) {
+            const imageFile: File = (event.target as HTMLInputElement).files![0];
+            if (imageFile === undefined) {
                 return;
             }
 
-            console.log(image);
+            // Create the file reader and set the event handler after reading is complete
+            const fileReader: FileReader = new FileReader();
+            fileReader.onloadend = (event: FileReaderProgressEvent): void => {
+                const imageUrl: string = event.target!.result;
+
+                if (this.$store.getters.activeSlide !== undefined) {
+                    const graphic: Image = new Image({ source: imageUrl });
+                    this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
+                    document.dispatchEvent(new CustomEvent("Deck.GraphicPasted", { detail: { slideId: this.$store.getters.activeSlide.id, graphic: graphic } }));
+                }
+            };
+
+            // Asynchronously read the uploaded presentation as text
+            fileReader.readAsDataURL(imageFile);
             (event.target as HTMLInputElement).value = "";
         });
     }

@@ -5,6 +5,7 @@ import Ellipse from "../models/graphics/Ellipse";
 import Curve from "../models/graphics/Curve";
 import Sketch from "../models/graphics/Sketch";
 import Text from "../models/graphics/Text";
+import Image from "../models/graphics/Image";
 
 function generateId(): string {
     function term(): string {
@@ -39,9 +40,12 @@ function parseGraphic(json: any): IGraphic {
     } else if (json.type === "text") {
         json.origin = new Point(json.origin.x, json.origin.y);
         return new Text(json);
+    } else if (json.type === "image") {
+        json.origin = new Point(json.origin.x, json.origin.y);
+        return new Image(json);
     }
 
-    throw `Undefined graphic ${json}`;
+    throw `Undefined graphic type: ${json.type}`;
 }
 
 const deckScript: string = `<style>
