@@ -128,6 +128,8 @@ export default new Vuex.Store({
 
             // Update the graphic
             activeSlide.graphics.splice(index, 1, graphic);
+
+            document.dispatchEvent(new CustomEvent("Deck.GraphicUpdated", { detail: { slideId: activeSlide.id, graphic: graphic } }));
         }
     },
     actions: {

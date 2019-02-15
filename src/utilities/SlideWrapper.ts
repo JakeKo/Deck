@@ -30,6 +30,14 @@ export default class SlideWrapper {
             this.focusGraphic(undefined);
         });
 
+        document.addEventListener("Deck.GraphicUpdated", (event: Event): void => {
+            if ((event as CustomEvent).detail.slideId === this.slideId) {
+                const graphic: IGraphic = (event as CustomEvent).detail.graphic;
+                this.updateGraphic(graphic.id, graphic);
+                this.focusGraphic(graphic.id);
+            }
+        });
+
         this._canvas.on("mousemove", (event: MouseEvent): void => {
             event.preventDefault();
             event.stopPropagation();
@@ -136,7 +144,7 @@ export default class SlideWrapper {
         return slide.graphics.find((graphic: IGraphic): boolean => graphic.id === id);
     }
 
-    public updateGraphic(id: string, newGraphic: any): void {
+    public updateGraphic(id: string, newGraphic: IGraphic): void {
         this.removeGraphic(id);
         this.addGraphic(newGraphic);
     }
