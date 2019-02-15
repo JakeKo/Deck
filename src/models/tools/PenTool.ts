@@ -30,6 +30,7 @@ export default class PenTool implements ICanvasTool {
             document.addEventListener("Deck.CanvasMouseUp", setFirstControlPoint);
             document.addEventListener("Deck.GraphicMouseUp", setFirstControlPoint);
 
+            slideWrapper.focusGraphic(undefined);
             slideWrapper.store.commit("focusGraphic", undefined);
             slideWrapper.store.commit("styleEditorObject", undefined);
 
@@ -140,8 +141,11 @@ export default class PenTool implements ICanvasTool {
         };
     }
 
-    public graphicMouseOver(): () => void {
-        return this.noop;
+    public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
+        const self: PenTool = this;
+        return function () {
+            slideWrapper.setCursor(self.cursor);
+        };
     }
 
     public graphicMouseOut(): () => void {

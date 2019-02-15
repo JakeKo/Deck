@@ -24,8 +24,10 @@ export default class EllipseTool implements ICanvasTool {
             document.addEventListener("keydown", toggleCircle);
             document.addEventListener("keyup", toggleCircle);
 
+            slideWrapper.focusGraphic(undefined);
             slideWrapper.store.commit("focusGraphic", undefined);
             slideWrapper.store.commit("styleEditorObject", undefined);
+
             const start: Point = Utilities.getPosition(event, slideWrapper.store);
             const ellipse: Ellipse = new Ellipse({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
             slideWrapper.addGraphic(ellipse);
@@ -99,8 +101,11 @@ export default class EllipseTool implements ICanvasTool {
         };
     }
 
-    public graphicMouseOver(): () => void {
-        return this.noop;
+    public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
+        const self: EllipseTool = this;
+        return function () {
+            slideWrapper.setCursor(self.cursor);
+        };
     }
 
     public graphicMouseOut(): () => void {

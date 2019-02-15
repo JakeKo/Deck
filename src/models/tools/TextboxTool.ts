@@ -17,6 +17,7 @@ export default class TextboxTool implements ICanvasTool {
     public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
         this.noop();
         return function (event: CustomEvent): void {
+            slideWrapper.focusGraphic(undefined);
             slideWrapper.store.commit("focusGraphic", undefined);
             slideWrapper.store.commit("styleEditorObject", undefined);
 
@@ -44,8 +45,11 @@ export default class TextboxTool implements ICanvasTool {
         };
     }
 
-    public graphicMouseOver(): () => void {
-        return this.noop;
+    public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
+        const self: TextboxTool = this;
+        return function () {
+            slideWrapper.setCursor(self.cursor);
+        };
     }
 
     public graphicMouseOut(): () => void {

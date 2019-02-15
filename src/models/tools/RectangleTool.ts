@@ -24,8 +24,10 @@ export default class RectangleTool implements ICanvasTool {
             document.addEventListener("keydown", toggleSquare);
             document.addEventListener("keyup", toggleSquare);
 
+            slideWrapper.focusGraphic(undefined);
             slideWrapper.store.commit("focusGraphic", undefined);
             slideWrapper.store.commit("styleEditorObject", undefined);
+
             const start: Point = Utilities.getPosition(event, slideWrapper.store);
             const rectangle: Rectangle = new Rectangle({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
             slideWrapper.addGraphic(rectangle);
@@ -99,8 +101,11 @@ export default class RectangleTool implements ICanvasTool {
         };
     }
 
-    public graphicMouseOver(): () => void {
-        return this.noop;
+    public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
+        const self: RectangleTool = this;
+        return function () {
+            slideWrapper.setCursor(self.cursor);
+        };
     }
 
     public graphicMouseOut(): () => void {

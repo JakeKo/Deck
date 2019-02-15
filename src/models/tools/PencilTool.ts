@@ -22,8 +22,10 @@ export default class PencilTool implements ICanvasTool {
             document.addEventListener("Deck.GraphicMouseUp", end);
 
             // Unfocus the current graphic if any and set initial state of pencil drawing
+            slideWrapper.focusGraphic(undefined);
             slideWrapper.store.commit("focusGraphic", undefined);
             slideWrapper.store.commit("styleEditorObject", undefined);
+
             const sketch: Sketch = new Sketch({ origin: Utilities.getPosition(event, slideWrapper.store), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
             slideWrapper.addGraphic(sketch);
 
@@ -61,8 +63,11 @@ export default class PencilTool implements ICanvasTool {
         };
     }
 
-    public graphicMouseOver(): () => void {
-        return this.noop;
+    public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
+        const self: PencilTool = this;
+        return function () {
+            slideWrapper.setCursor(self.cursor);
+        };
     }
 
     public graphicMouseOut(): () => void {
