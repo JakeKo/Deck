@@ -20,6 +20,8 @@ export default class CursorTool implements ICanvasTool {
         const self: CursorTool = this;
         return function (): void {
             slideWrapper.focusGraphic(self.objectToFocus);
+            slideWrapper.store.commit("focusGraphic", undefined);
+            slideWrapper.store.commit("styleEditorObject", undefined);
         };
     }
 

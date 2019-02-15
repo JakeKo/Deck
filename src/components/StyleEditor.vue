@@ -1,10 +1,12 @@
 <template>
 <div id="style-editor">
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
-    <textarea id="style-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
-    <div id="submit-button-container">
-        <button id="submit-button" @click="submit">Apply</button>
-    </div>
+    <div id="style-editor-header">Style Editor</div>
+    <div id="style-editor-interaction-message" v-show="$store.getters.focusedGraphic === undefined">Click on a graphic to edit its properties.</div>
+    <form id="style-editor-form" v-show="$store.getters.focusedGraphic !== undefined">
+        <textarea id="style-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
+        <button id="submit-button" @click="submit">Update Graphic</button>
+    </form>
 </div>
 </template>
 
@@ -106,12 +108,40 @@ export default class StyleEditor extends Vue {
     background: $color-primary;
     border-left: 1px solid $color-tertiary;
     flex-shrink: 0;
-    width: 256px;
+    width: 350px;
     min-width: 96px;
 }
 
+#style-editor-header {
+    font-family: "Roboto Slab";
+    font-size: 16px;
+    font-weight: 700;
+    padding: 8px;
+    box-sizing: border-box;
+    border-bottom: 1px solid $color-tertiary;
+}
+
+#style-editor-interaction-message {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    padding: 36px;
+    box-sizing: border-box;
+    font-family: "Roboto Mono";
+    color: $color-dark;
+    font-size: 14px;
+    text-align: center;
+}
+
+#style-editor-form {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 #style-editor-content {
-    font-family: monospace;
+    font-family: "Roboto Mono";
+    font-size: 14px;
     border: none;
     outline: none;
     flex-grow: 1;
@@ -121,19 +151,13 @@ export default class StyleEditor extends Vue {
     padding: 8px;
 }
 
-#submit-button-container {
-    height: 96px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 #submit-button {
     height: 48px;
-    width: 80%;
     cursor: pointer;
     border: none;
     outline: none;
-    background: $color-tertiary;
+    background: $color-secondary;
+    color: $color-dark;
+    font-family: "Roboto Slab";
 }
 </style>
