@@ -45,15 +45,25 @@ export default class Curve implements IGraphic {
     public render(canvas: SVG.Doc): SVG.Path {
         // Reformat points from an array of objects to the bezier curve string
         let points: string = `M ${this.origin.x},${this.origin.y}`;
-        this.points.forEach((point: Point, index: number) => {
+        this.points.forEach((point: Point, index: number): void => {
             points += `${index % 3 === 0 ? " c" : ""} ${point.x},${point.y}`;
         });
+
+        // Get the min and max of the points in the line to infer rotation center
+        const absolutePoints: Array<Point> = this.points.map<Point>((point: Point): Point => this.origin.add(point));
+        absolutePoints.unshift(this.origin);
+
+        const xCoordinates: Array<number> = absolutePoints.map<number>((point: Point): number => point.x);
+        const yCoordinates: Array<number> = absolutePoints.map<number>((point: Point): number => point.y);
+        const minimumPoint: Point = new Point(Math.min(...xCoordinates), Math.min(...yCoordinates));
+        const maximumPoint: Point = new Point(Math.max(...xCoordinates), Math.max(...yCoordinates));
+        const center: Point = minimumPoint.add(maximumPoint.add(minimumPoint.scale(-1)).scale(0.5));
 
         return canvas
             .path(points)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation)
+            .rotate(this.rotation, center.x, center.y)
             .id(`graphic_${this.id}`);
     }
 }
