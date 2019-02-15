@@ -8,6 +8,7 @@
     <tool @click="$store.commit('tool', 'textbox')" :toolName="'text'" :icon="'fas fa-font'" :isActive="$store.getters.tool.name === 'textbox'"></tool>
     <tool @click="$store.dispatch('export')" :toolName="'export'" :icon="'fas fa-cloud-download-alt'" :isActive="false"></tool>
     <tool @click="$store.dispatch('save')" :toolName="'save'" :icon="'fas fa-save'" :isActive="false"></tool>
+    <tool @click="input.click()" :toolName="'image'" :icon="'fas fa-image'" :isActive="false"></tool>
     <a href="https://github.com/JakeKo/Deck/issues/new/choose" target="blank" style="text-decoration: none">
         <tool :toolName="'feedback'" :icon="'fas fa-info'" :isActive="false"></tool>
     </a>
@@ -23,7 +24,26 @@ import Tool from "./Tool.vue";
         Tool
     }
 })
-export default class Toolbox extends Vue { }
+export default class Toolbox extends Vue {
+    private input!: HTMLInputElement;
+
+    private mounted(): void {
+        this.input = document.createElement("input");
+        this.input.type = "file";
+        this.input.style.display = "none";
+
+        this.input.addEventListener("change", (event: Event): void => {
+            // Fetch the uploaded file and abort if no file was selected
+            const image: File = (event.target as HTMLInputElement).files![0];
+            if (image === undefined) {
+                return;
+            }
+
+            console.log(image);
+            (event.target as HTMLInputElement).value = "";
+        });
+    }
+}
 </script>
 
 <style lang="scss" scoped>
