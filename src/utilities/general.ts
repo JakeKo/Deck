@@ -29,9 +29,11 @@ function parseGraphic(json: any): IGraphic {
         json.origin = new Point(json.origin.x, json.origin.y);
         return new Ellipse(json);
     } else if (json.type === "curve") {
+        json.origin = new Point(json.origin.x, json.origin.y);
         json.points = json.points.map((point: { x: number, y: number }): Point => new Point(point.x, point.y));
         return new Curve(json);
     } else if (json.type === "sketch") {
+        json.origin = new Point(json.origin.x, json.origin.y);
         json.points = json.points.map((point: { x: number, y: number }): Point => new Point(point.x, point.y));
         return new Sketch(json);
     } else if (json.type === "text") {
