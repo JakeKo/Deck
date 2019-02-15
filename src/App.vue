@@ -79,6 +79,8 @@ export default class App extends Vue {
             this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
             this.$store.commit("focusGraphic", graphic);
             this.$store.commit("styleEditorObject", graphic);
+
+            document.dispatchEvent(new CustomEvent("Deck.GraphicPasted", { detail: { slideId: this.$store.getters.activeSlide.id, graphic: graphic } }));
         });
     }
 }

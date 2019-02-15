@@ -38,6 +38,14 @@ export default class SlideWrapper {
             }
         });
 
+        document.addEventListener("Deck.GraphicPasted", (event: Event): void => {
+            if ((event as CustomEvent).detail.slideId === this.slideId) {
+                const graphic: IGraphic = (event as CustomEvent).detail.graphic;
+                this.addGraphic(graphic);
+                this.focusGraphic(graphic.id);
+            }
+        });
+
         this._canvas.on("mousemove", (event: MouseEvent): void => {
             event.preventDefault();
             event.stopPropagation();
