@@ -2,8 +2,11 @@
 <div id="style-editor">
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
     <div id="style-editor-header">Style Editor</div>
-    <textarea id="style-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
-    <button id="submit-button" @click="submit">Update Graphic</button>
+    <div id="style-editor-interaction-message" v-show="$store.getters.focusedGraphic === undefined">Click on a graphic to edit its properties.</div>
+    <form id="style-editor-form" v-show="$store.getters.focusedGraphic !== undefined">
+        <textarea id="style-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
+        <button id="submit-button" @click="submit">Update Graphic</button>
+    </form>
 </div>
 </template>
 
@@ -116,6 +119,24 @@ export default class StyleEditor extends Vue {
     padding: 8px;
     box-sizing: border-box;
     border-bottom: 1px solid $color-tertiary;
+}
+
+#style-editor-interaction-message {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    padding: 36px;
+    box-sizing: border-box;
+    font-family: "Roboto Mono";
+    color: $color-dark;
+    font-size: 14px;
+    text-align: center;
+}
+
+#style-editor-form {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 #style-editor-content {

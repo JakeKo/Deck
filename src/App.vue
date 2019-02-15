@@ -7,7 +7,7 @@
             <editor></editor>
             <roadmap></roadmap>
         </div>
-        <style-editor v-show="$store.getters.focusedGraphic !== undefined"></style-editor>
+        <style-editor></style-editor>
     </div>
 </div>
 </template>
