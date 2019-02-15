@@ -1,6 +1,7 @@
 <template>
 <div id="style-editor">
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
+    <div id="style-editor-header">Style Editor</div>
     <textarea id="style-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
     <div id="submit-button-container">
         <button id="submit-button" @click="submit">Apply</button>
@@ -106,12 +107,22 @@ export default class StyleEditor extends Vue {
     background: $color-primary;
     border-left: 1px solid $color-tertiary;
     flex-shrink: 0;
-    width: 256px;
+    width: 350px;
     min-width: 96px;
 }
 
+#style-editor-header {
+    font-family: "Roboto Slab";
+    font-size: 16px;
+    font-weight: 700;
+    padding: 8px;
+    box-sizing: border-box;
+    border-bottom: 1px solid $color-tertiary;
+}
+
 #style-editor-content {
-    font-family: monospace;
+    font-family: "Roboto Mono";
+    font-size: 14px;
     border: none;
     outline: none;
     flex-grow: 1;
