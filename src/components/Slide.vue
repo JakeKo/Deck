@@ -21,13 +21,41 @@ export default class Slide extends Vue {
         this.canvas = SVG(this.$el.id).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
         this.slideWrapper = new SlideWrapper(this.id, this.canvas, this.$store);
 
-        document.addEventListener("Deck.CanvasMouseOver", (event: Event): void => this.$store.getters.tool.canvasMouseOver(this.slideWrapper)(event));
-        document.addEventListener("Deck.CanvasMouseOut", (event: Event): void => this.$store.getters.tool.canvasMouseOut(this.slideWrapper)(event));
-        document.addEventListener("Deck.CanvasMouseDown", (event: Event): void => this.$store.getters.tool.canvasMouseDown(this.slideWrapper)(event));
+        document.addEventListener("Deck.CanvasMouseOver", (event: Event): void => {
+            if ((event as CustomEvent).detail.slideId === this.id) {
+                this.$store.getters.tool.canvasMouseOver(this.slideWrapper)(event);
+            }
+        });
 
-        document.addEventListener("Deck.GraphicMouseOver", (event: Event): void => this.$store.getters.tool.graphicMouseOver(this.slideWrapper)(event));
-        document.addEventListener("Deck.GraphicMouseOut", (event: Event): void => this.$store.getters.tool.graphicMouseOut(this.slideWrapper)(event));
-        document.addEventListener("Deck.GraphicMouseDown", (event: Event): void => this.$store.getters.tool.graphicMouseDown(this.slideWrapper)(event));
+        document.addEventListener("Deck.CanvasMouseOut", (event: Event): void => {
+            if ((event as CustomEvent).detail.slideId === this.id) {
+                this.$store.getters.tool.canvasMouseOut(this.slideWrapper)(event);
+            }
+        });
+
+        document.addEventListener("Deck.CanvasMouseDown", (event: Event): void => {
+            if ((event as CustomEvent).detail.slideId === this.id) {
+                this.$store.getters.tool.canvasMouseDown(this.slideWrapper)(event);
+            }
+        });
+
+        document.addEventListener("Deck.GraphicMouseOver", (event: Event): void => {
+            if ((event as CustomEvent).detail.slideId === this.id) {
+                this.$store.getters.tool.graphicMouseOver(this.slideWrapper)(event);
+            }
+        });
+
+        document.addEventListener("Deck.GraphicMouseOut", (event: Event): void => {
+            if ((event as CustomEvent).detail.slideId === this.id) {
+                this.$store.getters.tool.graphicMouseOut(this.slideWrapper)(event);
+            }
+        });
+
+        document.addEventListener("Deck.GraphicMouseDown", (event: Event): void => {
+            if ((event as CustomEvent).detail.slideId === this.id) {
+                this.$store.getters.tool.graphicMouseDown(this.slideWrapper)(event);
+            }
+        });
 
         this.graphics.forEach((graphic: IGraphic): void => this.slideWrapper.addGraphic(graphic));
     }
