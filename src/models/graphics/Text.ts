@@ -1,8 +1,8 @@
 import * as SVG from "svg.js";
-import Utilities from "../utilities/general";
+import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
 import BoundingBox from "./BoundingBox";
-import Point from "./Point";
+import Point from "../Point";
 
 export default class Text implements IGraphic {
     public id: string;
@@ -18,7 +18,7 @@ export default class Text implements IGraphic {
 
     constructor(
         { id, origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }:
-        { id?: string, origin?: Point, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
+            { id?: string, origin?: Point, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
@@ -42,18 +42,7 @@ export default class Text implements IGraphic {
             .move(this.origin.x, this.origin.y)
             .font({ size: this.fontSize, weight: this.fontWeight, family: this.fontFamily })
             .fill(this.fillColor)
-            .rotate(this.rotation); // TODO: Infer 'center' of text
-    }
-
-    public static model(svg: SVG.Text): Text {
-        return new Text({
-            origin: new Point(svg.x(), svg.y()),
-            content: svg.text(),
-            fontSize: svg.attr("font-size"),
-            fontWeight: svg.attr("font-weight"),
-            fontFamily: svg.attr("font-family"),
-            fillColor: svg.attr("fill"),
-            rotation: svg.attr("rotation")
-        });
+            .rotate(this.rotation)
+            .id(`graphic_${this.id}`);
     }
 }

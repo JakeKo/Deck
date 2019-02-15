@@ -1,8 +1,8 @@
 import * as SVG from "svg.js";
-import Utilities from "../utilities/general";
+import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
 import BoundingBox from "./BoundingBox";
-import Point from "./Point";
+import Point from "../Point";
 
 export default class Ellipse implements IGraphic {
     public id: string;
@@ -18,7 +18,7 @@ export default class Ellipse implements IGraphic {
 
     constructor(
         { id, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
-        { id?: string, origin?: Point, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+            { id?: string, origin?: Point, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
@@ -41,18 +41,7 @@ export default class Ellipse implements IGraphic {
             .center(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x, this.origin.y);
-    }
-
-    public static model(svg: SVG.Ellipse): Ellipse {
-        return new Ellipse({
-            origin: new Point(svg.cx(), svg.cy()),
-            width: svg.width(),
-            height: svg.height(),
-            fillColor: svg.attr("fill"),
-            strokeColor: svg.attr("stroke"),
-            strokeWidth: svg.attr("stroke-width"),
-            rotation: svg.attr("rotation")
-        });
+            .rotate(this.rotation, this.origin.x, this.origin.y)
+            .id(`graphic_${this.id}`);
     }
 }

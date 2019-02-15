@@ -1,5 +1,5 @@
 import Utilities from "../utilities/general";
-import IGraphic from "./IGraphic";
+import IGraphic from "./graphics/IGraphic";
 
 export default class Slide {
     public id: string;

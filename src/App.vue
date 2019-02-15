@@ -20,7 +20,7 @@ import Editor from "./components/Editor.vue";
 import Roadmap from "./components/Roadmap.vue";
 import StyleEditor from "./components/StyleEditor.vue";
 import Utilities from "./utilities/general";
-import IGraphic from "./models/IGraphic";
+import IGraphic from "./models/graphics/IGraphic";
 
 @Component({
     components: {
@@ -34,14 +34,12 @@ import IGraphic from "./models/IGraphic";
 export default class App extends Vue {
     private created(): void {
         document.addEventListener("keydown", (event: KeyboardEvent): void => {
-            if (event.key === "Delete" || event.key === "Backspace") {
+            if (["Delete", "Backspace"].indexOf(event.key) !== -1) {
+                document.dispatchEvent(new CustomEvent("Deck.CanvasDeletePressed"));
+
                 if (this.$store.getters.focusedGraphic === undefined) {
                     return;
                 }
-
-                // Remove the bounding box graphic
-                const boundingBoxId: number = this.$store.getters.focusedGraphic.getBoundingBox().id;
-                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: boundingBoxId });
 
                 // Remove the focused graphic
                 this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: this.$store.getters.focusedGraphic.id });
@@ -81,6 +79,8 @@ export default class App extends Vue {
             this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
             this.$store.commit("focusGraphic", graphic);
             this.$store.commit("styleEditorObject", graphic);
+
+            document.dispatchEvent(new CustomEvent("Deck.GraphicPasted", { detail: { slideId: this.$store.getters.activeSlide.id, graphic: graphic } }));
         });
     }
 }

@@ -1,10 +1,10 @@
 import Point from "../models/Point";
-import IGraphic from "../models/IGraphic";
-import Rectangle from "../models/Rectangle";
-import Ellipse from "../models/Ellipse";
-import Curve from "../models/Curve";
-import Sketch from "../models/Sketch";
-import Text from "../models/Text";
+import IGraphic from "../models/graphics/IGraphic";
+import Rectangle from "../models/graphics/Rectangle";
+import Ellipse from "../models/graphics/Ellipse";
+import Curve from "../models/graphics/Curve";
+import Sketch from "../models/graphics/Sketch";
+import Text from "../models/graphics/Text";
 
 function generateId(): string {
     function term(): string {
@@ -12,6 +12,13 @@ function generateId(): string {
     }
 
     return `${term()}${term()}-${term()}-${term()}-${term()}-${term()}${term()}${term()}`;
+}
+
+function getPosition(event: CustomEvent, store: any): Point {
+    const mouseEvent: MouseEvent = event.detail.baseEvent as MouseEvent;
+    const zoom: number = store.getters.canvasZoom;
+    const resolution: number = store.getters.canvasResolution;
+    return new Point(Math.round((mouseEvent.offsetX / zoom) * resolution), Math.round((mouseEvent.offsetY / zoom) * resolution));
 }
 
 function parseGraphic(json: any): IGraphic {
@@ -22,9 +29,11 @@ function parseGraphic(json: any): IGraphic {
         json.origin = new Point(json.origin.x, json.origin.y);
         return new Ellipse(json);
     } else if (json.type === "curve") {
+        json.origin = new Point(json.origin.x, json.origin.y);
         json.points = json.points.map((point: { x: number, y: number }): Point => new Point(point.x, point.y));
         return new Curve(json);
     } else if (json.type === "sketch") {
+        json.origin = new Point(json.origin.x, json.origin.y);
         json.points = json.points.map((point: { x: number, y: number }): Point => new Point(point.x, point.y));
         return new Sketch(json);
     } else if (json.type === "text") {
@@ -119,6 +128,7 @@ function rewindSlide() {
 
 export default {
     generateId,
+    getPosition,
     parseGraphic,
     deckScript
 };

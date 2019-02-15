@@ -1,10 +1,10 @@
 import Utilities from "../src/utilities/general";
-import Rectangle from "../src/models/Rectangle";
 import Point from "../src/models/Point";
-import Ellipse from "../src/models/Ellipse";
-import Sketch from "../src/models/Sketch";
-import Curve from "../src/models/Curve";
-import Text from "../src/models/Text";
+import Rectangle from "../src/models/graphics/Rectangle";
+import Ellipse from "../src/models/graphics/Ellipse";
+import Sketch from "../src/models/graphics/Sketch";
+import Curve from "../src/models/graphics/Curve";
+import Text from "../src/models/graphics/Text";
 
 describe("Utilities", () => {
     it("generates unique ids", () => {
@@ -82,12 +82,14 @@ describe("Utilities", () => {
         // Arrange
         const graphic = {
             type: "sketch",
+            origin: { x: 0, y: 45 },
             points: [ { x: 0, y: 10 }, { x: 5, y: 15 }],
             fillColor: "blue",
             strokeColor: "pink",
             strokeWidth: 5,
             rotation: 45
         }, expectedSketch = new Sketch({
+            origin: new Point(0, 45),
             points: [ new Point(0, 10), new Point(5, 15) ],
             fillColor: "blue",
             strokeColor: "pink",
@@ -108,12 +110,14 @@ describe("Utilities", () => {
         // Arrange
         const graphic = {
             type: "curve",
+            origin: { x: 25, y: 10 },
             points: [ { x: 0, y: 10 }, { x: 5, y: 15 }],
             fillColor: "blue",
             strokeColor: "pink",
             strokeWidth: 5,
             rotation: 45
         }, expectedCurve = new Curve({
+            origin: new Point(25, 10),
             points: [ new Point(0, 10), new Point(5, 15) ],
             fillColor: "blue",
             strokeColor: "pink",

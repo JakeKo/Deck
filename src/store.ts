@@ -1,11 +1,17 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import Utilities from "./utilities/general";
-import Tools from "./utilities/tools";
-import IGraphic from "./models/IGraphic";
+import IGraphic from "./models/graphics/IGraphic";
 import Slide from "./models/Slide";
-import Tool from "./models/Tool";
 import * as SVG from "svg.js";
+
+import ICanvasTool from "./models/tools/ICanvasTool";
+import CursorTool from "./models/tools/CursorTool";
+import EllipseTool from "./models/tools/EllipseTool";
+import PencilTool from "./models/tools/PencilTool";
+import PenTool from "./models/tools/PenTool";
+import RectangleTool from "./models/tools/RectangleTool";
+import TextboxTool from "./models/tools/TextboxTool";
 
 Vue.use(Vuex);
 
@@ -25,13 +31,13 @@ export default new Vuex.Store({
         slides: new Array<Slide>(),
         currentTool: "cursor",
         tools: {
-            cursor: Tools.cursorTool,
-            pencil: Tools.pencilTool,
-            pen: Tools.penTool,
-            rectangle: Tools.rectangleTool,
-            ellipse: Tools.ellipseTool,
-            textbox: Tools.textboxTool
-        } as { [key: string]: Tool }
+            cursor: new CursorTool("cursor"),
+            pencil: new PencilTool("pencil"),
+            pen: new PenTool("pen"),
+            rectangle: new RectangleTool("rectangle"),
+            ellipse: new EllipseTool("ellipse"),
+            textbox: new TextboxTool("textbox")
+        } as { [key: string]: ICanvasTool }
     },
     getters: {
         slides: (state: any): Slide[] => {
@@ -46,10 +52,7 @@ export default new Vuex.Store({
         styleEditorObjectId: (state: any): string => {
             return state.styleEditor.objectId;
         },
-        roadmapHeight: (state: any): number => {
-            return state.roadmap.height;
-        },
-        tool: (state: any): Tool => {
+        tool: (state: any): ICanvasTool => {
             return state.tools[state.currentTool];
         },
         focusedGraphic: (state: any): IGraphic | undefined => {
@@ -111,6 +114,7 @@ export default new Vuex.Store({
         },
         activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;
+            document.dispatchEvent(new CustomEvent("Deck.ActiveSlideChanged"));
         },
         focusGraphic: (state: any, graphic?: IGraphic): void => {
             state.focusedGraphicId = graphic === undefined ? undefined : graphic.id;
@@ -124,6 +128,8 @@ export default new Vuex.Store({
 
             // Update the graphic
             activeSlide.graphics.splice(index, 1, graphic);
+
+            document.dispatchEvent(new CustomEvent("Deck.GraphicUpdated", { detail: { slideId: activeSlide.id, graphic: graphic } }));
         }
     },
     actions: {

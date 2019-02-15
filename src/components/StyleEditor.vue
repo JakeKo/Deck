@@ -11,9 +11,9 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import Utilities from "../utilities/general";
-import IGraphic from "../models/IGraphic";
-import Sketch from "../models/Sketch";
-import Curve from "../models/Curve";
+import IGraphic from "../models/graphics/IGraphic";
+import Sketch from "../models/graphics/Sketch";
+import Curve from "../models/graphics/Curve";
 import Point from "../models/Point";
 
 function toPrettyString(object: any, indentDepth: number): string {
