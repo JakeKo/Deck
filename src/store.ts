@@ -52,9 +52,6 @@ export default new Vuex.Store({
         styleEditorObjectId: (state: any): string => {
             return state.styleEditor.objectId;
         },
-        roadmapHeight: (state: any): number => {
-            return state.roadmap.height;
-        },
         tool: (state: any): ICanvasTool => {
             return state.tools[state.currentTool];
         },
@@ -117,6 +114,7 @@ export default new Vuex.Store({
         },
         activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;
+            document.dispatchEvent(new CustomEvent("Deck.ActiveSlideChanged"));
         },
         focusGraphic: (state: any, graphic?: IGraphic): void => {
             state.focusedGraphicId = graphic === undefined ? undefined : graphic.id;

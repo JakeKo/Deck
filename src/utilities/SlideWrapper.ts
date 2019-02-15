@@ -26,6 +26,10 @@ export default class SlideWrapper {
             this.removeGraphic(focusedGraphicId);
         });
 
+        document.addEventListener("Deck.ActiveSlideChanged", (): void => {
+            this.focusGraphic(undefined);
+        });
+
         this._canvas.on("mousemove", (event: MouseEvent): void => {
             event.preventDefault();
             event.stopPropagation();
