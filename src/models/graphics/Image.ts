@@ -10,32 +10,28 @@ export default class Image implements IGraphic {
     public boundingBoxId: string;
     public origin: Point;
     public source: string;
-    public width: number;
-    public height: number;
     public rotation: number;
 
     constructor(
-        { id, origin, source, width, height, rotation }:
-            { id?: string, origin?: Point, source?: string, width?: number, height?: number, rotation?: number } = {}
+        { id, origin, source, rotation }:
+            { id?: string, origin?: Point, source?: string, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
         this.origin = origin || new Point(0, 0);
         this.source = source || "";
-        this.width = width || 50;
-        this.height = height || 50;
         this.rotation = rotation || 0;
     }
 
     get boundingBox(): BoundingBox {
-        return new BoundingBox(this.boundingBoxId, this.origin, this.width, this.height, this.rotation);
+        return new BoundingBox(this.boundingBoxId, this.origin, 0, 0, this.rotation);
     }
 
     public render(canvas: SVG.Doc): SVG.Image {
         return canvas
-            .image(this.source, this.width, this.height)
+            .image(this.source)
             .move(this.origin.x, this.origin.y)
-            .rotate(this.rotation, this.origin.x + this.width / 2, this.origin.y + this.height / 2)
+            .rotate(this.rotation, this.origin.x, this.origin.y)
             .id(`graphic_${this.id}`);
     }
 }
