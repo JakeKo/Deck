@@ -72,7 +72,8 @@ export default class Sketch implements IGraphic {
         const maximumPoint: Point = new Point(Math.max(...xCoordinates), Math.max(...yCoordinates));
         const center: Point = minimumPoint.add(maximumPoint.add(minimumPoint.scale(-1)).scale(0.5));
 
-        svg.fill(this.fillColor)
+        svg.plot(absolutePoints.map((point: Point) => point.toArray()))
+            .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation, center.x, center.y);
     }

@@ -153,8 +153,8 @@ export default class SlideWrapper {
     }
 
     public updateGraphic(id: string, newGraphic: IGraphic): void {
-        this.removeGraphic(id);
-        this.addGraphic(newGraphic);
+        const svg: SVG.Element = this._canvas.select(`#graphic_${id}`).first();
+        newGraphic.updateRendering(svg);
     }
 
     public removeGraphic(id: string): void {
