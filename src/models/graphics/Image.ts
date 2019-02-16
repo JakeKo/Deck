@@ -34,4 +34,9 @@ export default class Image implements IGraphic {
             .rotate(this.rotation, this.origin.x, this.origin.y)
             .id(`graphic_${this.id}`);
     }
+
+    public updateRendering(svg: SVG.Image): void {
+        svg.move(this.origin.x, this.origin.y)
+            .rotate(this.rotation, this.origin.x, this.origin.y);
+    }
 }

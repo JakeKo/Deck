@@ -45,4 +45,12 @@ export default class Text implements IGraphic {
             .rotate(this.rotation)
             .id(`graphic_${this.id}`);
     }
+
+    public updateRendering(svg: SVG.Text): void {
+        svg.text(this.content)
+            .move(this.origin.x, this.origin.y)
+            .font({ size: this.fontSize, weight: this.fontWeight, family: this.fontFamily })
+            .fill(this.fillColor)
+            .rotate(this.rotation);
+    }
 }

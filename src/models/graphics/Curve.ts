@@ -66,4 +66,20 @@ export default class Curve implements IGraphic {
             .rotate(this.rotation, center.x, center.y)
             .id(`graphic_${this.id}`);
     }
+
+    public updateRendering(svg: SVG.Path): void {
+        // Get the min and max of the points in the line to infer rotation center
+        const absolutePoints: Array<Point> = this.points.map<Point>((point: Point): Point => this.origin.add(point));
+        absolutePoints.unshift(this.origin);
+
+        const xCoordinates: Array<number> = absolutePoints.map<number>((point: Point): number => point.x);
+        const yCoordinates: Array<number> = absolutePoints.map<number>((point: Point): number => point.y);
+        const minimumPoint: Point = new Point(Math.min(...xCoordinates), Math.min(...yCoordinates));
+        const maximumPoint: Point = new Point(Math.max(...xCoordinates), Math.max(...yCoordinates));
+        const center: Point = minimumPoint.add(maximumPoint.add(minimumPoint.scale(-1)).scale(0.5));
+
+        svg.fill(this.fillColor)
+            .stroke({ color: this.strokeColor, width: this.strokeWidth })
+            .rotate(this.rotation, center.x, center.y);
+    }
 }

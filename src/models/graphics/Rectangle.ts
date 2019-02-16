@@ -44,4 +44,12 @@ export default class Rectangle implements IGraphic {
             .rotate(this.rotation, this.origin.x + this.width / 2, this.origin.y + this.height / 2)
             .id(`graphic_${this.id}`);
     }
+
+    public updateRendering(svg: SVG.Rect): void {
+        svg.size(this.width, this.height)
+            .move(this.origin.x, this.origin.y)
+            .fill(this.fillColor)
+            .stroke({ color: this.strokeColor, width: this.strokeWidth })
+            .rotate(this.rotation, this.origin.x + this.width / 2, this.origin.y + this.height / 2);
+    }
 }
