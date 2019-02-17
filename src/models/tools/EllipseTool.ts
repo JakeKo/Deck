@@ -49,7 +49,7 @@ export default class EllipseTool implements ICanvasTool {
 
                 ellipse.width = mouseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.x);
                 ellipse.height = mouseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.y);
-                slideWrapper.store.commit("updateGraphic", ellipse);
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: ellipse.id, graphic: ellipse });
             }
 
             // End drawing ellipse

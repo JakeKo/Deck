@@ -49,7 +49,7 @@ export default class RectangleTool implements ICanvasTool {
 
                 rectangle.width = mouseEvent.shiftKey ? minimumDimension : Math.abs(rawDimensions.x);
                 rectangle.height = mouseEvent.shiftKey ? minimumDimension : Math.abs(rawDimensions.y);
-                slideWrapper.store.commit("updateGraphic", rectangle);
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: rectangle.id, graphic: rectangle });
             }
 
             // End drawing rectangle

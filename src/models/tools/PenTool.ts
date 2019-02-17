@@ -83,7 +83,7 @@ export default class PenTool implements ICanvasTool {
                 // Redraw the current curve segment as the mouse moves around
                 const position: Point = Utilities.getPosition(event as CustomEvent, slideWrapper.store);
                 segment.points = resolveCurve(segmentPoints, position.add(segment.origin.scale(-1)));
-                slideWrapper.store.commit("updateGraphic", curve);
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: curve.id, graphic: curve });
                 slideWrapper.updateGraphic(segment.id, segment);
 
                 // Display the control point shape if the endpoint is defined

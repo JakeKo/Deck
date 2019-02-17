@@ -73,7 +73,7 @@ export default class CursorTool implements ICanvasTool {
                 graphic!.origin = initialOrigin.add(cursorOffset);
 
                 // Update the graphic and refresh focus to update bounding box
-                slideWrapper.store.commit("updateGraphic", graphic);
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
             }
 

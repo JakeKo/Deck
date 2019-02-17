@@ -31,7 +31,7 @@ export default class PencilTool implements ICanvasTool {
             // Add the current mouse position to the list of points to plot
             function preview(event: Event): void {
                 sketch.points.push(Utilities.getPosition(event as CustomEvent, slideWrapper.store).add(sketch.origin.scale(-1)));
-                slideWrapper.store.commit("updateGraphic", sketch);
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: sketch.id, graphic: sketch });
             }
 
             // Unbind handlers and commit graphic to the application

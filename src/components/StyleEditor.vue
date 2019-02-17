@@ -100,7 +100,7 @@ export default class StyleEditor extends Vue {
 
         const graphic: IGraphic = Utilities.parseGraphic(json);
         graphic.boundingBoxId = this.object.boundingBoxId;
-        this.$store.commit("updateGraphic", graphic);
+        this.$store.commit("updateGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id, graphic: graphic });
     }
 }
 </script>

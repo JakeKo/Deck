@@ -107,13 +107,24 @@ export default new Vuex.Store({
             slide.graphics = slide.graphics.filter((graphic: IGraphic): boolean => graphic.id !== graphicId);
             document.dispatchEvent(new CustomEvent("Deck.GraphicRemoved", { detail: { slideId: slideId, graphicId: graphicId } }));
         },
-        updateGraphic: (state: any, graphic: IGraphic): void => {
-            const activeSlide: Slide = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
-            const index: number = activeSlide.graphics.findIndex((g: IGraphic): boolean => g.id === graphic.id);
+        updateGraphic: (state: any, { slideId, graphicId, graphic }: { slideId: string, graphicId: string, graphic: IGraphic }): void => {
+            const slide: Slide = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+
+            if (slide === undefined) {
+                console.error(`ERROR: Could not find slide ("${slideId}")`);
+                return;
+            }
 
             // Update the graphic
-            activeSlide.graphics.splice(index, 1, graphic);
-            document.dispatchEvent(new CustomEvent("Deck.GraphicUpdated", { detail: { slideId: activeSlide.id, graphicId: graphic.id } }));
+            const index: number = slide.graphics.findIndex((g: IGraphic): boolean => g.id === graphicId);
+
+            if (index < 0) {
+                console.error(`ERROR: Could not find graphic ("${graphicId}")`);
+                return;
+            }
+
+            slide.graphics.splice(index, 1, graphic);
+            document.dispatchEvent(new CustomEvent("Deck.GraphicUpdated", { detail: { slideId: slide.id, graphicId: graphic.id } }));
         },
         focusGraphic: (state: any, { slideId, graphicId }: { slideId: string, graphicId?: string }): void => {
             state.focusedGraphicId = graphicId;
