@@ -24,13 +24,12 @@ export default class RectangleTool implements ICanvasTool {
             document.addEventListener("keydown", toggleSquare);
             document.addEventListener("keyup", toggleSquare);
 
-            slideWrapper.focusGraphic(undefined);
-            slideWrapper.store.commit("focusGraphic", undefined);
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
             const start: Point = Utilities.getPosition(event, slideWrapper.store);
             const rectangle: Rectangle = new Rectangle({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
-            slideWrapper.addGraphic(rectangle);
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: rectangle });
             let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
             let shiftPressed = false;
 
@@ -50,7 +49,7 @@ export default class RectangleTool implements ICanvasTool {
 
                 rectangle.width = mouseEvent.shiftKey ? minimumDimension : Math.abs(rawDimensions.x);
                 rectangle.height = mouseEvent.shiftKey ? minimumDimension : Math.abs(rawDimensions.y);
-                slideWrapper.updateGraphic(rectangle.id, rectangle);
+                slideWrapper.store.commit("updateGraphic", rectangle);
             }
 
             // End drawing rectangle
@@ -61,10 +60,8 @@ export default class RectangleTool implements ICanvasTool {
                 document.removeEventListener("keydown", toggleSquare);
                 document.removeEventListener("keyup", toggleSquare);
 
-                slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: rectangle });
-                slideWrapper.store.commit("focusGraphic", rectangle);
+                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: rectangle.id });
                 slideWrapper.store.commit("styleEditorObject", rectangle);
-                slideWrapper.focusGraphic(rectangle.id);
             }
 
             function toggleSquare(event: KeyboardEvent): void {

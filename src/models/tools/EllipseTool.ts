@@ -24,13 +24,12 @@ export default class EllipseTool implements ICanvasTool {
             document.addEventListener("keydown", toggleCircle);
             document.addEventListener("keyup", toggleCircle);
 
-            slideWrapper.focusGraphic(undefined);
-            slideWrapper.store.commit("focusGraphic", undefined);
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
             const start: Point = Utilities.getPosition(event, slideWrapper.store);
             const ellipse: Ellipse = new Ellipse({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
-            slideWrapper.addGraphic(ellipse);
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: ellipse });
             let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
             let shiftPressed = false;
 
@@ -50,7 +49,7 @@ export default class EllipseTool implements ICanvasTool {
 
                 ellipse.width = mouseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.x);
                 ellipse.height = mouseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.y);
-                slideWrapper.updateGraphic(ellipse.id, ellipse);
+                slideWrapper.store.commit("updateGraphic", ellipse);
             }
 
             // End drawing ellipse
@@ -61,10 +60,8 @@ export default class EllipseTool implements ICanvasTool {
                 document.removeEventListener("keydown", toggleCircle);
                 document.removeEventListener("keyup", toggleCircle);
 
-                slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: ellipse });
-                slideWrapper.store.commit("focusGraphic", ellipse);
+                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: ellipse.id });
                 slideWrapper.store.commit("styleEditorObject", ellipse);
-                slideWrapper.focusGraphic(ellipse.id);
             }
 
             function toggleCircle(event: KeyboardEvent): void {

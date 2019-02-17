@@ -30,8 +30,7 @@ export default class PenTool implements ICanvasTool {
             document.addEventListener("Deck.CanvasMouseUp", setFirstControlPoint);
             document.addEventListener("Deck.GraphicMouseUp", setFirstControlPoint);
 
-            slideWrapper.focusGraphic(undefined);
-            slideWrapper.store.commit("focusGraphic", undefined);
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
             // Create SVGs for the primary curve, the editable curve segment, and the control point preview
@@ -43,7 +42,8 @@ export default class PenTool implements ICanvasTool {
             const segment: Curve = new Curve({ origin: start, points: resolveCurve(segmentPoints, new Point(0, 0)), fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
             const handle: Sketch = new Sketch({ fillColor: "none", strokeColor: "blue", strokeWidth: resolution });
 
-            slideWrapper.addGraphic(curve);
+            // Only add the curve to the store - not the preview segment or handle preview
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: curve });
             slideWrapper.addGraphic(segment);
             slideWrapper.addGraphic(handle);
 
@@ -83,8 +83,8 @@ export default class PenTool implements ICanvasTool {
                 // Redraw the current curve segment as the mouse moves around
                 const position: Point = Utilities.getPosition(event as CustomEvent, slideWrapper.store);
                 segment.points = resolveCurve(segmentPoints, position.add(segment.origin.scale(-1)));
+                slideWrapper.store.commit("updateGraphic", curve);
                 slideWrapper.updateGraphic(segment.id, segment);
-                slideWrapper.updateGraphic(curve.id, curve);
 
                 // Display the control point shape if the endpoint is defined
                 if (segmentPoints[2] !== Point.undefined) {
@@ -110,10 +110,8 @@ export default class PenTool implements ICanvasTool {
                 document.removeEventListener("keydown", end);
                 document.removeEventListener("Deck.CanvasMouseMove", preview);
 
-                slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: curve });
-                slideWrapper.store.commit("focusGraphic", curve);
+                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: curve.id });
                 slideWrapper.store.commit("styleEditorObject", curve);
-                slideWrapper.focusGraphic(curve.id);
             }
 
             // Convert a curve with possible undefined values to a curve with defined fallback values

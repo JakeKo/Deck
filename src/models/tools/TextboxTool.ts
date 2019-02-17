@@ -17,17 +17,13 @@ export default class TextboxTool implements ICanvasTool {
     public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
         this.noop();
         return function (event: CustomEvent): void {
-            slideWrapper.focusGraphic(undefined);
-            slideWrapper.store.commit("focusGraphic", undefined);
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
             const text: Text = new Text({ origin: Utilities.getPosition(event, slideWrapper.store), content: "lorem ipsum\ndolor sit amet", fontSize: 24 });
-            slideWrapper.addGraphic(text);
-
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: text });
-            slideWrapper.store.commit("focusGraphic", text);
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: text.id });
             slideWrapper.store.commit("styleEditorObject", text);
-            slideWrapper.focusGraphic(text.id);
         };
     }
 

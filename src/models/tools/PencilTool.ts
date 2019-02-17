@@ -22,17 +22,16 @@ export default class PencilTool implements ICanvasTool {
             document.addEventListener("Deck.GraphicMouseUp", end);
 
             // Unfocus the current graphic if any and set initial state of pencil drawing
-            slideWrapper.focusGraphic(undefined);
-            slideWrapper.store.commit("focusGraphic", undefined);
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
             const sketch: Sketch = new Sketch({ origin: Utilities.getPosition(event, slideWrapper.store), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
-            slideWrapper.addGraphic(sketch);
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: sketch });
 
             // Add the current mouse position to the list of points to plot
             function preview(event: Event): void {
                 sketch.points.push(Utilities.getPosition(event as CustomEvent, slideWrapper.store).add(sketch.origin.scale(-1)));
-                slideWrapper.updateGraphic(sketch.id, sketch);
+                slideWrapper.store.commit("updateGraphic", sketch);
             }
 
             // Unbind handlers and commit graphic to the application
@@ -41,10 +40,8 @@ export default class PencilTool implements ICanvasTool {
                 document.removeEventListener("Deck.CanvasMouseUp", end);
                 document.removeEventListener("Deck.GraphicMouseUp", end);
 
-                slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: sketch });
-                slideWrapper.store.commit("focusGraphic", sketch);
+                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: sketch.id });
                 slideWrapper.store.commit("styleEditorObject", sketch);
-                slideWrapper.focusGraphic(sketch.id);
             }
         };
     }

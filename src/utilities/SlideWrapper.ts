@@ -15,37 +15,76 @@ export default class SlideWrapper {
         this._canvas = canvas;
         this._focusedGraphicId = undefined;
 
-        document.addEventListener("Deck.CanvasDeletePressed", (): void => {
-            if (this.store.getters.activeSlide.id !== this.slideId || this._focusedGraphicId === undefined) {
+        document.addEventListener("Deck.GraphicAdded", (event: Event): void => {
+            // Check that the event pertains to the wrapper's specific slide
+            if ((event as CustomEvent).detail.slideId !== this.slideId) {
                 return;
             }
 
-            // Store the focusedGraphicId so we can first unfocus it, then delete it
-            const focusedGraphicId: string = this._focusedGraphicId;
-            this.focusGraphic(undefined);
-            this.removeGraphic(focusedGraphicId);
+            const graphicId: string = (event as CustomEvent).detail.graphicId;
+            const graphic: IGraphic | undefined = this.getGraphic(graphicId);
+            if (graphic === undefined) {
+                console.error(`ERROR: No such graphic ("${graphicId}") exists on slide ("${this.slideId}")`);
+                return;
+            }
+
+            this.addGraphic(graphic);
+        });
+
+        document.addEventListener("Deck.GraphicRemoved", (event: Event): void => {
+            // Check that the event pertains to the wrapper's specific slide
+            if ((event as CustomEvent).detail.slideId !== this.slideId) {
+                return;
+            }
+
+            this.removeGraphic((event as CustomEvent).detail.graphicId);
+        });
+
+        document.addEventListener("Deck.GraphicUpdated", (event: Event): void => {
+            // Check that the event pertains to the wrapper's specific slide
+            if ((event as CustomEvent).detail.slideId !== this.slideId) {
+                return;
+            }
+
+            const graphicId: string = (event as CustomEvent).detail.graphicId;
+            const graphic: IGraphic | undefined = this.getGraphic(graphicId);
+            if (graphic === undefined) {
+                console.error(`ERROR: No such graphic ("${graphicId}") exists on slide ("${this.slideId}")`);
+                return;
+            }
+
+            this.updateGraphic(graphicId, graphic);
+        });
+
+        document.addEventListener("Deck.GraphicFocused", (event: Event): void => {
+            // Check that the event pertains to the wrapper's specific slide
+            if ((event as CustomEvent).detail.slideId !== this.slideId) {
+                return;
+            }
+
+            const graphicId: string = (event as CustomEvent).detail.graphicId;
+            if (graphicId === undefined) {
+                this.focusGraphic(undefined);
+                return;
+            }
+
+            const graphic: IGraphic | undefined = this.getGraphic(graphicId);
+            if (graphic === undefined) {
+                console.error(`ERROR: No such graphic ("${graphicId}") exists on slide ("${this.slideId}")`);
+                return;
+            }
+
+            this.focusGraphic(graphicId);
         });
 
         document.addEventListener("Deck.ActiveSlideChanged", (): void => {
             this.focusGraphic(undefined);
         });
 
-        document.addEventListener("Deck.GraphicUpdated", (event: Event): void => {
-            if ((event as CustomEvent).detail.slideId === this.slideId) {
-                const graphic: IGraphic = (event as CustomEvent).detail.graphic;
-                this.updateGraphic(graphic.id, graphic);
-                this.focusGraphic(graphic.id);
-            }
-        });
+        this._forwardCanvasEvents();
+    }
 
-        document.addEventListener("Deck.GraphicPasted", (event: Event): void => {
-            if ((event as CustomEvent).detail.slideId === this.slideId) {
-                const graphic: IGraphic = (event as CustomEvent).detail.graphic;
-                this.addGraphic(graphic);
-                this.focusGraphic(graphic.id);
-            }
-        });
-
+    private _forwardCanvasEvents(): void {
         this._canvas.on("mousemove", (event: MouseEvent): void => {
             event.preventDefault();
             event.stopPropagation();
