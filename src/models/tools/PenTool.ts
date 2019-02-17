@@ -107,7 +107,15 @@ export default class PenTool implements ICanvasTool {
                 self._active = false;
                 slideWrapper.removeGraphic(handle.id);
                 slideWrapper.removeGraphic(segment.id);
+
+                // Remove all event handlers
                 document.removeEventListener("keydown", end);
+                document.removeEventListener("Deck.CanvasMouseUp", setFirstControlPoint);
+                document.removeEventListener("Deck.GraphicMouseUp", setFirstControlPoint);
+                document.removeEventListener("Deck.CanvasMouseDown", setEndpoint);
+                document.removeEventListener("Deck.GraphicMouseDown", setEndpoint);
+                document.removeEventListener("Deck.CanvasMouseUp", setSecondControlPoint);
+                document.removeEventListener("Deck.GraphicMouseUp", setSecondControlPoint);
                 document.removeEventListener("Deck.CanvasMouseMove", preview);
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: curve.id });
