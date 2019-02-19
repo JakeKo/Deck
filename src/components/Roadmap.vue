@@ -4,6 +4,7 @@
     <div id="slide-previews">
         <slide-preview v-for="slide in $store.getters.slides"
             :id="slide.id"
+            :slideId="slide.id"
             :isActive="$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id"
             :graphics="$store.getters.slides.find((s) => s.id === slide.id).graphics"
             :key="slide.id"
@@ -18,6 +19,7 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import SlidePreview from "./SlidePreview.vue";
+import Slide from "../models/Slide";
 
 @Component({
     components: {
@@ -51,9 +53,15 @@ export default class Roadmap extends Vue {
     }
 
     private addSlide(): void {
-        this.$store.commit("addSlide", this.$store.getters.slides.length);
-        this.$store.commit("activeSlide", this.$store.getters.slides[this.$store.getters.slides.length - 1].id);
-        this.$store.commit("focusGraphic", undefined);
+        const slides: Array<Slide> = this.$store.getters.slides;
+        const activeSlide: Slide = this.$store.getters.activeSlide;
+
+        if (activeSlide !== undefined) {
+            this.$store.commit("focusGraphic", { slideId: activeSlide.id, graphicId: undefined });
+        }
+
+        this.$store.commit("addSlide", slides.length);
+        this.$store.commit("activeSlide", slides[slides.length - 1].id);
         this.$store.commit("styleEditorObject", undefined);
     }
 }

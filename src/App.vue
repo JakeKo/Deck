@@ -35,15 +35,14 @@ export default class App extends Vue {
     private created(): void {
         document.addEventListener("keydown", (event: KeyboardEvent): void => {
             if (["Delete", "Backspace"].indexOf(event.key) !== -1) {
-                document.dispatchEvent(new CustomEvent("Deck.CanvasDeletePressed"));
-
                 if (this.$store.getters.focusedGraphic === undefined) {
                     return;
                 }
 
                 // Remove the focused graphic
-                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: this.$store.getters.focusedGraphic.id });
-                this.$store.commit("focusGraphic", undefined);
+                const graphicId: string = this.$store.getters.focusedGraphic.id;
+                this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
+                this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphicId });
                 this.$store.commit("styleEditorObject", undefined);
             }
         });
@@ -77,10 +76,8 @@ export default class App extends Vue {
             const graphic: IGraphic = Utilities.parseGraphic(data);
             graphic.id = Utilities.generateId();
             this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
-            this.$store.commit("focusGraphic", graphic);
+            this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
             this.$store.commit("styleEditorObject", graphic);
-
-            document.dispatchEvent(new CustomEvent("Deck.GraphicPasted", { detail: { slideId: this.$store.getters.activeSlide.id, graphic: graphic } }));
         });
     }
 }

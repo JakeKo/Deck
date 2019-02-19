@@ -9,4 +9,5 @@ export default interface IGraphic {
     boundingBoxId: string;
     boundingBox: BoundingBox;
     render(canvas: SVG.Doc): SVG.Element;
+    updateRendering(svg: SVG.Element): void;
 }

@@ -20,7 +20,7 @@ export default class CursorTool implements ICanvasTool {
         const self: CursorTool = this;
         return function (): void {
             slideWrapper.focusGraphic(self.objectToFocus);
-            slideWrapper.store.commit("focusGraphic", undefined);
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
         };
     }
@@ -56,8 +56,7 @@ export default class CursorTool implements ICanvasTool {
                 return;
             }
 
-            slideWrapper.focusGraphic(graphic.id);
-            slideWrapper.store.commit("focusGraphic", graphic);
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: graphic.id });
             slideWrapper.store.commit("styleEditorObject", graphic);
 
             const initialPosition: Point = Utilities.getPosition(event, slideWrapper.store);
@@ -72,8 +71,10 @@ export default class CursorTool implements ICanvasTool {
                 const position: Point = Utilities.getPosition(event as CustomEvent, slideWrapper.store);
                 const cursorOffset: Point = position.add(initialPosition.scale(-1));
                 graphic!.origin = initialOrigin.add(cursorOffset);
-                slideWrapper.updateGraphic(graphic!.id, graphic!);
-                slideWrapper.focusGraphic(graphic!.id); // Update the bounding box on preview
+
+                // Update the graphic and refresh focus to update bounding box
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
+                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
             }
 
             // End moving shape

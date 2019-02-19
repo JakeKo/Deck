@@ -44,4 +44,12 @@ export default class Ellipse implements IGraphic {
             .rotate(this.rotation, this.origin.x, this.origin.y)
             .id(`graphic_${this.id}`);
     }
+
+    public updateRendering(svg: SVG.Ellipse): void {
+        svg.size(this.width, this.height)
+            .center(this.origin.x, this.origin.y)
+            .fill(this.fillColor)
+            .stroke({ color: this.strokeColor, width: this.strokeWidth })
+            .rotate(this.rotation, this.origin.x, this.origin.y);
+    }
 }

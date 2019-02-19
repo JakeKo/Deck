@@ -16,6 +16,7 @@ import Utilities from "../utilities/general";
 import IGraphic from "../models/graphics/IGraphic";
 import Sketch from "../models/graphics/Sketch";
 import Curve from "../models/graphics/Curve";
+import Image from "../models/graphics/Image";
 import Point from "../models/Point";
 
 function toPrettyString(object: any, indentDepth: number): string {
@@ -53,6 +54,7 @@ export default class StyleEditor extends Vue {
         json.boundingBoxId = undefined;
         json.points = undefined;
         json.type = undefined;
+        json.source = undefined;
 
         this.content = toPrettyString(json, 1);
     }
@@ -87,13 +89,18 @@ export default class StyleEditor extends Vue {
         const json: any = JSON.parse(this.content);
         json.id = this.object.id;
         json.type = this.object.type;
+
         if (this.object instanceof Sketch || this.object instanceof Curve) {
-            json.points = (this.object as Sketch).points.map<Array<any>>((point: Point): any => ({ x: point.x, y: point.y }));
+            json.points = this.object.points.map<Array<any>>((point: Point): any => ({ x: point.x, y: point.y }));
+        }
+
+        if (this.object instanceof Image) {
+            json.source = this.object.source;
         }
 
         const graphic: IGraphic = Utilities.parseGraphic(json);
         graphic.boundingBoxId = this.object.boundingBoxId;
-        this.$store.commit("updateGraphic", graphic);
+        this.$store.commit("updateGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id, graphic: graphic });
     }
 }
 </script>
