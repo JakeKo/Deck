@@ -138,7 +138,6 @@ export default new Vuex.Store({
         },
         activeSlide: (state: any, slideId: string): void => {
             state.activeSlideId = slideId;
-            document.dispatchEvent(new CustomEvent("Deck.ActiveSlideChanged"));
         },
         canvasZoom: (state: any, zoom: number): void => {
             state.canvas.zoom = Math.max(zoom, 0.25);

@@ -1,62 +1,56 @@
 <template>
-<div :id="uid" :class="{ 'slide-preview': true, 'active-slide-preview': isActive }" @mousedown="focusSlide"></div>
+<div :id="id" :class="{ 'slide-preview': true, 'active-slide-preview': isActive }">
+    <div class="slide-preview-interface" @mousedown="focusSlide"></div>
+    <div :id="`canvas_${id}`"></div>
+</div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop } from "vue-property-decorator";
 import IGraphic from "../models/graphics/IGraphic";
 import * as SVG from "svg.js";
 import Point from "../models/Point";
-import BoundingBox from "../models/graphics/BoundingBox";
+import SlideWrapper from "../utilities/SlideWrapper";
 
 @Component
 export default class SlidePreview extends Vue {
-    private canvas!: SVG.Doc;
     @Prop({ type: String, required: true }) private id!: string;
+    @Prop({ type: String, required: true }) private slideId!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
-    @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
-
-    // Re-render the canvas any time a graphic is created, removed, or modified
-    @Watch("graphics", { deep: true }) private refreshCanvas(): void {
-        this.canvas.clear();
-        this.graphics.forEach((graphic: IGraphic): SVG.Element => graphic.render(this.canvas));
-    }
-
-    get uid(): string {
-        return `slide-preview_${this.id}`;
-    }
 
     private mounted(): void {
         // Infer the height of the slide preview from other slide previews if possible
         const slidePreview: HTMLElement = document.getElementsByClassName("slide-preview")[0] as HTMLElement;
         if (slidePreview !== undefined) {
-            document.getElementById(this.uid)!.style.height = slidePreview.style.height;
-            document.getElementById(this.uid)!.style.width = slidePreview.style.width;
+            document.getElementById(this.id)!.style.height = slidePreview.style.height;
+            document.getElementById(this.id)!.style.width = slidePreview.style.width;
         }
 
         // Instantiate the svg.js API on the slide preview and perform the initial render
         const canvasResolution: number = this.$store.getters.canvasResolution;
-        this.canvas = SVG(this.uid).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
-        this.refreshCanvas();
+        const canvas: SVG.Doc = SVG(`canvas_${this.id}`).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
+        new SlideWrapper(this.slideId, canvas, this.$store);
     }
 
     private focusSlide(event: MouseEvent): void {
-        this.$store.commit("activeSlide", this.id);
         this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
+        this.$store.commit("activeSlide", this.id);
         this.$store.commit("styleEditorObject", undefined);
 
-        const self = this;
+        const self: SlidePreview = this;
         const beginSlideReorder: number = window.setTimeout(reorderSlidePreview, 150);
         const slidePreview: HTMLElement = this.$el as HTMLElement;
-        slidePreview.addEventListener("mouseup", interrupt);
+        document.addEventListener("mouseup", interrupt);
 
         // Interrupt the slide reordering handlers if the mouse is lifted before the reordering begins
-        function interrupt(): void {
+        function interrupt(event: MouseEvent): void {
+            document.removeEventListener("mouseup", interrupt);
             window.clearTimeout(beginSlideReorder);
-            slidePreview.removeEventListener("mouseup", interrupt);
         }
 
         function reorderSlidePreview(): void {
+            document.removeEventListener("mouseup", interrupt);
+
             // Determine the offset of the mouse relative to the slide preview (accounting for the horizontal margin)
             const bounds: ClientRect | DOMRect = slidePreview.getBoundingClientRect();
             const offset: Point = new Point(bounds.left - event.clientX - 12, bounds.top - event.clientY);
@@ -77,7 +71,6 @@ export default class SlidePreview extends Vue {
             }
 
             function placeSlidePreview(event: MouseEvent): void {
-                document.removeEventListener("mousemove", moveSlidePreview);
                 document.removeEventListener("mouseup", placeSlidePreview);
 
                 slidePreview.style.position = "static";
@@ -89,7 +82,7 @@ export default class SlidePreview extends Vue {
 
                 // Get the horiontal midpoint of each slide preview to divide the slide reordering regions
                 const displacements: Array<number> = slidePreviews.slice(0, slidePreviews.length - 1)
-                    .filter((slidePreview: Element): boolean => slidePreview.id !== self.uid)
+                    .filter((slidePreview: Element): boolean => slidePreview.id !== self.id)
                     .map((slidePreview: Element, index: number): number => {
                         const bounds: ClientRect | DOMRect = slidePreview.getBoundingClientRect();
                         return bounds.left + bounds.width / 2 - (index >= source ? 124 : 0);
@@ -110,6 +103,23 @@ export default class SlidePreview extends Vue {
 
 <style lang="scss" scoped>
 @import "../styles/application";
+
+.slide-preview {
+    margin: 0 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 2px solid $color-tertiary;
+    height: 54px;
+    width: 96px;
+    background: $color-light;
+    position: relative;
+}
+
+.slide-preview-interface {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
 
 // SVG canvas binding and styling breaks if active-slide-preview is an id
 .active-slide-preview {

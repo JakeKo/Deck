@@ -77,10 +77,6 @@ export default class SlideWrapper {
             this.focusGraphic(graphicId);
         });
 
-        document.addEventListener("Deck.ActiveSlideChanged", (): void => {
-            this.focusGraphic(undefined);
-        });
-
         this._forwardCanvasEvents();
     }
 
