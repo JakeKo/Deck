@@ -71,9 +71,10 @@ export default class SlidePreview extends Vue {
             }
 
             function placeSlidePreview(event: MouseEvent): void {
+                document.removeEventListener("mousemove", moveSlidePreview);
                 document.removeEventListener("mouseup", placeSlidePreview);
 
-                slidePreview.style.position = "static";
+                slidePreview.style.position = "relative";
                 slidePreview.style.top = "initial";
                 slidePreview.style.left = "initial";
 
@@ -103,17 +104,6 @@ export default class SlidePreview extends Vue {
 
 <style lang="scss" scoped>
 @import "../styles/application";
-
-.slide-preview {
-    margin: 0 12px;
-    cursor: pointer;
-    flex-shrink: 0;
-    border: 2px solid $color-tertiary;
-    height: 54px;
-    width: 96px;
-    background: $color-light;
-    position: relative;
-}
 
 .slide-preview-interface {
     height: 100%;
