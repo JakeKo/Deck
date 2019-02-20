@@ -6,6 +6,7 @@ import Curve from "../models/graphics/Curve";
 import Sketch from "../models/graphics/Sketch";
 import Text from "../models/graphics/Text";
 import Image from "../models/graphics/Image";
+import Video from "../models/graphics/Video";
 
 function generateId(): string {
     function term(): string {
@@ -43,6 +44,9 @@ function parseGraphic(json: any): IGraphic {
     } else if (json.type === "image") {
         json.origin = new Point(json.origin.x, json.origin.y);
         return new Image(json);
+    } else if (json.type === "video") {
+        json.origin = new Point(json.origin.x, json.origin.y);
+        return new Video(json);
     }
 
     throw `Undefined graphic type: ${json.type}`;

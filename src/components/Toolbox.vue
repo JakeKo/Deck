@@ -21,6 +21,7 @@ import { Vue, Component } from "vue-property-decorator";
 import Tool from "./Tool.vue";
 import Image from "../models/graphics/Image";
 import Point from "../models/Point";
+import Video from "../models/graphics/Video";
 
 @Component({
     components: {
@@ -60,7 +61,8 @@ export default class Toolbox extends Vue {
     }
 
     private addVideo(): void {
-        this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: new Image({ source: "https://youtu.be/hRBOnA0ak4w" }) });
+        console.log("Hello");
+        this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: new Video({ source: "http://techslides.com/demos/sample-videos/small.mp4" }) });
     }
 }
 </script>

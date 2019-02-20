@@ -27,13 +27,27 @@ export default class Video implements IGraphic {
         return new BoundingBox(this.boundingBoxId, this.origin, 0, 0, this.rotation);
     }
 
+    /*
+    <foreignObject x="0" y="0" width="300" height="200">
+        <video width="300" height="200" controls="" style="position: fixed; left: 151px; top: 104px;">
+            <source src="http://techslides.com/demos/sample-videos/small.mp4" type="video/mp4">
+        </video>
+    </foreignObject>
+    */
     public render(canvas: SVG.Doc): SVG.Bare {
-        return canvas
-            .element("iframe")
-            .attr("src", this.source)
-            .move(this.origin.x, this.origin.y)
-            .rotate(this.rotation, this.origin.x, this.origin.y)
+        const video: SVG.Bare = canvas
+            .element("video")
+            .size(560, 320)
+            .attr("controls", "1")
+            .attr("src", this.source);
+
+        const videoFrame: SVG.Bare = canvas
+            .element("foreignObject")
+            .size(560, 320)
             .id(`graphic_${this.id}`);
+
+        videoFrame.node.appendChild(video.node);
+        return videoFrame;
     }
 
     public updateRendering(svg: SVG.Bare): void {
