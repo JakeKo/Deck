@@ -61,8 +61,7 @@ export default class Toolbox extends Vue {
     }
 
     private addVideo(): void {
-        console.log("Hello");
-        this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: new Video({ source: "http://techslides.com/demos/sample-videos/small.mp4" }) });
+        this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: new Video({ source: "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" }) });
     }
 }
 </script>
