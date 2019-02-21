@@ -30,15 +30,19 @@ export default class Video implements IGraphic {
     public render(canvas: SVG.Doc): SVG.Bare {
         const videoFrame: SVG.Bare = canvas
             .element("foreignObject")
-            .size(560, 320)
-            .attr("xmlns", "http://www.w3.org/1999/xhtml")
             .id(`graphic_${this.id}`);
 
         const video: HTMLVideoElement = document.createElement("video");
         video.src = this.source;
         video.controls = true;
-        video.width = 100;
-        video.height = 100;
+
+        // Resive the video and video frame elements once the metadata for the video has loaded
+        video.addEventListener("loadedmetadata", (event: Event): void => {
+            const target: any = event.target;
+            videoFrame.size(target.videoWidth, target.videoHeight);
+            video.height = target.videoHeight;
+            video.width = target.videoWidth;
+        });
 
         videoFrame.node.appendChild(video);
         return videoFrame;
