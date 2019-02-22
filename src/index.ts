@@ -3,10 +3,10 @@ import App from "./App.vue";
 import Store from "./store";
 
 const appContainer: HTMLDivElement = document.createElement<"div">("div");
-appContainer.setAttribute("id", "app-container");
+appContainer.id = "app-container";
 
 const exportFrame: HTMLDivElement = document.createElement<"div">("div");
-exportFrame.setAttribute("id", "export-frame");
+exportFrame.id = "export-frame";
 exportFrame.style.display = "none";
 
 const body: HTMLBodyElement = document.getElementsByTagName("body")[0];
