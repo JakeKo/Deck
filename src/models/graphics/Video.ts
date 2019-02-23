@@ -54,7 +54,7 @@ export default class Video implements IGraphic {
 
         const video: HTMLVideoElement = document.createElement("video");
         video.src = this.source;
-        video.controls = true;
+        video.controls = false;
         video.width = this.width;
         video.height = this.height;
 

@@ -113,29 +113,29 @@ export default class SlideWrapper {
         });
     }
 
-    private _forwardGraphicEvents(svg: SVG.Element): void {
+    private _forwardGraphicEvents(graphicId: string, svg: SVG.Element): void {
         svg.on("mouseover", (event: MouseEvent): void => {
             event.preventDefault();
             event.stopPropagation();
-            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseOver", { detail: { baseEvent: event, slideId: this.slideId, graphicId: svg.id() } }));
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseOver", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphicId } }));
         });
 
         svg.on("mouseout", (event: MouseEvent): void => {
             event.preventDefault();
             event.stopPropagation();
-            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseOut", { detail: { baseEvent: event, slideId: this.slideId, graphicId: svg.id() } }));
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseOut", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphicId } }));
         });
 
         svg.on("mouseup", (event: MouseEvent): void => {
             event.preventDefault();
             event.stopPropagation();
-            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseUp", { detail: { baseEvent: event, slideId: this.slideId, graphicId: svg.id() } }));
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseUp", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphicId } }));
         });
 
         svg.on("mousedown", (event: MouseEvent): void => {
             event.preventDefault();
             event.stopPropagation();
-            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseDown", { detail: { baseEvent: event, slideId: this.slideId, graphicId: svg.id() } }));
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseDown", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphicId } }));
         });
     }
 
@@ -189,12 +189,12 @@ export default class SlideWrapper {
             document.addEventListener("Deck.VideoMetadataLoaded", (event: Event): void => {
                 if ((event as CustomEvent).detail.graphicId === graphic.id) {
                     const svg: SVG.Element = graphic.render(this._canvas);
-                    this._forwardGraphicEvents(svg);
+                    this._forwardGraphicEvents(graphic.id, svg);
                 }
             });
         } else {
             const svg: SVG.Element = graphic.render(this._canvas);
-            this._forwardGraphicEvents(svg);
+            this._forwardGraphicEvents(graphic.id, svg);
         }
     }
 
