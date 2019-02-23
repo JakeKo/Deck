@@ -36,7 +36,7 @@ export default class Video implements IGraphic {
             this.height = this.height || target.videoHeight;
 
             this.metadataLoaded = true;
-            document.dispatchEvent(new CustomEvent("Deck.VideoMetadataLoaded", { detail: { graphicId: this.id }}));
+            document.dispatchEvent(new CustomEvent("Deck.VideoMetadataLoaded", { detail: { graphicId: this.id } }));
         });
     }
 
@@ -55,16 +55,28 @@ export default class Video implements IGraphic {
         const video: HTMLVideoElement = document.createElement("video");
         video.src = this.source;
         video.controls = false;
-        video.width = this.width;
-        video.height = this.height;
+
+        const boundingRect: DOMRect | ClientRect = videoFrame.node.getBoundingClientRect();
+        video.width = boundingRect.width;
+        video.height = boundingRect.height;
 
         videoFrame.node.appendChild(video);
         return videoFrame;
     }
 
     public updateRendering(svg: SVG.Bare): void {
+        const video: HTMLVideoElement | null = svg.node.querySelector("video");
+        if (video === null) {
+            console.error(`ERROR: Video element is missing on graphic with id: ${this.id}`);
+            return;
+        }
+
         svg.move(this.origin.x, this.origin.y)
             .size(this.width, this.height)
             .rotate(this.rotation, this.origin.x, this.origin.y);
+
+        const boundingRect: DOMRect | ClientRect = svg.node.getBoundingClientRect();
+        video.width = boundingRect.width;
+        video.height = boundingRect.height;
     }
 }
