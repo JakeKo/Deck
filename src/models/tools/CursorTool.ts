@@ -59,8 +59,7 @@ export default class CursorTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: graphic.id });
             slideWrapper.store.commit("styleEditorObject", graphic);
 
-            const initialPosition: Point = Utilities.getPosition(event, slideWrapper.store);
-            const initialOrigin: Point = graphic.origin;
+            const cursorOffset: Point = graphic.origin.add(Utilities.getPosition(event, slideWrapper).scale(-1));
 
             document.addEventListener("Deck.CanvasMouseMove", preview);
             document.addEventListener("Deck.CanvasMouseUp", end);
@@ -68,9 +67,7 @@ export default class CursorTool implements ICanvasTool {
 
             // Preview moving shape
             function preview(event: Event): void {
-                const position: Point = Utilities.getPosition(event as CustomEvent, slideWrapper.store);
-                const cursorOffset: Point = position.add(initialPosition.scale(-1));
-                graphic!.origin = initialOrigin.add(cursorOffset);
+                graphic!.origin = Utilities.getPosition(event as CustomEvent, slideWrapper).add(cursorOffset);
 
                 // Update the graphic and refresh focus to update bounding box
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });

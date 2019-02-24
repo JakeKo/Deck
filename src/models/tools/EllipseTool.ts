@@ -27,7 +27,7 @@ export default class EllipseTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
-            const start: Point = Utilities.getPosition(event, slideWrapper.store);
+            const start: Point = Utilities.getPosition(event, slideWrapper);
             const ellipse: Ellipse = new Ellipse({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: ellipse });
             let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
@@ -39,7 +39,7 @@ export default class EllipseTool implements ICanvasTool {
                 const mouseEvent: MouseEvent = (event as CustomEvent).detail.baseEvent as MouseEvent;
                 lastPosition = new Point(mouseEvent.clientX, mouseEvent.clientY);
 
-                const position: Point = Utilities.getPosition(event as CustomEvent, slideWrapper.store);
+                const position: Point = Utilities.getPosition(event as CustomEvent, slideWrapper);
                 const rawOffset: Point = position.add(start.scale(-1));
                 const minimumOffset: number = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
 

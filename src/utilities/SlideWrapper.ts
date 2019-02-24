@@ -184,6 +184,10 @@ export default class SlideWrapper {
         this._canvas.style("cursor", cursor);
     }
 
+    public absoluteBounds(): DOMRect {
+        return this._canvas.node.getBoundingClientRect() as DOMRect;
+    }
+
     public addGraphic(graphic: IGraphic): void {
         if (graphic.type === "video" && !(graphic as Video).metadataLoaded) {
             document.addEventListener("Deck.VideoMetadataLoaded", (event: Event): void => {

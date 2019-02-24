@@ -7,6 +7,7 @@ import Sketch from "../models/graphics/Sketch";
 import Text from "../models/graphics/Text";
 import Image from "../models/graphics/Image";
 import Video from "../models/graphics/Video";
+import SlideWrapper from "./SlideWrapper";
 
 function generateId(): string {
     function term(): string {
@@ -16,11 +17,12 @@ function generateId(): string {
     return `${term()}${term()}-${term()}-${term()}-${term()}-${term()}${term()}${term()}`;
 }
 
-function getPosition(event: CustomEvent, store: any): Point {
+function getPosition(event: CustomEvent, slideWrapper: SlideWrapper): Point {
     const mouseEvent: MouseEvent = event.detail.baseEvent as MouseEvent;
-    const zoom: number = store.getters.canvasZoom;
-    const resolution: number = store.getters.canvasResolution;
-    return new Point(Math.round((mouseEvent.offsetX / zoom) * resolution), Math.round((mouseEvent.offsetY / zoom) * resolution));
+    const zoom: number = slideWrapper.store.getters.canvasZoom;
+    const resolution: number = slideWrapper.store.getters.canvasResolution;
+    const bounds: DOMRect = slideWrapper.absoluteBounds();
+    return new Point(Math.round(((mouseEvent.pageX - bounds.x) / zoom) * resolution), Math.round(((mouseEvent.pageY - bounds.y) / zoom) * resolution));
 }
 
 function parseGraphic(json: any): IGraphic {

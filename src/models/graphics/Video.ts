@@ -55,6 +55,7 @@ export default class Video implements IGraphic {
         const video: HTMLVideoElement = document.createElement("video");
         video.src = this.source;
         video.controls = false;
+        video.style.objectFit = "fill";
 
         const boundingRect: DOMRect | ClientRect = videoFrame.node.getBoundingClientRect();
         video.width = boundingRect.width;
