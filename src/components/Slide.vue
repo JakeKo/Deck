@@ -5,8 +5,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
-import IGraphic from "../models/graphics/IGraphic";
 import SlideWrapper from "../utilities/SlideWrapper";
+import IGraphic from "../models/graphics/IGraphic";
 
 @Component
 export default class Slide extends Vue {
@@ -55,7 +55,9 @@ export default class Slide extends Vue {
             }
         });
 
-        this.graphics.forEach((graphic: IGraphic): void => slideWrapper.addGraphic(graphic));
+        this.graphics.forEach((graphic: IGraphic): void => {
+            slideWrapper.addGraphic(graphic);
+        });
     }
 }
 </script>

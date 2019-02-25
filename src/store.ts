@@ -254,10 +254,8 @@ const store: {
             presentation.forEach((slide: Slide, index: number): void => {
                 store.commit("addSlide", index);
 
-                // Add graphics to the current slide
-                const slideId: string = store.state.slides[store.state.slides.length - 1].id;
+                const slideId: string = store.state.slides[index].id;
                 slide.graphics.forEach((graphic: IGraphic): void => {
-
                     store.commit("addGraphic", { slideId, graphic });
                 });
             });

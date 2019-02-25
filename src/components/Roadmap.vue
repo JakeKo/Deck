@@ -6,7 +6,7 @@
             :id="slide.id"
             :slideId="slide.id"
             :isActive="$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id"
-            :graphics="$store.getters.slides.find((s) => s.id === slide.id).graphics"
+            :graphics="slide.graphics"
             :key="slide.id"
         ></slide-preview>
         <div id="new-slide-button" class="slide-preview" @click="addSlide">

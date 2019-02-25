@@ -7,16 +7,17 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import IGraphic from "../models/graphics/IGraphic";
 import * as SVG from "svg.js";
 import Point from "../models/Point";
 import SlideWrapper from "../utilities/SlideWrapper";
+import IGraphic from "../models/graphics/IGraphic";
 
 @Component
 export default class SlidePreview extends Vue {
     @Prop({ type: String, required: true }) private id!: string;
     @Prop({ type: String, required: true }) private slideId!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
+    @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
 
     private mounted(): void {
         // Infer the height of the slide preview from other slide previews if possible
@@ -29,7 +30,11 @@ export default class SlidePreview extends Vue {
         // Instantiate the svg.js API on the slide preview and perform the initial render
         const canvasResolution: number = this.$store.getters.canvasResolution;
         const canvas: SVG.Doc = SVG(`canvas_${this.id}`).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
-        new SlideWrapper(this.slideId, canvas, this.$store);
+        const slideWrapper: SlideWrapper = new SlideWrapper(this.slideId, canvas, this.$store);
+
+        this.graphics.forEach((graphic: IGraphic): void => {
+            slideWrapper.addGraphic(graphic);
+        });
     }
 
     private focusSlide(event: MouseEvent): void {
