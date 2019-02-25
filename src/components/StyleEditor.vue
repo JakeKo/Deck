@@ -55,6 +55,7 @@ export default class StyleEditor extends Vue {
         json.points = undefined;
         json.type = undefined;
         json.source = undefined;
+        json.metadataLoaded = undefined;
 
         this.content = toPrettyString(json, 1);
     }

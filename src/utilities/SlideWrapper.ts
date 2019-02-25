@@ -1,6 +1,7 @@
 import * as SVG from "svg.js";
 import IGraphic from "../models/graphics/IGraphic";
 import Slide from "../models/Slide";
+import Video from "../models/graphics/Video";
 
 export default class SlideWrapper {
     public store: any;
@@ -112,6 +113,32 @@ export default class SlideWrapper {
         });
     }
 
+    private _forwardGraphicEvents(graphicId: string, svg: SVG.Element): void {
+        svg.on("mouseover", (event: MouseEvent): void => {
+            event.preventDefault();
+            event.stopPropagation();
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseOver", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphicId } }));
+        });
+
+        svg.on("mouseout", (event: MouseEvent): void => {
+            event.preventDefault();
+            event.stopPropagation();
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseOut", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphicId } }));
+        });
+
+        svg.on("mouseup", (event: MouseEvent): void => {
+            event.preventDefault();
+            event.stopPropagation();
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseUp", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphicId } }));
+        });
+
+        svg.on("mousedown", (event: MouseEvent): void => {
+            event.preventDefault();
+            event.stopPropagation();
+            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseDown", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphicId } }));
+        });
+    }
+
     public focusGraphic(id: string | undefined) {
         // Unfocus the current graphic if there is one
         if (this._focusedGraphicId !== undefined) {
@@ -139,42 +166,40 @@ export default class SlideWrapper {
             return;
         }
 
+        // Update the focused graphis and the bounding box
+        // Note videos are bounded asynchronously so listen for the metadata event
         this._focusedGraphicId = graphicToFocus.id;
-        this.addGraphic(graphicToFocus.boundingBox);
+        if (graphicToFocus.type === "video" && !(graphicToFocus as Video).metadataLoaded) {
+            document.addEventListener("Deck.VideoMetadataLoaded", (event: Event): void => {
+                if ((event as CustomEvent).detail.graphicId === graphicToFocus.id) {
+                    this.addGraphic(graphicToFocus.boundingBox);
+                }
+            });
+        } else {
+            this.addGraphic(graphicToFocus.boundingBox);
+        }
     }
 
     public setCursor(cursor: string): void {
         this._canvas.style("cursor", cursor);
     }
 
+    public absoluteBounds(): DOMRect {
+        return this._canvas.node.getBoundingClientRect() as DOMRect;
+    }
+
     public addGraphic(graphic: IGraphic): void {
-        // Add graphic to the canvas
-        const svg: SVG.Element = graphic.render(this._canvas);
-
-        // Bind each event handler
-        svg.on("mouseover", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
-            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseOver", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphic.id } }));
-        });
-
-        svg.on("mouseout", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
-            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseOut", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphic.id } }));
-        });
-
-        svg.on("mouseup", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
-            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseUp", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphic.id } }));
-        });
-
-        svg.on("mousedown", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
-            document.dispatchEvent(new CustomEvent("Deck.GraphicMouseDown", { detail: { baseEvent: event, slideId: this.slideId, graphicId: graphic.id } }));
-        });
+        if (graphic.type === "video" && !(graphic as Video).metadataLoaded) {
+            document.addEventListener("Deck.VideoMetadataLoaded", (event: Event): void => {
+                if ((event as CustomEvent).detail.graphicId === graphic.id) {
+                    const svg: SVG.Element = graphic.render(this._canvas);
+                    this._forwardGraphicEvents(graphic.id, svg);
+                }
+            });
+        } else {
+            const svg: SVG.Element = graphic.render(this._canvas);
+            this._forwardGraphicEvents(graphic.id, svg);
+        }
     }
 
     public getGraphic(id: string): IGraphic | undefined {

@@ -7,6 +7,7 @@
     <tool @click="$store.commit('tool', 'ellipse')" :toolName="'ellipse'" :icon="'fas fa-circle'" :isActive="$store.getters.tool.name === 'ellipse'"></tool>
     <tool @click="$store.commit('tool', 'textbox')" :toolName="'text'" :icon="'fas fa-font'" :isActive="$store.getters.tool.name === 'textbox'"></tool>
     <tool @click="input.click()" :toolName="'image'" :icon="'fas fa-image'" :isActive="false"></tool>
+    <tool @click="addVideo" :toolName="'video'" :icon="'fas fa-video'" :isActive="false"></tool>
     <tool @click="$store.dispatch('export')" :toolName="'export'" :icon="'fas fa-cloud-download-alt'" :isActive="false"></tool>
     <tool @click="$store.dispatch('save')" :toolName="'save'" :icon="'fas fa-save'" :isActive="false"></tool>
     <a href="https://github.com/JakeKo/Deck/issues/new/choose" target="blank" style="text-decoration: none">
@@ -20,6 +21,7 @@ import { Vue, Component } from "vue-property-decorator";
 import Tool from "./Tool.vue";
 import Image from "../models/graphics/Image";
 import Point from "../models/Point";
+import Video from "../models/graphics/Video";
 
 @Component({
     components: {
@@ -56,6 +58,14 @@ export default class Toolbox extends Vue {
             fileReader.readAsDataURL(imageFile);
             (event.target as HTMLInputElement).value = "";
         });
+    }
+
+    private addVideo(): void {
+        const prompt: string | null = window.prompt("Enter a link to the video you would like add:");
+
+        if (prompt !== null && prompt !== "") {
+            this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: new Video({ source: prompt }) });
+        }
     }
 }
 </script>

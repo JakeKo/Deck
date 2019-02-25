@@ -53,15 +53,13 @@ export default class Roadmap extends Vue {
     }
 
     private addSlide(): void {
-        const slides: Array<Slide> = this.$store.getters.slides;
-        const activeSlide: Slide = this.$store.getters.activeSlide;
-
-        if (activeSlide !== undefined) {
-            this.$store.commit("focusGraphic", { slideId: activeSlide.id, graphicId: undefined });
+        // If there is an active slide, unfocus any graphic(s) that may be focused
+        if (this.$store.getters.activeSlide !== undefined) {
+            this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
         }
 
-        this.$store.commit("addSlide", slides.length);
-        this.$store.commit("activeSlide", slides[slides.length - 1].id);
+        this.$store.commit("addSlide", this.$store.getters.slides.length);
+        this.$store.commit("activeSlide", this.$store.getters.slides[this.$store.getters.slides.length - 1].id);
         this.$store.commit("styleEditorObject", undefined);
     }
 }
