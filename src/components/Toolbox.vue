@@ -49,7 +49,7 @@ export default class Toolbox extends Vue {
                 return;
             }
 
-            // Asynchronously read the uploaded presentation as text
+            // Asynchronously read the uploaded file as a binary string
             this.fileReader.readAsBinaryString(file);
             (event.target as HTMLInputElement).value = "";
         });

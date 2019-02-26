@@ -23,9 +23,9 @@ export default class Video implements IGraphic {
         this.boundingBoxId = Utilities.generateId();
         this.origin = origin || new Point(0, 0);
         this.source = source || "";
-        this.rotation = rotation || 0;
         this.width = width || 0;
         this.height = height || 0;
+        this.rotation = rotation || 0;
 
         const video: HTMLVideoElement = document.createElement("video");
         video.src = this.source;
