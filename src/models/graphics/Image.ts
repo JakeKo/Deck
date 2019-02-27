@@ -13,7 +13,6 @@ export default class Image implements IGraphic {
     public width: number;
     public height: number;
     public rotation: number;
-    public metadataLoaded: boolean = false;
 
     constructor(
         { id, origin, source, width, height, rotation }:
@@ -26,18 +25,6 @@ export default class Image implements IGraphic {
         this.width = width || 0;
         this.height = height || 0;
         this.rotation = rotation || 0;
-
-        const image: HTMLImageElement = document.createElement<"img">("img");
-        image.src = this.source;
-
-        image.addEventListener("load", (event: Event): void => {
-            const target: any = event.target;
-            this.width = this.width || target.width;
-            this.height = this.height || target.height;
-
-            this.metadataLoaded = true;
-            document.dispatchEvent(new CustomEvent("Deck.ImageMetadataLoaded", { detail: { graphicId: this.id } }));
-        });
     }
 
     get boundingBox(): BoundingBox {
@@ -55,6 +42,7 @@ export default class Image implements IGraphic {
 
     public updateRendering(svg: SVG.Image): void {
         svg.move(this.origin.x, this.origin.y)
+            .size(this.width, this.height)
             .rotate(this.rotation);
     }
 }

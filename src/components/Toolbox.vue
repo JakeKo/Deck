@@ -61,19 +61,49 @@ export default class Toolbox extends Vue {
                 return;
             }
 
+            // Create a promise that waits for the image width and height to be determined
             const imageUrl: string = `data:image;base64,${btoa(this.fileReader.result)}`;
-            this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: new Image({ source: imageUrl }) });
+            const promise = new Promise((resolve, reject): void => {
+                const image: HTMLImageElement = document.createElement<"img">("img");
+                image.src = imageUrl;
+
+                image.addEventListener("load", (event: Event): void => {
+                    image.remove();
+                    const target: any = event.target;
+                    resolve({ width: target.width, height: target.height });
+                });
+            });
+
+            promise.then((value: any): void => {
+                const graphic: Image = new Image({ source: imageUrl, width: value.width, height: value.height });
+                this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
+            });
         };
 
         this.input.click();
     }
 
     private uploadVideo(): void {
-        const prompt: string | null = window.prompt("Enter a link to the video you would like add:");
-
-        if (prompt !== null && prompt !== "") {
-            this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: new Video({ source: prompt }) });
+        const videoUrl: string | null = window.prompt("Enter a link to the video you would like add:");
+        if (this.$store.getters.activeSlide === undefined || videoUrl === null || videoUrl === "") {
+            return;
         }
+
+        const promise = new Promise((resolve, reject): void => {
+            const video: HTMLVideoElement = document.createElement("video");
+            video.src = videoUrl;
+
+            video.addEventListener("loadedmetadata", (event: Event): void => {
+                video.remove();
+                const target: any = event.target;
+                resolve({ width: target.videoWidth, height: target.videoHeight });
+            });
+        });
+
+        promise.then((value: any): void => {
+            const graphic: Video = new Video({ source: videoUrl, width: value.width, height: value.height });
+            this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
+        });
     }
 
     private uploadPresentation(): void {

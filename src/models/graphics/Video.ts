@@ -13,7 +13,6 @@ export default class Video implements IGraphic {
     public width: number;
     public height: number;
     public rotation: number;
-    public metadataLoaded: boolean = false;
 
     constructor(
         { id, origin, source, width, height, rotation }:
@@ -26,18 +25,6 @@ export default class Video implements IGraphic {
         this.width = width || 0;
         this.height = height || 0;
         this.rotation = rotation || 0;
-
-        const video: HTMLVideoElement = document.createElement("video");
-        video.src = this.source;
-
-        video.addEventListener("loadedmetadata", (event: Event): void => {
-            const target: any = event.target;
-            this.width = this.width || target.videoWidth;
-            this.height = this.height || target.videoHeight;
-
-            this.metadataLoaded = true;
-            document.dispatchEvent(new CustomEvent("Deck.VideoMetadataLoaded", { detail: { graphicId: this.id } }));
-        });
     }
 
     get boundingBox(): BoundingBox {
