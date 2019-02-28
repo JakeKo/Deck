@@ -1,7 +1,6 @@
 import * as SVG from "svg.js";
 import IGraphic from "../models/graphics/IGraphic";
 import Slide from "../models/Slide";
-import Video from "../models/graphics/Video";
 
 export default class SlideWrapper {
     public store: any;
@@ -169,15 +168,7 @@ export default class SlideWrapper {
         // Update the focused graphis and the bounding box
         // Note videos are bounded asynchronously so listen for the metadata event
         this._focusedGraphicId = graphicToFocus.id;
-        if (graphicToFocus.type === "video" && !(graphicToFocus as Video).metadataLoaded) {
-            document.addEventListener("Deck.VideoMetadataLoaded", (event: Event): void => {
-                if ((event as CustomEvent).detail.graphicId === graphicToFocus.id) {
-                    this.addGraphic(graphicToFocus.boundingBox);
-                }
-            });
-        } else {
-            this.addGraphic(graphicToFocus.boundingBox);
-        }
+        this.addGraphic(graphicToFocus.boundingBox);
     }
 
     public setCursor(cursor: string): void {
@@ -189,17 +180,8 @@ export default class SlideWrapper {
     }
 
     public addGraphic(graphic: IGraphic): void {
-        if (graphic.type === "video" && !(graphic as Video).metadataLoaded) {
-            document.addEventListener("Deck.VideoMetadataLoaded", (event: Event): void => {
-                if ((event as CustomEvent).detail.graphicId === graphic.id) {
-                    const svg: SVG.Element = graphic.render(this._canvas);
-                    this._forwardGraphicEvents(graphic.id, svg);
-                }
-            });
-        } else {
-            const svg: SVG.Element = graphic.render(this._canvas);
-            this._forwardGraphicEvents(graphic.id, svg);
-        }
+        const svg: SVG.Element = graphic.render(this._canvas);
+        this._forwardGraphicEvents(graphic.id, svg);
     }
 
     public getGraphic(id: string): IGraphic | undefined {

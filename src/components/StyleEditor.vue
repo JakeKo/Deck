@@ -18,6 +18,7 @@ import Sketch from "../models/graphics/Sketch";
 import Curve from "../models/graphics/Curve";
 import Image from "../models/graphics/Image";
 import Point from "../models/Point";
+import Video from "../models/graphics/Video";
 
 function toPrettyString(object: any, indentDepth: number): string {
     const properties: Array<string> = [];
@@ -95,13 +96,14 @@ export default class StyleEditor extends Vue {
             json.points = this.object.points.map<Array<any>>((point: Point): any => ({ x: point.x, y: point.y }));
         }
 
-        if (this.object instanceof Image) {
+        if (this.object instanceof Image || this.object instanceof Video) {
             json.source = this.object.source;
         }
 
         const graphic: IGraphic = Utilities.parseGraphic(json);
         graphic.boundingBoxId = this.object.boundingBoxId;
         this.$store.commit("updateGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id, graphic: graphic });
+        this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
     }
 }
 </script>
