@@ -1,7 +1,10 @@
 <template>
-<div :id="id" :class="{ 'slide-preview': true, 'active-slide-preview': isActive }">
-    <div class="slide-preview-interface" @mousedown="focusSlide"></div>
-    <div :id="`canvas_${id}`"></div>
+<div class="slide-preview-container">
+    <div class="slide-preview-slot"></div>
+    <div :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive }">
+        <div :id="`canvas_${id}`" class="slide-preview-canvas"></div>
+        <div class="slide-preview-interface" @mousedown="focusSlide"></div>
+    </div>
 </div>
 </template>
 
@@ -20,12 +23,9 @@ export default class SlidePreview extends Vue {
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
 
     private mounted(): void {
-        // Infer the height of the slide preview from other slide previews if possible
-        const slidePreview: HTMLElement = document.getElementsByClassName("slide-preview")[0] as HTMLElement;
-        if (slidePreview !== undefined) {
-            document.getElementById(this.id)!.style.height = slidePreview.style.height;
-            document.getElementById(this.id)!.style.width = slidePreview.style.width;
-        }
+        // Set the aspect ratio of the slide preview
+        const slidePreview: HTMLDivElement = document.querySelector<HTMLDivElement>(`#slide-preview_${this.id}`)!;
+        slidePreview.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
 
         // Instantiate the svg.js API on the slide preview and perform the initial render
         const canvasResolution: number = this.$store.getters.canvasResolution;
@@ -110,6 +110,24 @@ export default class SlidePreview extends Vue {
 <style lang="scss" scoped>
 @import "../styles/application";
 
+.slide-preview-container {
+    height: 100%;
+    display: flex;
+}
+
+.slide-preview-slot {
+    height: 100%;
+    width: 8px;
+    background: $color-information;
+}
+
+.slide-preview-canvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: $color-light;
+}
+
 .slide-preview-interface {
     height: 100%;
     width: 100%;
@@ -119,10 +137,5 @@ export default class SlidePreview extends Vue {
 // SVG canvas binding and styling breaks if active-slide-preview is an id
 .active-slide-preview {
     border: 2px solid $color-information !important;
-}
-
-svg {
-    width: 100%;
-    height: 100%;
 }
 </style>

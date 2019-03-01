@@ -64,9 +64,9 @@
     cursor: pointer;
     flex-shrink: 0;
     border: 2px solid $color-tertiary;
-    height: 54px;
-    width: 96px;
+    height: 100%;
     background: $color-light;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
 }

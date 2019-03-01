@@ -39,10 +39,9 @@ export default class Roadmap extends Vue {
             const height: number = Math.max(Math.min(window.innerHeight - event.pageY, 256), 64);
             (self.$el as HTMLElement).style.height = `${height}px`;
 
-            // Set the height and width of the slide previews based on the new height of the roadmap
-            Array.forEach(document.getElementsByClassName("slide-preview"), (slidePreview: Element): void => {
-                (slidePreview as HTMLElement).style.height = `${height - 42}px`;
-                (slidePreview as HTMLElement).style.width = `${(height - 42) * 16 / 9}px`;
+            // Resize the slide previews based on the height of the roadmap
+            Array.from(document.querySelectorAll<HTMLDivElement>(".slide-preview")).forEach((slidePreview: HTMLDivElement): void => {
+                slidePreview.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
             });
         }
 
@@ -73,10 +72,13 @@ export default class Roadmap extends Vue {
     box-sizing: border-box;
     border-top: 1px solid $color-tertiary;
     height: 96px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 #slide-previews {
-    height: 100%;
+    height: 60%;
     min-width: 100%;
     overflow-x: auto;
     display: flex;
