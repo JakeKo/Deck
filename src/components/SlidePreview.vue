@@ -14,6 +14,7 @@ import * as SVG from "svg.js";
 import Point from "../models/Point";
 import SlideWrapper from "../utilities/SlideWrapper";
 import IGraphic from "../models/graphics/IGraphic";
+import Slide from "../models/Slide";
 
 @Component
 export default class SlidePreview extends Vue {
@@ -24,7 +25,7 @@ export default class SlidePreview extends Vue {
 
     private mounted(): void {
         // Set the aspect ratio of the slide preview
-        const slidePreview: HTMLDivElement = document.querySelector<HTMLDivElement>(`#slide-preview_${this.id}`)!;
+        const slidePreview: HTMLElement = document.querySelector<HTMLElement>(`#slide-preview_${this.id}`)!;
         slidePreview.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
 
         // Instantiate the svg.js API on the slide preview and perform the initial render
@@ -45,27 +46,31 @@ export default class SlidePreview extends Vue {
         const self: SlidePreview = this;
         const beginSlideReorder: number = window.setTimeout(reorderSlidePreview, 150);
         const slidePreview: HTMLElement = this.$el as HTMLElement;
+        const slides: Array<Slide> = self.$store.getters.slides;
+        const sourceIndex: number = slides.findIndex((slide: Slide): boolean => slide.id === self.slideId);
         document.addEventListener("mouseup", interrupt);
 
         // Interrupt the slide reordering handlers if the mouse is lifted before the reordering begins
-        function interrupt(event: MouseEvent): void {
+        function interrupt(): void {
             document.removeEventListener("mouseup", interrupt);
             window.clearTimeout(beginSlideReorder);
         }
 
         function reorderSlidePreview(): void {
-            document.removeEventListener("mouseup", interrupt);
-
-            // Determine the offset of the mouse relative to the slide preview (accounting for the horizontal margin)
-            const bounds: ClientRect | DOMRect = slidePreview.getBoundingClientRect();
-            const offset: Point = new Point(bounds.left - event.clientX - 12, bounds.top - event.clientY);
+            // Determine the offset of the mouse relative to the slide preview
+            const bounds: DOMRect = slidePreview.getBoundingClientRect() as DOMRect;
+            const offset: Point = new Point(bounds.left - event.clientX, bounds.top - event.clientY);
 
             document.addEventListener("mousemove", moveSlidePreview);
             document.addEventListener("mouseup", placeSlidePreview);
 
+            // Note: height must be set before changing the position
+            slidePreview.id = "reordering-slide";
+            slidePreview.style.height = `${slidePreview.clientHeight}px`;
             slidePreview.style.position = "fixed";
             slidePreview.style.left = `${event.clientX + offset.x}px`;
             slidePreview.style.top = `${event.clientY + offset.y}px`;
+            slidePreview.style.zIndex = "1";
 
             function moveSlidePreview(event: MouseEvent): void {
                 event.stopPropagation();
@@ -79,29 +84,34 @@ export default class SlidePreview extends Vue {
                 document.removeEventListener("mousemove", moveSlidePreview);
                 document.removeEventListener("mouseup", placeSlidePreview);
 
+                const slidePreviews: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-container:not([id*='reordering-slide'])"));
+                const destinationIndex: number = getDestinationIndex(event.clientX, slidePreviews);
+
+                // Note: replacing the styling must come after fetching the destination index
+                slidePreview.id = "";
                 slidePreview.style.position = "relative";
                 slidePreview.style.top = "initial";
                 slidePreview.style.left = "initial";
+                slidePreview.style.height = "100%";
+                slidePreview.style.zIndex = "initial";
 
-                const slidePreviews: Array<Element> = Array.from(document.getElementsByClassName("slide-preview"));
-                const source: number = slidePreviews.findIndex((s: Element): boolean => s === slidePreview);
-
-                // Get the horiontal midpoint of each slide preview to divide the slide reordering regions
-                const displacements: Array<number> = slidePreviews.slice(0, slidePreviews.length - 1)
-                    .filter((slidePreview: Element): boolean => slidePreview.id !== self.id)
-                    .map((slidePreview: Element, index: number): number => {
-                        const bounds: ClientRect | DOMRect = slidePreview.getBoundingClientRect();
-                        return bounds.left + bounds.width / 2 - (index >= source ? 124 : 0);
-                    }).sort();
-
-                // Evaluate the slide destination as the region where the mouse is
-                let destination: number = 0;
-                for (const displacement of displacements) {
-                    destination += event.clientX > displacement ? 1 : 0;
-                }
-
-                self.$store.commit("reorderSlide", { source, destination });
+                self.$store.commit("reorderSlide", { source: sourceIndex, destination: destinationIndex });
             }
+        }
+
+        // Returns the potential destination index of a slide if the reordering were to complete
+        // Calculates based on mouse position relative to centers of each slide preview
+        function getDestinationIndex(position: number, slidePreviews: Array<HTMLElement>): number {
+            const boundsList: Array<DOMRect> = slidePreviews.map<DOMRect>((slidePreview: HTMLElement): DOMRect => slidePreview.getBoundingClientRect() as DOMRect);
+            const borders: Array<number> = boundsList.map<number>((bounds: DOMRect): number => bounds.x + bounds.width / 2);
+
+            for (let i = 0; i < borders.length; i++) {
+                if (position < borders[i]) {
+                    return i;
+                }
+            }
+
+            return borders.length;
         }
     }
 }
@@ -118,7 +128,6 @@ export default class SlidePreview extends Vue {
 .slide-preview-slot {
     height: 100%;
     width: 2px;
-    background: $color-light;
 }
 
 .slide-preview {
@@ -131,6 +140,10 @@ export default class SlidePreview extends Vue {
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
+
+    &:hover {
+        border: 2px solid $color-success;
+    }
 }
 
 .slide-preview-canvas {

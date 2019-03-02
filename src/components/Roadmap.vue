@@ -28,7 +28,7 @@ import Slide from "../models/Slide";
 })
 export default class Roadmap extends Vue {
     private mounted(): void {
-        const newSlideButton: HTMLDivElement = this.$el.querySelector<HTMLDivElement>("#new-slide-button")!;
+        const newSlideButton: HTMLElement = this.$el.querySelector<HTMLElement>("#new-slide-button")!;
         newSlideButton.style.width = `${newSlideButton.clientHeight}px`;
     }
 
@@ -39,7 +39,7 @@ export default class Roadmap extends Vue {
         document.addEventListener("mouseup", end);
 
         const self: Roadmap = this;
-        const newSlideButton: HTMLDivElement = document.querySelector<HTMLDivElement>("#new-slide-button")!;
+        const newSlideButton: HTMLElement = document.querySelector<HTMLElement>("#new-slide-button")!;
         function preview(event: MouseEvent): void {
             // Update the height of the roadmap
             const height: number = Math.max(Math.min(window.innerHeight - event.pageY, 256), 64);
@@ -47,7 +47,7 @@ export default class Roadmap extends Vue {
             newSlideButton.style.width = `${newSlideButton.clientHeight}px`;
 
             // Resize the slide previews based on the height of the roadmap
-            Array.from(document.querySelectorAll<HTMLDivElement>(".slide-preview")).forEach((slidePreview: HTMLDivElement): void => {
+            Array.from(document.querySelectorAll<HTMLElement>(".slide-preview")).forEach((slidePreview: HTMLElement): void => {
                 slidePreview.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
             });
         }
