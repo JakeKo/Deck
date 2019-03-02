@@ -72,20 +72,31 @@ export default class SlidePreview extends Vue {
             slidePreview.style.top = `${event.clientY + offset.y}px`;
             slidePreview.style.zIndex = "1";
 
+            const slidePreviews: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-container:not([id*='reordering-slide'])"));
+            const slidePreviewSlots: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-slot"));
             function moveSlidePreview(event: MouseEvent): void {
                 event.stopPropagation();
                 event.preventDefault();
 
                 slidePreview.style.left = `${event.clientX + offset.x}px`;
                 slidePreview.style.top = `${event.clientY + offset.y}px`;
+
+                const destinationIndex: number = getDestinationIndex(event.clientX, slidePreviews);
+                const slidePreviewToMove: HTMLElement | undefined = slidePreviews[destinationIndex];
+
+                if (slidePreviewToMove !== undefined) {
+                    const slidePreviewSlot: HTMLElement = slidePreviewToMove.querySelector<HTMLElement>(".slide-preview-slot")!;
+                    slidePreviewSlots.forEach((slot: HTMLElement): void => void (slot.style.background = null));
+                    slidePreviewSlot.style.background = "black";
+                }
             }
 
             function placeSlidePreview(event: MouseEvent): void {
                 document.removeEventListener("mousemove", moveSlidePreview);
                 document.removeEventListener("mouseup", placeSlidePreview);
 
-                const slidePreviews: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-container:not([id*='reordering-slide'])"));
                 const destinationIndex: number = getDestinationIndex(event.clientX, slidePreviews);
+                slidePreviewSlots.forEach((slot: HTMLElement): void => void (slot.style.background = null));
 
                 // Note: replacing the styling must come after fetching the destination index
                 slidePreview.id = "";
