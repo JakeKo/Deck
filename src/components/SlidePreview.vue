@@ -117,8 +117,20 @@ export default class SlidePreview extends Vue {
 
 .slide-preview-slot {
     height: 100%;
-    width: 8px;
-    background: $color-information;
+    width: 2px;
+    background: $color-light;
+}
+
+.slide-preview {
+    margin: 0 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 2px solid $color-tertiary;
+    height: 100%;
+    background: $color-light;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .slide-preview-canvas {

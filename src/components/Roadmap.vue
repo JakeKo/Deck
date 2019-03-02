@@ -9,7 +9,7 @@
             :graphics="slide.graphics"
             :key="slide.id"
         ></slide-preview>
-        <div id="new-slide-button" class="slide-preview" @click="addSlide">
+        <div id="new-slide-button" @click="addSlide">
             <i class="fas fa-plus"></i>
         </div>
     </div>
@@ -27,6 +27,11 @@ import Slide from "../models/Slide";
     }
 })
 export default class Roadmap extends Vue {
+    private mounted(): void {
+        const newSlideButton: HTMLDivElement = this.$el.querySelector<HTMLDivElement>("#new-slide-button")!;
+        newSlideButton.style.width = `${newSlideButton.clientHeight}px`;
+    }
+
     private stretch(event: MouseEvent): void {
         event.stopPropagation();
         event.preventDefault();
@@ -34,10 +39,12 @@ export default class Roadmap extends Vue {
         document.addEventListener("mouseup", end);
 
         const self: Roadmap = this;
+        const newSlideButton: HTMLDivElement = document.querySelector<HTMLDivElement>("#new-slide-button")!;
         function preview(event: MouseEvent): void {
             // Update the height of the roadmap
             const height: number = Math.max(Math.min(window.innerHeight - event.pageY, 256), 64);
             (self.$el as HTMLElement).style.height = `${height}px`;
+            newSlideButton.style.width = `${newSlideButton.clientHeight}px`;
 
             // Resize the slide previews based on the height of the roadmap
             Array.from(document.querySelectorAll<HTMLDivElement>(".slide-preview")).forEach((slidePreview: HTMLDivElement): void => {
@@ -95,6 +102,16 @@ export default class Roadmap extends Vue {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: $color-tertiary;
+    height: 50%;
+    background: $color-tertiary;
+    color: $color-light;
+    border-radius: 50%;
+    cursor: pointer;
+    margin: 0 12px;
+    flex-shrink: 0;
+
+    &:hover {
+        background: $color-information;
+    }
 }
 </style>
