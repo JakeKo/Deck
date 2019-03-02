@@ -9,7 +9,7 @@
             :graphics="slide.graphics"
             :key="slide.id"
         ></slide-preview>
-        <div id="new-slide-button" class="slide-preview" @click="addSlide">
+        <div id="new-slide-button" @click="addSlide">
             <i class="fas fa-plus"></i>
         </div>
     </div>
@@ -27,6 +27,11 @@ import Slide from "../models/Slide";
     }
 })
 export default class Roadmap extends Vue {
+    private mounted(): void {
+        const newSlideButton: HTMLElement = this.$el.querySelector<HTMLElement>("#new-slide-button")!;
+        newSlideButton.style.width = `${newSlideButton.clientHeight}px`;
+    }
+
     private stretch(event: MouseEvent): void {
         event.stopPropagation();
         event.preventDefault();
@@ -34,15 +39,16 @@ export default class Roadmap extends Vue {
         document.addEventListener("mouseup", end);
 
         const self: Roadmap = this;
+        const newSlideButton: HTMLElement = document.querySelector<HTMLElement>("#new-slide-button")!;
         function preview(event: MouseEvent): void {
             // Update the height of the roadmap
             const height: number = Math.max(Math.min(window.innerHeight - event.pageY, 256), 64);
             (self.$el as HTMLElement).style.height = `${height}px`;
+            newSlideButton.style.width = `${newSlideButton.clientHeight}px`;
 
-            // Set the height and width of the slide previews based on the new height of the roadmap
-            Array.forEach(document.getElementsByClassName("slide-preview"), (slidePreview: Element): void => {
-                (slidePreview as HTMLElement).style.height = `${height - 42}px`;
-                (slidePreview as HTMLElement).style.width = `${(height - 42) * 16 / 9}px`;
+            // Resize the slide previews based on the height of the roadmap
+            Array.from(document.querySelectorAll<HTMLElement>(".slide-preview")).forEach((slidePreview: HTMLElement): void => {
+                slidePreview.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
             });
         }
 
@@ -73,10 +79,13 @@ export default class Roadmap extends Vue {
     box-sizing: border-box;
     border-top: 1px solid $color-tertiary;
     height: 96px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 #slide-previews {
-    height: 100%;
+    height: 60%;
     min-width: 100%;
     overflow-x: auto;
     display: flex;
@@ -93,6 +102,16 @@ export default class Roadmap extends Vue {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: $color-tertiary;
+    height: 50%;
+    background: $color-tertiary;
+    color: $color-light;
+    border-radius: 50%;
+    cursor: pointer;
+    margin: 0 12px;
+    flex-shrink: 0;
+
+    &:hover {
+        background: $color-information;
+    }
 }
 </style>
