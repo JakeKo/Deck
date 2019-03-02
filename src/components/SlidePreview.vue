@@ -83,11 +83,10 @@ export default class SlidePreview extends Vue {
 
                 const destinationIndex: number = getDestinationIndex(event.clientX, slidePreviews);
                 const slidePreviewToMove: HTMLElement | undefined = slidePreviews[destinationIndex];
+                slidePreviewSlots.forEach((slot: HTMLElement): void => void (slot.id = ""));
 
                 if (slidePreviewToMove !== undefined) {
-                    const slidePreviewSlot: HTMLElement = slidePreviewToMove.querySelector<HTMLElement>(".slide-preview-slot")!;
-                    slidePreviewSlots.forEach((slot: HTMLElement): void => void (slot.style.background = null));
-                    slidePreviewSlot.style.background = "black";
+                    slidePreviewToMove.querySelector<HTMLElement>(".slide-preview-slot")!.id = "active-slide-preview-slot";
                 }
             }
 
@@ -96,15 +95,15 @@ export default class SlidePreview extends Vue {
                 document.removeEventListener("mouseup", placeSlidePreview);
 
                 const destinationIndex: number = getDestinationIndex(event.clientX, slidePreviews);
-                slidePreviewSlots.forEach((slot: HTMLElement): void => void (slot.style.background = null));
+                slidePreviewSlots.forEach((slot: HTMLElement): void => void (slot.id = ""));
 
                 // Note: replacing the styling must come after fetching the destination index
                 slidePreview.id = "";
                 slidePreview.style.position = "relative";
-                slidePreview.style.top = "initial";
-                slidePreview.style.left = "initial";
+                slidePreview.style.top = null;
+                slidePreview.style.left = null;
                 slidePreview.style.height = "100%";
-                slidePreview.style.zIndex = "initial";
+                slidePreview.style.zIndex = null;
 
                 self.$store.commit("reorderSlide", { source: sourceIndex, destination: destinationIndex });
             }
@@ -139,6 +138,10 @@ export default class SlidePreview extends Vue {
 .slide-preview-slot {
     height: 100%;
     width: 2px;
+}
+
+#active-slide-preview-slot {
+    background: $color-information;
 }
 
 .slide-preview {
