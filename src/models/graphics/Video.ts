@@ -61,7 +61,7 @@ export default class Video implements IGraphic {
 
         svg.move(this.origin.x, this.origin.y)
             .size(this.width, this.height)
-            .rotate(this.rotation, this.origin.x, this.origin.y);
+            .rotate(this.rotation);
 
         const boundingRect: DOMRect | ClientRect = svg.node.getBoundingClientRect();
         video.width = boundingRect.width;

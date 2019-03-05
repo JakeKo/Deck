@@ -41,7 +41,7 @@ export default class Ellipse implements IGraphic {
             .center(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x, this.origin.y)
+            .rotate(this.rotation)
             .id(`graphic_${this.id}`);
     }
 
@@ -50,6 +50,6 @@ export default class Ellipse implements IGraphic {
             .center(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x, this.origin.y);
+            .rotate(this.rotation);
     }
 }

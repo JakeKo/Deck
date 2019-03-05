@@ -57,7 +57,7 @@ export default class Sketch implements IGraphic {
             .polyline(absolutePoints.map((point: Point) => point.toArray()))
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, center.x, center.y)
+            .rotate(this.rotation)
             .id(`graphic_${this.id}`);
     }
 
@@ -75,6 +75,6 @@ export default class Sketch implements IGraphic {
         svg.plot(absolutePoints.map((point: Point) => point.toArray()))
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, center.x, center.y);
+            .rotate(this.rotation);
     }
 }

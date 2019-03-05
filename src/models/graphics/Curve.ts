@@ -63,7 +63,7 @@ export default class Curve implements IGraphic {
             .path(points)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, center.x, center.y)
+            .rotate(this.rotation)
             .id(`graphic_${this.id}`);
     }
 
@@ -87,6 +87,6 @@ export default class Curve implements IGraphic {
         svg.plot(points)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, center.x, center.y);
+            .rotate(this.rotation);
     }
 }

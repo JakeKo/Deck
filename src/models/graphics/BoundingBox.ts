@@ -10,7 +10,7 @@ export default class BoundingBox implements IGraphic {
     public width: number;
     public height: number;
     public fillColor: string = "none";
-    public strokeColor: string = "magenta";
+    public strokeColor: string = "cyan";
     public strokeWidth: number = 1;
     public rotation: number;
 
@@ -28,18 +28,13 @@ export default class BoundingBox implements IGraphic {
         return this;
     }
 
-    // Note: Filler method so BoundingBox can be an IGraphic
-    public update(): void {
-        this.id = this.id;
-    }
-
     public render(canvas: SVG.Doc): SVG.Rect {
         return canvas
             .rect(this.width, this.height)
             .move(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x + this.width / 2, this.origin.y + this.height / 2)
+            .rotate(this.rotation)
             .id(`graphic_${this.id}`);
     }
 
@@ -48,6 +43,6 @@ export default class BoundingBox implements IGraphic {
             .move(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x + this.width / 2, this.origin.y + this.height / 2);
+            .rotate(this.rotation);
     }
 }
