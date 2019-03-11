@@ -38,18 +38,19 @@ export default class Ellipse implements IGraphic {
     public render(canvas: SVG.Doc): SVG.Ellipse {
         return canvas
             .ellipse(this.width, this.height)
-            .center(this.origin.x, this.origin.y)
+            .translate(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x, this.origin.y)
+            .rotate(this.rotation)
             .id(`graphic_${this.id}`);
     }
 
     public updateRendering(svg: SVG.Ellipse): void {
         svg.size(this.width, this.height)
-            .center(this.origin.x, this.origin.y)
+            .rotate(0)
+            .translate(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x, this.origin.y);
+            .rotate(this.rotation);
     }
 }

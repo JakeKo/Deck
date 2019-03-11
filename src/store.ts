@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import Utilities from "./utilities/general";
 import IGraphic from "./models/graphics/IGraphic";
 import Slide from "./models/Slide";
+import GraphicEvent from "./models/GraphicEvent";
 import * as SVG from "svg.js";
 
 import ICanvasTool from "./models/tools/ICanvasTool";
@@ -31,15 +32,16 @@ type State = {
 };
 
 type Getters = {
-    slides: (state: any) => Array<Slide>,
-    activeSlide: (state: any) => Slide | undefined,
-    styleEditorObject: (state: any) => any,
-    tool: (state: any) => ICanvasTool,
-    focusedGraphic: (state: any) => IGraphic | undefined,
-    canvasHeight: (state: any) => number,
-    canvasWidth: (state: any) => number,
-    canvasZoom: (state: any) => number,
-    canvasResolution: (state: any) => number
+    slides: (state: State) => Array<Slide>,
+    graphic: (state: State) => (slideId: string, graphicId: string) => IGraphic | undefined,
+    activeSlide: (state: State) => Slide | undefined,
+    styleEditorObject: (state: State) => any,
+    tool: (state: State) => ICanvasTool,
+    focusedGraphic: (state: State) => IGraphic | undefined,
+    canvasHeight: (state: State) => number,
+    canvasWidth: (state: State) => number,
+    canvasZoom: (state: State) => number,
+    canvasResolution: (state: State) => number
 };
 
 type Mutations = {
@@ -93,6 +95,23 @@ const store: {
     getters: {
         slides: (state: State): Array<Slide> => {
             return state.slides;
+        },
+        graphic: (state: State): ((slideId: string, graphicId: string) => IGraphic | undefined) => {
+            return function (slideId: string, graphicId: string): IGraphic | undefined {
+                const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+                if (slide === undefined) {
+                    console.error(`ERROR: No slide exists with id: ${slideId}`);
+                    return;
+                }
+
+                const index: number = slide.graphics.findIndex((graphic: IGraphic): boolean => graphic.id === graphicId);
+                if (index < 0) {
+                    console.error(`ERROR: Could not find graphic ("${graphicId}")`);
+                    return;
+                }
+
+                return slide.graphics[index];
+            };
         },
         activeSlide: (state: State): Slide | undefined => {
             return state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
@@ -152,7 +171,7 @@ const store: {
             }
 
             slide.graphics.push(graphic);
-            document.dispatchEvent(new CustomEvent("Deck.GraphicAdded", { detail: { slideId: slideId, graphicId: graphic.id } }));
+            document.dispatchEvent(new CustomEvent<GraphicEvent>("Deck.GraphicAdded", { detail: { slideId: slideId, graphicId: graphic.id, graphic: graphic } }));
         },
         removeGraphic: (state: State, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
             const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
@@ -161,8 +180,14 @@ const store: {
                 return;
             }
 
-            slide.graphics = slide.graphics.filter((graphic: IGraphic): boolean => graphic.id !== graphicId);
-            document.dispatchEvent(new CustomEvent("Deck.GraphicRemoved", { detail: { slideId: slideId, graphicId: graphicId } }));
+            const index: number = slide.graphics.findIndex((graphic: IGraphic): boolean => graphic.id === graphicId);
+            if (index < 0) {
+                console.error(`ERROR: Could not find graphic ("${graphicId}")`);
+                return;
+            }
+
+            const graphic: IGraphic = slide.graphics.splice(index, 1)[0];
+            document.dispatchEvent(new CustomEvent<GraphicEvent>("Deck.GraphicRemoved", { detail: { slideId: slideId, graphicId: graphicId, graphic: graphic } }));
         },
         updateGraphic: (state: State, { slideId, graphicId, graphic }: { slideId: string, graphicId: string, graphic: IGraphic }): void => {
             const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
@@ -178,12 +203,24 @@ const store: {
                 return;
             }
 
-            slide.graphics.splice(index, 1, graphic);
-            document.dispatchEvent(new CustomEvent("Deck.GraphicUpdated", { detail: { slideId: slide.id, graphicId: graphic.id } }));
+            slide.graphics[index] = graphic;
+            document.dispatchEvent(new CustomEvent<GraphicEvent>("Deck.GraphicUpdated", { detail: { slideId: slide.id, graphicId: graphic.id, graphic: graphic } }));
         },
         focusGraphic: (state: State, { slideId, graphicId }: { slideId: string, graphicId?: string }): void => {
+            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+            if (slide === undefined) {
+                console.error(`ERROR: No slide exists with id: ${slideId}`);
+                return;
+            }
+
+            const graphic: IGraphic | undefined = slide.graphics.find((graphic: IGraphic): boolean => graphic.id === graphicId);
+            if (graphicId !== undefined && graphic === undefined) {
+                console.error(`ERROR: No graphic (${graphicId}) exists on slide (${slideId})`);
+                return;
+            }
+
             state.focusedGraphicId = graphicId;
-            document.dispatchEvent(new CustomEvent("Deck.GraphicFocused", { detail: { slideId: slideId, graphicId: graphicId } }));
+            document.dispatchEvent(new CustomEvent<GraphicEvent>("Deck.GraphicFocused", { detail: { slideId: slideId, graphicId: graphicId, graphic: graphic } }));
         },
         tool: (state: State, toolName: string): void => {
             state.currentTool = toolName;

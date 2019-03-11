@@ -34,14 +34,15 @@ export default class Image implements IGraphic {
     public render(canvas: SVG.Doc): SVG.Image {
         return canvas
             .image(this.source)
-            .move(this.origin.x, this.origin.y)
+            .translate(this.origin.x, this.origin.y)
             .size(this.width, this.height)
             .rotate(this.rotation)
             .id(`graphic_${this.id}`);
     }
 
     public updateRendering(svg: SVG.Image): void {
-        svg.move(this.origin.x, this.origin.y)
+        svg.rotate(0)
+            .translate(this.origin.x, this.origin.y)
             .size(this.width, this.height)
             .rotate(this.rotation);
     }

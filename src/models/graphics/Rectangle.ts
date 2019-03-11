@@ -38,18 +38,19 @@ export default class Rectangle implements IGraphic {
     public render(canvas: SVG.Doc): SVG.Rect {
         return canvas
             .rect(this.width, this.height)
-            .move(this.origin.x, this.origin.y)
+            .translate(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x + this.width / 2, this.origin.y + this.height / 2)
+            .rotate(this.rotation)
             .id(`graphic_${this.id}`);
     }
 
     public updateRendering(svg: SVG.Rect): void {
         svg.size(this.width, this.height)
-            .move(this.origin.x, this.origin.y)
+            .rotate(0)
+            .translate(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
-            .rotate(this.rotation, this.origin.x + this.width / 2, this.origin.y + this.height / 2);
+            .rotate(this.rotation);
     }
 }

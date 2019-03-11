@@ -10,7 +10,7 @@ export default class CursorTool implements ICanvasTool {
     private noop: () => void = (): void => { return; };
     private cursor: string = "pointer";
     private defaultCursor: string = "default";
-    private objectToFocus?: string = undefined;
+    private objectToFocus?: IGraphic = undefined;
 
     constructor(name: string) {
         this.name = name;
@@ -50,7 +50,7 @@ export default class CursorTool implements ICanvasTool {
     public graphicMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
         this.noop();
         return function (event: CustomEvent): void {
-            const graphic: IGraphic | undefined = slideWrapper.getGraphic(event.detail.graphicId);
+            const graphic: IGraphic | undefined = slideWrapper.store.getters.graphic(slideWrapper.slideId, event.detail.graphicId);
             if (graphic === undefined) {
                 console.error(`ERROR: Could not find a graphic with the id: ${event.detail.graphicId}`);
                 return;

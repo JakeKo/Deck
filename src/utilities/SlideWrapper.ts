@@ -1,80 +1,50 @@
 import * as SVG from "svg.js";
 import IGraphic from "../models/graphics/IGraphic";
-import Slide from "../models/Slide";
+import GraphicEvent from "../models/GraphicEvent";
 
 export default class SlideWrapper {
     public store: any;
     public slideId: string;
 
     private _canvas: SVG.Doc;
-    private _focusedGraphicId: string | undefined;
+    private _focusedGraphic: IGraphic | undefined;
 
     constructor(slideId: string, canvas: SVG.Doc, store: any) {
         this.store = store;
         this.slideId = slideId;
         this._canvas = canvas;
-        this._focusedGraphicId = undefined;
+        this._focusedGraphic = undefined;
 
         document.addEventListener("Deck.GraphicAdded", (event: Event): void => {
             // Check that the event pertains to the wrapper's specific slide
-            if ((event as CustomEvent).detail.slideId !== this.slideId) {
-                return;
+            const detail: any = (event as CustomEvent<GraphicEvent>).detail;
+            if (detail.slideId === this.slideId) {
+                this.addGraphic(detail.graphic);
             }
-
-            const graphicId: string = (event as CustomEvent).detail.graphicId;
-            const graphic: IGraphic | undefined = this.getGraphic(graphicId);
-            if (graphic === undefined) {
-                console.error(`ERROR: No such graphic ("${graphicId}") exists on slide ("${this.slideId}")`);
-                return;
-            }
-
-            this.addGraphic(graphic);
         });
 
         document.addEventListener("Deck.GraphicRemoved", (event: Event): void => {
             // Check that the event pertains to the wrapper's specific slide
-            if ((event as CustomEvent).detail.slideId !== this.slideId) {
-                return;
+            const detail: any = (event as CustomEvent<GraphicEvent>).detail;
+            if (detail.slideId === this.slideId) {
+                this.removeGraphic(detail.graphicId);
             }
-
-            this.removeGraphic((event as CustomEvent).detail.graphicId);
         });
 
         document.addEventListener("Deck.GraphicUpdated", (event: Event): void => {
             // Check that the event pertains to the wrapper's specific slide
-            if ((event as CustomEvent).detail.slideId !== this.slideId) {
-                return;
+            const detail: any = (event as CustomEvent<GraphicEvent>).detail;
+            if (detail.slideId === this.slideId) {
+                this.updateGraphic(detail.graphicId, detail.graphic);
             }
-
-            const graphicId: string = (event as CustomEvent).detail.graphicId;
-            const graphic: IGraphic | undefined = this.getGraphic(graphicId);
-            if (graphic === undefined) {
-                console.error(`ERROR: No such graphic ("${graphicId}") exists on slide ("${this.slideId}")`);
-                return;
-            }
-
-            this.updateGraphic(graphicId, graphic);
         });
 
         document.addEventListener("Deck.GraphicFocused", (event: Event): void => {
             // Check that the event pertains to the wrapper's specific slide
-            if ((event as CustomEvent).detail.slideId !== this.slideId) {
-                return;
+            const detail: any = (event as CustomEvent<GraphicEvent>).detail;
+            if (detail.slideId === this.slideId) {
+                this.focusGraphic(detail.graphic);
             }
-
-            const graphicId: string = (event as CustomEvent).detail.graphicId;
-            if (graphicId === undefined) {
-                this.focusGraphic(undefined);
-                return;
-            }
-
-            const graphic: IGraphic | undefined = this.getGraphic(graphicId);
-            if (graphic === undefined) {
-                console.error(`ERROR: No such graphic ("${graphicId}") exists on slide ("${this.slideId}")`);
-                return;
-            }
-
-            this.focusGraphic(graphicId);
         });
 
         this._forwardCanvasEvents();
@@ -138,37 +108,16 @@ export default class SlideWrapper {
         });
     }
 
-    public focusGraphic(id: string | undefined) {
+    public focusGraphic(graphic: IGraphic | undefined) {
         // Unfocus the current graphic if there is one
-        if (this._focusedGraphicId !== undefined) {
-            const focusedGraphic: IGraphic | undefined = this.getGraphic(this._focusedGraphicId);
-
-            if (focusedGraphic === undefined) {
-                console.error(`ERROR: Could not find a graphic with the id ${this._focusedGraphicId}`);
-                return;
-            }
-
-            this.removeGraphic(focusedGraphic.boundingBoxId);
+        if (this._focusedGraphic !== undefined) {
+            this.removeGraphic(this._focusedGraphic.boundingBoxId);
         }
 
-        // Exit if no object is being focused
-        if (id === undefined) {
-            this._focusedGraphicId = undefined;
-            return;
+        this._focusedGraphic = graphic;
+        if (this._focusedGraphic !== undefined) {
+            this.addGraphic(this._focusedGraphic.boundingBox);
         }
-
-        // Try to focus the new graphic and render the bounding box
-        const graphicToFocus: IGraphic | undefined = this.getGraphic(id);
-        if (graphicToFocus === undefined) {
-            this._focusedGraphicId = undefined;
-            console.error(`ERROR: Could not find a graphic with the id ${id}`);
-            return;
-        }
-
-        // Update the focused graphis and the bounding box
-        // Note videos are bounded asynchronously so listen for the metadata event
-        this._focusedGraphicId = graphicToFocus.id;
-        this.addGraphic(graphicToFocus.boundingBox);
     }
 
     public setCursor(cursor: string): void {
@@ -182,16 +131,6 @@ export default class SlideWrapper {
     public addGraphic(graphic: IGraphic): void {
         const svg: SVG.Element = graphic.render(this._canvas);
         this._forwardGraphicEvents(graphic.id, svg);
-    }
-
-    public getGraphic(id: string): IGraphic | undefined {
-        const slide: Slide = this.store.getters.slides.find((s: Slide): boolean => s.id === this.slideId);
-
-        if (slide === undefined) {
-            throw `ERROR: Could not find a slide with the id: "${id}"`;
-        }
-
-        return slide.graphics.find((graphic: IGraphic): boolean => graphic.id === id);
     }
 
     public updateGraphic(id: string, newGraphic: IGraphic): void {

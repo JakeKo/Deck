@@ -39,7 +39,7 @@ export default class Text implements IGraphic {
     public render(canvas: SVG.Doc): SVG.Text {
         return canvas
             .text(this.content)
-            .move(this.origin.x, this.origin.y)
+            .translate(this.origin.x, this.origin.y)
             .font({ size: this.fontSize, weight: this.fontWeight, family: this.fontFamily })
             .fill(this.fillColor)
             .rotate(this.rotation)
@@ -48,7 +48,8 @@ export default class Text implements IGraphic {
 
     public updateRendering(svg: SVG.Text): void {
         svg.text(this.content)
-            .move(this.origin.x, this.origin.y)
+            .rotate(0)
+            .translate(this.origin.x, this.origin.y)
             .font({ size: this.fontSize, weight: this.fontWeight, family: this.fontFamily })
             .fill(this.fillColor)
             .rotate(this.rotation);
