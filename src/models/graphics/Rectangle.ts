@@ -38,7 +38,7 @@ export default class Rectangle implements IGraphic {
     public render(canvas: SVG.Doc): SVG.Rect {
         return canvas
             .rect(this.width, this.height)
-            .move(this.origin.x, this.origin.y)
+            .translate(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation)
@@ -47,7 +47,8 @@ export default class Rectangle implements IGraphic {
 
     public updateRendering(svg: SVG.Rect): void {
         svg.size(this.width, this.height)
-            .move(this.origin.x, this.origin.y)
+            .rotate(0)
+            .translate(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation);

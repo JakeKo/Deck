@@ -35,7 +35,7 @@ export default class Video implements IGraphic {
         const videoFrame: SVG.Bare = canvas
             .element("foreignObject")
             .size(this.width, this.height)
-            .move(this.origin.x, this.origin.y)
+            .translate(this.origin.x, this.origin.y)
             .rotate(this.rotation)
             .id(`graphic_${this.id}`);
 
@@ -59,7 +59,8 @@ export default class Video implements IGraphic {
             return;
         }
 
-        svg.move(this.origin.x, this.origin.y)
+        svg.rotate(0)
+            .translate(this.origin.x, this.origin.y)
             .size(this.width, this.height)
             .rotate(this.rotation);
 

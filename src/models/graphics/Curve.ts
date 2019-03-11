@@ -49,16 +49,6 @@ export default class Curve implements IGraphic {
             points += `${index % 3 === 0 ? " c" : ""} ${point.x},${point.y}`;
         });
 
-        // Get the min and max of the points in the line to infer rotation center
-        const absolutePoints: Array<Point> = this.points.map<Point>((point: Point): Point => this.origin.add(point));
-        absolutePoints.unshift(this.origin);
-
-        const xCoordinates: Array<number> = absolutePoints.map<number>((point: Point): number => point.x);
-        const yCoordinates: Array<number> = absolutePoints.map<number>((point: Point): number => point.y);
-        const minimumPoint: Point = new Point(Math.min(...xCoordinates), Math.min(...yCoordinates));
-        const maximumPoint: Point = new Point(Math.max(...xCoordinates), Math.max(...yCoordinates));
-        const center: Point = minimumPoint.add(maximumPoint.add(minimumPoint.scale(-1)).scale(0.5));
-
         return canvas
             .path(points)
             .fill(this.fillColor)
@@ -73,16 +63,6 @@ export default class Curve implements IGraphic {
         this.points.forEach((point: Point, index: number): void => {
             points += `${index % 3 === 0 ? " c" : ""} ${point.x},${point.y}`;
         });
-
-        // Get the min and max of the points in the line to infer rotation center
-        const absolutePoints: Array<Point> = this.points.map<Point>((point: Point): Point => this.origin.add(point));
-        absolutePoints.unshift(this.origin);
-
-        const xCoordinates: Array<number> = absolutePoints.map<number>((point: Point): number => point.x);
-        const yCoordinates: Array<number> = absolutePoints.map<number>((point: Point): number => point.y);
-        const minimumPoint: Point = new Point(Math.min(...xCoordinates), Math.min(...yCoordinates));
-        const maximumPoint: Point = new Point(Math.max(...xCoordinates), Math.max(...yCoordinates));
-        const center: Point = minimumPoint.add(maximumPoint.add(minimumPoint.scale(-1)).scale(0.5));
 
         svg.plot(points)
             .fill(this.fillColor)
