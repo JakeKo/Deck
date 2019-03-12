@@ -1,7 +1,6 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
-import BoundingBox from "./BoundingBox";
 import Point from "../Point";
 
 export default class Text implements IGraphic {
@@ -29,11 +28,6 @@ export default class Text implements IGraphic {
         this.fontFamily = fontFamily || "Arial";
         this.fillColor = fillColor || "#000000";
         this.rotation = rotation || 0;
-    }
-
-    get boundingBox(): BoundingBox {
-        const lines: Array<string> = this.content.split("\n");
-        return new BoundingBox(this.boundingBoxId, this.origin, Math.max(...lines.map<number>((line: string): number => line.length)) * 8, lines.length * 20, this.rotation);
     }
 
     public render(canvas: SVG.Doc): SVG.Text {

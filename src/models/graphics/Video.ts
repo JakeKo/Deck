@@ -1,7 +1,6 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
-import BoundingBox from "./BoundingBox";
 import Point from "../Point";
 
 export default class Video implements IGraphic {
@@ -25,10 +24,6 @@ export default class Video implements IGraphic {
         this.width = width || 0;
         this.height = height || 0;
         this.rotation = rotation || 0;
-    }
-
-    get boundingBox(): BoundingBox {
-        return new BoundingBox(this.boundingBoxId, this.origin, this.width, this.height, this.rotation);
     }
 
     public render(canvas: SVG.Doc): SVG.Bare {
