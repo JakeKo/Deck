@@ -1,7 +1,7 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
-import Point from "../Point";
+import Point from "../Vector";
 
 export default class Sketch implements IGraphic {
     public id: string;

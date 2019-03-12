@@ -11,7 +11,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
-import Point from "../models/Point";
+import Vector from "../models/Vector";
 import SlideWrapper from "../utilities/SlideWrapper";
 import IGraphic from "../models/graphics/IGraphic";
 import Slide from "../models/Slide";
@@ -59,7 +59,7 @@ export default class SlidePreview extends Vue {
         function reorderSlidePreview(): void {
             // Determine the offset of the mouse relative to the slide preview
             const bounds: DOMRect = slidePreview.getBoundingClientRect() as DOMRect;
-            const offset: Point = new Point(bounds.left - event.clientX, bounds.top - event.clientY);
+            const offset: Vector = new Vector(bounds.left - event.clientX, bounds.top - event.clientY);
 
             document.addEventListener("mousemove", moveSlidePreview);
             document.addEventListener("mouseup", placeSlidePreview);

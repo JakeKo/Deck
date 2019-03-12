@@ -17,7 +17,7 @@ import IGraphic from "../models/graphics/IGraphic";
 import Sketch from "../models/graphics/Sketch";
 import Curve from "../models/graphics/Curve";
 import Image from "../models/graphics/Image";
-import Point from "../models/Point";
+import Vector from "../models/Vector";
 import Video from "../models/graphics/Video";
 
 function toPrettyString(object: any, indentDepth: number): string {
@@ -93,7 +93,7 @@ export default class StyleEditor extends Vue {
         json.type = this.object.type;
 
         if (this.object instanceof Sketch || this.object instanceof Curve) {
-            json.points = this.object.points.map<Array<any>>((point: Point): any => ({ x: point.x, y: point.y }));
+            json.points = this.object.points.map<{ x: number, y: number }>((point: Vector): { x: number, y: number } => ({ x: point.x, y: point.y }));
         }
 
         if (this.object instanceof Image || this.object instanceof Video) {

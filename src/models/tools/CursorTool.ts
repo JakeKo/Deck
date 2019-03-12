@@ -1,6 +1,6 @@
 import ICanvasTool from "./ICanvasTool";
 import IGraphic from "../graphics/IGraphic";
-import Point from "../Point";
+import Point from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 

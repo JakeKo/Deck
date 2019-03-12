@@ -1,5 +1,5 @@
 import * as SVG from "svg.js";
-import Point from "../Point";
+import Point from "../Vector";
 
 export default interface IGraphic {
     id: string;

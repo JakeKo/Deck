@@ -1,4 +1,4 @@
-import Point from "../models/Point";
+import Point from "../models/Vector";
 import IGraphic from "../models/graphics/IGraphic";
 import Rectangle from "../models/graphics/Rectangle";
 import Ellipse from "../models/graphics/Ellipse";

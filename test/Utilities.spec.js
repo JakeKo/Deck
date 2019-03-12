@@ -1,5 +1,5 @@
 import Utilities from "../src/utilities/general";
-import Point from "../src/models/Point";
+import Vector from "../src/models/Vector";
 import Rectangle from "../src/models/graphics/Rectangle";
 import Ellipse from "../src/models/graphics/Ellipse";
 import Sketch from "../src/models/graphics/Sketch";
@@ -30,7 +30,7 @@ describe("Utilities", () => {
             strokeWidth: 5,
             rotation: 45
         }, expectedRectangle = new Rectangle({
-            origin: new Point(0, 0),
+            origin: new Vector(0, 0),
             width: 50,
             height: 100,
             fillColor: "blue",
@@ -60,7 +60,7 @@ describe("Utilities", () => {
             strokeWidth: 5,
             rotation: 45
         }, expectedEllipse = new Ellipse({
-            origin: new Point(0, 0),
+            origin: new Vector(0, 0),
             width: 50,
             height: 100,
             fillColor: "blue",
@@ -89,8 +89,8 @@ describe("Utilities", () => {
             strokeWidth: 5,
             rotation: 45
         }, expectedSketch = new Sketch({
-            origin: new Point(0, 45),
-            points: [ new Point(0, 10), new Point(5, 15) ],
+            origin: new Vector(0, 45),
+            points: [ new Vector(0, 10), new Vector(5, 15) ],
             fillColor: "blue",
             strokeColor: "pink",
             strokeWidth: 5,
@@ -117,8 +117,8 @@ describe("Utilities", () => {
             strokeWidth: 5,
             rotation: 45
         }, expectedCurve = new Curve({
-            origin: new Point(25, 10),
-            points: [ new Point(0, 10), new Point(5, 15) ],
+            origin: new Vector(25, 10),
+            points: [ new Vector(0, 10), new Vector(5, 15) ],
             fillColor: "blue",
             strokeColor: "pink",
             strokeWidth: 5,
@@ -146,7 +146,7 @@ describe("Utilities", () => {
             fillColor: "blue",
             rotation: 45
         }, expectedTextbox = new Text({
-            origin: new Point(0, 10),
+            origin: new Vector(0, 10),
             content: "Hello World!",
             fontSize: "12px",
             fontWeight: "regular",
