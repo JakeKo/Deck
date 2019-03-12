@@ -1,5 +1,4 @@
 import * as SVG from "svg.js";
-import BoundingBox from "./BoundingBox";
 import Point from "../Point";
 
 export default interface IGraphic {
@@ -8,7 +7,6 @@ export default interface IGraphic {
     origin: Point;
     rotation: number;
     boundingBoxId: string;
-    boundingBox: BoundingBox;
     render(canvas: SVG.Doc): SVG.Element;
     updateRendering(svg: SVG.Element): void;
 }

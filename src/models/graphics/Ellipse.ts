@@ -1,7 +1,6 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
-import BoundingBox from "./BoundingBox";
 import Point from "../Point";
 
 export default class Ellipse implements IGraphic {
@@ -29,10 +28,6 @@ export default class Ellipse implements IGraphic {
         this.strokeColor = strokeColor || "#000000";
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
-    }
-
-    get boundingBox(): BoundingBox {
-        return new BoundingBox(this.boundingBoxId, new Point(this.origin.x - this.width * 0.5, this.origin.y - this.height * 0.5), this.width, this.height, this.rotation);
     }
 
     public render(canvas: SVG.Doc): SVG.Ellipse {
