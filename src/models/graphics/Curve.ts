@@ -44,13 +44,14 @@ export default class Curve implements IGraphic {
 
     public render(canvas: SVG.Doc): SVG.Path {
         // Reformat points from an array of objects to the bezier curve string
-        let points: string = `M ${this.origin.x},${this.origin.y}`;
+        let points: string = `M 0,0`;
         this.points.forEach((point: Point, index: number): void => {
             points += `${index % 3 === 0 ? " c" : ""} ${point.x},${point.y}`;
         });
 
         return canvas
             .path(points)
+            .translate(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation)
@@ -59,12 +60,14 @@ export default class Curve implements IGraphic {
 
     public updateRendering(svg: SVG.Path): void {
         // Reformat points from an array of objects to the bezier curve string
-        let points: string = `M ${this.origin.x},${this.origin.y}`;
+        let points: string = `M 0,0`;
         this.points.forEach((point: Point, index: number): void => {
             points += `${index % 3 === 0 ? " c" : ""} ${point.x},${point.y}`;
         });
 
         svg.plot(points)
+            .rotate(0)
+            .translate(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation);

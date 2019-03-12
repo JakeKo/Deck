@@ -116,7 +116,13 @@ export default class SlideWrapper {
 
         this._focusedGraphic = graphic;
         if (this._focusedGraphic !== undefined) {
-            this.addGraphic(this._focusedGraphic.boundingBox);
+            const box: SVG.RBox = this._canvas.select(`#graphic_${this._focusedGraphic.id}`).first().rbox();
+            const bounds: DOMRect = this.absoluteBounds();
+            this._canvas.rect(box.width, box.height)
+                .translate(box.x - bounds.x, box.y - bounds.y)
+                .fill("none")
+                .stroke({ color: "cyan", width: 1 })
+                .id(`graphic_${this._focusedGraphic.boundingBoxId}`);
         }
     }
 

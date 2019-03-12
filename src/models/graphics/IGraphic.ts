@@ -6,6 +6,7 @@ export default interface IGraphic {
     id: string;
     type: string;
     origin: Point;
+    rotation: number;
     boundingBoxId: string;
     boundingBox: BoundingBox;
     render(canvas: SVG.Doc): SVG.Element;
