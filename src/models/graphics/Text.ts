@@ -2,6 +2,7 @@ import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
 import Vector from "../Vector";
+import SnapVector from "../SnapVector";
 
 export default class Text implements IGraphic {
     public id: string;
@@ -47,5 +48,9 @@ export default class Text implements IGraphic {
             .font({ size: this.fontSize, weight: this.fontWeight, family: this.fontFamily })
             .fill(this.fillColor)
             .rotate(this.rotation);
+    }
+
+    public getSnapVectors(svg: SVG.Rect): Array<SnapVector> {
+        return [];
     }
 }

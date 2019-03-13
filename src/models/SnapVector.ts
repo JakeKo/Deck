@@ -9,6 +9,8 @@ export default class SnapVector {
         this.direction = direction === undefined ? undefined : direction.normalized;
     }
 
+    // Calculates the distance between the given point and the line represented by the SnapVector
+    // If the SnapVector has no direction than it returns a simple point-to-point distance
     public distanceFromVector(point: Vector): number {
         const difference: Vector = point.add(this.origin.scale(-1));
 

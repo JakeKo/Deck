@@ -2,6 +2,7 @@ import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
 import Vector from "../Vector";
+import SnapVector from "../SnapVector";
 
 export default class Curve implements IGraphic {
     public id: string;
@@ -57,5 +58,9 @@ export default class Curve implements IGraphic {
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
             .rotate(this.rotation);
+    }
+
+    public getSnapVectors(svg: SVG.Rect): Array<SnapVector> {
+        return [];
     }
 }

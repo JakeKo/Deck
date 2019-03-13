@@ -1,5 +1,6 @@
 import * as SVG from "svg.js";
 import Vector from "../Vector";
+import SnapVector from "../SnapVector";
 
 export default interface IGraphic {
     id: string;
@@ -9,4 +10,5 @@ export default interface IGraphic {
     boundingBoxId: string;
     render(canvas: SVG.Doc): SVG.Element;
     updateRendering(svg: SVG.Element): void;
+    getSnapVectors(svg: SVG.Element): Array<SnapVector>;
 }

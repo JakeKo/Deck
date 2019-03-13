@@ -2,6 +2,7 @@ import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
 import Vector from "../Vector";
+import SnapVector from "../SnapVector";
 
 export default class Video implements IGraphic {
     public id: string;
@@ -62,5 +63,9 @@ export default class Video implements IGraphic {
         const boundingRect: DOMRect | ClientRect = svg.node.getBoundingClientRect();
         video.width = boundingRect.width;
         video.height = boundingRect.height;
+    }
+
+    public getSnapVectors(svg: SVG.Rect): Array<SnapVector> {
+        return [];
     }
 }
