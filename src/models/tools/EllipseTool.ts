@@ -1,6 +1,6 @@
 import ICanvasTool from "./ICanvasTool";
 import Ellipse from "../graphics/Ellipse";
-import Point from "../Vector";
+import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 
@@ -27,20 +27,20 @@ export default class EllipseTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
-            const start: Point = Utilities.getPosition(event, slideWrapper);
-            const ellipse: Ellipse = new Ellipse({ origin: new Point(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
+            const start: Vector = Utilities.getPosition(event, slideWrapper);
+            const ellipse: Ellipse = new Ellipse({ origin: new Vector(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: ellipse });
-            let lastPosition: Point = new Point((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
+            let lastPosition: Vector = new Vector((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
             let shiftPressed = false;
 
             // Preview drawing ellipse
             function preview(event: Event): void {
                 // Determine dimensions for an ellipse or circle (based on if shift is pressed)
                 const mouseEvent: MouseEvent = (event as CustomEvent).detail.baseEvent as MouseEvent;
-                lastPosition = new Point(mouseEvent.clientX, mouseEvent.clientY);
+                lastPosition = new Vector(mouseEvent.clientX, mouseEvent.clientY);
 
-                const position: Point = Utilities.getPosition(event as CustomEvent, slideWrapper);
-                const rawOffset: Point = position.add(start.scale(-1));
+                const position: Vector = Utilities.getPosition(event as CustomEvent, slideWrapper);
+                const rawOffset: Vector = position.add(start.scale(-1));
                 const minimumOffset: number = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
 
                 // Enforce that a shape has positive width and height i.e. move the x and y if the width or height are negative

@@ -1,14 +1,14 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
-import Point from "../Vector";
+import Vector from "../Vector";
 
 export default class Sketch implements IGraphic {
     public id: string;
     public type: string = "sketch";
     public boundingBoxId: string;
-    public origin: Point;
-    public points: Array<Point>;
+    public origin: Vector;
+    public points: Array<Vector>;
     public fillColor: string;
     public strokeColor: string;
     public strokeWidth: number;
@@ -16,11 +16,11 @@ export default class Sketch implements IGraphic {
 
     constructor(
         { id, origin, points, fillColor, strokeColor, strokeWidth, rotation }:
-            { id?: string, origin?: Point, points?: Array<Point>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+            { id?: string, origin?: Vector, points?: Array<Vector>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
-        this.origin = origin || new Point(0, 0);
+        this.origin = origin || new Vector(0, 0);
         this.points = points || [];
         this.fillColor = fillColor || "#EEEEEE";
         this.strokeColor = strokeColor || "#000000";
@@ -30,7 +30,7 @@ export default class Sketch implements IGraphic {
 
     public render(canvas: SVG.Doc): SVG.PolyLine {
         return canvas
-            .polyline(this.points.map((point: Point) => point.toArray()))
+            .polyline(this.points.map((point: Vector) => point.toArray()))
             .translate(this.origin.x, this.origin.y)
             .fill(this.fillColor)
             .stroke({ color: this.strokeColor, width: this.strokeWidth })
@@ -39,7 +39,7 @@ export default class Sketch implements IGraphic {
     }
 
     public updateRendering(svg: SVG.PolyLine): void {
-        svg.plot(this.points.map((point: Point) => point.toArray()))
+        svg.plot(this.points.map((point: Vector) => point.toArray()))
             .rotate(0)
             .translate(this.origin.x, this.origin.y)
             .fill(this.fillColor)

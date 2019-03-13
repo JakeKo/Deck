@@ -1,4 +1,4 @@
-import Point from "../models/Vector";
+import Vector from "../models/Vector";
 import IGraphic from "../models/graphics/IGraphic";
 import Rectangle from "../models/graphics/Rectangle";
 import Ellipse from "../models/graphics/Ellipse";
@@ -17,37 +17,37 @@ function generateId(): string {
     return `${term()}${term()}-${term()}-${term()}-${term()}-${term()}${term()}${term()}`;
 }
 
-function getPosition(event: CustomEvent, slideWrapper: SlideWrapper): Point {
+function getPosition(event: CustomEvent, slideWrapper: SlideWrapper): Vector {
     const mouseEvent: MouseEvent = event.detail.baseEvent as MouseEvent;
     const zoom: number = slideWrapper.store.getters.canvasZoom;
     const resolution: number = slideWrapper.store.getters.canvasResolution;
     const bounds: DOMRect = slideWrapper.absoluteBounds();
-    return new Point(Math.round(((mouseEvent.pageX - bounds.x) / zoom) * resolution), Math.round(((mouseEvent.pageY - bounds.y) / zoom) * resolution));
+    return new Vector(Math.round(((mouseEvent.pageX - bounds.x) / zoom) * resolution), Math.round(((mouseEvent.pageY - bounds.y) / zoom) * resolution));
 }
 
 function parseGraphic(json: any): IGraphic {
     if (json.type === "rectangle") {
-        json.origin = new Point(json.origin.x, json.origin.y);
+        json.origin = new Vector(json.origin.x, json.origin.y);
         return new Rectangle(json);
     } else if (json.type === "ellipse") {
-        json.origin = new Point(json.origin.x, json.origin.y);
+        json.origin = new Vector(json.origin.x, json.origin.y);
         return new Ellipse(json);
     } else if (json.type === "curve") {
-        json.origin = new Point(json.origin.x, json.origin.y);
-        json.points = json.points.map((point: { x: number, y: number }): Point => new Point(point.x, point.y));
+        json.origin = new Vector(json.origin.x, json.origin.y);
+        json.points = json.points.map((point: { x: number, y: number }): Vector => new Vector(point.x, point.y));
         return new Curve(json);
     } else if (json.type === "sketch") {
-        json.origin = new Point(json.origin.x, json.origin.y);
-        json.points = json.points.map((point: { x: number, y: number }): Point => new Point(point.x, point.y));
+        json.origin = new Vector(json.origin.x, json.origin.y);
+        json.points = json.points.map((point: { x: number, y: number }): Vector => new Vector(point.x, point.y));
         return new Sketch(json);
     } else if (json.type === "text") {
-        json.origin = new Point(json.origin.x, json.origin.y);
+        json.origin = new Vector(json.origin.x, json.origin.y);
         return new Text(json);
     } else if (json.type === "image") {
-        json.origin = new Point(json.origin.x, json.origin.y);
+        json.origin = new Vector(json.origin.x, json.origin.y);
         return new Image(json);
     } else if (json.type === "video") {
-        json.origin = new Point(json.origin.x, json.origin.y);
+        json.origin = new Vector(json.origin.x, json.origin.y);
         return new Video(json);
     }
 

@@ -1,13 +1,13 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
-import Point from "../Vector";
+import Vector from "../Vector";
 
 export default class Video implements IGraphic {
     public id: string;
     public type: string = "video";
     public boundingBoxId: string;
-    public origin: Point;
+    public origin: Vector;
     public source: string;
     public width: number;
     public height: number;
@@ -15,11 +15,11 @@ export default class Video implements IGraphic {
 
     constructor(
         { id, origin, source, width, height, rotation }:
-            { id?: string, origin?: Point, source?: string, width?: number, height?: number, rotation?: number } = {}
+            { id?: string, origin?: Vector, source?: string, width?: number, height?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
-        this.origin = origin || new Point(0, 0);
+        this.origin = origin || new Vector(0, 0);
         this.source = source || "";
         this.width = width || 0;
         this.height = height || 0;

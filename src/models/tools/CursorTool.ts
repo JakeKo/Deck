@@ -1,6 +1,6 @@
 import ICanvasTool from "./ICanvasTool";
 import IGraphic from "../graphics/IGraphic";
-import Point from "../Vector";
+import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 
@@ -59,7 +59,7 @@ export default class CursorTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: graphic.id });
             slideWrapper.store.commit("styleEditorObject", graphic);
 
-            const cursorOffset: Point = graphic.origin.add(Utilities.getPosition(event, slideWrapper).scale(-1));
+            const cursorOffset: Vector = graphic.origin.add(Utilities.getPosition(event, slideWrapper).scale(-1));
 
             document.addEventListener("Deck.CanvasMouseMove", preview);
             document.addEventListener("Deck.CanvasMouseUp", end);

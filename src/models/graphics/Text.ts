@@ -1,13 +1,13 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
-import Point from "../Vector";
+import Vector from "../Vector";
 
 export default class Text implements IGraphic {
     public id: string;
     public type: string = "text";
     public boundingBoxId: string;
-    public origin: Point;
+    public origin: Vector;
     public content: string;
     public fontSize: number;
     public fontWeight: string;
@@ -17,11 +17,11 @@ export default class Text implements IGraphic {
 
     constructor(
         { id, origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }:
-            { id?: string, origin?: Point, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
+            { id?: string, origin?: Vector, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
-        this.origin = origin || new Point(0, 0);
+        this.origin = origin || new Vector(0, 0);
         this.content = content || "lorem ipsum dolor sit amet";
         this.fontSize = fontSize || 12;
         this.fontWeight = fontWeight || "400";

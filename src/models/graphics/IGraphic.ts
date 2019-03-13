@@ -1,10 +1,10 @@
 import * as SVG from "svg.js";
-import Point from "../Vector";
+import Vector from "../Vector";
 
 export default interface IGraphic {
     id: string;
     type: string;
-    origin: Point;
+    origin: Vector;
     rotation: number;
     boundingBoxId: string;
     render(canvas: SVG.Doc): SVG.Element;

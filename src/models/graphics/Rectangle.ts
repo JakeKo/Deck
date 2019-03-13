@@ -1,13 +1,13 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
-import Point from "../Vector";
+import Vector from "../Vector";
 
 export default class Rectangle implements IGraphic {
     public id: string;
     public type: string = "rectangle";
     public boundingBoxId: string;
-    public origin: Point;
+    public origin: Vector;
     public width: number;
     public height: number;
     public fillColor: string;
@@ -17,11 +17,11 @@ export default class Rectangle implements IGraphic {
 
     constructor(
         { id, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
-            { id?: string, origin?: Point, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+            { id?: string, origin?: Vector, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
-        this.origin = origin || new Point(0, 0);
+        this.origin = origin || new Vector(0, 0);
         this.width = width || 50;
         this.height = height || 50;
         this.fillColor = fillColor || "#EEEEEE";
