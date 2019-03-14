@@ -4,6 +4,7 @@ import Utilities from "./utilities/general";
 import IGraphic from "./models/graphics/IGraphic";
 import Slide from "./models/Slide";
 import GraphicEvent from "./models/GraphicEvent";
+import SnapVector from "./models/SnapVector";
 import * as SVG from "svg.js";
 
 import ICanvasTool from "./models/tools/ICanvasTool";
@@ -54,7 +55,9 @@ type Mutations = {
     tool: (state: State, toolName: string) => void,
     styleEditorObject: (state: State, object?: IGraphic) => void,
     activeSlide: (state: State, slideId: string) => void,
-    canvasZoom: (state: State, zoom: number) => void
+    canvasZoom: (state: State, zoom: number) => void,
+    removeSnapVectors: (state: State, { slideId, snapVectors }: { slideId: string, snapVectors: Array<SnapVector> }) => void,
+    addSnapVectors: (state: State, { slideId, snapVectors }: { slideId: string, snapVectors: Array<SnapVector> }) => void
 };
 
 type Actions = {
@@ -233,6 +236,27 @@ const store: {
         },
         canvasZoom: (state: State, zoom: number): void => {
             state.canvas.zoom = Math.max(zoom, 0.25);
+        },
+        removeSnapVectors: (state: State, { slideId, snapVectors }: { slideId: string, snapVectors: Array<SnapVector> }): void => {
+            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+            if (slide === undefined) {
+                console.error(`ERROR: No slide exists with id: ${slideId}`);
+                return;
+            }
+
+            snapVectors.forEach((snapVector: SnapVector): void => {
+                const index: number = slide.snapVectors.findIndex((s: SnapVector): boolean => s.origin.equals(snapVector.origin) && s.direction.equals(snapVector.direction));
+                slide.snapVectors = slide.snapVectors.splice(index, 1);
+            });
+        },
+        addSnapVectors: (state: State, { slideId, snapVectors }: { slideId: string, snapVectors: Array<SnapVector> }): void => {
+            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+            if (slide === undefined) {
+                console.error(`ERROR: No slide exists with id: ${slideId}`);
+                return;
+            }
+
+            slide.snapVectors.push(...snapVectors);
         }
     },
     actions: {

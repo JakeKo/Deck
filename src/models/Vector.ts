@@ -35,4 +35,8 @@ export default class Vector {
     public transform(transformation: (coordinate: number) => number) {
         return new Vector(transformation(this.x), transformation(this.y));
     }
+
+    public equals(vector: Vector): boolean {
+        return this.x === vector.x && this.y === vector.y;
+    }
 }
