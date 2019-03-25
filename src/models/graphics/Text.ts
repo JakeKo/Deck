@@ -50,7 +50,19 @@ export default class Text implements IGraphic {
             .rotate(this.rotation);
     }
 
-    public getSnapVectors(svg: SVG.Rect): Array<SnapVector> {
-        return [];
+    public getSnapVectors(svg: SVG.Text): Array<SnapVector> {
+        const snapVectors: Array<SnapVector> = [];
+        const width: number = svg.width();
+        const height: number = svg.height();
+
+        // Center, upper center, left center, lower center, right center
+        snapVectors.push(new SnapVector(Utilities.transform(new Vector(width / 2, height / 2), svg), Vector.right));
+        snapVectors.push(new SnapVector(Utilities.transform(new Vector(width / 2, height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(Utilities.transform(new Vector(width / 2, 0), svg), Vector.right));
+        snapVectors.push(new SnapVector(Utilities.transform(new Vector(width, height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(Utilities.transform(new Vector(width / 2, height), svg), Vector.right));
+        snapVectors.push(new SnapVector(Utilities.transform(new Vector(0, height / 2), svg), Vector.up));
+
+        return snapVectors;
     }
 }

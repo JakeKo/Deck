@@ -44,7 +44,6 @@
 		"prefer-conditional-expression": true,
 		"prefer-const": true,
 		"prefer-for-of": true,
-		"prefer-function-over-method": true,
 		"prefer-template": true,
 		"quotemark": {
 			"options": "double"

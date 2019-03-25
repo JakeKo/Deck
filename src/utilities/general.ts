@@ -8,6 +8,7 @@ import Text from "../models/graphics/Text";
 import Image from "../models/graphics/Image";
 import Video from "../models/graphics/Video";
 import SlideWrapper from "./SlideWrapper";
+import * as SVG from "svg.js";
 
 function generateId(): string {
     function term(): string {
@@ -52,6 +53,12 @@ function parseGraphic(json: any): IGraphic {
     }
 
     throw `Undefined graphic type: ${json.type}`;
+}
+
+function transform(point: Vector, svg: SVG.Element): Vector {
+    const svgPoint: SVG.Point = new SVG.Point(point.x, point.y);
+    const transformedSvgPoint: SVG.Point = svgPoint.transform(svg.matrixify());
+    return new Vector(transformedSvgPoint.x, transformedSvgPoint.y);
 }
 
 const deckScript: string = `<style>
@@ -140,5 +147,6 @@ export default {
     generateId,
     getPosition,
     parseGraphic,
+    transform,
     deckScript
 };
