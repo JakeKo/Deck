@@ -15,7 +15,7 @@ describe("SnapVector", () => {
 
     it("can calculate the distance from a point with no direction", () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(2, 5), new Vector(0, 0));
+        const snapVector = new SnapVector(new Vector(2, 5));
         const point = new Vector(-3, 7);
         const expectedDistance = Math.sqrt(29);
 

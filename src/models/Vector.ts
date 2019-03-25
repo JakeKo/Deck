@@ -1,7 +1,13 @@
 export default class Vector {
     public x: number;
     public y: number;
+
     public static undefined: Vector = new Vector(NaN, NaN);
+    public static zero = new Vector(0, 0);
+    public static up = new Vector(0, 1);
+    public static right = new Vector(1, 0);
+    public static down = new Vector(0, -1);
+    public static left = new Vector(-1, 0);
 
     constructor(x: number, y: number) {
         this.x = x;
@@ -13,7 +19,7 @@ export default class Vector {
     }
 
     get normalized(): Vector {
-        return new Vector(this.x / this.magnitude, this.y / this.magnitude);
+        return this.magnitude === 0 ? Vector.zero : new Vector(this.x / this.magnitude, this.y / this.magnitude);
     }
 
     public toArray(): Array<number> {

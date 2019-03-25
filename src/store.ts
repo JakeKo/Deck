@@ -245,7 +245,8 @@ const store: {
             }
 
             snapVectors.forEach((snapVector: SnapVector): void => {
-                const index: number = slide.snapVectors.findIndex((s: SnapVector): boolean => s.origin.equals(snapVector.origin) && s.direction.equals(snapVector.direction));
+                const index: number = slide.snapVectors.findIndex((s: SnapVector): boolean =>
+                    s.origin.equals(snapVector.origin) && s.direction.equals(snapVector.direction));
                 slide.snapVectors = slide.snapVectors.splice(index, 1);
             });
         },

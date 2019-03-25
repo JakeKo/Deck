@@ -56,6 +56,7 @@ export default class CursorTool implements ICanvasTool {
                 return;
             }
 
+            console.log(graphic.getSnapVectors(slideWrapper.getRenderedGraphic(graphic.id)));
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: graphic.id });
             slideWrapper.store.commit("styleEditorObject", graphic);
 

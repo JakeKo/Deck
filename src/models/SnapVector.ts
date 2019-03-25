@@ -4,7 +4,7 @@ export default class SnapVector {
     public origin: Vector;
     public direction: Vector;
 
-    constructor(origin: Vector, direction: Vector) {
+    constructor(origin: Vector, direction: Vector = Vector.zero) {
         this.origin = origin;
         this.direction = direction.normalized;
     }
@@ -14,7 +14,7 @@ export default class SnapVector {
     public distanceFromVector(point: Vector): number {
         const difference: Vector = point.add(this.origin.scale(-1));
 
-        if (this.direction.equals(new Vector(0, 0))) {
+        if (this.direction.equals(Vector.zero)) {
             return difference.magnitude;
         }
 
