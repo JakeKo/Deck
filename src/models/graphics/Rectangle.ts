@@ -65,6 +65,15 @@ export default class Rectangle implements IGraphic {
     }
 
     public getSnappableVectors(svg: SVG.Rect): Array<Vector> {
-        return [];
+        const snappableVectors: Array<Vector> = [];
+
+        // Center, upper center, left center, lower center, right center
+        snappableVectors.push(Utilities.transform(new Vector(this.width / 2, this.height / 2), svg));
+        snappableVectors.push(Utilities.transform(new Vector(this.width / 2, 0), svg));
+        snappableVectors.push(Utilities.transform(new Vector(this.width, this.height / 2), svg));
+        snappableVectors.push(Utilities.transform(new Vector(this.width / 2, this.height), svg));
+        snappableVectors.push(Utilities.transform(new Vector(0, this.height / 2), svg));
+
+        return snappableVectors;
     }
 }

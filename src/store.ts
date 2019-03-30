@@ -35,6 +35,7 @@ type State = {
 type Getters = {
     slides: (state: State) => Array<Slide>,
     graphic: (state: State) => (slideId: string, graphicId: string) => IGraphic | undefined,
+    snapVectors: (state: State) => (slideId: string) => Array<SnapVector>,
     activeSlide: (state: State) => Slide | undefined,
     styleEditorObject: (state: State) => any,
     tool: (state: State) => ICanvasTool,
@@ -114,6 +115,17 @@ const store: {
                 }
 
                 return slide.graphics[index];
+            };
+        },
+        snapVectors: (state: State): ((slideId: string) => Array<SnapVector>) => {
+            return function(slideId: string): Array<SnapVector> {
+                const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+                if (slide === undefined) {
+                    console.error(`ERROR: No slide exists with id: ${slideId}`);
+                    return [];
+                }
+
+                return slide.snapVectors;
             };
         },
         activeSlide: (state: State): Slide | undefined => {
