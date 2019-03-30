@@ -78,4 +78,8 @@ export default class Video implements IGraphic {
 
         return snapVectors;
     }
+
+    public getSnappableVectors(svg: SVG.Bare): Array<Vector> {
+        return [];
+    }
 }

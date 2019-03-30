@@ -11,4 +11,5 @@ export default interface IGraphic {
     render(canvas: SVG.Doc): SVG.Element;
     updateRendering(svg: SVG.Element): void;
     getSnapVectors(svg: SVG.Element): Array<SnapVector>;
+    getSnappableVectors(svg: SVG.Element): Array<Vector>;
 }

@@ -76,4 +76,8 @@ export default class Curve implements IGraphic {
 
         return snapVectors;
     }
+
+    public getSnappableVectors(svg: SVG.Path): Array<Vector> {
+        return [];
+    }
 }

@@ -64,4 +64,8 @@ export default class Sketch implements IGraphic {
 
         return snapVectors;
     }
+
+    public getSnappableVectors(svg: SVG.PolyLine): Array<Vector> {
+        return [];
+    }
 }

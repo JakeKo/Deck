@@ -56,4 +56,8 @@ export default class Image implements IGraphic {
 
         return snapVectors;
     }
+
+    public getSnappableVectors(svg: SVG.Image): Array<Vector> {
+        return [];
+    }
 }

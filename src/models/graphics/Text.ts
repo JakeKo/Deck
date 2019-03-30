@@ -65,4 +65,8 @@ export default class Text implements IGraphic {
 
         return snapVectors;
     }
+
+    public getSnappableVectors(svg: SVG.Text): Array<Vector> {
+        return [];
+    }
 }

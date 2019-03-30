@@ -55,12 +55,16 @@ export default class Rectangle implements IGraphic {
 
         // Center, upper center, left center, lower center, right center
         snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height / 2), svg), Vector.right));
-        // snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height / 2), svg), Vector.up));
-        // snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, 0), svg), Vector.right));
-        // snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width, this.height / 2), svg), Vector.up));
-        // snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height), svg), Vector.right));
-        // snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(0, this.height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, 0), svg), Vector.right));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width, this.height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height), svg), Vector.right));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(0, this.height / 2), svg), Vector.up));
 
         return snapVectors;
+    }
+
+    public getSnappableVectors(svg: SVG.Rect): Array<Vector> {
+        return [];
     }
 }

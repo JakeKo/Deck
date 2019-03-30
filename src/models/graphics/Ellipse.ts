@@ -63,4 +63,8 @@ export default class Ellipse implements IGraphic {
 
         return snapVectors;
     }
+
+    public getSnappableVectors(svg: SVG.Ellipse): Array<Vector> {
+        return [];
+    }
 }
