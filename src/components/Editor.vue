@@ -63,6 +63,7 @@ export default class Editor extends Vue {
 #editor {
     display: flex;
     flex-grow: 1;
+    min-height: 0;
 }
 
 #canvas-container {

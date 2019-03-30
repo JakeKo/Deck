@@ -3,7 +3,7 @@ import IGraphic from "../graphics/IGraphic";
 import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
-import SnapVector from "../SnapVector";
+import * as SVG from "svg.js";
 
 export default class CursorTool implements ICanvasTool {
     public name: string;
@@ -60,8 +60,6 @@ export default class CursorTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: graphic.id });
             slideWrapper.store.commit("styleEditorObject", graphic);
 
-            // Fetch the initial snap vectors of the graphic
-            let snapVectors: Array<SnapVector> = graphic.getSnapVectors(slideWrapper.getRenderedGraphic(event.detail.graphicId));
             const cursorOffset: Vector = graphic.origin.add(Utilities.getPosition(event, slideWrapper).scale(-1));
 
             document.addEventListener("Deck.CanvasMouseMove", preview);
@@ -76,9 +74,9 @@ export default class CursorTool implements ICanvasTool {
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
 
-                slideWrapper.store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, snapVectors: snapVectors });
-                snapVectors = graphic!.getSnapVectors(slideWrapper.getRenderedGraphic((event as CustomEvent).detail.graphicId));
-                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: snapVectors });
+                const svg: SVG.Element = slideWrapper.getRenderedGraphic(graphic!.id);
+                slideWrapper.store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
+                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors(svg) });
             }
 
             // End moving shape

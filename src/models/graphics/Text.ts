@@ -56,12 +56,12 @@ export default class Text implements IGraphic {
         const height: number = svg.height();
 
         // Center, upper center, left center, lower center, right center
-        snapVectors.push(new SnapVector(Utilities.transform(new Vector(width / 2, height / 2), svg), Vector.right));
-        snapVectors.push(new SnapVector(Utilities.transform(new Vector(width / 2, height / 2), svg), Vector.up));
-        snapVectors.push(new SnapVector(Utilities.transform(new Vector(width / 2, 0), svg), Vector.right));
-        snapVectors.push(new SnapVector(Utilities.transform(new Vector(width, height / 2), svg), Vector.up));
-        snapVectors.push(new SnapVector(Utilities.transform(new Vector(width / 2, height), svg), Vector.right));
-        snapVectors.push(new SnapVector(Utilities.transform(new Vector(0, height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(width / 2, height / 2), svg), Vector.right));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(width / 2, height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(width / 2, 0), svg), Vector.right));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(width, height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(width / 2, height), svg), Vector.right));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(0, height / 2), svg), Vector.up));
 
         return snapVectors;
     }
