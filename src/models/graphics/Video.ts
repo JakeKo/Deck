@@ -1,13 +1,14 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
-import Point from "../Point";
+import Vector from "../Vector";
+import SnapVector from "../SnapVector";
 
 export default class Video implements IGraphic {
     public id: string;
     public type: string = "video";
     public boundingBoxId: string;
-    public origin: Point;
+    public origin: Vector;
     public source: string;
     public width: number;
     public height: number;
@@ -15,11 +16,11 @@ export default class Video implements IGraphic {
 
     constructor(
         { id, origin, source, width, height, rotation }:
-            { id?: string, origin?: Point, source?: string, width?: number, height?: number, rotation?: number } = {}
+            { id?: string, origin?: Vector, source?: string, width?: number, height?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
-        this.origin = origin || new Point(0, 0);
+        this.origin = origin || new Vector(0, 0);
         this.source = source || "";
         this.width = width || 0;
         this.height = height || 0;
@@ -62,5 +63,19 @@ export default class Video implements IGraphic {
         const boundingRect: DOMRect | ClientRect = svg.node.getBoundingClientRect();
         video.width = boundingRect.width;
         video.height = boundingRect.height;
+    }
+
+    public getSnapVectors(svg: SVG.Bare): Array<SnapVector> {
+        const snapVectors: Array<SnapVector> = [];
+
+        // Center, upper center, left center, lower center, right center
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height / 2), svg), Vector.right));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, 0), svg), Vector.right));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width, this.height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height), svg), Vector.right));
+        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(0, this.height / 2), svg), Vector.up));
+
+        return snapVectors;
     }
 }

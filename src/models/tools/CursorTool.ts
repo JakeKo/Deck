@@ -1,8 +1,9 @@
 import ICanvasTool from "./ICanvasTool";
 import IGraphic from "../graphics/IGraphic";
-import Point from "../Point";
+import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
+import * as SVG from "svg.js";
 
 export default class CursorTool implements ICanvasTool {
     public name: string;
@@ -59,7 +60,7 @@ export default class CursorTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: graphic.id });
             slideWrapper.store.commit("styleEditorObject", graphic);
 
-            const cursorOffset: Point = graphic.origin.add(Utilities.getPosition(event, slideWrapper).scale(-1));
+            const cursorOffset: Vector = graphic.origin.add(Utilities.getPosition(event, slideWrapper).scale(-1));
 
             document.addEventListener("Deck.CanvasMouseMove", preview);
             document.addEventListener("Deck.CanvasMouseUp", end);
@@ -72,6 +73,10 @@ export default class CursorTool implements ICanvasTool {
                 // Update the graphic and refresh focus to update bounding box
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
+
+                const svg: SVG.Element = slideWrapper.getRenderedGraphic(graphic!.id);
+                slideWrapper.store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
+                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors(svg) });
             }
 
             // End moving shape

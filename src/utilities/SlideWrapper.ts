@@ -134,6 +134,10 @@ export default class SlideWrapper {
         return this._canvas.node.getBoundingClientRect() as DOMRect;
     }
 
+    public getRenderedGraphic(id: string): SVG.Element {
+        return this._canvas.select(`#graphic_${id}`).first();
+    }
+
     public addGraphic(graphic: IGraphic): void {
         const svg: SVG.Element = graphic.render(this._canvas);
         this._forwardGraphicEvents(graphic.id, svg);

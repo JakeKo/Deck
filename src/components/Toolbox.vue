@@ -21,7 +21,6 @@
 import { Vue, Component } from "vue-property-decorator";
 import Tool from "./Tool.vue";
 import Image from "../models/graphics/Image";
-import Point from "../models/Point";
 import Video from "../models/graphics/Video";
 import Slide from "../models/Slide";
 import IGraphic from "../models/graphics/IGraphic";

@@ -1,12 +1,14 @@
 import * as SVG from "svg.js";
-import Point from "../Point";
+import Vector from "../Vector";
+import SnapVector from "../SnapVector";
 
 export default interface IGraphic {
     id: string;
     type: string;
-    origin: Point;
+    origin: Vector;
     rotation: number;
     boundingBoxId: string;
     render(canvas: SVG.Doc): SVG.Element;
     updateRendering(svg: SVG.Element): void;
+    getSnapVectors(svg: SVG.Element): Array<SnapVector>;
 }

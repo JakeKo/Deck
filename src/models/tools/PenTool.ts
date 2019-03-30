@@ -1,6 +1,6 @@
 import ICanvasTool from "./ICanvasTool";
 import Curve from "../graphics/Curve";
-import Point from "../Point";
+import Vector from "../Vector";
 import Sketch from "../graphics/Sketch";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
@@ -34,12 +34,12 @@ export default class PenTool implements ICanvasTool {
             slideWrapper.store.commit("styleEditorObject", undefined);
 
             // Create SVGs for the primary curve, the editable curve segment, and the control point preview
-            const start: Point = Utilities.getPosition(event, slideWrapper);
+            const start: Vector = Utilities.getPosition(event, slideWrapper);
             const resolution: number = slideWrapper.store.getters.canvasResolution;
 
-            let segmentPoints: Array<Point> = [Point.undefined, Point.undefined, Point.undefined];
+            let segmentPoints: Array<Vector> = [Vector.undefined, Vector.undefined, Vector.undefined];
             const curve: Curve = new Curve({ origin: start, fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
-            const segment: Curve = new Curve({ origin: start, points: resolveCurve(segmentPoints, new Point(0, 0)), fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
+            const segment: Curve = new Curve({ origin: start, points: resolveCurve(segmentPoints, new Vector(0, 0)), fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
             const handle: Sketch = new Sketch({ fillColor: "none", strokeColor: "blue", strokeWidth: resolution });
 
             // Only add the curve to the store - not the preview segment or handle preview
@@ -75,19 +75,19 @@ export default class PenTool implements ICanvasTool {
 
                 // Reset the curve segment and set the first control point
                 segment.origin = segmentPoints[2].add(segment.origin);
-                segmentPoints = [Point.undefined, Point.undefined, Point.undefined];
+                segmentPoints = [Vector.undefined, Vector.undefined, Vector.undefined];
                 setFirstControlPoint(event);
             }
 
             function preview(event: Event): void {
                 // Redraw the current curve segment as the mouse moves around
-                const position: Point = Utilities.getPosition(event as CustomEvent, slideWrapper);
+                const position: Vector = Utilities.getPosition(event as CustomEvent, slideWrapper);
                 segment.points = resolveCurve(segmentPoints, position.add(segment.origin.scale(-1)));
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: curve.id, graphic: curve });
                 slideWrapper.updateGraphic(segment.id, segment);
 
                 // Display the control point shape if the endpoint is defined
-                if (segmentPoints[2] !== Point.undefined) {
+                if (segmentPoints[2] !== Vector.undefined) {
                     handle.origin = position;
                     handle.points = [position.reflect(segment.points[2].add(segment.origin)).add(position.scale(-1))];
                     handle.strokeColor = "blue";
@@ -123,11 +123,11 @@ export default class PenTool implements ICanvasTool {
             }
 
             // Convert a curve with possible undefined values to a curve with defined fallback values
-            function resolveCurve(curve: Array<Point>, defaultPoint: Point): Array<Point> {
+            function resolveCurve(curve: Array<Vector>, defaultPoint: Vector): Array<Vector> {
                 return [
-                    curve[0] === Point.undefined ? defaultPoint : curve[0],
-                    curve[1] === Point.undefined ? (curve[2] !== Point.undefined ? defaultPoint.reflect(curve[2]) : defaultPoint) : curve[1],
-                    curve[2] === Point.undefined ? defaultPoint : curve[2],
+                    curve[0] === Vector.undefined ? defaultPoint : curve[0],
+                    curve[1] === Vector.undefined ? (curve[2] !== Vector.undefined ? defaultPoint.reflect(curve[2]) : defaultPoint) : curve[1],
+                    curve[2] === Vector.undefined ? defaultPoint : curve[2],
                 ];
             }
         };
