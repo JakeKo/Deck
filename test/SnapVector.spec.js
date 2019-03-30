@@ -4,7 +4,7 @@ import Vector from "../src/models/Vector";
 describe("SnapVector", () => {
     it("can instantiate", () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(0, 0), new Vector(1, 1));
+        const snapVector = new SnapVector("", new Vector(0, 0), new Vector(1, 1));
         
         // Act
 
@@ -15,7 +15,7 @@ describe("SnapVector", () => {
 
     it("can calculate the distance from a point with no direction", () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(2, 5));
+        const snapVector = new SnapVector("", new Vector(2, 5));
         const point = new Vector(-3, 7);
         const expectedDistance = Math.sqrt(29);
 
@@ -28,7 +28,7 @@ describe("SnapVector", () => {
 
     it("can calculate the distance from a point with direction", () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(3, 8), new Vector(1, -1));
+        const snapVector = new SnapVector("", new Vector(3, 8), new Vector(1, -1));
         const point = new Vector(9, 3);
         const expectedDistance = 1 / Math.SQRT2;
 
@@ -41,7 +41,7 @@ describe("SnapVector", () => {
 
     it("can calculate the distance from a point along the vector", () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(3, 8), new Vector(1, -1));
+        const snapVector = new SnapVector("", new Vector(3, 8), new Vector(1, -1));
         const point = new Vector(9, 2);
         const expectedDistance = 0;
 
