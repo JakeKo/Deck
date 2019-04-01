@@ -20,6 +20,10 @@ export default class SnapVector {
             return difference.magnitude;
         }
 
+        if (this.direction.equals(Vector.up) || this.direction.equals(Vector.down)) {
+            return Math.abs(this.origin.x - point.x);
+        }
+
         const standardForm: Vector = new Vector(-this.direction.y / this.direction.x, 1);
         return Math.abs(standardForm.x * difference.x + standardForm.y * difference.y) / standardForm.magnitude;
     }

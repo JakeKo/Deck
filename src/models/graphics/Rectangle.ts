@@ -50,7 +50,7 @@ export default class Rectangle implements IGraphic {
             .rotate(this.rotation);
     }
 
-    public getSnapVectors(svg: SVG.Rect): Array<SnapVector> {
+    public getSnapVectors(svg: SVG.Element): Array<SnapVector> {
         const snapVectors: Array<SnapVector> = [];
 
         // Center, upper center, left center, lower center, right center
@@ -68,11 +68,11 @@ export default class Rectangle implements IGraphic {
         const snappableVectors: Array<Vector> = [];
 
         // Center, upper center, left center, lower center, right center
-        snappableVectors.push(Utilities.transform(new Vector(this.width / 2, this.height / 2), svg));
-        snappableVectors.push(Utilities.transform(new Vector(this.width / 2, 0), svg));
-        snappableVectors.push(Utilities.transform(new Vector(this.width, this.height / 2), svg));
-        snappableVectors.push(Utilities.transform(new Vector(this.width / 2, this.height), svg));
+        snappableVectors.push(Utilities.transform(new Vector(0, 0), svg));
+        snappableVectors.push(Utilities.transform(new Vector(this.width, 0), svg));
+        snappableVectors.push(Utilities.transform(new Vector(this.width, this.height), svg));
         snappableVectors.push(Utilities.transform(new Vector(0, this.height / 2), svg));
+        snappableVectors.push(Utilities.transform(new Vector(this.width / 2, this.height / 2), svg));
 
         return snappableVectors;
     }

@@ -4,6 +4,7 @@ import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 import SnapVector from "../SnapVector";
+import Ellipse from "../graphics/Ellipse";
 
 export default class CursorTool implements ICanvasTool {
     public name: string;
@@ -50,6 +51,11 @@ export default class CursorTool implements ICanvasTool {
 
     public graphicMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
         this.noop();
+        const c1: Ellipse = new Ellipse({ origin: new Vector(-7.5, -7.5), fillColor: "red", strokeColor: "none", width: 15, height: 15 });
+        const c2: Ellipse = new Ellipse({ origin: new Vector(-7.5, -7.5), fillColor: "purple", strokeColor: "none", width: 15, height: 15 });
+        slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: c1 });
+        slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: c2 });
+
         return function (event: CustomEvent): void {
             const graphic: IGraphic | undefined = slideWrapper.store.getters.graphic(slideWrapper.slideId, event.detail.graphicId);
             if (graphic === undefined) {
@@ -72,17 +78,41 @@ export default class CursorTool implements ICanvasTool {
             function preview(event: Event): void {
                 graphic!.origin = Utilities.getPosition(event as CustomEvent, slideWrapper).add(cursorOffset);
 
-                const snapTranslations: Array<{ source: Vector, destination: Vector }> = [];
+                const snapTranslations: Array<{ source: Vector, destination: SnapVector }> = [];
                 const snappableVectors: Array<Vector> = graphic!.getSnappableVectors(slideWrapper.getRenderedGraphic(graphic!.id));
-                snappableVectors.forEach((snappableVector: Vector): void => {
-                    snapVectors.forEach((snapVector: SnapVector): void => {
-                        if (snapVector.distanceFromVector(snappableVector) <= 50) {
-                            snapTranslations.push({ source: snappableVector, destination: snapVector.origin });
+                snapVectors.forEach((snapVector: SnapVector): void => {
+                    // Find the closest snappable vector
+                    const snapTranslation: { source: Vector, destination: SnapVector } = { source: snappableVectors[0], destination: snapVector };
+                    snappableVectors.forEach((snappableVector: Vector): void => {
+                        if (snapVector.distanceFromVector(snappableVector) < snapTranslation.destination.distanceFromVector(snapTranslation.source)) {
+                            snapTranslation.source = snappableVector;
                         }
                     });
+
+                    // If the closest snappable vector is within a specific radius, add it to potential snap translations
+                    if (snapTranslation.destination.distanceFromVector(snapTranslation.source) <= 10) {
+                        snapTranslations.push(snapTranslation);
+                    }
                 });
 
-                console.log(snapTranslations);
+                if (snapTranslations.length > 0) {
+                    let snapTranslation: { source: Vector, destination: SnapVector } = snapTranslations[0];
+                    snapTranslations.forEach((s: { source: Vector, destination: SnapVector }): void => {
+                        if (s.destination.distanceFromVector(s.source) < snapTranslation.destination.distanceFromVector(snapTranslation.source)) {
+                            snapTranslation = s;
+                        }
+                    });
+
+                    c1.origin = snapTranslation.source.add(new Vector(-7.5, -7.5));
+                    c2.origin = snapTranslation.destination.origin.add(new Vector(-7.5, -7.5));
+                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c1.id, graphic: c1 });
+                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c2.id, graphic: c2 });
+                } else {
+                    c1.origin = new Vector(-7.5, -7.5);
+                    c2.origin = new Vector(-7.5, -7.5);
+                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c1.id, graphic: c1 });
+                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c2.id, graphic: c2 });
+                }
 
                 // Update the graphic and refresh focus to update bounding box
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });

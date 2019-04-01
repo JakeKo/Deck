@@ -118,7 +118,7 @@ const store: {
             };
         },
         snapVectors: (state: State): ((slideId: string) => Array<SnapVector>) => {
-            return function(slideId: string): Array<SnapVector> {
+            return function (slideId: string): Array<SnapVector> {
                 const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
                 if (slide === undefined) {
                     console.error(`ERROR: No slide exists with id: ${slideId}`);
@@ -257,6 +257,7 @@ const store: {
             }
 
             slide.snapVectors = slide.snapVectors.filter((snapVector: SnapVector): boolean => snapVector.graphicId !== graphicId);
+            // console.log("REMOVE:", slide.snapVectors.length);
         },
         addSnapVectors: (state: State, { slideId, snapVectors }: { slideId: string, snapVectors: Array<SnapVector> }): void => {
             const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
@@ -266,6 +267,7 @@ const store: {
             }
 
             slide.snapVectors.push(...snapVectors);
+            // console.log("ADDED:", slide.snapVectors.length);
         }
     },
     actions: {
