@@ -76,7 +76,6 @@ export default class CursorTool implements ICanvasTool {
 
             // Preview moving shape
             function preview(event: Event): void {
-                graphic!.origin = Utilities.getPosition(event as CustomEvent, slideWrapper).add(cursorOffset);
 
                 const snapTranslations: Array<{ source: Vector, destination: SnapVector }> = [];
                 const snappableVectors: Array<Vector> = graphic!.getSnappableVectors(slideWrapper.getRenderedGraphic(graphic!.id));
@@ -103,7 +102,9 @@ export default class CursorTool implements ICanvasTool {
                         }
                     });
 
-                    // graphic!.origin = graphic!.origin.add(snapTranslation.destination.origin.add(snapTranslation.source.scale(-1)));
+                    graphic!.origin = Utilities.getPosition(event as CustomEvent, slideWrapper)
+                        .add(cursorOffset)
+                        .add(snapTranslation.source.towards(snapTranslation.destination.getClosestPoint(snapTranslation.source)));
 
                     c1.origin = snapTranslation.source.add(new Vector(-7.5, -7.5));
                     c2.origin = snapTranslation.destination.origin.add(new Vector(-7.5, -7.5));
@@ -112,6 +113,7 @@ export default class CursorTool implements ICanvasTool {
                 } else {
                     c1.origin = new Vector(-7.5, -7.5);
                     c2.origin = new Vector(-7.5, -7.5);
+                    graphic!.origin = Utilities.getPosition(event as CustomEvent, slideWrapper).add(cursorOffset);
                     slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c1.id, graphic: c1 });
                     slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c2.id, graphic: c2 });
                 }
