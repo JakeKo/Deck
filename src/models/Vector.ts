@@ -22,12 +22,32 @@ export default class Vector {
         return this.magnitude === 0 ? Vector.zero : new Vector(this.x / this.magnitude, this.y / this.magnitude);
     }
 
+    get array(): Array<number> {
+        return [this.x, this.y];
+    }
+
     public toArray(): Array<number> {
         return [this.x, this.y];
     }
 
-    public add(point: Vector): Vector {
-        return new Vector(this.x + point.x, this.y + point.y);
+    public add(vector: Vector): Vector {
+        return new Vector(this.x + vector.x, this.y + vector.y);
+    }
+
+    public towards(vector: Vector): Vector {
+        return vector.add(this.scale(-1));
+    }
+
+    public dot(vector: Vector): number {
+        return this.x * vector.x + this.y * vector.y;
+    }
+
+    public theta(vector: Vector): number {
+        return Math.acos(this.dot(vector) / (this.magnitude * vector.magnitude));
+    }
+
+    public projectOn(vector: Vector): Vector {
+        return vector.normalized.scale(this.dot(vector.normalized));
     }
 
     public scale(scalar: number): Vector {
@@ -35,7 +55,7 @@ export default class Vector {
     }
 
     public reflect(origin: Vector = this): Vector {
-        return origin.scale(2).add(this.scale(-1));
+        return origin.add(origin.towards(this).scale(-1));
     }
 
     public transform(transformation: (coordinate: number) => number) {

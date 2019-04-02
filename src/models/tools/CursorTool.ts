@@ -103,6 +103,8 @@ export default class CursorTool implements ICanvasTool {
                         }
                     });
 
+                    // graphic!.origin = graphic!.origin.add(snapTranslation.destination.origin.add(snapTranslation.source.scale(-1)));
+
                     c1.origin = snapTranslation.source.add(new Vector(-7.5, -7.5));
                     c2.origin = snapTranslation.destination.origin.add(new Vector(-7.5, -7.5));
                     slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c1.id, graphic: c1 });
