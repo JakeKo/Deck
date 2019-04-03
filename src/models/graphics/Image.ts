@@ -43,8 +43,9 @@ export default class Image implements IGraphic {
             .rotate(this.rotation);
     }
 
-    public getSnapVectors(svg: SVG.Image): Array<SnapVector> {
+    public getSnapVectors(origin: Vector): Array<SnapVector> {
         const snapVectors: Array<SnapVector> = [];
+        const svg: any = {};
 
         // Center, upper center, left center, lower center, right center
         snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height / 2), svg), Vector.right));
@@ -57,7 +58,7 @@ export default class Image implements IGraphic {
         return snapVectors;
     }
 
-    public getSnappableVectors(svg: SVG.Image): Array<Vector> {
+    public getSnappableVectors(origin: Vector): Array<Vector> {
         return [];
     }
 }

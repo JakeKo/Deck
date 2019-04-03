@@ -51,11 +51,6 @@ export default class CursorTool implements ICanvasTool {
 
     public graphicMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
         this.noop();
-        const c1: Ellipse = new Ellipse({ origin: new Vector(-7.5, -7.5), fillColor: "red", strokeColor: "none", width: 15, height: 15 });
-        const c2: Ellipse = new Ellipse({ origin: new Vector(-7.5, -7.5), fillColor: "purple", strokeColor: "none", width: 15, height: 15 });
-        slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: c1 });
-        slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: c2 });
-
         return function (event: CustomEvent): void {
             const graphic: IGraphic | undefined = slideWrapper.store.getters.graphic(slideWrapper.slideId, event.detail.graphicId);
             if (graphic === undefined) {
@@ -78,7 +73,7 @@ export default class CursorTool implements ICanvasTool {
             function preview(event: Event): void {
 
                 const snapTranslations: Array<{ source: Vector, destination: SnapVector }> = [];
-                const snappableVectors: Array<Vector> = graphic!.getSnappableVectors(slideWrapper.getRenderedGraphic(graphic!.id));
+                const snappableVectors: Array<Vector> = graphic!.getSnappableVectors(Utilities.getPosition(event as CustomEvent, slideWrapper).add(cursorOffset));
                 snapVectors.forEach((snapVector: SnapVector): void => {
                     // Find the closest snappable vector
                     const snapTranslation: { source: Vector, destination: SnapVector } = { source: snappableVectors[0], destination: snapVector };
@@ -105,17 +100,8 @@ export default class CursorTool implements ICanvasTool {
                     graphic!.origin = Utilities.getPosition(event as CustomEvent, slideWrapper)
                         .add(cursorOffset)
                         .add(snapTranslation.source.towards(snapTranslation.destination.getClosestPoint(snapTranslation.source)));
-
-                    c1.origin = snapTranslation.source.add(new Vector(-7.5, -7.5));
-                    c2.origin = snapTranslation.destination.origin.add(new Vector(-7.5, -7.5));
-                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c1.id, graphic: c1 });
-                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c2.id, graphic: c2 });
                 } else {
-                    c1.origin = new Vector(-7.5, -7.5);
-                    c2.origin = new Vector(-7.5, -7.5);
                     graphic!.origin = Utilities.getPosition(event as CustomEvent, slideWrapper).add(cursorOffset);
-                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c1.id, graphic: c1 });
-                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: c2.id, graphic: c2 });
                 }
 
                 // Update the graphic and refresh focus to update bounding box
@@ -130,7 +116,7 @@ export default class CursorTool implements ICanvasTool {
                 document.removeEventListener("Deck.GraphicMouseUp", end);
 
                 // Add the new SnapVectors once the graphic move has been finalized
-                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors(slideWrapper.getRenderedGraphic(graphic!.id)) });
+                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors(Utilities.getPosition(event, slideWrapper).add(cursorOffset)) });
 
                 slideWrapper.store.commit("styleEditorObject", undefined);
                 slideWrapper.store.commit("styleEditorObject", graphic);

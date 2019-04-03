@@ -60,8 +60,9 @@ export default class Curve implements IGraphic {
             .rotate(this.rotation);
     }
 
-    public getSnapVectors(svg: SVG.Path): Array<SnapVector> {
+    public getSnapVectors(origin: Vector): Array<SnapVector> {
         const snapVectors: Array<SnapVector> = [];
+        const svg: any = {};
         const boundingBox: SVG.RBox = svg.rbox();
         const width: number = boundingBox.width;
         const height: number = boundingBox.height;
@@ -77,7 +78,7 @@ export default class Curve implements IGraphic {
         return snapVectors;
     }
 
-    public getSnappableVectors(svg: SVG.Path): Array<Vector> {
+    public getSnappableVectors(origin: Vector): Array<Vector> {
         return [];
     }
 }

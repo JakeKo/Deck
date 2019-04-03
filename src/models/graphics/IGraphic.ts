@@ -10,6 +10,6 @@ export default interface IGraphic {
     boundingBoxId: string;
     render(canvas: SVG.Doc): SVG.Element;
     updateRendering(svg: SVG.Element): void;
-    getSnapVectors(svg: SVG.Element): Array<SnapVector>;
-    getSnappableVectors(svg: SVG.Element): Array<Vector>;
+    getSnapVectors(origin: Vector): Array<SnapVector>;
+    getSnappableVectors(origin: Vector): Array<Vector>;
 }

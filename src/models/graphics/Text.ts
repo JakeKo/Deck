@@ -50,8 +50,9 @@ export default class Text implements IGraphic {
             .rotate(this.rotation);
     }
 
-    public getSnapVectors(svg: SVG.Text): Array<SnapVector> {
+    public getSnapVectors(origin: Vector): Array<SnapVector> {
         const snapVectors: Array<SnapVector> = [];
+        const svg: any = {};
         const width: number = svg.width();
         const height: number = svg.height();
 
@@ -66,7 +67,7 @@ export default class Text implements IGraphic {
         return snapVectors;
     }
 
-    public getSnappableVectors(svg: SVG.Text): Array<Vector> {
+    public getSnappableVectors(origin: Vector): Array<Vector> {
         return [];
     }
 }

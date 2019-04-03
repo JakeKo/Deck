@@ -50,29 +50,29 @@ export default class Rectangle implements IGraphic {
             .rotate(this.rotation);
     }
 
-    public getSnapVectors(svg: SVG.Element): Array<SnapVector> {
+    public getSnapVectors(origin: Vector): Array<SnapVector> {
         const snapVectors: Array<SnapVector> = [];
 
         // Center, upper center, left center, lower center, right center
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height / 2), svg), Vector.right));
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height / 2), svg), Vector.up));
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, 0), svg), Vector.right));
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width, this.height / 2), svg), Vector.up));
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(this.width / 2, this.height), svg), Vector.right));
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(0, this.height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(this.id, new Vector(origin.x + this.width / 2,  origin.y + this.height / 2),    Vector.right));
+        snapVectors.push(new SnapVector(this.id, new Vector(origin.x + this.width / 2,  origin.y + this.height / 2),    Vector.up));
+        snapVectors.push(new SnapVector(this.id, new Vector(origin.x + this.width / 2,  origin.y),                      Vector.right));
+        snapVectors.push(new SnapVector(this.id, new Vector(origin.x + this.width,      origin.y + this.height / 2),    Vector.up));
+        snapVectors.push(new SnapVector(this.id, new Vector(origin.x + this.width / 2,  origin.y + this.height),        Vector.right));
+        snapVectors.push(new SnapVector(this.id, new Vector(origin.x,                   origin.y + this.height / 2),    Vector.up));
 
         return snapVectors;
     }
 
-    public getSnappableVectors(svg: SVG.Rect): Array<Vector> {
+    public getSnappableVectors(origin: Vector): Array<Vector> {
         const snappableVectors: Array<Vector> = [];
 
         // Center, upper center, left center, lower center, right center
-        snappableVectors.push(Utilities.transform(new Vector(0, 0), svg));
-        snappableVectors.push(Utilities.transform(new Vector(this.width, 0), svg));
-        snappableVectors.push(Utilities.transform(new Vector(this.width, this.height), svg));
-        snappableVectors.push(Utilities.transform(new Vector(0, this.height / 2), svg));
-        snappableVectors.push(Utilities.transform(new Vector(this.width / 2, this.height / 2), svg));
+        snappableVectors.push(new Vector(origin.x, origin.y));
+        snappableVectors.push(new Vector(origin.x + this.width, origin.y));
+        snappableVectors.push(new Vector(origin.x + this.width, origin.y + this.height));
+        snappableVectors.push(new Vector(origin.x, origin.y + this.height / 2));
+        snappableVectors.push(new Vector(origin.x + this.width / 2, origin.y + this.height / 2));
 
         return snappableVectors;
     }
