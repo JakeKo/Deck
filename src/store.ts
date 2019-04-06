@@ -89,12 +89,12 @@ const store: {
         slides: new Array<Slide>(),
         currentTool: "cursor",
         tools: {
-            cursor: new CursorTool("cursor"),
-            pencil: new PencilTool("pencil"),
-            pen: new PenTool("pen"),
-            rectangle: new RectangleTool("rectangle"),
-            ellipse: new EllipseTool("ellipse"),
-            textbox: new TextboxTool("textbox")
+            cursor: new CursorTool(),
+            pencil: new PencilTool(),
+            pen: new PenTool(),
+            rectangle: new RectangleTool(),
+            ellipse: new EllipseTool(),
+            textbox: new TextboxTool()
         } as { [key: string]: ICanvasTool }
     },
     getters: {

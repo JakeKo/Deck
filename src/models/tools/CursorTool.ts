@@ -6,50 +6,35 @@ import Utilities from "../../utilities/general";
 import SnapVector from "../SnapVector";
 
 export default class CursorTool implements ICanvasTool {
-    public name: string;
-
-    private noop: () => void = (): void => { return; };
-    private cursor: string = "pointer";
-    private defaultCursor: string = "default";
-    private objectToFocus?: IGraphic = undefined;
-
-    constructor(name: string) {
-        this.name = name;
-    }
-
     public canvasMouseDown(slideWrapper: SlideWrapper): () => void {
-        const self: CursorTool = this;
         return function (): void {
-            slideWrapper.focusGraphic(self.objectToFocus);
+            slideWrapper.focusGraphic(undefined);
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
         };
     }
 
     public canvasMouseOver(): () => void {
-        return this.noop;
+        return (): void => { return; };
     }
 
     public canvasMouseOut(): () => void {
-        return this.noop;
+        return (): void => { return; };
     }
 
     public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
-        const self: CursorTool = this;
         return function (): void {
-            slideWrapper.setCursor(self.cursor);
+            slideWrapper.setCursor("pointer");
         };
     }
 
     public graphicMouseOut(slideWrapper: SlideWrapper): () => void {
-        const self: CursorTool = this;
         return function (): void {
-            slideWrapper.setCursor(self.defaultCursor);
+            slideWrapper.setCursor("default");
         };
     }
 
     public graphicMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
-        this.noop();
         return function (event: CustomEvent): void {
             const graphic: IGraphic | undefined = slideWrapper.store.getters.graphic(slideWrapper.slideId, event.detail.graphicId);
             if (graphic === undefined) {

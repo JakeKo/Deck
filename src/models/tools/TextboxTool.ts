@@ -4,18 +4,7 @@ import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 
 export default class TextboxTool implements ICanvasTool {
-    public name: string;
-
-    private noop: () => void = (): void => { return; };
-    private cursor: string = "text";
-    private defaultCursor: string = "default";
-
-    constructor(name: string) {
-        this.name = name;
-    }
-
     public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
-        this.noop();
         return function (event: CustomEvent): void {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
@@ -24,35 +13,33 @@ export default class TextboxTool implements ICanvasTool {
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: text });
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: text.id });
             slideWrapper.store.commit("styleEditorObject", text);
+            slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: text.getSnapVectors() });
         };
     }
 
     public canvasMouseOver(slideWrapper: SlideWrapper): () => void {
-        const self: TextboxTool = this;
         return function () {
-            slideWrapper.setCursor(self.cursor);
+            slideWrapper.setCursor("text");
         };
     }
 
     public canvasMouseOut(slideWrapper: SlideWrapper): () => void {
-        const self: TextboxTool = this;
         return function () {
-            slideWrapper.setCursor(self.defaultCursor);
+            slideWrapper.setCursor("default");
         };
     }
 
     public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
-        const self: TextboxTool = this;
         return function () {
-            slideWrapper.setCursor(self.cursor);
+            slideWrapper.setCursor("text");
         };
     }
 
     public graphicMouseOut(): () => void {
-        return this.noop;
+        return (): void => { return; };
     }
 
     public graphicMouseDown(): () => void {
-        return this.noop;
+        return (): void => { return; };
     }
 }
