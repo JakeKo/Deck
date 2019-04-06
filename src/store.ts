@@ -14,6 +14,7 @@ import PencilTool from "./models/tools/PencilTool";
 import PenTool from "./models/tools/PenTool";
 import RectangleTool from "./models/tools/RectangleTool";
 import TextboxTool from "./models/tools/TextboxTool";
+import Vector from "./models/Vector";
 
 type State = {
     activeSlideId: string,
@@ -35,6 +36,7 @@ type State = {
 type Getters = {
     slides: (state: State) => Array<Slide>,
     graphic: (state: State) => (slideId: string, graphicId: string) => IGraphic | undefined,
+    snapVectors: (state: State) => (slideId: string) => Array<SnapVector>,
     activeSlide: (state: State) => Slide | undefined,
     styleEditorObject: (state: State) => any,
     tool: (state: State) => ICanvasTool,
@@ -116,6 +118,17 @@ const store: {
                 return slide.graphics[index];
             };
         },
+        snapVectors: (state: State): ((slideId: string) => Array<SnapVector>) => {
+            return function (slideId: string): Array<SnapVector> {
+                const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+                if (slide === undefined) {
+                    console.error(`ERROR: No slide exists with id: ${slideId}`);
+                    return [];
+                }
+
+                return slide.snapVectors;
+            };
+        },
         activeSlide: (state: State): Slide | undefined => {
             return state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
         },
@@ -144,11 +157,17 @@ const store: {
     },
     mutations: {
         addSlide: (state: State, index: number): void => {
-            if (state.slides.length === index) {
-                state.slides.push(new Slide());
-            } else {
-                state.slides.splice(index, 0, new Slide());
-            }
+            const slide: Slide = new Slide();
+            const width: number = state.canvas.resolution * 1072;
+            const height: number = state.canvas.resolution * 603;
+            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, 0), Vector.right));
+            slide.snapVectors.push(new SnapVector("slide", new Vector(width, height / 2), Vector.up));
+            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height), Vector.right));
+            slide.snapVectors.push(new SnapVector("slide", new Vector(0, height / 2), Vector.up));
+            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height / 2), Vector.right));
+            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height / 2), Vector.up));
+
+            state.slides.splice(index, 0, slide);
         },
         reorderSlide: (state: State, { source, destination }: { source: number, destination: number }): void => {
             const slide: Slide = state.slides[source];

@@ -3,6 +3,7 @@ import Rectangle from "../graphics/Rectangle";
 import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
+import SnapVector from "../SnapVector";
 
 export default class RectangleTool implements ICanvasTool {
     public name: string;
@@ -62,6 +63,7 @@ export default class RectangleTool implements ICanvasTool {
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: rectangle.id });
                 slideWrapper.store.commit("styleEditorObject", rectangle);
+                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: rectangle.getSnapVectors() });
             }
 
             function toggleSquare(event: KeyboardEvent): void {
