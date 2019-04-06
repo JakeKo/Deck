@@ -14,6 +14,7 @@ import PencilTool from "./models/tools/PencilTool";
 import PenTool from "./models/tools/PenTool";
 import RectangleTool from "./models/tools/RectangleTool";
 import TextboxTool from "./models/tools/TextboxTool";
+import Vector from "./models/Vector";
 
 type State = {
     activeSlideId: string,
@@ -156,11 +157,17 @@ const store: {
     },
     mutations: {
         addSlide: (state: State, index: number): void => {
-            if (state.slides.length === index) {
-                state.slides.push(new Slide());
-            } else {
-                state.slides.splice(index, 0, new Slide());
-            }
+            const slide: Slide = new Slide();
+            const width: number = state.canvas.resolution * 1072;
+            const height: number = state.canvas.resolution * 603;
+            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, 0), Vector.right));
+            slide.snapVectors.push(new SnapVector("slide", new Vector(width, height / 2), Vector.up));
+            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height), Vector.right));
+            slide.snapVectors.push(new SnapVector("slide", new Vector(0, height / 2), Vector.up));
+            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height / 2), Vector.right));
+            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height / 2), Vector.up));
+
+            state.slides.splice(index, 0, slide);
         },
         reorderSlide: (state: State, { source, destination }: { source: number, destination: number }): void => {
             const slide: Slide = state.slides[source];
@@ -257,7 +264,6 @@ const store: {
             }
 
             slide.snapVectors = slide.snapVectors.filter((snapVector: SnapVector): boolean => snapVector.graphicId !== graphicId);
-            // console.log("REMOVE:", slide.snapVectors.length);
         },
         addSnapVectors: (state: State, { slideId, snapVectors }: { slideId: string, snapVectors: Array<SnapVector> }): void => {
             const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
@@ -267,7 +273,6 @@ const store: {
             }
 
             slide.snapVectors.push(...snapVectors);
-            // console.log("ADDED:", slide.snapVectors.length);
         }
     },
     actions: {
