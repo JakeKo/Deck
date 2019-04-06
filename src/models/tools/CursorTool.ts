@@ -5,6 +5,21 @@ import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 import SnapVector from "../SnapVector";
 
+function getClosestTranslation(translations: Array<Vector>): Vector | undefined {
+    if (translations.length === 0) {
+        return;
+    }
+
+    let closestTranslation: Vector = translations[0];
+    translations.forEach((translation: Vector): void => {
+        if (translation.magnitude < closestTranslation.magnitude) {
+            closestTranslation = translation;
+        }
+    });
+
+    return closestTranslation;
+}
+
 export default class CursorTool implements ICanvasTool {
     public canvasMouseDown(slideWrapper: SlideWrapper): () => void {
         return function (): void {
@@ -60,27 +75,32 @@ export default class CursorTool implements ICanvasTool {
                 const position: Vector = Utilities.getPosition(event as CustomEvent, slideWrapper);
                 graphic!.origin = position.add(cursorOffset);
 
-                const snapTranslations: Array<Vector> = [];
+                const translations: Array<Vector> = [];
                 const snappableVectors: Array<Vector> = snappableVectorOffsets.map<Vector>((offset: Vector): Vector => position.add(offset));
 
                 // List all combinations of snap and snappable vectors
                 snapVectors.forEach((snapVector: SnapVector): void => {
                     snappableVectors.forEach((snappableVector: Vector): void => {
-                        snapTranslations.push(snappableVector.towards(snapVector.getClosestPoint(snappableVector)));
+                        translations.push(snappableVector.towards(snapVector.getClosestPoint(snappableVector)));
                     });
                 });
 
-                // Find the closest snap translation
-                let finalSnapTranslation: Vector = snapTranslations[0];
-                snapTranslations.forEach((snapTranslation: Vector): void => {
-                    if (snapTranslation.magnitude < finalSnapTranslation.magnitude) {
-                        finalSnapTranslation = snapTranslation;
-                    }
-                });
+                // Filter by all snap translations within some epsilon and finish if there are no close translations
+                const closeTranslations: Array<Vector> = translations.filter((snapTranslation: Vector): boolean => snapTranslation.magnitude < 10);
+                const mainTranslation: Vector | undefined = getClosestTranslation(closeTranslations);
+                if (mainTranslation === undefined) {
+                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
+                    slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
+                    return;
+                }
 
-                // Commit the closest snap translation if it is sufficiently close to a snap vector
-                if (finalSnapTranslation.magnitude < 10) {
-                    graphic!.origin = graphic!.origin.add(finalSnapTranslation);
+                // Find all translations that could also be performed without interfering with the main translation (i.e. the vectors are orthogonal)
+                const compatibleTranslations: Array<Vector> = closeTranslations.filter((translation: Vector): boolean => translation.dot(mainTranslation) === 0);
+                const compatibleTranslation: Vector | undefined = getClosestTranslation(compatibleTranslations);
+
+                graphic!.origin = graphic!.origin.add(mainTranslation);
+                if (compatibleTranslation !== undefined) {
+                    graphic!.origin = graphic!.origin.add(compatibleTranslation);
                 }
 
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
