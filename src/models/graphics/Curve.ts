@@ -60,25 +60,22 @@ export default class Curve implements IGraphic {
             .rotate(this.rotation);
     }
 
-    public getSnapVectors(origin: Vector): Array<SnapVector> {
+    public getSnapVectors(): Array<SnapVector> {
         const snapVectors: Array<SnapVector> = [];
-        const svg: any = {};
-        const boundingBox: SVG.RBox = svg.rbox();
-        const width: number = boundingBox.width;
-        const height: number = boundingBox.height;
 
         // Center, upper center, left center, lower center, right center
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(width / 2, height / 2), svg), Vector.right));
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(width / 2, height / 2), svg), Vector.up));
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(width / 2, 0), svg), Vector.right));
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(width, height / 2), svg), Vector.up));
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(width / 2, height), svg), Vector.right));
-        snapVectors.push(new SnapVector(this.id, Utilities.transform(new Vector(0, height / 2), svg), Vector.up));
+        snapVectors.push(new SnapVector(this.id, this.origin, Vector.right));
+        snapVectors.push(new SnapVector(this.id, this.origin, Vector.up));
 
         return snapVectors;
     }
 
-    public getSnappableVectors(origin: Vector): Array<Vector> {
-        return [];
+    public getSnappableVectors(): Array<Vector> {
+        const snappableVectors: Array<Vector> = [];
+
+        // Center, upper center, left center, lower center, right center
+        snappableVectors.push(this.origin);
+
+        return snappableVectors;
     }
 }

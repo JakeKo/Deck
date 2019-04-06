@@ -50,29 +50,29 @@ export default class Rectangle implements IGraphic {
             .rotate(this.rotation);
     }
 
-    public getSnapVectors(origin: Vector): Array<SnapVector> {
+    public getSnapVectors(): Array<SnapVector> {
         const snapVectors: Array<SnapVector> = [];
 
         // Center, upper center, left center, lower center, right center
-        snapVectors.push(new SnapVector(this.id, new Vector(origin.x + this.width / 2,  origin.y + this.height / 2),    Vector.right));
-        snapVectors.push(new SnapVector(this.id, new Vector(origin.x + this.width / 2,  origin.y + this.height / 2),    Vector.up));
-        snapVectors.push(new SnapVector(this.id, new Vector(origin.x + this.width / 2,  origin.y),                      Vector.right));
-        snapVectors.push(new SnapVector(this.id, new Vector(origin.x + this.width,      origin.y + this.height / 2),    Vector.up));
-        snapVectors.push(new SnapVector(this.id, new Vector(origin.x + this.width / 2,  origin.y + this.height),        Vector.right));
-        snapVectors.push(new SnapVector(this.id, new Vector(origin.x,                   origin.y + this.height / 2),    Vector.up));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2),   Vector.right));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2),   Vector.up));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y),                     Vector.right));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width,     this.origin.y + this.height / 2),   Vector.up));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height),       Vector.right));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x,                  this.origin.y + this.height / 2),   Vector.up));
 
         return snapVectors;
     }
 
-    public getSnappableVectors(origin: Vector): Array<Vector> {
+    public getSnappableVectors(): Array<Vector> {
         const snappableVectors: Array<Vector> = [];
 
         // Center, upper center, left center, lower center, right center
-        snappableVectors.push(new Vector(origin.x, origin.y));
-        snappableVectors.push(new Vector(origin.x + this.width, origin.y));
-        snappableVectors.push(new Vector(origin.x + this.width, origin.y + this.height));
-        snappableVectors.push(new Vector(origin.x, origin.y + this.height / 2));
-        snappableVectors.push(new Vector(origin.x + this.width / 2, origin.y + this.height / 2));
+        snappableVectors.push(new Vector(this.origin.x,                     this.origin.y));
+        snappableVectors.push(new Vector(this.origin.x + this.width,        this.origin.y));
+        snappableVectors.push(new Vector(this.origin.x + this.width,        this.origin.y + this.height));
+        snappableVectors.push(new Vector(this.origin.x,                     this.origin.y + this.height / 2));
+        snappableVectors.push(new Vector(this.origin.x + this.width / 2,    this.origin.y + this.height / 2));
 
         return snappableVectors;
     }

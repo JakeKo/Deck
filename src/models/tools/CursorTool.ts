@@ -4,7 +4,6 @@ import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 import SnapVector from "../SnapVector";
-import Ellipse from "../graphics/Ellipse";
 
 export default class CursorTool implements ICanvasTool {
     public name: string;
@@ -62,8 +61,10 @@ export default class CursorTool implements ICanvasTool {
             slideWrapper.store.commit("styleEditorObject", graphic);
             slideWrapper.store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphic.id });
 
-            const cursorOffset: Vector = graphic.origin.add(Utilities.getPosition(event, slideWrapper).scale(-1));
+            const position: Vector = Utilities.getPosition(event, slideWrapper);
+            const cursorOffset: Vector = position.towards(graphic.origin);
             const snapVectors: Array<SnapVector> = slideWrapper.store.getters.snapVectors(slideWrapper.slideId);
+            const snappableVectorOffsets: Array<Vector> = graphic.getSnappableVectors().map<Vector>((snappableVector: Vector): Vector => position.towards(snappableVector));
 
             document.addEventListener("Deck.CanvasMouseMove", preview);
             document.addEventListener("Deck.CanvasMouseUp", end);
@@ -71,40 +72,32 @@ export default class CursorTool implements ICanvasTool {
 
             // Preview moving shape
             function preview(event: Event): void {
+                const position: Vector = Utilities.getPosition(event as CustomEvent, slideWrapper);
+                graphic!.origin = position.add(cursorOffset);
 
-                const snapTranslations: Array<{ source: Vector, destination: SnapVector }> = [];
-                const snappableVectors: Array<Vector> = graphic!.getSnappableVectors(Utilities.getPosition(event as CustomEvent, slideWrapper).add(cursorOffset));
+                const snapTranslations: Array<Vector> = [];
+                const snappableVectors: Array<Vector> = snappableVectorOffsets.map<Vector>((offset: Vector): Vector => position.add(offset));
+
+                // List all combinations of snap and snappable vectors
                 snapVectors.forEach((snapVector: SnapVector): void => {
-                    // Find the closest snappable vector
-                    const snapTranslation: { source: Vector, destination: SnapVector } = { source: snappableVectors[0], destination: snapVector };
                     snappableVectors.forEach((snappableVector: Vector): void => {
-                        if (snapVector.distanceFromVector(snappableVector) < snapTranslation.destination.distanceFromVector(snapTranslation.source)) {
-                            snapTranslation.source = snappableVector;
-                        }
+                        snapTranslations.push(snappableVector.towards(snapVector.getClosestPoint(snappableVector)));
                     });
+                });
 
-                    // If the closest snappable vector is within a specific radius, add it to potential snap translations
-                    if (snapTranslation.destination.distanceFromVector(snapTranslation.source) <= 10) {
-                        snapTranslations.push(snapTranslation);
+                // Find the closest snap translation
+                let finalSnapTranslation: Vector = snapTranslations[0];
+                snapTranslations.forEach((snapTranslation: Vector): void => {
+                    if (snapTranslation.magnitude < finalSnapTranslation.magnitude) {
+                        finalSnapTranslation = snapTranslation;
                     }
                 });
 
-                if (snapTranslations.length > 0) {
-                    let snapTranslation: { source: Vector, destination: SnapVector } = snapTranslations[0];
-                    snapTranslations.forEach((s: { source: Vector, destination: SnapVector }): void => {
-                        if (s.destination.distanceFromVector(s.source) < snapTranslation.destination.distanceFromVector(snapTranslation.source)) {
-                            snapTranslation = s;
-                        }
-                    });
-
-                    graphic!.origin = Utilities.getPosition(event as CustomEvent, slideWrapper)
-                        .add(cursorOffset)
-                        .add(snapTranslation.source.towards(snapTranslation.destination.getClosestPoint(snapTranslation.source)));
-                } else {
-                    graphic!.origin = Utilities.getPosition(event as CustomEvent, slideWrapper).add(cursorOffset);
+                // Commit the closest snap translation if it is sufficiently close to a snap vector
+                if (finalSnapTranslation.magnitude < 10) {
+                    graphic!.origin = graphic!.origin.add(finalSnapTranslation);
                 }
 
-                // Update the graphic and refresh focus to update bounding box
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
             }
@@ -116,7 +109,7 @@ export default class CursorTool implements ICanvasTool {
                 document.removeEventListener("Deck.GraphicMouseUp", end);
 
                 // Add the new SnapVectors once the graphic move has been finalized
-                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors(Utilities.getPosition(event, slideWrapper).add(cursorOffset)) });
+                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors() });
 
                 slideWrapper.store.commit("styleEditorObject", undefined);
                 slideWrapper.store.commit("styleEditorObject", graphic);
