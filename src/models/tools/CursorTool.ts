@@ -4,20 +4,27 @@ import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 import SnapVector from "../SnapVector";
+import Sketch from "../graphics/Sketch";
 
-function getClosestTranslation(translations: Array<Vector>): Vector | undefined {
-    if (translations.length === 0) {
+type Snap = { source: Vector, destination: SnapVector };
+
+function getClosestSnap(snaps: Array<Snap>): Snap | undefined {
+    if (snaps.length === 0) {
         return;
     }
 
-    let closestTranslation: Vector = translations[0];
-    translations.forEach((translation: Vector): void => {
-        if (translation.magnitude < closestTranslation.magnitude) {
-            closestTranslation = translation;
+    let closestSnap: Snap = snaps[0];
+    snaps.forEach((snap: Snap): void => {
+        if (getTranslation(snap).magnitude < getTranslation(closestSnap).magnitude) {
+            closestSnap = snap;
         }
     });
 
-    return closestTranslation;
+    return closestSnap;
+}
+
+function getTranslation(snap: Snap): Vector {
+    return snap.source.towards(snap.destination.getClosestPoint(snap.source));
 }
 
 export default class CursorTool implements ICanvasTool {
@@ -57,6 +64,13 @@ export default class CursorTool implements ICanvasTool {
                 return;
             }
 
+            // Create preview lines to show snapping
+            const snapLine1: Sketch = new Sketch({ origin: Vector.zero, strokeColor: "hotpink", strokeWidth: 1 });
+            const snapLine2: Sketch = new Sketch({ origin: Vector.zero, strokeColor: "hotpink", strokeWidth: 1 });
+
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: snapLine1 });
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: snapLine2 });
+
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: graphic.id });
             slideWrapper.store.commit("styleEditorObject", graphic);
             slideWrapper.store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphic.id });
@@ -75,33 +89,52 @@ export default class CursorTool implements ICanvasTool {
                 const position: Vector = Utilities.getPosition(event as CustomEvent, slideWrapper);
                 graphic!.origin = position.add(cursorOffset);
 
-                const translations: Array<Vector> = [];
+                const snaps: Array<Snap> = [];
                 const snappableVectors: Array<Vector> = snappableVectorOffsets.map<Vector>((offset: Vector): Vector => position.add(offset));
 
                 // List all combinations of snap and snappable vectors
                 snapVectors.forEach((snapVector: SnapVector): void => {
                     snappableVectors.forEach((snappableVector: Vector): void => {
-                        translations.push(snappableVector.towards(snapVector.getClosestPoint(snappableVector)));
+                        snaps.push({ source: snappableVector, destination: snapVector });
                     });
                 });
 
                 // Filter by all snap translations within some epsilon and finish if there are no close translations
-                const closeTranslations: Array<Vector> = translations.filter((snapTranslation: Vector): boolean => snapTranslation.magnitude < 20);
-                const mainTranslation: Vector | undefined = getClosestTranslation(closeTranslations);
-                if (mainTranslation === undefined) {
+                const closeSnaps: Array<Snap> = snaps.filter((snap: Snap): boolean => getTranslation(snap).magnitude < 20);
+                const mainSnap: Snap | undefined = getClosestSnap(closeSnaps);
+                if (mainSnap === undefined) {
+                    snapLine1.origin = snapLine2.origin = Vector.zero;
+                    snapLine1.points = snapLine2.points = [];
+
+                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine1.id, graphic: snapLine1 });
+                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine2.id, graphic: snapLine2 });
+
                     slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                     slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
+
                     return;
                 }
 
                 // Find all translations that could also be performed without interfering with the main translation (i.e. the vectors are orthogonal)
-                const compatibleTranslations: Array<Vector> = closeTranslations.filter((translation: Vector): boolean => translation.dot(mainTranslation) === 0);
-                const compatibleTranslation: Vector | undefined = getClosestTranslation(compatibleTranslations);
+                const compatibleSnaps: Array<Snap> = closeSnaps.filter((snap: Snap): boolean => getTranslation(snap).dot(getTranslation(mainSnap)) === 0);
+                const compatibleSnap: Snap | undefined = getClosestSnap(compatibleSnaps);
+                const snapLineScale: number = 1000;
 
-                graphic!.origin = graphic!.origin.add(mainTranslation);
-                if (compatibleTranslation !== undefined) {
-                    graphic!.origin = graphic!.origin.add(compatibleTranslation);
+                graphic!.origin = graphic!.origin.add(getTranslation(mainSnap));
+                snapLine1.origin = mainSnap.destination.origin;
+                snapLine1.points = [mainSnap.destination.direction.scale(-snapLineScale), Vector.zero, mainSnap.destination.direction.scale(snapLineScale)];
+
+                if (compatibleSnap !== undefined) {
+                    graphic!.origin = graphic!.origin.add(getTranslation(compatibleSnap));
+                    snapLine2.origin = compatibleSnap.destination.origin;
+                    snapLine2.points = [compatibleSnap.destination.direction.scale(-snapLineScale), Vector.zero, compatibleSnap.destination.direction.scale(snapLineScale)];
+                } else {
+                    snapLine2.origin = Vector.zero;
+                    snapLine2.points = [];
                 }
+
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine1.id, graphic: snapLine1 });
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine2.id, graphic: snapLine2 });
 
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
@@ -118,6 +151,9 @@ export default class CursorTool implements ICanvasTool {
 
                 slideWrapper.store.commit("styleEditorObject", undefined);
                 slideWrapper.store.commit("styleEditorObject", graphic);
+
+                slideWrapper.store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine1.id });
+                slideWrapper.store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine2.id });
             }
         };
     }
