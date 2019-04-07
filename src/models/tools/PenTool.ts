@@ -6,24 +6,14 @@ import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 
 export default class PenTool implements ICanvasTool {
-    public name: string;
-
-    private _active: boolean;
-    private noop: () => void = (): void => { return; };
-    private cursor: string = "crosshair";
-    private defaultCursor: string = "default";
-
-    constructor(name: string) {
-        this.name = name;
-        this._active = false;
-    }
+    private active: boolean = false;
 
     public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
         const self: PenTool = this;
         return function (event: CustomEvent): void {
             // Prevent any action on canvas click if a bezier curve is being drawn
-            if (self._active) { return; }
-            else { self._active = true; }
+            if (self.active) { return; }
+            else { self.active = true; }
 
             document.addEventListener("keydown", end);
             document.addEventListener("Deck.CanvasMouseMove", preview);
@@ -104,7 +94,7 @@ export default class PenTool implements ICanvasTool {
                     return;
                 }
 
-                self._active = false;
+                self.active = false;
                 slideWrapper.removeGraphic(handle.id);
                 slideWrapper.removeGraphic(segment.id);
 
@@ -120,6 +110,8 @@ export default class PenTool implements ICanvasTool {
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: curve.id });
                 slideWrapper.store.commit("styleEditorObject", curve);
+                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: curve.getSnapVectors() });
+                slideWrapper.store.commit("tool", "cursor");
             }
 
             // Convert a curve with possible undefined values to a curve with defined fallback values
@@ -134,31 +126,28 @@ export default class PenTool implements ICanvasTool {
     }
 
     public canvasMouseOver(slideWrapper: SlideWrapper): () => void {
-        const self: PenTool = this;
         return function () {
-            slideWrapper.setCursor(self.cursor);
+            slideWrapper.setCursor("crosshair");
         };
     }
 
     public canvasMouseOut(slideWrapper: SlideWrapper): () => void {
-        const self: PenTool = this;
         return function () {
-            slideWrapper.setCursor(self.defaultCursor);
+            slideWrapper.setCursor("default");
         };
     }
 
     public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
-        const self: PenTool = this;
         return function () {
-            slideWrapper.setCursor(self.cursor);
+            slideWrapper.setCursor("crosshair");
         };
     }
 
     public graphicMouseOut(): () => void {
-        return this.noop;
+        return (): void => { return; };
     }
 
     public graphicMouseDown(): () => void {
-        return this.noop;
+        return (): void => { return; };
     }
 }

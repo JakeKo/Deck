@@ -3,21 +3,9 @@ import Rectangle from "../graphics/Rectangle";
 import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
-import SnapVector from "../SnapVector";
 
 export default class RectangleTool implements ICanvasTool {
-    public name: string;
-
-    private noop: () => void = (): void => { return; };
-    private cursor: string = "crosshair";
-    private defaultCursor: string = "default";
-
-    constructor(name: string) {
-        this.name = name;
-    }
-
     public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
-        this.noop();
         return function (event: CustomEvent): void {
             document.addEventListener("Deck.CanvasMouseMove", preview);
             document.addEventListener("Deck.CanvasMouseUp", end);
@@ -64,6 +52,7 @@ export default class RectangleTool implements ICanvasTool {
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: rectangle.id });
                 slideWrapper.store.commit("styleEditorObject", rectangle);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: rectangle.getSnapVectors() });
+                slideWrapper.store.commit("tool", "cursor");
             }
 
             function toggleSquare(event: KeyboardEvent): void {
@@ -87,31 +76,28 @@ export default class RectangleTool implements ICanvasTool {
     }
 
     public canvasMouseOver(slideWrapper: SlideWrapper): () => void {
-        const self: RectangleTool = this;
         return function () {
-            slideWrapper.setCursor(self.cursor);
+            slideWrapper.setCursor("crosshair");
         };
     }
 
     public canvasMouseOut(slideWrapper: SlideWrapper): () => void {
-        const self: RectangleTool = this;
         return function () {
-            slideWrapper.setCursor(self.defaultCursor);
+            slideWrapper.setCursor("default");
         };
     }
 
     public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
-        const self: RectangleTool = this;
         return function () {
-            slideWrapper.setCursor(self.cursor);
+            slideWrapper.setCursor("crosshair");
         };
     }
 
     public graphicMouseOut(): () => void {
-        return this.noop;
+        return (): void => { return; };
     }
 
     public graphicMouseDown(): () => void {
-        return this.noop;
+        return (): void => { return; };
     }
 }

@@ -43,6 +43,7 @@ export default class App extends Vue {
                 const graphicId: string = this.$store.getters.focusedGraphic.id;
                 this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
                 this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphicId });
+                this.$store.commit("removeSnapVectors", { slideId: this.$store.getters.activeSlide.id, graphicId: graphicId });
                 this.$store.commit("styleEditorObject", undefined);
             }
         });
