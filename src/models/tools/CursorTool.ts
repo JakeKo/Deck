@@ -88,7 +88,8 @@ export default class CursorTool implements ICanvasTool {
 
             // Preview moving shape
             function preview(event: Event): void {
-                const position: Vector = Utilities.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>, slideWrapper);
+                const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
+                const position: Vector = Utilities.getPosition(customEvent, slideWrapper);
                 graphic!.origin = position.add(cursorOffset);
 
                 const snaps: Array<Snap> = [];
@@ -104,7 +105,7 @@ export default class CursorTool implements ICanvasTool {
                 // Filter by all snap translations within some epsilon and finish if there are no close translations
                 const closeSnaps: Array<Snap> = snaps.filter((snap: Snap): boolean => getTranslation(snap).magnitude < 20);
                 const mainSnap: Snap | undefined = getClosestSnap(closeSnaps);
-                if (mainSnap === undefined) {
+                if (mainSnap === undefined || customEvent.detail.baseEvent.altKey) {
                     snapLine1.origin = snapLine2.origin = Vector.zero;
                     snapLine1.points = snapLine2.points = [];
 
