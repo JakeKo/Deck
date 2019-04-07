@@ -52,6 +52,7 @@ export default class EllipseTool implements ICanvasTool {
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: ellipse.id });
                 slideWrapper.store.commit("styleEditorObject", ellipse);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: ellipse.getSnapVectors() });
+                slideWrapper.store.commit("tool", "cursor");
             }
 
             function toggleCircle(event: KeyboardEvent): void {

@@ -64,7 +64,7 @@ export default class CursorTool implements ICanvasTool {
             const position: Vector = Utilities.getPosition(event, slideWrapper);
             const cursorOffset: Vector = position.towards(graphic.origin);
             const snapVectors: Array<SnapVector> = slideWrapper.store.getters.snapVectors(slideWrapper.slideId);
-            const snappableVectorOffsets: Array<Vector> = graphic.getSnappableVectors().map<Vector>((snappableVector: Vector): Vector => position.towards(snappableVector));
+            const snappableVectorOffsets: Array<Vector> = graphic.getSnappableVectors().map((snappableVector: Vector): Vector => position.towards(snappableVector));
 
             document.addEventListener("Deck.CanvasMouseMove", preview);
             document.addEventListener("Deck.CanvasMouseUp", end);
@@ -86,7 +86,7 @@ export default class CursorTool implements ICanvasTool {
                 });
 
                 // Filter by all snap translations within some epsilon and finish if there are no close translations
-                const closeTranslations: Array<Vector> = translations.filter((snapTranslation: Vector): boolean => snapTranslation.magnitude < 10);
+                const closeTranslations: Array<Vector> = translations.filter((snapTranslation: Vector): boolean => snapTranslation.magnitude < 20);
                 const mainTranslation: Vector | undefined = getClosestTranslation(closeTranslations);
                 if (mainTranslation === undefined) {
                     slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });

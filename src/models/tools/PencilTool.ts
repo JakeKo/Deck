@@ -32,6 +32,7 @@ export default class PencilTool implements ICanvasTool {
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: sketch.id });
                 slideWrapper.store.commit("styleEditorObject", sketch);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: sketch.getSnapVectors() });
+                slideWrapper.store.commit("tool", "cursor");
             }
         };
     }

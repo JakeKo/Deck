@@ -14,6 +14,7 @@ export default class TextboxTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: text.id });
             slideWrapper.store.commit("styleEditorObject", text);
             slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: text.getSnapVectors() });
+            slideWrapper.store.commit("tool", "cursor");
         };
     }
 

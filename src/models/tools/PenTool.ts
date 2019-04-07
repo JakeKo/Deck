@@ -111,6 +111,7 @@ export default class PenTool implements ICanvasTool {
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: curve.id });
                 slideWrapper.store.commit("styleEditorObject", curve);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: curve.getSnapVectors() });
+                slideWrapper.store.commit("tool", "cursor");
             }
 
             // Convert a curve with possible undefined values to a curve with defined fallback values
