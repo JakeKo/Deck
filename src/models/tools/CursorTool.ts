@@ -4,6 +4,7 @@ import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 import SnapVector from "../SnapVector";
+import Sketch from "../graphics/Sketch";
 
 type Snap = { source: Vector, destination: Vector };
 
@@ -63,6 +64,13 @@ export default class CursorTool implements ICanvasTool {
                 return;
             }
 
+            // Create preview lines to show snapping
+            const snapLine1: Sketch = new Sketch({ origin: Vector.zero, strokeColor: "red", strokeWidth: 3 });
+            const snapLine2: Sketch = new Sketch({ origin: Vector.zero, strokeColor: "red", strokeWidth: 3 });
+
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: snapLine1 });
+            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: snapLine2 });
+
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: graphic.id });
             slideWrapper.store.commit("styleEditorObject", graphic);
             slideWrapper.store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphic.id });
@@ -95,8 +103,15 @@ export default class CursorTool implements ICanvasTool {
                 const closeSnaps: Array<Snap> = snaps.filter((snap: Snap): boolean => getTranslation(snap).magnitude < 20);
                 const mainSnap: Snap | undefined = getClosestSnap(closeSnaps);
                 if (mainSnap === undefined) {
+                    snapLine1.origin = snapLine2.origin = Vector.zero;
+                    snapLine1.points = snapLine2.points = [];
+
+                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine1.id, graphic: snapLine1 });
+                    slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine2.id, graphic: snapLine2 });
+
                     slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                     slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
+
                     return;
                 }
 
@@ -105,9 +120,20 @@ export default class CursorTool implements ICanvasTool {
                 const compatibleSnap: Snap | undefined = getClosestSnap(compatibleSnaps);
 
                 graphic!.origin = graphic!.origin.add(getTranslation(mainSnap));
+                snapLine1.origin = mainSnap.source;
+                snapLine1.points = [Vector.zero, getTranslation(mainSnap)];
+
                 if (compatibleSnap !== undefined) {
                     graphic!.origin = graphic!.origin.add(getTranslation(compatibleSnap));
+                    snapLine2.origin = compatibleSnap.source;
+                    snapLine2.points = [Vector.zero, getTranslation(compatibleSnap)];
+                } else {
+                    snapLine2.origin = Vector.zero;
+                    snapLine2.points = [];
                 }
+
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine1.id, graphic: snapLine1 });
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine2.id, graphic: snapLine2 });
 
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
@@ -124,6 +150,9 @@ export default class CursorTool implements ICanvasTool {
 
                 slideWrapper.store.commit("styleEditorObject", undefined);
                 slideWrapper.store.commit("styleEditorObject", graphic);
+
+                slideWrapper.store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine1.id });
+                slideWrapper.store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: snapLine2.id });
             }
         };
     }
