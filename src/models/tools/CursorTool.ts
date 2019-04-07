@@ -6,7 +6,7 @@ import Utilities from "../../utilities/general";
 import SnapVector from "../SnapVector";
 import Sketch from "../graphics/Sketch";
 
-type Snap = { source: Vector, destination: Vector };
+type Snap = { source: Vector, destination: SnapVector };
 
 function getClosestSnap(snaps: Array<Snap>): Snap | undefined {
     if (snaps.length === 0) {
@@ -15,7 +15,7 @@ function getClosestSnap(snaps: Array<Snap>): Snap | undefined {
 
     let closestSnap: Snap = snaps[0];
     snaps.forEach((snap: Snap): void => {
-        if (snap.source.towards(snap.destination).magnitude < closestSnap.source.towards(closestSnap.destination).magnitude) {
+        if (getTranslation(snap).magnitude < getTranslation(closestSnap).magnitude) {
             closestSnap = snap;
         }
     });
@@ -24,7 +24,7 @@ function getClosestSnap(snaps: Array<Snap>): Snap | undefined {
 }
 
 function getTranslation(snap: Snap): Vector {
-    return snap.source.towards(snap.destination);
+    return snap.source.towards(snap.destination.getClosestPoint(snap.source));
 }
 
 export default class CursorTool implements ICanvasTool {
@@ -65,8 +65,8 @@ export default class CursorTool implements ICanvasTool {
             }
 
             // Create preview lines to show snapping
-            const snapLine1: Sketch = new Sketch({ origin: Vector.zero, strokeColor: "red", strokeWidth: 3 });
-            const snapLine2: Sketch = new Sketch({ origin: Vector.zero, strokeColor: "red", strokeWidth: 3 });
+            const snapLine1: Sketch = new Sketch({ origin: Vector.zero, strokeColor: "hotpink", strokeWidth: 1 });
+            const snapLine2: Sketch = new Sketch({ origin: Vector.zero, strokeColor: "hotpink", strokeWidth: 1 });
 
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: snapLine1 });
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: snapLine2 });
@@ -95,7 +95,7 @@ export default class CursorTool implements ICanvasTool {
                 // List all combinations of snap and snappable vectors
                 snapVectors.forEach((snapVector: SnapVector): void => {
                     snappableVectors.forEach((snappableVector: Vector): void => {
-                        snaps.push({ source: snappableVector, destination: snapVector.getClosestPoint(snappableVector) });
+                        snaps.push({ source: snappableVector, destination: snapVector });
                     });
                 });
 
@@ -118,15 +118,16 @@ export default class CursorTool implements ICanvasTool {
                 // Find all translations that could also be performed without interfering with the main translation (i.e. the vectors are orthogonal)
                 const compatibleSnaps: Array<Snap> = closeSnaps.filter((snap: Snap): boolean => getTranslation(snap).dot(getTranslation(mainSnap)) === 0);
                 const compatibleSnap: Snap | undefined = getClosestSnap(compatibleSnaps);
+                const snapLineScale: number = 1000;
 
                 graphic!.origin = graphic!.origin.add(getTranslation(mainSnap));
-                snapLine1.origin = mainSnap.source;
-                snapLine1.points = [Vector.zero, getTranslation(mainSnap)];
+                snapLine1.origin = mainSnap.destination.origin;
+                snapLine1.points = [mainSnap.destination.direction.scale(-snapLineScale), Vector.zero, mainSnap.destination.direction.scale(snapLineScale)];
 
                 if (compatibleSnap !== undefined) {
                     graphic!.origin = graphic!.origin.add(getTranslation(compatibleSnap));
-                    snapLine2.origin = compatibleSnap.source;
-                    snapLine2.points = [Vector.zero, getTranslation(compatibleSnap)];
+                    snapLine2.origin = compatibleSnap.destination.origin;
+                    snapLine2.points = [compatibleSnap.destination.direction.scale(-snapLineScale), Vector.zero, compatibleSnap.destination.direction.scale(snapLineScale)];
                 } else {
                     snapLine2.origin = Vector.zero;
                     snapLine2.points = [];
