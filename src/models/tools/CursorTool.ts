@@ -5,19 +5,25 @@ import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 import SnapVector from "../SnapVector";
 
-function getClosestTranslation(translations: Array<Vector>): Vector | undefined {
-    if (translations.length === 0) {
+type Snap = { source: Vector, destination: Vector };
+
+function getClosestSnap(snaps: Array<Snap>): Snap | undefined {
+    if (snaps.length === 0) {
         return;
     }
 
-    let closestTranslation: Vector = translations[0];
-    translations.forEach((translation: Vector): void => {
-        if (translation.magnitude < closestTranslation.magnitude) {
-            closestTranslation = translation;
+    let closestSnap: Snap = snaps[0];
+    snaps.forEach((snap: Snap): void => {
+        if (snap.source.towards(snap.destination).magnitude < closestSnap.source.towards(closestSnap.destination).magnitude) {
+            closestSnap = snap;
         }
     });
 
-    return closestTranslation;
+    return closestSnap;
+}
+
+function getTranslation(snap: Snap): Vector {
+    return snap.source.towards(snap.destination);
 }
 
 export default class CursorTool implements ICanvasTool {
@@ -75,32 +81,32 @@ export default class CursorTool implements ICanvasTool {
                 const position: Vector = Utilities.getPosition(event as CustomEvent, slideWrapper);
                 graphic!.origin = position.add(cursorOffset);
 
-                const translations: Array<Vector> = [];
+                const snaps: Array<Snap> = [];
                 const snappableVectors: Array<Vector> = snappableVectorOffsets.map<Vector>((offset: Vector): Vector => position.add(offset));
 
                 // List all combinations of snap and snappable vectors
                 snapVectors.forEach((snapVector: SnapVector): void => {
                     snappableVectors.forEach((snappableVector: Vector): void => {
-                        translations.push(snappableVector.towards(snapVector.getClosestPoint(snappableVector)));
+                        snaps.push({ source: snappableVector, destination: snapVector.getClosestPoint(snappableVector) });
                     });
                 });
 
                 // Filter by all snap translations within some epsilon and finish if there are no close translations
-                const closeTranslations: Array<Vector> = translations.filter((snapTranslation: Vector): boolean => snapTranslation.magnitude < 20);
-                const mainTranslation: Vector | undefined = getClosestTranslation(closeTranslations);
-                if (mainTranslation === undefined) {
+                const closeSnaps: Array<Snap> = snaps.filter((snap: Snap): boolean => getTranslation(snap).magnitude < 20);
+                const mainSnap: Snap | undefined = getClosestSnap(closeSnaps);
+                if (mainSnap === undefined) {
                     slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                     slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
                     return;
                 }
 
                 // Find all translations that could also be performed without interfering with the main translation (i.e. the vectors are orthogonal)
-                const compatibleTranslations: Array<Vector> = closeTranslations.filter((translation: Vector): boolean => translation.dot(mainTranslation) === 0);
-                const compatibleTranslation: Vector | undefined = getClosestTranslation(compatibleTranslations);
+                const compatibleSnaps: Array<Snap> = closeSnaps.filter((snap: Snap): boolean => getTranslation(snap).dot(getTranslation(mainSnap)) === 0);
+                const compatibleSnap: Snap | undefined = getClosestSnap(compatibleSnaps);
 
-                graphic!.origin = graphic!.origin.add(mainTranslation);
-                if (compatibleTranslation !== undefined) {
-                    graphic!.origin = graphic!.origin.add(compatibleTranslation);
+                graphic!.origin = graphic!.origin.add(getTranslation(mainSnap));
+                if (compatibleSnap !== undefined) {
+                    graphic!.origin = graphic!.origin.add(getTranslation(compatibleSnap));
                 }
 
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
