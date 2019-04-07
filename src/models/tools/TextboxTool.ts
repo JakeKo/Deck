@@ -2,10 +2,11 @@ import ICanvasTool from "./ICanvasTool";
 import Text from "../graphics/Text";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
+import CanvasMouseEvent from "../CanvasMouseEvent";
 
 export default class TextboxTool implements ICanvasTool {
-    public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
-        return function (event: CustomEvent): void {
+    public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent<CanvasMouseEvent>) => void {
+        return function (event: CustomEvent<CanvasMouseEvent>): void {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 

@@ -5,6 +5,8 @@ import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
 import SnapVector from "../SnapVector";
 import Sketch from "../graphics/Sketch";
+import GraphicMouseEvent from "../GraphicMouseEvent";
+import CanvasMouseEvent from "../CanvasMouseEvent";
 
 type Snap = { source: Vector, destination: SnapVector };
 
@@ -56,8 +58,8 @@ export default class CursorTool implements ICanvasTool {
         };
     }
 
-    public graphicMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
-        return function (event: CustomEvent): void {
+    public graphicMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent<GraphicMouseEvent>) => void {
+        return function (event: CustomEvent<GraphicMouseEvent>): void {
             const graphic: IGraphic | undefined = slideWrapper.store.getters.graphic(slideWrapper.slideId, event.detail.graphicId);
             if (graphic === undefined) {
                 console.error(`ERROR: Could not find a graphic with the id: ${event.detail.graphicId}`);
@@ -86,7 +88,7 @@ export default class CursorTool implements ICanvasTool {
 
             // Preview moving shape
             function preview(event: Event): void {
-                const position: Vector = Utilities.getPosition(event as CustomEvent, slideWrapper);
+                const position: Vector = Utilities.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>, slideWrapper);
                 graphic!.origin = position.add(cursorOffset);
 
                 const snaps: Array<Snap> = [];
