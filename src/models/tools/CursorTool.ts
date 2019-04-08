@@ -108,14 +108,20 @@ export default class CursorTool implements ICanvasTool {
             const initialPosition: Vector = Utilities.getPosition(event, slideWrapper);
             const snapVectors: Array<SnapVector> = slideWrapper.store.getters.snapVectors(slideWrapper.slideId);
             const snappableVectorOffsets: Array<Vector> = graphic.getSnappableVectors().map((snappableVector: Vector): Vector => initialPosition.towards(snappableVector));
+            let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
+            let shiftPressed = false;
 
             document.addEventListener("Deck.CanvasMouseMove", preview);
             document.addEventListener("Deck.CanvasMouseUp", end);
             document.addEventListener("Deck.GraphicMouseUp", end);
+            document.addEventListener("keydown", toggleStrictMovement);
+            document.addEventListener("keyup", toggleStrictMovement);
+
 
             // Preview moving shape
             function preview(event: Event): void {
                 const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
+                lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
                 const position: Vector = Utilities.getPosition(customEvent, slideWrapper);
                 let movement: Vector = initialPosition.towards(position);
                 const projection: Vector = getStrictProjectionVector(movement);
@@ -161,6 +167,8 @@ export default class CursorTool implements ICanvasTool {
                 document.removeEventListener("Deck.CanvasMouseMove", preview);
                 document.removeEventListener("Deck.CanvasMouseUp", end);
                 document.removeEventListener("Deck.GraphicMouseUp", end);
+                document.removeEventListener("keydown", toggleStrictMovement);
+                document.removeEventListener("keyup", toggleStrictMovement);
 
                 // Add the new SnapVectors once the graphic move has been finalized
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors() });
@@ -171,6 +179,24 @@ export default class CursorTool implements ICanvasTool {
                 // Remove the old snap highlights
                 snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: snapHighlight.id }));
                 snapHighlights.length = 0;
+            }
+
+            function toggleStrictMovement(event: KeyboardEvent): void {
+                if (event.key !== "Shift" || (event.type === "keydown" && shiftPressed)) {
+                    return;
+                }
+
+                shiftPressed = event.type === "keydown";
+                document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseMove", {
+                    detail: new CanvasMouseEvent(
+                        new MouseEvent("mousemove", {
+                            shiftKey: event.type === "keydown",
+                            clientX: lastPosition.x,
+                            clientY: lastPosition.y
+                        }),
+                        slideWrapper.slideId
+                    )
+                }));
             }
         };
     }
