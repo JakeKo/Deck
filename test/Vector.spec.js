@@ -127,15 +127,27 @@ describe("Vector", () => {
     it("can calculate the angle between two vectors (in radians)", () => {
         // Arrange
         const epsilon = 1E-5;
-        const vector1 = new Vector(2, 0);
+        const vector1 = Vector.right;
         const vector2 = new Vector(5, 5);
-        const expectedAngle = Math.PI / 4;
+        const vector3 = new Vector(-5, 5);
+        const vector4 = new Vector(-5, -5);
+        const vector5 = new Vector(5, -5);
+        const expectedAngle1 = Math.PI * 1 / 4;
+        const expectedAngle2 = Math.PI * 3 / 4;
+        const expectedAngle3 = Math.PI * 3 / 4;
+        const expectedAngle4 = Math.PI * 1 / 4;
         
         // Act
-        const actualAngle = vector1.theta(vector2);
+        const actualAngle1 = vector1.theta(vector2);
+        const actualAngle2 = vector1.theta(vector3);
+        const actualAngle3 = vector1.theta(vector4);
+        const actualAngle4 = vector1.theta(vector5);
 
         // Assert
-        expect(closeEnough(actualAngle, expectedAngle, epsilon)).toBe(true);
+        expect(closeEnough(actualAngle1, expectedAngle1, epsilon)).toBe(true);
+        expect(closeEnough(actualAngle2, expectedAngle2, epsilon)).toBe(true);
+        expect(closeEnough(actualAngle3, expectedAngle3, epsilon)).toBe(true);
+        expect(closeEnough(actualAngle4, expectedAngle4, epsilon)).toBe(true);
     });
 
     it("can calculate the projection of one vector onto another", () => {

@@ -3,10 +3,12 @@ import Ellipse from "../graphics/Ellipse";
 import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
+import CanvasMouseEvent from "../CanvasMouseEvent";
+import GraphicMouseEvent from "../GraphicMouseEvent";
 
 export default class EllipseTool implements ICanvasTool {
-    public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
-        return function (event: CustomEvent): void {
+    public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent<CanvasMouseEvent>) => void {
+        return function (event: CustomEvent<CanvasMouseEvent>): void {
             document.addEventListener("Deck.CanvasMouseMove", preview);
             document.addEventListener("Deck.CanvasMouseUp", end);
             document.addEventListener("Deck.GraphicMouseUp", end);
@@ -19,25 +21,25 @@ export default class EllipseTool implements ICanvasTool {
             const start: Vector = Utilities.getPosition(event, slideWrapper);
             const ellipse: Ellipse = new Ellipse({ origin: new Vector(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: ellipse });
-            let lastPosition: Vector = new Vector((event.detail.baseEvent as MouseEvent).clientX, (event.detail.baseEvent as MouseEvent).clientY);
+            let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
             let shiftPressed = false;
 
             // Preview drawing ellipse
             function preview(event: Event): void {
-                // Determine dimensions for an ellipse or circle (based on if shift is pressed)
-                const mouseEvent: MouseEvent = (event as CustomEvent).detail.baseEvent as MouseEvent;
-                lastPosition = new Vector(mouseEvent.clientX, mouseEvent.clientY);
+                const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
 
-                const position: Vector = Utilities.getPosition(event as CustomEvent, slideWrapper);
+                // Determine dimensions for an ellipse or circle (based on if shift is pressed)
+                lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
+                const position: Vector = Utilities.getPosition(customEvent, slideWrapper);
                 const rawOffset: Vector = position.add(start.scale(-1));
                 const minimumOffset: number = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
 
                 // Enforce that a shape has positive width and height i.e. move the x and y if the width or height are negative
-                ellipse.origin.x = start.x + (mouseEvent.shiftKey ? Math.sign(rawOffset.x) * minimumOffset : rawOffset.x) * 0.5;
-                ellipse.origin.y = start.y + (mouseEvent.shiftKey ? Math.sign(rawOffset.y) * minimumOffset : rawOffset.y) * 0.5;
+                ellipse.origin.x = start.x + (customEvent.detail.baseEvent.shiftKey ? Math.sign(rawOffset.x) * minimumOffset : rawOffset.x) * 0.5;
+                ellipse.origin.y = start.y + (customEvent.detail.baseEvent.shiftKey ? Math.sign(rawOffset.y) * minimumOffset : rawOffset.y) * 0.5;
 
-                ellipse.width = mouseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.x);
-                ellipse.height = mouseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.y);
+                ellipse.width = customEvent.detail.baseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.x);
+                ellipse.height = customEvent.detail.baseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.y);
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: ellipse.id, graphic: ellipse });
             }
 
@@ -61,15 +63,15 @@ export default class EllipseTool implements ICanvasTool {
                 }
 
                 shiftPressed = event.type === "keydown";
-                document.dispatchEvent(new CustomEvent("Deck.CanvasMouseMove", {
-                    detail: {
-                        baseEvent: new MouseEvent("mousemove", {
+                document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseMove", {
+                    detail: new CanvasMouseEvent(
+                        new MouseEvent("mousemove", {
                             shiftKey: event.type === "keydown",
                             clientX: lastPosition.x,
                             clientY: lastPosition.y
                         }),
-                        slideId: slideWrapper.slideId
-                    }
+                        slideWrapper.slideId
+                    )
                 }));
             }
         };

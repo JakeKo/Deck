@@ -2,10 +2,12 @@ import ICanvasTool from "./ICanvasTool";
 import Sketch from "../graphics/Sketch";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Utilities from "../../utilities/general";
+import CanvasMouseEvent from "../CanvasMouseEvent";
+import GraphicMouseEvent from "../GraphicMouseEvent";
 
 export default class PencilTool implements ICanvasTool {
-    public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent) => void {
-        return function (event: CustomEvent): void {
+    public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent<CanvasMouseEvent>) => void {
+        return function (event: CustomEvent<CanvasMouseEvent>): void {
             document.addEventListener("Deck.CanvasMouseMove", preview);
             document.addEventListener("Deck.CanvasMouseUp", end);
             document.addEventListener("Deck.GraphicMouseUp", end);
@@ -19,7 +21,7 @@ export default class PencilTool implements ICanvasTool {
 
             // Add the current mouse position to the list of points to plot
             function preview(event: Event): void {
-                sketch.points.push(Utilities.getPosition(event as CustomEvent, slideWrapper).add(sketch.origin.scale(-1)));
+                sketch.points.push(Utilities.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>, slideWrapper).add(sketch.origin.scale(-1)));
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: sketch.id, graphic: sketch });
             }
 
