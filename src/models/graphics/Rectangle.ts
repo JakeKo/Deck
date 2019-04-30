@@ -3,6 +3,9 @@ import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
+import GraphicMouseEvent from "../GraphicMouseEvent";
+import SlideWrapper from "../../utilities/SlideWrapper";
+import Ellipse from "./Ellipse";
 
 export default class Rectangle implements IGraphic {
     public id: string;
@@ -54,12 +57,12 @@ export default class Rectangle implements IGraphic {
         const snapVectors: Array<SnapVector> = [];
 
         // Center, upper center, left center, lower center, right center
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2),   Vector.right));
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2),   Vector.up));
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y),                     Vector.right));
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width,     this.origin.y + this.height / 2),   Vector.up));
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height),       Vector.right));
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x,                  this.origin.y + this.height / 2),   Vector.up));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2), Vector.right));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2), Vector.up));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y), Vector.right));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width, this.origin.y + this.height / 2), Vector.up));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height), Vector.right));
+        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x, this.origin.y + this.height / 2), Vector.up));
 
         return snapVectors;
     }
@@ -68,12 +71,31 @@ export default class Rectangle implements IGraphic {
         const snappableVectors: Array<Vector> = [];
 
         // Center, upper center, left center, lower center, right center
-        snappableVectors.push(new Vector(this.origin.x,                     this.origin.y));
-        snappableVectors.push(new Vector(this.origin.x + this.width,        this.origin.y));
-        snappableVectors.push(new Vector(this.origin.x + this.width,        this.origin.y + this.height));
-        snappableVectors.push(new Vector(this.origin.x,                     this.origin.y + this.height / 2));
-        snappableVectors.push(new Vector(this.origin.x + this.width / 2,    this.origin.y + this.height / 2));
+        snappableVectors.push(new Vector(this.origin.x, this.origin.y));
+        snappableVectors.push(new Vector(this.origin.x + this.width, this.origin.y));
+        snappableVectors.push(new Vector(this.origin.x + this.width, this.origin.y + this.height));
+        snappableVectors.push(new Vector(this.origin.x, this.origin.y + this.height / 2));
+        snappableVectors.push(new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2));
 
         return snappableVectors;
+    }
+
+    public getAnchors(slideWrapper: SlideWrapper): any {
+        const anchor: any = {
+            handler: (event: CustomEvent<GraphicMouseEvent>): void => {
+                const position: Vector = Utilities.getPosition(event, slideWrapper);
+                this.height -= Math.abs(this.origin.y - position.y);
+                this.origin.y = position.y;
+            },
+            graphic: new Ellipse({
+                origin: new Vector(this.origin.x + this.width / 2, this.origin.y),
+                height: 10,
+                width: 10,
+                fillColor: "blue",
+                strokeColor: "transparent"
+            })
+        };
+
+        return anchor;
     }
 }

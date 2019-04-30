@@ -54,8 +54,8 @@ export default class Text implements IGraphic {
         const snapVectors: Array<SnapVector> = [];
 
         // Center, upper center, left center, lower center, right center
-        snapVectors.push(new SnapVector(this.id, this.origin,   Vector.right));
-        snapVectors.push(new SnapVector(this.id, this.origin,   Vector.up));
+        snapVectors.push(new SnapVector(this.id, this.origin, Vector.right));
+        snapVectors.push(new SnapVector(this.id, this.origin, Vector.up));
 
         return snapVectors;
     }

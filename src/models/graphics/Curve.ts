@@ -47,7 +47,7 @@ export default class Curve implements IGraphic {
 
     public updateRendering(svg: SVG.Path): void {
         // Reformat points from an array of objects to the bezier curve string
-        let points: string = `M 0,0`;
+        let points: string = "M 0,0";
         this.points.forEach((point: Vector, index: number): void => {
             points += `${index % 3 === 0 ? " c" : ""} ${point.x},${point.y}`;
         });
