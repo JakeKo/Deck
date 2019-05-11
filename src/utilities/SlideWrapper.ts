@@ -3,6 +3,7 @@ import IGraphic from "../models/graphics/IGraphic";
 import GraphicEvent from "../models/GraphicEvent";
 import CanvasMouseEvent from "../models/CanvasMouseEvent";
 import GraphicMouseEvent from "../models/GraphicMouseEvent";
+import Anchor from "../models/Anchor";
 
 export default class SlideWrapper {
     public store: any;
@@ -113,11 +114,14 @@ export default class SlideWrapper {
     public focusGraphic(graphic: IGraphic | undefined) {
         // Unfocus the current graphic if there is one
         if (this._focusedGraphic !== undefined) {
+            // Remove the anchor and bounding box graphics
+            this._focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => this.removeGraphic(anchor.graphic.id));
             this.removeGraphic(this._focusedGraphic.boundingBoxId);
         }
 
         this._focusedGraphic = graphic;
         if (this._focusedGraphic !== undefined) {
+            // Render the bounding box graphic
             const box: SVG.RBox = this._canvas.select(`#graphic_${this._focusedGraphic.id}`).first().rbox();
             const bounds: DOMRect = this.absoluteBounds();
             this._canvas.rect(box.width, box.height)
@@ -125,6 +129,9 @@ export default class SlideWrapper {
                 .fill("none")
                 .stroke({ color: "cyan", width: 1 })
                 .id(`graphic_${this._focusedGraphic.boundingBoxId}`);
+
+            // Render the anchor graphics
+            this._focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => this.addGraphic(anchor.graphic));
         }
     }
 

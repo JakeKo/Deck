@@ -5,6 +5,7 @@ import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 import SlideWrapper from "../../utilities/SlideWrapper";
+import Anchor from "../Anchor";
 
 export default class Rectangle implements IGraphic {
     public id: string;
@@ -87,11 +88,10 @@ export default class Rectangle implements IGraphic {
         return snappableVectors;
     }
 
-    public getAnchors(slideWrapper: SlideWrapper): Array<any> {
-        const anchors: Array<any> = [
-            {
-                graphic: Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
-                handler: (event: CustomEvent<GraphicMouseEvent>): void => {
+    public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
+        const anchors: Array<Anchor> = [
+            new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
+                (event: CustomEvent<GraphicMouseEvent>): void => {
                     // TODO: Handle when the position crosses another point
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const dimensions: Vector = position.towards(this.origin.add(new Vector(this.width, this.height)));
@@ -99,39 +99,32 @@ export default class Rectangle implements IGraphic {
                     this.origin = position;
                     this.width = dimensions.x;
                     this.height = dimensions.y;
-                }
-            },
-            {
-                graphic: Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
-                handler: (event: CustomEvent<GraphicMouseEvent>): void => {
+                }),
+            new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
+                (event: CustomEvent<GraphicMouseEvent>): void => {
                     // TODO: Handle when the position crosses another point
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
 
                     this.origin.y = position.y;
                     this.width = position.x - this.origin.x;
-                }
-            },
-            {
-                graphic: Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
-                handler: (event: CustomEvent<GraphicMouseEvent>): void => {
+                }),
+            new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
+                (event: CustomEvent<GraphicMouseEvent>): void => {
                     // TODO: Handle when the position crosses another point
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const dimensions: Vector = this.origin.towards(position);
 
                     this.width = dimensions.x;
                     this.height = dimensions.y;
-                }
-            },
-            {
-                graphic: Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
-                handler: (event: CustomEvent<GraphicMouseEvent>): void => {
+                }),
+            new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
+                (event: CustomEvent<GraphicMouseEvent>): void => {
                     // TODO: Handle when the position crosses another point
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
 
                     this.origin.x = position.x;
                     this.height = position.y - this.origin.y;
-                }
-            },
+                })
         ];
 
 

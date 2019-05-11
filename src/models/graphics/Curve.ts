@@ -3,6 +3,8 @@ import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
+import SlideWrapper from "../../utilities/SlideWrapper";
+import Anchor from "../Anchor";
 
 export default class Curve implements IGraphic {
     public id: string;
@@ -79,5 +81,9 @@ export default class Curve implements IGraphic {
         snappableVectors.push(this.origin);
 
         return snappableVectors;
+    }
+
+    public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
+        return [];
     }
 }

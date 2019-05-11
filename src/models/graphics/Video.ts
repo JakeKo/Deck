@@ -3,6 +3,8 @@ import Utilities from "../../utilities/general";
 import IGraphic from "./IGraphic";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
+import SlideWrapper from "../../utilities/SlideWrapper";
+import Anchor from "../Anchor";
 
 export default class Video implements IGraphic {
     public id: string;
@@ -92,5 +94,9 @@ export default class Video implements IGraphic {
         snappableVectors.push(new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2));
 
         return snappableVectors;
+    }
+
+    public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
+        return [];
     }
 }
