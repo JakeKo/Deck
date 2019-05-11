@@ -10,6 +10,7 @@ export default class Rectangle implements IGraphic {
     public id: string;
     public type: string = "rectangle";
     public boundingBoxId: string;
+    public defaultInteractive: boolean;
     public anchorIds: Array<string> = [];
     public origin: Vector;
     public width: number;
@@ -20,11 +21,12 @@ export default class Rectangle implements IGraphic {
     public rotation: number;
 
     constructor(
-        { id, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
-            { id?: string, origin?: Vector, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+        { id, defaultInteractive, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
+            { id?: string, defaultInteractive?: boolean, origin?: Vector, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
+        this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
         this.origin = origin || new Vector(0, 0);
         this.width = width || 50;
         this.height = height || 50;

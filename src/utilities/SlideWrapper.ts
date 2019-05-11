@@ -142,7 +142,10 @@ export default class SlideWrapper {
 
     public addGraphic(graphic: IGraphic): void {
         const svg: SVG.Element = graphic.render(this._canvas);
-        this._forwardGraphicEvents(graphic.id, svg);
+
+        if (graphic.defaultInteractive) {
+            this._forwardGraphicEvents(graphic.id, svg);
+        }
     }
 
     public updateGraphic(id: string, newGraphic: IGraphic): void {
