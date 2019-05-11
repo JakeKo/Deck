@@ -5,12 +5,12 @@ import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 import SlideWrapper from "../../utilities/SlideWrapper";
-import Ellipse from "./Ellipse";
 
 export default class Rectangle implements IGraphic {
     public id: string;
     public type: string = "rectangle";
     public boundingBoxId: string;
+    public anchorIds: Array<string> = [];
     public origin: Vector;
     public width: number;
     public height: number;
@@ -32,6 +32,11 @@ export default class Rectangle implements IGraphic {
         this.strokeColor = strokeColor || "#000000";
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
+
+        const anchorCount: number = 4;
+        for (let i = 0; i < anchorCount; i++) {
+            this.anchorIds.push(Utilities.generateId());
+        }
     }
 
     public render(canvas: SVG.Doc): SVG.Rect {
@@ -57,12 +62,12 @@ export default class Rectangle implements IGraphic {
         const snapVectors: Array<SnapVector> = [];
 
         // Center, upper center, left center, lower center, right center
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2), Vector.right));
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2), Vector.up));
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y), Vector.right));
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width, this.origin.y + this.height / 2), Vector.up));
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x + this.width / 2, this.origin.y + this.height), Vector.right));
-        snapVectors.push(new SnapVector(this.id, new Vector(this.origin.x, this.origin.y + this.height / 2), Vector.up));
+        snapVectors.push(new SnapVector(this.id, this.origin.add(new Vector(this.width / 2, this.height / 2)), Vector.right));
+        snapVectors.push(new SnapVector(this.id, this.origin.add(new Vector(this.width / 2, this.height / 2)), Vector.up));
+        snapVectors.push(new SnapVector(this.id, this.origin.add(new Vector(this.width / 2, 0)), Vector.right));
+        snapVectors.push(new SnapVector(this.id, this.origin.add(new Vector(this.width, this.height / 2)), Vector.up));
+        snapVectors.push(new SnapVector(this.id, this.origin.add(new Vector(this.width / 2, this.height)), Vector.right));
+        snapVectors.push(new SnapVector(this.id, this.origin.add(new Vector(0, this.height / 2)), Vector.up));
 
         return snapVectors;
     }
@@ -70,32 +75,64 @@ export default class Rectangle implements IGraphic {
     public getSnappableVectors(): Array<Vector> {
         const snappableVectors: Array<Vector> = [];
 
-        // Center, upper center, left center, lower center, right center
-        snappableVectors.push(new Vector(this.origin.x, this.origin.y));
-        snappableVectors.push(new Vector(this.origin.x + this.width, this.origin.y));
-        snappableVectors.push(new Vector(this.origin.x + this.width, this.origin.y + this.height));
-        snappableVectors.push(new Vector(this.origin.x, this.origin.y + this.height / 2));
-        snappableVectors.push(new Vector(this.origin.x + this.width / 2, this.origin.y + this.height / 2));
+        // Upper left, upper right, lower right, lower left, center
+        snappableVectors.push(this.origin);
+        snappableVectors.push(this.origin.add(new Vector(this.width, 0)));
+        snappableVectors.push(this.origin.add(new Vector(this.width, this.height)));
+        snappableVectors.push(this.origin.add(new Vector(0, this.height / 2)));
+        snappableVectors.push(this.origin.add(new Vector(this.width / 2, this.height / 2)));
 
         return snappableVectors;
     }
 
-    public getAnchors(slideWrapper: SlideWrapper): any {
-        const anchor: any = {
-            handler: (event: CustomEvent<GraphicMouseEvent>): void => {
-                const position: Vector = Utilities.getPosition(event, slideWrapper);
-                this.height -= Math.abs(this.origin.y - position.y);
-                this.origin.y = position.y;
-            },
-            graphic: new Ellipse({
-                origin: new Vector(this.origin.x + this.width / 2, this.origin.y),
-                height: 10,
-                width: 10,
-                fillColor: "blue",
-                strokeColor: "transparent"
-            })
-        };
+    public getAnchors(slideWrapper: SlideWrapper): Array<any> {
+        const anchors: Array<any> = [
+            {
+                graphic: Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
+                handler: (event: CustomEvent<GraphicMouseEvent>): void => {
+                    // TODO: Handle when the position crosses another point
+                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+                    const dimensions: Vector = position.towards(this.origin.add(new Vector(this.width, this.height)));
 
-        return anchor;
+                    this.origin = position;
+                    this.width = dimensions.x;
+                    this.height = dimensions.y;
+                }
+            },
+            {
+                graphic: Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
+                handler: (event: CustomEvent<GraphicMouseEvent>): void => {
+                    // TODO: Handle when the position crosses another point
+                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+
+                    this.origin.y = position.y;
+                    this.width = position.x - this.origin.x;
+                }
+            },
+            {
+                graphic: Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
+                handler: (event: CustomEvent<GraphicMouseEvent>): void => {
+                    // TODO: Handle when the position crosses another point
+                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+                    const dimensions: Vector = this.origin.towards(position);
+
+                    this.width = dimensions.x;
+                    this.height = dimensions.y;
+                }
+            },
+            {
+                graphic: Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
+                handler: (event: CustomEvent<GraphicMouseEvent>): void => {
+                    // TODO: Handle when the position crosses another point
+                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+
+                    this.origin.x = position.x;
+                    this.height = position.y - this.origin.y;
+                }
+            },
+        ];
+
+
+        return anchors;
     }
 }

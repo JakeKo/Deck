@@ -59,6 +59,20 @@ function parseGraphic(json: any): IGraphic {
     throw `Undefined graphic type: ${json.type}`;
 }
 
+function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
+    const radius: number = 5;
+
+    return new Ellipse({
+        id: id,
+        origin: origin.add(new Vector(-radius, -radius)),
+        height: radius * 2,
+        width: radius * 2,
+        fillColor: "white",
+        strokeColor: "black",
+        strokeWidth: 1
+    });
+}
+
 const deckScript: string = `<style>
 html,
 body {
@@ -145,5 +159,6 @@ export default {
     generateId,
     getPosition,
     parseGraphic,
+    makeAnchorGraphic,
     deckScript
 };

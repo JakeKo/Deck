@@ -7,6 +7,7 @@ import SnapVector from "../SnapVector";
 import Sketch from "../graphics/Sketch";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 import CanvasMouseEvent from "../CanvasMouseEvent";
+import Rectangle from "../graphics/Rectangle";
 
 type Snap = { source: Vector, destination: SnapVector };
 
@@ -117,6 +118,12 @@ export default class CursorTool implements ICanvasTool {
             document.addEventListener("keydown", toggleStrictMovement);
             document.addEventListener("keyup", toggleStrictMovement);
 
+            if (graphic.type === "rectangle") {
+                const rect: Rectangle = graphic as Rectangle;
+                rect.getAnchors(slideWrapper).forEach((anchor: any): void => {
+                    slideWrapper.addGraphic(anchor.graphic);
+                });
+            }
 
             // Preview moving shape
             function preview(event: Event): void {
@@ -129,6 +136,13 @@ export default class CursorTool implements ICanvasTool {
                 // Remove the old snap highlights
                 snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: snapHighlight.id }));
                 snapHighlights.length = 0;
+
+                if (graphic!.type === "rectangle") {
+                    const rect: Rectangle = graphic as Rectangle;
+                    rect.getAnchors(slideWrapper).forEach((anchor: any): void => {
+                        slideWrapper.removeGraphic(anchor.graphic.id);
+                    });
+                }
 
                 // Do not perform any snapping if the alt key is pressed
                 if (!customEvent.detail.baseEvent.altKey) {
@@ -179,6 +193,13 @@ export default class CursorTool implements ICanvasTool {
                 // Remove the old snap highlights
                 snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: snapHighlight.id }));
                 snapHighlights.length = 0;
+
+                if (graphic!.type === "rectangle") {
+                    const rect: Rectangle = graphic as Rectangle;
+                    rect.getAnchors(slideWrapper).forEach((anchor: any): void => {
+                        slideWrapper.addGraphic(anchor.graphic);
+                    });
+                }
             }
 
             function toggleStrictMovement(event: KeyboardEvent): void {
