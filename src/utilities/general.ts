@@ -65,6 +65,7 @@ function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
     return new Ellipse({
         id: id,
         defaultInteractive: false,
+        supplementary: true,
         origin: origin.add(new Vector(-radius, -radius)),
         height: radius * 2,
         width: radius * 2,

@@ -11,6 +11,7 @@ export default class Text implements IGraphic {
     public type: string = "text";
     public boundingBoxId: string;
     public defaultInteractive: boolean;
+    public supplementary: boolean;
     public origin: Vector;
     public content: string;
     public fontSize: number;
@@ -20,12 +21,13 @@ export default class Text implements IGraphic {
     public rotation: number;
 
     constructor(
-        { id, defaultInteractive, origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }:
-            { id?: string, defaultInteractive?: boolean, origin?: Vector, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
+        { id, defaultInteractive, supplementary, origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }:
+            { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
+        this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);
         this.content = content || "lorem ipsum dolor sit amet";
         this.fontSize = fontSize || 12;

@@ -8,36 +8,38 @@ import Anchor from "../models/Anchor";
 export default class SlideWrapper {
     public store: any;
     public slideId: string;
+    public renderSupplementary: boolean;
 
     private _canvas: SVG.Doc;
     private _focusedGraphic: IGraphic | undefined;
 
-    constructor(slideId: string, canvas: SVG.Doc, store: any) {
+    constructor(slideId: string, canvas: SVG.Doc, store: any, renderSupplementary: boolean) {
         this.store = store;
         this.slideId = slideId;
+        this.renderSupplementary = renderSupplementary;
         this._canvas = canvas;
         this._focusedGraphic = undefined;
 
         document.addEventListener("Deck.GraphicAdded", (event: Event): void => {
             // Check that the event pertains to the wrapper's specific slide
-            const detail: any = (event as CustomEvent<GraphicEvent>).detail;
-            if (detail.slideId === this.slideId) {
-                this.addGraphic(detail.graphic);
+            const detail: GraphicEvent = (event as CustomEvent<GraphicEvent>).detail;
+            if (detail.slideId === this.slideId && (detail.graphic !== undefined && (this.renderSupplementary || !detail.graphic!.supplementary))) {
+                this.addGraphic(detail.graphic!);
             }
         });
 
         document.addEventListener("Deck.GraphicRemoved", (event: Event): void => {
             // Check that the event pertains to the wrapper's specific slide
-            const detail: any = (event as CustomEvent<GraphicEvent>).detail;
-            if (detail.slideId === this.slideId) {
-                this.removeGraphic(detail.graphicId);
+            const detail: GraphicEvent = (event as CustomEvent<GraphicEvent>).detail;
+            if (detail.slideId === this.slideId && (detail.graphic !== undefined && (this.renderSupplementary || !detail.graphic!.supplementary))) {
+                this.removeGraphic(detail.graphicId!);
             }
         });
 
         document.addEventListener("Deck.GraphicUpdated", (event: Event): void => {
             // Check that the event pertains to the wrapper's specific slide
             const detail: any = (event as CustomEvent<GraphicEvent>).detail;
-            if (detail.slideId === this.slideId) {
+            if (detail.slideId === this.slideId && (detail.graphic !== undefined && (this.renderSupplementary || !detail.graphic!.supplementary))) {
                 this.updateGraphic(detail.graphicId, detail.graphic);
             }
         });
@@ -45,7 +47,7 @@ export default class SlideWrapper {
         document.addEventListener("Deck.GraphicFocused", (event: Event): void => {
             // Check that the event pertains to the wrapper's specific slide
             const detail: any = (event as CustomEvent<GraphicEvent>).detail;
-            if (detail.slideId === this.slideId) {
+            if (detail.slideId === this.slideId && (detail.graphic !== undefined && (this.renderSupplementary || !detail.graphic!.supplementary))) {
                 this.focusGraphic(detail.graphic);
             }
         });

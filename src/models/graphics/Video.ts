@@ -11,6 +11,7 @@ export default class Video implements IGraphic {
     public type: string = "video";
     public boundingBoxId: string;
     public defaultInteractive: boolean;
+    public supplementary: boolean;
     public origin: Vector;
     public source: string;
     public width: number;
@@ -18,12 +19,13 @@ export default class Video implements IGraphic {
     public rotation: number;
 
     constructor(
-        { id, defaultInteractive, origin, source, width, height, rotation }:
-            { id?: string, defaultInteractive?: boolean, origin?: Vector, source?: string, width?: number, height?: number, rotation?: number } = {}
+        { id, defaultInteractive, supplementary, origin, source, width, height, rotation }:
+            { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, source?: string, width?: number, height?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
+        this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);
         this.source = source || "";
         this.width = width || 0;

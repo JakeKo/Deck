@@ -11,6 +11,7 @@ export default class Curve implements IGraphic {
     public type: string = "curve";
     public boundingBoxId: string;
     public defaultInteractive: boolean;
+    public supplementary: boolean;
     public origin: Vector;
     public points: Array<Vector>;
     public fillColor: string;
@@ -19,12 +20,13 @@ export default class Curve implements IGraphic {
     public rotation: number;
 
     constructor(
-        { id, defaultInteractive, origin, points, fillColor, strokeColor, strokeWidth, rotation }:
-            { id?: string, defaultInteractive?: boolean, origin?: Vector, points?: Array<Vector>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+        { id, defaultInteractive, supplementary, origin, points, fillColor, strokeColor, strokeWidth, rotation }:
+            { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, points?: Array<Vector>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
+        this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);
         this.points = points || [];
         this.fillColor = fillColor || "#EEEEEE";

@@ -11,6 +11,7 @@ export default class Ellipse implements IGraphic {
     public type: string = "ellipse";
     public boundingBoxId: string;
     public defaultInteractive: boolean;
+    public supplementary: boolean;
     public origin: Vector;
     public width: number;
     public height: number;
@@ -20,12 +21,13 @@ export default class Ellipse implements IGraphic {
     public rotation: number;
 
     constructor(
-        { id, defaultInteractive, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
-            { id?: string, defaultInteractive?: boolean, origin?: Vector, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
+        { id, defaultInteractive, supplementary, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
+            { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
         this.boundingBoxId = Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
+        this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);
         this.width = width || 50;
         this.height = height || 50;

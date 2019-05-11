@@ -11,6 +11,7 @@ export default interface IGraphic {
     rotation: number;
     boundingBoxId: string;
     defaultInteractive: boolean;
+    supplementary: boolean;
     render(canvas: SVG.Doc): SVG.Element;
     updateRendering(svg: SVG.Element): void;
     getSnapVectors(): Array<SnapVector>;

@@ -147,6 +147,7 @@ export default class CursorTool implements ICanvasTool {
                         movement = movement.add(getTranslation(snap));
 
                         const snapHighlight: Sketch = new Sketch({
+                            supplementary: true,
                             origin: snap.destination.origin,
                             points: [snap.destination.direction.scale(-snapLineScale), snap.destination.direction.scale(snapLineScale)],
                             strokeWidth: 1,
