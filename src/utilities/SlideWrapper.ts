@@ -115,21 +115,21 @@ export default class SlideWrapper {
 
     public focusGraphic(graphic: IGraphic | undefined) {
         // Unfocus the current graphic if there is one
-        if (this._focusedGraphic !== undefined) {
+        if (this._focusedGraphic !== undefined && this.renderSupplementary) {
             // Remove the anchor and bounding box graphics
             this._focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => this.removeGraphic(anchor.graphic.id));
             this.removeGraphic(this._focusedGraphic.boundingBoxId);
         }
 
         this._focusedGraphic = graphic;
-        if (this._focusedGraphic !== undefined) {
+        if (this._focusedGraphic !== undefined && this.renderSupplementary) {
             // Render the bounding box graphic
             const box: SVG.RBox = this._canvas.select(`#graphic_${this._focusedGraphic.id}`).first().rbox();
             const bounds: DOMRect = this.absoluteBounds();
             this._canvas.rect(box.width, box.height)
                 .translate(box.x - bounds.x, box.y - bounds.y)
                 .fill("none")
-                .stroke({ color: "cyan", width: 1 })
+                .stroke({ color: "hotpink", width: 2 })
                 .id(`graphic_${this._focusedGraphic.boundingBoxId}`);
 
             // Render the anchor graphics

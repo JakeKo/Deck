@@ -60,7 +60,7 @@ function parseGraphic(json: any): IGraphic {
 }
 
 function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
-    const radius: number = 5;
+    const radius: number = 4;
 
     return new Ellipse({
         id: id,
@@ -70,8 +70,8 @@ function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
         height: radius * 2,
         width: radius * 2,
         fillColor: "white",
-        strokeColor: "black",
-        strokeWidth: 1
+        strokeColor: "hotpink",
+        strokeWidth: 2
     });
 }
 
