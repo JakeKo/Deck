@@ -12,6 +12,7 @@ export default class Text implements IGraphic {
     public boundingBoxId: string;
     public defaultInteractive: boolean;
     public supplementary: boolean;
+    public anchorIds: Array<string> = [];
     public origin: Vector;
     public content: string;
     public fontSize: number;

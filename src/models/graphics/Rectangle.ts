@@ -10,7 +10,7 @@ import Anchor from "../Anchor";
 export default class Rectangle implements IGraphic {
     public id: string;
     public type: string = "rectangle";
-    public boundingBoxId: string;
+    public boundingBoxId: string = Utilities.generateId();
     public defaultInteractive: boolean;
     public supplementary: boolean;
     public anchorIds: Array<string> = [];
@@ -27,7 +27,6 @@ export default class Rectangle implements IGraphic {
             { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
-        this.boundingBoxId = Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
         this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);

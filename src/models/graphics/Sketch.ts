@@ -5,13 +5,15 @@ import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
+import GraphicMouseEvent from "../GraphicMouseEvent";
 
 export default class Sketch implements IGraphic {
     public id: string;
     public type: string = "sketch";
-    public boundingBoxId: string;
+    public boundingBoxId: string = Utilities.generateId();
     public defaultInteractive: boolean;
     public supplementary: boolean;
+    public anchorIds: Array<string> = [];
     public origin: Vector;
     public points: Array<Vector>;
     public fillColor: string;
@@ -24,7 +26,6 @@ export default class Sketch implements IGraphic {
             { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, points?: Array<Vector>, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
-        this.boundingBoxId = Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
         this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);
@@ -74,6 +75,18 @@ export default class Sketch implements IGraphic {
     }
 
     public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
-        return [];
+        // Reset anchorIds with new ids for the to-be rendered anchors
+        this.anchorIds.length = 0;
+        this.points.forEach((): void => void this.anchorIds.push(Utilities.generateId()));
+
+        return this.anchorIds.map<Anchor>((anchorId: string, index: number): Anchor => {
+            return new Anchor(
+                Utilities.makeAnchorGraphic(anchorId, this.points[index]),
+                (event: CustomEvent<GraphicMouseEvent>): void => {
+                    // Move the specific point on the curve to the mouse position
+                    this.points[index] = Utilities.getPosition(event, slideWrapper);
+                }
+            );
+        });
     }
 }

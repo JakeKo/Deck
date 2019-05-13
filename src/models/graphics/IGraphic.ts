@@ -10,6 +10,7 @@ export default interface IGraphic {
     origin: Vector;
     rotation: number;
     boundingBoxId: string;
+    anchorIds: Array<string>;
     defaultInteractive: boolean;
     supplementary: boolean;
     render(canvas: SVG.Doc): SVG.Element;

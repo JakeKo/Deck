@@ -5,13 +5,15 @@ import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
+import GraphicMouseEvent from "../GraphicMouseEvent";
 
 export default class Ellipse implements IGraphic {
     public id: string;
     public type: string = "ellipse";
-    public boundingBoxId: string;
+    public boundingBoxId: string = Utilities.generateId();
     public defaultInteractive: boolean;
     public supplementary: boolean;
+    public anchorIds: Array<string> = [];
     public origin: Vector;
     public width: number;
     public height: number;
@@ -25,7 +27,6 @@ export default class Ellipse implements IGraphic {
             { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
-        this.boundingBoxId = Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
         this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);
@@ -84,6 +85,38 @@ export default class Ellipse implements IGraphic {
     }
 
     public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
-        return [];
+        // Reset anchorIds with new ids for the to-be rendered anchors
+        const anchorCount: number = 4;
+        this.anchorIds.length = 0;
+        for (let i = 0; i < anchorCount; i++) {
+            this.anchorIds.push(Utilities.generateId());
+        }
+
+        return [
+            new Anchor(
+                Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
+                (event: CustomEvent<GraphicMouseEvent>): void => {
+                    return;
+                }
+            ),
+            new Anchor(
+                Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
+                (event: CustomEvent<GraphicMouseEvent>): void => {
+                    return;
+                }
+            ),
+            new Anchor(
+                Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
+                (event: CustomEvent<GraphicMouseEvent>): void => {
+                    return;
+                }
+            ),
+            new Anchor(
+                Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
+                (event: CustomEvent<GraphicMouseEvent>): void => {
+                    return;
+                }
+            )
+        ];
     }
 }
