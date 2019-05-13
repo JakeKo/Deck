@@ -6,8 +6,9 @@ import SnapVector from "../SnapVector";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
+import IRectangularGraphic from "./IRectangularGraphic";
 
-export default class Rectangle implements IGraphic {
+export default class Rectangle implements IGraphic, IRectangularGraphic {
     public id: string;
     public type: string = "rectangle";
     public boundingBoxId: string = Utilities.generateId();
