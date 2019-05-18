@@ -93,29 +93,69 @@ export default class Ellipse implements IGraphic, IRectangularGraphic {
             this.anchorIds.push(Utilities.generateId());
         }
 
+        // Create deep copies of the origin and the point opposite from the origin
+        const baseOrigin: Vector = new Vector(this.origin.x, this.origin.y);
+        const baseAntiOrigin: Vector = this.origin.add(new Vector(this.width, this.height));
+
         return [
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    return;
+                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
+                    if (positon.x > baseAntiOrigin.x && positon.y > baseAntiOrigin.y) {
+                        Utilities.adjustLowerRightAnchor(positon, this);
+                    } else if (positon.x > baseAntiOrigin.x) {
+                        Utilities.adjustUpperRightAnchor(positon, this);
+                    } else if (positon.y > baseAntiOrigin.y) {
+                        Utilities.adjustLowerLeftAnchor(positon, this);
+                    } else {
+                        Utilities.adjustUpperLeftAnchor(positon, this);
+                    }
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    return;
+                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
+                    if (positon.x < baseOrigin.x && positon.y > baseAntiOrigin.y) {
+                        Utilities.adjustLowerLeftAnchor(positon, this);
+                    } else if (positon.x < baseOrigin.x) {
+                        Utilities.adjustUpperLeftAnchor(positon, this);
+                    } else if (positon.y > baseAntiOrigin.y) {
+                        Utilities.adjustLowerRightAnchor(positon, this);
+                    } else {
+                        Utilities.adjustUpperRightAnchor(positon, this);
+                    }
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    return;
+                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
+                    if (positon.x < baseOrigin.x && positon.y < baseOrigin.y) {
+                        Utilities.adjustUpperLeftAnchor(positon, this);
+                    } else if (positon.x < baseOrigin.x) {
+                        Utilities.adjustLowerLeftAnchor(positon, this);
+                    } else if (positon.y < baseOrigin.y) {
+                        Utilities.adjustUpperRightAnchor(positon, this);
+                    } else {
+                        Utilities.adjustLowerRightAnchor(positon, this);
+                    }
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    return;
+                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
+                    if (positon.x > baseAntiOrigin.x && positon.y < baseOrigin.y) {
+                        Utilities.adjustUpperRightAnchor(positon, this);
+                    } else if (positon.x > baseAntiOrigin.x) {
+                        Utilities.adjustLowerRightAnchor(positon, this);
+                    } else if (positon.y < baseOrigin.y) {
+                        Utilities.adjustUpperLeftAnchor(positon, this);
+                    } else {
+                        Utilities.adjustLowerLeftAnchor(positon, this);
+                    }
                 }
             )
         ];
