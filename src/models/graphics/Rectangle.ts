@@ -91,41 +91,69 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
     }
 
     public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
+        // Reset anchorIds with new ids for the to-be rendered anchors
+        const anchorCount: number = 4;
+        this.anchorIds.length = 0;
+        for (let i = 0; i < anchorCount; i++) {
+            this.anchorIds.push(Utilities.generateId());
+        }
+
+        // Create deep copies of the origin and the point opposite from the origin
+        const baseOrigin: Vector = new Vector(this.origin.x, this.origin.y);
+        const baseAntiOrigin: Vector = this.origin.add(new Vector(this.width, this.height));
+
         const anchors: Array<Anchor> = [
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    // TODO: Handle when the position crosses another point
-                    const position: Vector = Utilities.getPosition(event, slideWrapper);
-                    const dimensions: Vector = position.towards(this.origin.add(new Vector(this.width, this.height)));
-
-                    this.origin = position;
-                    this.width = dimensions.x;
-                    this.height = dimensions.y;
+                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
+                    if (positon.x > baseAntiOrigin.x && positon.y > baseAntiOrigin.y) {
+                        Utilities.adjustLowerRightAnchor(positon, this);
+                    } else if (positon.x > baseAntiOrigin.x) {
+                        Utilities.adjustUpperRightAnchor(positon, this);
+                    } else if (positon.y > baseAntiOrigin.y) {
+                        Utilities.adjustLowerLeftAnchor(positon, this);
+                    } else {
+                        Utilities.adjustUpperLeftAnchor(positon, this);
+                    }
                 }),
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    // TODO: Handle when the position crosses another point
-                    const position: Vector = Utilities.getPosition(event, slideWrapper);
-
-                    this.origin.y = position.y;
-                    this.width = position.x - this.origin.x;
+                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
+                    if (positon.x < baseOrigin.x && positon.y > baseAntiOrigin.y) {
+                        Utilities.adjustLowerLeftAnchor(positon, this);
+                    } else if (positon.x < baseOrigin.x) {
+                        Utilities.adjustUpperLeftAnchor(positon, this);
+                    } else if (positon.y > baseAntiOrigin.y) {
+                        Utilities.adjustLowerRightAnchor(positon, this);
+                    } else {
+                        Utilities.adjustUpperRightAnchor(positon, this);
+                    }
                 }),
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    // TODO: Handle when the position crosses another point
-                    const position: Vector = Utilities.getPosition(event, slideWrapper);
-                    const dimensions: Vector = this.origin.towards(position);
-
-                    this.width = dimensions.x;
-                    this.height = dimensions.y;
+                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
+                    if (positon.x < baseOrigin.x && positon.y < baseOrigin.y) {
+                        Utilities.adjustUpperLeftAnchor(positon, this);
+                    } else if (positon.x < baseOrigin.x) {
+                        Utilities.adjustLowerLeftAnchor(positon, this);
+                    } else if (positon.y < baseOrigin.y) {
+                        Utilities.adjustUpperRightAnchor(positon, this);
+                    } else {
+                        Utilities.adjustLowerRightAnchor(positon, this);
+                    }
                 }),
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    // TODO: Handle when the position crosses another point
-                    const position: Vector = Utilities.getPosition(event, slideWrapper);
-
-                    this.origin.x = position.x;
-                    this.height = position.y - this.origin.y;
+                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
+                    if (positon.x > baseAntiOrigin.x && positon.y < baseOrigin.y) {
+                        Utilities.adjustUpperRightAnchor(positon, this);
+                    } else if (positon.x > baseAntiOrigin.x) {
+                        Utilities.adjustLowerRightAnchor(positon, this);
+                    } else if (positon.y < baseOrigin.y) {
+                        Utilities.adjustUpperLeftAnchor(positon, this);
+                    } else {
+                        Utilities.adjustLowerLeftAnchor(positon, this);
+                    }
                 })
         ];
 

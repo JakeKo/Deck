@@ -6,9 +6,8 @@ import SnapVector from "../SnapVector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
 import GraphicMouseEvent from "../GraphicMouseEvent";
-import IRectangularGraphic from "./IRectangularGraphic";
 
-export default class Ellipse implements IGraphic, IRectangularGraphic {
+export default class Ellipse implements IGraphic {
     public id: string;
     public type: string = "ellipse";
     public boundingBoxId: string = Utilities.generateId();
@@ -94,68 +93,48 @@ export default class Ellipse implements IGraphic, IRectangularGraphic {
         }
 
         // Create deep copies of the origin and the point opposite from the origin
-        const baseOrigin: Vector = new Vector(this.origin.x, this.origin.y);
-        const baseAntiOrigin: Vector = this.origin.add(new Vector(this.width, this.height));
+        const baseOrigin: Vector = this.origin.add(new Vector(-this.width / 2, -this.height / 2));
+        const baseDimensions: Vector = new Vector(this.width, this.height);
 
         return [
             new Anchor(
-                Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
+                Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin.add(new Vector(-this.width / 2, -this.height / 2))),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
-                    if (positon.x > baseAntiOrigin.x && positon.y > baseAntiOrigin.y) {
-                        Utilities.adjustLowerRightAnchor(positon, this);
-                    } else if (positon.x > baseAntiOrigin.x) {
-                        Utilities.adjustUpperRightAnchor(positon, this);
-                    } else if (positon.y > baseAntiOrigin.y) {
-                        Utilities.adjustLowerLeftAnchor(positon, this);
-                    } else {
-                        Utilities.adjustUpperLeftAnchor(positon, this);
-                    }
+                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+                    const adjustment: Vector = baseOrigin.add(baseDimensions).towards(position);
+                    this.origin = baseOrigin.add(baseDimensions).add(adjustment.scale(0.5));
+                    this.width = Math.abs(adjustment.x);
+                    this.height = Math.abs(adjustment.y);
                 }
             ),
             new Anchor(
-                Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
+                Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width / 2, -this.height / 2))),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
-                    if (positon.x < baseOrigin.x && positon.y > baseAntiOrigin.y) {
-                        Utilities.adjustLowerLeftAnchor(positon, this);
-                    } else if (positon.x < baseOrigin.x) {
-                        Utilities.adjustUpperLeftAnchor(positon, this);
-                    } else if (positon.y > baseAntiOrigin.y) {
-                        Utilities.adjustLowerRightAnchor(positon, this);
-                    } else {
-                        Utilities.adjustUpperRightAnchor(positon, this);
-                    }
+                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+                    const adjustment: Vector = baseOrigin.add(new Vector(0, baseDimensions.y)).towards(position);
+                    this.origin = baseOrigin.add(new Vector(0, baseDimensions.y)).add(adjustment.scale(0.5));
+                    this.width = Math.abs(adjustment.x);
+                    this.height = Math.abs(adjustment.y);
                 }
             ),
             new Anchor(
-                Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
+                Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width / 2, this.height / 2))),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
-                    if (positon.x < baseOrigin.x && positon.y < baseOrigin.y) {
-                        Utilities.adjustUpperLeftAnchor(positon, this);
-                    } else if (positon.x < baseOrigin.x) {
-                        Utilities.adjustLowerLeftAnchor(positon, this);
-                    } else if (positon.y < baseOrigin.y) {
-                        Utilities.adjustUpperRightAnchor(positon, this);
-                    } else {
-                        Utilities.adjustLowerRightAnchor(positon, this);
-                    }
+                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+                    const adjustment: Vector = baseOrigin.towards(position);
+                    this.origin = baseOrigin.add(adjustment.scale(0.5));
+                    this.width = Math.abs(adjustment.x);
+                    this.height = Math.abs(adjustment.y);
                 }
             ),
             new Anchor(
-                Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
+                Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(-this.width / 2, this.height / 2))),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
-                    const positon: Vector = Utilities.getPosition(event, slideWrapper);
-                    if (positon.x > baseAntiOrigin.x && positon.y < baseOrigin.y) {
-                        Utilities.adjustUpperRightAnchor(positon, this);
-                    } else if (positon.x > baseAntiOrigin.x) {
-                        Utilities.adjustLowerRightAnchor(positon, this);
-                    } else if (positon.y < baseOrigin.y) {
-                        Utilities.adjustUpperLeftAnchor(positon, this);
-                    } else {
-                        Utilities.adjustLowerLeftAnchor(positon, this);
-                    }
+                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+                    const adjustment: Vector = baseOrigin.add(new Vector(baseDimensions.x, 0)).towards(position);
+                    this.origin = baseOrigin.add(new Vector(baseDimensions.x, 0)).add(adjustment.scale(0.5));
+                    this.width = Math.abs(adjustment.x);
+                    this.height = Math.abs(adjustment.y);
                 }
             )
         ];
