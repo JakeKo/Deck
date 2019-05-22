@@ -102,7 +102,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
         const baseOrigin: Vector = new Vector(this.origin.x, this.origin.y);
         const baseDimensions: Vector = new Vector(this.width, this.height);
 
-        const anchors: Array<Anchor> = [
+        return [
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
                 (event: CustomEvent<GraphicMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
@@ -140,8 +140,5 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
                     this.height = absoluteAdjustment.y;
                 })
         ];
-
-
-        return anchors;
     }
 }

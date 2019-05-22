@@ -133,7 +133,34 @@ export default class SlideWrapper {
                 .id(`graphic_${this._focusedGraphic.boundingBoxId}`);
 
             // Render the anchor graphics
-            this._focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => this.addGraphic(anchor.graphic));
+            this._focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => {
+                this.addGraphic(anchor.graphic);
+
+                const svg: SVG.Element = this._canvas.select(`#graphic_${anchor.graphic.id}`).first();
+                svg.on("mouseover", (event: MouseEvent): void => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.setCursor("cursor");
+                });
+
+                svg.on("mouseout", (event: MouseEvent): void => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.setCursor("default");
+                });
+
+                svg.on("mouseup", (event: MouseEvent): void => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    console.log("mouseup");
+                });
+
+                svg.on("mousedown", (event: MouseEvent): void => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    console.log("mousedown");
+                });
+            });
         }
     }
 
