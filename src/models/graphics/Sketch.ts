@@ -6,6 +6,7 @@ import SnapVector from "../SnapVector";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
 import GraphicMouseEvent from "../GraphicMouseEvent";
+import CanvasMouseEvent from "../CanvasMouseEvent";
 
 export default class Sketch implements IGraphic {
     public id: string;
@@ -82,7 +83,7 @@ export default class Sketch implements IGraphic {
         return this.anchorIds.map<Anchor>((anchorId: string, index: number): Anchor => {
             return new Anchor(
                 Utilities.makeAnchorGraphic(anchorId, this.points[index]),
-                (event: CustomEvent<GraphicMouseEvent>): void => {
+                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     // Move the specific point on the curve to the mouse position
                     this.points[index] = Utilities.getPosition(event, slideWrapper);
                 }

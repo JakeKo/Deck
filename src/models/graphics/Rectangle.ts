@@ -7,6 +7,7 @@ import GraphicMouseEvent from "../GraphicMouseEvent";
 import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
 import IRectangularGraphic from "./IRectangularGraphic";
+import CanvasMouseEvent from "../CanvasMouseEvent";
 
 export default class Rectangle implements IGraphic, IRectangularGraphic {
     public id: string;
@@ -104,7 +105,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
 
         return [
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
-                (event: CustomEvent<GraphicMouseEvent>): void => {
+                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.add(baseDimensions).towards(position);
                     const absoluteAdjustment: Vector = adjustment.transform(Math.abs);
@@ -113,7 +114,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
                     this.height = absoluteAdjustment.y;
                 }),
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
-                (event: CustomEvent<GraphicMouseEvent>): void => {
+                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.add(new Vector(0, baseDimensions.y)).towards(position);
                     const absoluteAdjustment: Vector = adjustment.transform(Math.abs);
@@ -122,7 +123,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
                     this.height = absoluteAdjustment.y;
                 }),
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
-                (event: CustomEvent<GraphicMouseEvent>): void => {
+                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.towards(position);
                     const absoluteAdjustment: Vector = adjustment.transform(Math.abs);
@@ -131,7 +132,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
                     this.height = absoluteAdjustment.y;
                 }),
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
-                (event: CustomEvent<GraphicMouseEvent>): void => {
+                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.add(new Vector(baseDimensions.x, 0)).towards(position);
                     const absoluteAdjustment: Vector = adjustment.transform(Math.abs);

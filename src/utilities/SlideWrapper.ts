@@ -4,6 +4,8 @@ import GraphicEvent from "../models/GraphicEvent";
 import CanvasMouseEvent from "../models/CanvasMouseEvent";
 import GraphicMouseEvent from "../models/GraphicMouseEvent";
 import Anchor from "../models/Anchor";
+import Utilities from "../utilities/general";
+import Vector from "../models/Vector";
 
 export default class SlideWrapper {
     public store: any;
@@ -136,29 +138,46 @@ export default class SlideWrapper {
             this._focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => {
                 this.addGraphic(anchor.graphic);
 
-                const svg: SVG.Element = this._canvas.select(`#graphic_${anchor.graphic.id}`).first();
-                svg.on("mouseover", (event: MouseEvent): void => {
+                const svg: SVG.Element = this._canvas.select(`#graphic_${this._focusedGraphic!.id}`).first();
+                const anchorSvg: SVG.Element = this._canvas.select(`#graphic_${anchor.graphic.id}`).first();
+                anchorSvg.on("mouseover", (event: MouseEvent): void => {
                     event.preventDefault();
                     event.stopPropagation();
                     this.setCursor("cursor");
                 });
 
-                svg.on("mouseout", (event: MouseEvent): void => {
+                anchorSvg.on("mouseout", (event: MouseEvent): void => {
                     event.preventDefault();
                     event.stopPropagation();
                     this.setCursor("default");
                 });
 
-                svg.on("mouseup", (event: MouseEvent): void => {
+                anchorSvg.on("mousedown", (event: MouseEvent): void => {
                     event.preventDefault();
                     event.stopPropagation();
-                    console.log("mouseup");
-                });
 
-                svg.on("mousedown", (event: MouseEvent): void => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    console.log("mousedown");
+                    document.addEventListener("Deck.CanvasMouseMove", preview);
+                    document.addEventListener("Deck.GraphicMouseMove", preview);
+                    document.addEventListener("Deck.CanvasMouseUp", end);
+                    document.addEventListener("Deck.GraphicMouseUp", end);
+
+                    const self: SlideWrapper = this;
+                    function preview(event: Event): void {
+                        const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
+                        const position: Vector = Utilities.getPosition(customEvent, self);
+
+                        anchor.graphic.origin = position;
+                        anchor.graphic.updateRendering(anchorSvg as SVG.Ellipse);
+                        anchor.handler(customEvent);
+                        self._focusedGraphic!.updateRendering(svg);
+                    }
+
+                    function end(): void {
+                        document.removeEventListener("Deck.CanvasMouseMove", preview);
+                        document.removeEventListener("Deck.GraphicMouseMove", preview);
+                        document.removeEventListener("Deck.CanvasMouseUp", end);
+                        document.removeEventListener("Deck.GraphicMouseUp", end);
+                    }
                 });
             });
         }

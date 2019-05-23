@@ -7,6 +7,7 @@ import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 import IRectangularGraphic from "./IRectangularGraphic";
+import CanvasMouseEvent from "../CanvasMouseEvent";
 
 export default class Video implements IGraphic, IRectangularGraphic {
     public id: string;
@@ -111,25 +112,25 @@ export default class Video implements IGraphic, IRectangularGraphic {
         return [
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
-                (event: CustomEvent<GraphicMouseEvent>): void => {
+                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     return;
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
-                (event: CustomEvent<GraphicMouseEvent>): void => {
+                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     return;
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
-                (event: CustomEvent<GraphicMouseEvent>): void => {
+                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     return;
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
-                (event: CustomEvent<GraphicMouseEvent>): void => {
+                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     return;
                 }
             )
