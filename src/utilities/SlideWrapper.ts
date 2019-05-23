@@ -143,7 +143,7 @@ export default class SlideWrapper {
                 anchorSvg.on("mouseover", (event: MouseEvent): void => {
                     event.preventDefault();
                     event.stopPropagation();
-                    this.setCursor("cursor");
+                    this.setCursor("pointer");
                 });
 
                 anchorSvg.on("mouseout", (event: MouseEvent): void => {
@@ -166,7 +166,7 @@ export default class SlideWrapper {
                         const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
                         const position: Vector = Utilities.getPosition(customEvent, self);
 
-                        anchor.graphic.origin = position;
+                        anchor.graphic.origin = position.add(new Vector(-anchor.graphic.width / 2, -anchor.graphic.height / 2));
                         anchor.graphic.updateRendering(anchorSvg as SVG.Ellipse);
                         anchor.handler(customEvent);
                         self._focusedGraphic!.updateRendering(svg);
