@@ -119,7 +119,7 @@ export default class SlideWrapper {
         // Unfocus the current graphic if there is one
         if (this._focusedGraphic !== undefined && this.renderSupplementary) {
             // Remove the anchor and bounding box graphics
-            this._focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => this.removeGraphic(anchor.graphic.id));
+            this._focusedGraphic.anchorIds.forEach((anchorId: string): void => this.removeGraphic(anchorId));
             this.removeGraphic(this._focusedGraphic.boundingBoxId);
         }
 
