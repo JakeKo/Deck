@@ -135,7 +135,8 @@ export default class SlideWrapper {
                 .id(`graphic_${this._focusedGraphic.boundingBoxId}`);
 
             // Render the anchor graphics
-            this._focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => {
+            const focusedGraphic: IGraphic = this._focusedGraphic;
+            focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => {
                 this.addGraphic(anchor.graphic);
 
                 const svg: SVG.Element = this._canvas.select(`#graphic_${this._focusedGraphic!.id}`).first();
@@ -162,14 +163,17 @@ export default class SlideWrapper {
                     document.addEventListener("Deck.GraphicMouseUp", end);
 
                     const self: SlideWrapper = this;
+                    focusedGraphic.anchorIds.forEach((anchorId: string): void => self.removeGraphic(anchorId));
+                    self.removeGraphic(focusedGraphic.boundingBoxId);
+
                     function preview(event: Event): void {
                         const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
-                        const position: Vector = Utilities.getPosition(customEvent, self);
-
-                        anchor.graphic.origin = position.add(new Vector(-anchor.graphic.width / 2, -anchor.graphic.height / 2));
-                        anchor.graphic.updateRendering(anchorSvg as SVG.Ellipse);
                         anchor.handler(customEvent);
-                        self._focusedGraphic!.updateRendering(svg);
+                        focusedGraphic.updateRendering(svg);
+
+                        self.store.commit("updateGraphic", { slideId: self.slideId, graphicId: focusedGraphic.id, graphic: focusedGraphic });
+                        self.store.commit("styleEditorObject", undefined);
+                        self.store.commit("styleEditorObject", focusedGraphic);
                     }
 
                     function end(): void {
@@ -177,6 +181,8 @@ export default class SlideWrapper {
                         document.removeEventListener("Deck.GraphicMouseMove", preview);
                         document.removeEventListener("Deck.CanvasMouseUp", end);
                         document.removeEventListener("Deck.GraphicMouseUp", end);
+
+                        self.store.commit("focusGraphic", { slideId: self.slideId, graphicId: focusedGraphic.id });
                     }
                 });
             });

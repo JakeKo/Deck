@@ -121,6 +121,9 @@ export default class CursorTool implements ICanvasTool {
 
             // Preview moving shape
             function preview(event: Event): void {
+                graphic!.anchorIds.forEach((anchorId: string): void => slideWrapper.removeGraphic(anchorId));
+                slideWrapper.removeGraphic(graphic!.boundingBoxId);
+
                 const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
                 lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
                 const position: Vector = Utilities.getPosition(customEvent, slideWrapper);
@@ -161,7 +164,8 @@ export default class CursorTool implements ICanvasTool {
 
                 graphic!.origin = customEvent.detail.baseEvent.shiftKey ? initialOrigin.add(movement.projectOn(projection)) : initialOrigin.add(movement);
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
-                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
+                slideWrapper.store.commit("styleEditorObject", undefined);
+                slideWrapper.store.commit("styleEditorObject", graphic);
             }
 
             // End moving shape
@@ -175,6 +179,7 @@ export default class CursorTool implements ICanvasTool {
                 // Add the new SnapVectors once the graphic move has been finalized
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors() });
 
+                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
                 slideWrapper.store.commit("styleEditorObject", undefined);
                 slideWrapper.store.commit("styleEditorObject", graphic);
 
