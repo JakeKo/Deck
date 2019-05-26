@@ -135,6 +135,7 @@ export default class SlideWrapper {
                 .id(`graphic_${this._focusedGraphic.boundingBoxId}`);
 
             // Render the anchor graphics
+            const focusedGraphic: IGraphic = this._focusedGraphic;
             this._focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => {
                 this.addGraphic(anchor.graphic);
 
@@ -169,7 +170,10 @@ export default class SlideWrapper {
                         anchor.graphic.origin = position.add(new Vector(-anchor.graphic.width / 2, -anchor.graphic.height / 2));
                         anchor.graphic.updateRendering(anchorSvg as SVG.Ellipse);
                         anchor.handler(customEvent);
-                        self._focusedGraphic!.updateRendering(svg);
+                        focusedGraphic.updateRendering(svg);
+                        self.store.commit("updateGraphic", { slideId: self.slideId, graphicId: focusedGraphic.id, graphic: focusedGraphic });
+                        self.store.commit("styleEditorObject", undefined);
+                        self.store.commit("styleEditorObject", focusedGraphic);
                     }
 
                     function end(): void {
