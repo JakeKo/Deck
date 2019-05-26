@@ -38,11 +38,6 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
         this.strokeColor = strokeColor || "#000000";
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
-
-        const anchorCount: number = 4;
-        for (let i = 0; i < anchorCount; i++) {
-            this.anchorIds.push(Utilities.generateId());
-        }
     }
 
     public render(canvas: SVG.Doc): SVG.Rect {
