@@ -10,6 +10,7 @@ import Video from "../models/graphics/Video";
 import SlideWrapper from "./SlideWrapper";
 import GraphicMouseEvent from "../models/GraphicMouseEvent";
 import CanvasMouseEvent from "../models/CanvasMouseEvent";
+import IRectangularGraphic from "../models/graphics/IRectangularGraphic";
 
 function generateId(): string {
     function term(): string {
@@ -57,6 +58,47 @@ function parseGraphic(json: any): IGraphic {
     }
 
     throw `Undefined graphic type: ${json.type}`;
+}
+
+function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
+    const radius: number = 4;
+
+    return new Ellipse({
+        id: id,
+        defaultInteractive: false,
+        supplementary: true,
+        origin: origin.add(new Vector(-radius, -radius)),
+        height: radius * 2,
+        width: radius * 2,
+        fillColor: "white",
+        strokeColor: "hotpink",
+        strokeWidth: 2
+    });
+}
+
+function adjustUpperLeftAnchor(position: Vector, graphic: IRectangularGraphic) {
+    const adjustment: Vector = graphic.origin.towards(position);
+    graphic.origin = position;
+    graphic.width -= adjustment.x;
+    graphic.height -= adjustment.y;
+}
+
+function adjustUpperRightAnchor(position: Vector, graphic: IRectangularGraphic) {
+    const adjustment: Vector = graphic.origin.add(new Vector(graphic.width, 0)).towards(position);
+    graphic.origin.y += adjustment.y;
+    graphic.width += adjustment.x;
+}
+
+function adjustLowerRightAnchor(position: Vector, graphic: IRectangularGraphic) {
+    const adjustment: Vector = graphic.origin.add(new Vector(graphic.width, graphic.height)).towards(position);
+    graphic.width += adjustment.x;
+    graphic.height += adjustment.y;
+}
+
+function adjustLowerLeftAnchor(position: Vector, graphic: IRectangularGraphic) {
+    const adjustment: Vector = graphic.origin.add(new Vector(0, graphic.height)).towards(position);
+    graphic.origin.x += adjustment.x;
+    graphic.height += adjustment.y;
 }
 
 const deckScript: string = `<style>
@@ -145,5 +187,10 @@ export default {
     generateId,
     getPosition,
     parseGraphic,
+    makeAnchorGraphic,
+    adjustUpperLeftAnchor,
+    adjustUpperRightAnchor,
+    adjustLowerRightAnchor,
+    adjustLowerLeftAnchor,
     deckScript
 };

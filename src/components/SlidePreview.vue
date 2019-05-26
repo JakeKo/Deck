@@ -31,7 +31,7 @@ export default class SlidePreview extends Vue {
         // Instantiate the svg.js API on the slide preview and perform the initial render
         const canvasResolution: number = this.$store.getters.canvasResolution;
         const canvas: SVG.Doc = SVG(`canvas_${this.id}`).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
-        const slideWrapper: SlideWrapper = new SlideWrapper(this.slideId, canvas, this.$store);
+        const slideWrapper: SlideWrapper = new SlideWrapper(this.slideId, canvas, this.$store, false);
 
         this.graphics.forEach((graphic: IGraphic): void => {
             slideWrapper.addGraphic(graphic);

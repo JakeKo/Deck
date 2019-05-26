@@ -7,6 +7,8 @@ import SnapVector from "../SnapVector";
 import Sketch from "../graphics/Sketch";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 import CanvasMouseEvent from "../CanvasMouseEvent";
+import Rectangle from "../graphics/Rectangle";
+import Anchor from "../Anchor";
 
 type Snap = { source: Vector, destination: SnapVector };
 
@@ -40,7 +42,7 @@ function getSnaps(snapVectors: Array<SnapVector>, snappableVectors: Array<Vector
     });
 
     // Filter by all snap translations within some epsilon and finish if there are no close translations
-    const closeSnaps: Array<Snap> = snaps.filter((snap: Snap): boolean => getTranslation(snap).magnitude < 20);
+    const closeSnaps: Array<Snap> = snaps.filter((snap: Snap): boolean => getTranslation(snap).magnitude < 10);
     const mainSnap: Snap | undefined = getClosestSnap(closeSnaps);
 
     if (mainSnap === undefined) {
@@ -117,7 +119,6 @@ export default class CursorTool implements ICanvasTool {
             document.addEventListener("keydown", toggleStrictMovement);
             document.addEventListener("keyup", toggleStrictMovement);
 
-
             // Preview moving shape
             function preview(event: Event): void {
                 const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
@@ -146,9 +147,10 @@ export default class CursorTool implements ICanvasTool {
                         movement = movement.add(getTranslation(snap));
 
                         const snapHighlight: Sketch = new Sketch({
+                            supplementary: true,
                             origin: snap.destination.origin,
                             points: [snap.destination.direction.scale(-snapLineScale), snap.destination.direction.scale(snapLineScale)],
-                            strokeWidth: 1,
+                            strokeWidth: 2,
                             strokeColor: "hotpink"
                         });
 
