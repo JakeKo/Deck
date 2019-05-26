@@ -102,7 +102,7 @@ export default class Ellipse implements IGraphic {
                 Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin.add(new Vector(-this.width / 2, -this.height / 2))),
                 "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
-                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+                    const position: Vector = slideWrapper.getPosition(event);
                     const adjustment: Vector = baseOrigin.add(baseDimensions).towards(position);
                     this.origin = baseOrigin.add(baseDimensions).add(adjustment.scale(0.5));
                     this.width = Math.abs(adjustment.x);
@@ -113,7 +113,7 @@ export default class Ellipse implements IGraphic {
                 Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width / 2, -this.height / 2))),
                 "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
-                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+                    const position: Vector = slideWrapper.getPosition(event);
                     const adjustment: Vector = baseOrigin.add(new Vector(0, baseDimensions.y)).towards(position);
                     this.origin = baseOrigin.add(new Vector(0, baseDimensions.y)).add(adjustment.scale(0.5));
                     this.width = Math.abs(adjustment.x);
@@ -124,7 +124,7 @@ export default class Ellipse implements IGraphic {
                 Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width / 2, this.height / 2))),
                 "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
-                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+                    const position: Vector = slideWrapper.getPosition(event);
                     const adjustment: Vector = baseOrigin.towards(position);
                     this.origin = baseOrigin.add(adjustment.scale(0.5));
                     this.width = Math.abs(adjustment.x);
@@ -135,7 +135,7 @@ export default class Ellipse implements IGraphic {
                 Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(-this.width / 2, this.height / 2))),
                 "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
-                    const position: Vector = Utilities.getPosition(event, slideWrapper);
+                    const position: Vector = slideWrapper.getPosition(event);
                     const adjustment: Vector = baseOrigin.add(new Vector(baseDimensions.x, 0)).towards(position);
                     this.origin = baseOrigin.add(new Vector(baseDimensions.x, 0)).add(adjustment.scale(0.5));
                     this.width = Math.abs(adjustment.x);

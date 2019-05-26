@@ -7,9 +7,6 @@ import Sketch from "../models/graphics/Sketch";
 import Text from "../models/graphics/Text";
 import Image from "../models/graphics/Image";
 import Video from "../models/graphics/Video";
-import SlideWrapper from "./SlideWrapper";
-import GraphicMouseEvent from "../models/GraphicMouseEvent";
-import CanvasMouseEvent from "../models/CanvasMouseEvent";
 import IRectangularGraphic from "../models/graphics/IRectangularGraphic";
 
 function generateId(): string {
@@ -18,17 +15,6 @@ function generateId(): string {
     }
 
     return `${term()}${term()}-${term()}-${term()}-${term()}-${term()}${term()}${term()}`;
-}
-
-function getPosition(event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>, slideWrapper: SlideWrapper): Vector {
-    const zoom: number = slideWrapper.store.getters.canvasZoom;
-    const resolution: number = slideWrapper.store.getters.canvasResolution;
-    const bounds: DOMRect = slideWrapper.absoluteBounds();
-
-    return new Vector(
-        Math.round(((event.detail.baseEvent.pageX - bounds.x) / zoom) * resolution),
-        Math.round(((event.detail.baseEvent.pageY - bounds.y) / zoom) * resolution)
-    );
 }
 
 function parseGraphic(json: any): IGraphic {
@@ -185,7 +171,6 @@ function rewindSlide() {
 
 export default {
     generateId,
-    getPosition,
     parseGraphic,
     makeAnchorGraphic,
     adjustUpperLeftAnchor,

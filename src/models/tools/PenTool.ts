@@ -3,7 +3,6 @@ import Curve from "../graphics/Curve";
 import Vector from "../Vector";
 import Sketch from "../graphics/Sketch";
 import SlideWrapper from "../../utilities/SlideWrapper";
-import Utilities from "../../utilities/general";
 import CanvasMouseEvent from "../CanvasMouseEvent";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 
@@ -26,7 +25,7 @@ export default class PenTool implements ICanvasTool {
             slideWrapper.store.commit("styleEditorObject", undefined);
 
             // Create SVGs for the primary curve, the editable curve segment, and the control point preview
-            const start: Vector = Utilities.getPosition(event, slideWrapper);
+            const start: Vector = slideWrapper.getPosition(event);
             const resolution: number = slideWrapper.store.getters.canvasResolution;
 
             let segmentPoints: Array<Vector> = [Vector.undefined, Vector.undefined, Vector.undefined];
@@ -45,7 +44,7 @@ export default class PenTool implements ICanvasTool {
                 document.addEventListener("Deck.CanvasMouseDown", setEndpoint);
                 document.addEventListener("Deck.GraphicMouseDown", setEndpoint);
 
-                segmentPoints[0] = Utilities.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>, slideWrapper).add(segment.origin.scale(-1));
+                segmentPoints[0] = slideWrapper.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>).add(segment.origin.scale(-1));
             }
 
             function setEndpoint(event: Event): void {
@@ -54,7 +53,7 @@ export default class PenTool implements ICanvasTool {
                 document.addEventListener("Deck.CanvasMouseUp", setSecondControlPoint);
                 document.addEventListener("Deck.GraphicMouseUp", setSecondControlPoint);
 
-                segmentPoints[2] = Utilities.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>, slideWrapper).add(segment.origin.scale(-1));
+                segmentPoints[2] = slideWrapper.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>).add(segment.origin.scale(-1));
             }
 
             function setSecondControlPoint(event: Event): void {
@@ -62,7 +61,7 @@ export default class PenTool implements ICanvasTool {
                 document.removeEventListener("Deck.GraphicMouseUp", setSecondControlPoint);
 
                 // Complete the curve segment and add it to the final curve
-                segmentPoints[1] = Utilities.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>, slideWrapper).add(segment.origin.scale(-1)).reflect(segmentPoints[2]);
+                segmentPoints[1] = slideWrapper.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>).add(segment.origin.scale(-1)).reflect(segmentPoints[2]);
                 curve.points.push(...segmentPoints);
 
                 // Reset the curve segment and set the first control point
@@ -73,7 +72,7 @@ export default class PenTool implements ICanvasTool {
 
             function preview(event: Event): void {
                 // Redraw the current curve segment as the mouse moves around
-                const position: Vector = Utilities.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>, slideWrapper);
+                const position: Vector = slideWrapper.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>);
                 segment.points = resolveCurve(segmentPoints, position.add(segment.origin.scale(-1)));
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: curve.id, graphic: curve });
                 slideWrapper.updateGraphic(segment.id, segment);

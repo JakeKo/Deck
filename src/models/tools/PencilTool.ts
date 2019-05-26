@@ -1,7 +1,6 @@
 import ICanvasTool from "./ICanvasTool";
 import Sketch from "../graphics/Sketch";
 import SlideWrapper from "../../utilities/SlideWrapper";
-import Utilities from "../../utilities/general";
 import CanvasMouseEvent from "../CanvasMouseEvent";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 
@@ -16,12 +15,12 @@ export default class PencilTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
-            const sketch: Sketch = new Sketch({ origin: Utilities.getPosition(event, slideWrapper), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
+            const sketch: Sketch = new Sketch({ origin: slideWrapper.getPosition(event), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: sketch });
 
             // Add the current mouse position to the list of points to plot
             function preview(event: Event): void {
-                sketch.points.push(Utilities.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>, slideWrapper).add(sketch.origin.scale(-1)));
+                sketch.points.push(slideWrapper.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>).add(sketch.origin.scale(-1)));
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: sketch.id, graphic: sketch });
             }
 

@@ -86,7 +86,7 @@ export default class Sketch implements IGraphic {
                 "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     // Move the specific point on the curve to the mouse position
-                    this.points[index] = Utilities.getPosition(event, slideWrapper).add(this.origin.scale(-1));
+                    this.points[index] = slideWrapper.getPosition(event).add(this.origin.scale(-1));
                 }
             );
         });

@@ -2,7 +2,6 @@ import ICanvasTool from "./ICanvasTool";
 import Ellipse from "../graphics/Ellipse";
 import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
-import Utilities from "../../utilities/general";
 import CanvasMouseEvent from "../CanvasMouseEvent";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 
@@ -18,7 +17,7 @@ export default class EllipseTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
-            const start: Vector = Utilities.getPosition(event, slideWrapper);
+            const start: Vector = slideWrapper.getPosition(event);
             const ellipse: Ellipse = new Ellipse({ origin: new Vector(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: ellipse });
             let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
@@ -30,7 +29,7 @@ export default class EllipseTool implements ICanvasTool {
 
                 // Determine dimensions for an ellipse or circle (based on if shift is pressed)
                 lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
-                const position: Vector = Utilities.getPosition(customEvent, slideWrapper);
+                const position: Vector = slideWrapper.getPosition(customEvent);
                 const rawOffset: Vector = position.add(start.scale(-1));
                 const minimumOffset: number = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
 

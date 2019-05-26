@@ -2,7 +2,6 @@ import ICanvasTool from "./ICanvasTool";
 import Rectangle from "../graphics/Rectangle";
 import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
-import Utilities from "../../utilities/general";
 import CanvasMouseEvent from "../CanvasMouseEvent";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 
@@ -18,7 +17,7 @@ export default class RectangleTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
-            const start: Vector = Utilities.getPosition(event, slideWrapper);
+            const start: Vector = slideWrapper.getPosition(event);
             const rectangle: Rectangle = new Rectangle({ origin: new Vector(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: rectangle });
             let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
@@ -30,7 +29,7 @@ export default class RectangleTool implements ICanvasTool {
 
                 // Determine dimensions for a rectangle or square (based on if shift is pressed)
                 lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
-                const position: Vector = Utilities.getPosition(event as CustomEvent, slideWrapper);
+                const position: Vector = slideWrapper.getPosition(event as CustomEvent);
                 const rawDimensions: Vector = position.add(start.scale(-1));
                 const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
 

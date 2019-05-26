@@ -4,7 +4,6 @@ import GraphicEvent from "../models/GraphicEvent";
 import CanvasMouseEvent from "../models/CanvasMouseEvent";
 import GraphicMouseEvent from "../models/GraphicMouseEvent";
 import Anchor from "../models/Anchor";
-import Utilities from "../utilities/general";
 import Vector from "../models/Vector";
 
 export default class SlideWrapper {
@@ -220,5 +219,16 @@ export default class SlideWrapper {
         if (svg !== undefined) {
             svg.remove();
         }
+    }
+
+    public getPosition(event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): Vector {
+        const zoom: number = this.store.getters.canvasZoom;
+        const resolution: number = this.store.getters.canvasResolution;
+        const bounds: DOMRect = this.absoluteBounds();
+
+        return new Vector(
+            Math.round(((event.detail.baseEvent.pageX - bounds.x) / zoom) * resolution),
+            Math.round(((event.detail.baseEvent.pageY - bounds.y) / zoom) * resolution)
+        );
     }
 }

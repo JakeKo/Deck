@@ -2,13 +2,10 @@ import ICanvasTool from "./ICanvasTool";
 import IGraphic from "../graphics/IGraphic";
 import Vector from "../Vector";
 import SlideWrapper from "../../utilities/SlideWrapper";
-import Utilities from "../../utilities/general";
 import SnapVector from "../SnapVector";
 import Sketch from "../graphics/Sketch";
 import GraphicMouseEvent from "../GraphicMouseEvent";
 import CanvasMouseEvent from "../CanvasMouseEvent";
-import Rectangle from "../graphics/Rectangle";
-import Anchor from "../Anchor";
 
 type Snap = { source: Vector, destination: SnapVector };
 
@@ -107,7 +104,7 @@ export default class CursorTool implements ICanvasTool {
             slideWrapper.store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphic.id });
 
             const initialOrigin: Vector = new Vector(graphic.origin.x, graphic.origin.y);
-            const initialPosition: Vector = Utilities.getPosition(event, slideWrapper);
+            const initialPosition: Vector = slideWrapper.getPosition(event);
             const snapVectors: Array<SnapVector> = slideWrapper.store.getters.snapVectors(slideWrapper.slideId);
             const snappableVectorOffsets: Array<Vector> = graphic.getSnappableVectors().map((snappableVector: Vector): Vector => initialPosition.towards(snappableVector));
             let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
@@ -126,7 +123,7 @@ export default class CursorTool implements ICanvasTool {
 
                 const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
                 lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
-                const position: Vector = Utilities.getPosition(customEvent, slideWrapper);
+                const position: Vector = slideWrapper.getPosition(customEvent);
                 let movement: Vector = initialPosition.towards(position);
                 const projection: Vector = getStrictProjectionVector(movement);
 

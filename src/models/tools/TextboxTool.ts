@@ -1,7 +1,6 @@
 import ICanvasTool from "./ICanvasTool";
 import Text from "../graphics/Text";
 import SlideWrapper from "../../utilities/SlideWrapper";
-import Utilities from "../../utilities/general";
 import CanvasMouseEvent from "../CanvasMouseEvent";
 
 export default class TextboxTool implements ICanvasTool {
@@ -10,7 +9,7 @@ export default class TextboxTool implements ICanvasTool {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("styleEditorObject", undefined);
 
-            const text: Text = new Text({ origin: Utilities.getPosition(event, slideWrapper), content: "lorem ipsum\ndolor sit amet", fontSize: 24 });
+            const text: Text = new Text({ origin: slideWrapper.getPosition(event), content: "lorem ipsum\ndolor sit amet", fontSize: 24 });
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: text });
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: text.id });
             slideWrapper.store.commit("styleEditorObject", text);
