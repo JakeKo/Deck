@@ -105,6 +105,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
 
         return [
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.add(baseDimensions).towards(position);
@@ -114,6 +115,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
                     this.height = absoluteAdjustment.y;
                 }),
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.add(new Vector(0, baseDimensions.y)).towards(position);
@@ -123,6 +125,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
                     this.height = absoluteAdjustment.y;
                 }),
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.towards(position);
@@ -132,6 +135,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
                     this.height = absoluteAdjustment.y;
                 }),
             new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.add(new Vector(baseDimensions.x, 0)).towards(position);

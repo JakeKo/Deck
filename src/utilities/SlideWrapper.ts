@@ -143,7 +143,7 @@ export default class SlideWrapper {
                 anchorSvg.on("mouseover", (event: MouseEvent): void => {
                     event.preventDefault();
                     event.stopPropagation();
-                    this.setCursor("pointer");
+                    this.setCursor(anchor.cursor);
                 });
 
                 anchorSvg.on("mouseout", (event: MouseEvent): void => {

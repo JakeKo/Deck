@@ -95,6 +95,7 @@ export default class Curve implements IGraphic {
         return this.anchorIds.map<Anchor>((anchorId: string, index: number): Anchor => {
             return new Anchor(
                 Utilities.makeAnchorGraphic(anchorId, this.points[index]),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     // Move the specific point on the curve to the mouse position
                     this.points[index] = Utilities.getPosition(event, slideWrapper);

@@ -90,24 +90,28 @@ export default class Image implements IGraphic, IRectangularGraphic {
         return [
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     return;
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     return;
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     return;
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     return;
                 }

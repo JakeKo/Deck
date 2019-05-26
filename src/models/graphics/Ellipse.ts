@@ -100,6 +100,7 @@ export default class Ellipse implements IGraphic {
         return [
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin.add(new Vector(-this.width / 2, -this.height / 2))),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.add(baseDimensions).towards(position);
@@ -110,6 +111,7 @@ export default class Ellipse implements IGraphic {
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width / 2, -this.height / 2))),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.add(new Vector(0, baseDimensions.y)).towards(position);
@@ -120,6 +122,7 @@ export default class Ellipse implements IGraphic {
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width / 2, this.height / 2))),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.towards(position);
@@ -130,6 +133,7 @@ export default class Ellipse implements IGraphic {
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(-this.width / 2, this.height / 2))),
+                "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     const position: Vector = Utilities.getPosition(event, slideWrapper);
                     const adjustment: Vector = baseOrigin.add(new Vector(baseDimensions.x, 0)).towards(position);
