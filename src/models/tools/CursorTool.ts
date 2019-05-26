@@ -64,7 +64,7 @@ export default class CursorTool implements ICanvasTool {
         return function (): void {
             slideWrapper.focusGraphic(undefined);
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
-            slideWrapper.store.commit("styleEditorObject", undefined);
+            slideWrapper.store.commit("graphicEditorObject", undefined);
         };
     }
 
@@ -100,7 +100,7 @@ export default class CursorTool implements ICanvasTool {
             const snapHighlights: Array<Sketch> = [];
 
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: graphic.id });
-            slideWrapper.store.commit("styleEditorObject", graphic);
+            slideWrapper.store.commit("graphicEditorObject", graphic);
             slideWrapper.store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphic.id });
 
             const initialOrigin: Vector = new Vector(graphic.origin.x, graphic.origin.y);
@@ -161,8 +161,8 @@ export default class CursorTool implements ICanvasTool {
 
                 graphic!.origin = customEvent.detail.baseEvent.shiftKey ? initialOrigin.add(movement.projectOn(projection)) : initialOrigin.add(movement);
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
-                slideWrapper.store.commit("styleEditorObject", undefined);
-                slideWrapper.store.commit("styleEditorObject", graphic);
+                slideWrapper.store.commit("graphicEditorObject", undefined);
+                slideWrapper.store.commit("graphicEditorObject", graphic);
             }
 
             // End moving shape
@@ -177,8 +177,8 @@ export default class CursorTool implements ICanvasTool {
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors() });
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
-                slideWrapper.store.commit("styleEditorObject", undefined);
-                slideWrapper.store.commit("styleEditorObject", graphic);
+                slideWrapper.store.commit("graphicEditorObject", undefined);
+                slideWrapper.store.commit("graphicEditorObject", graphic);
 
                 // Remove the old snap highlights
                 snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: snapHighlight.id }));

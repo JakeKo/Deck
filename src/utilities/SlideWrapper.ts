@@ -171,8 +171,8 @@ export default class SlideWrapper {
                         focusedGraphic.updateRendering(svg);
 
                         self.store.commit("updateGraphic", { slideId: self.slideId, graphicId: focusedGraphic.id, graphic: focusedGraphic });
-                        self.store.commit("styleEditorObject", undefined);
-                        self.store.commit("styleEditorObject", focusedGraphic);
+                        self.store.commit("graphicEditorObject", undefined);
+                        self.store.commit("graphicEditorObject", focusedGraphic);
                     }
 
                     function end(): void {

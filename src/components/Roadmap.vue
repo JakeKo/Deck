@@ -66,7 +66,7 @@ export default class Roadmap extends Vue {
 
         this.$store.commit("addSlide", this.$store.getters.slides.length);
         this.$store.commit("activeSlide", this.$store.getters.slides[this.$store.getters.slides.length - 1].id);
-        this.$store.commit("styleEditorObject", undefined);
+        this.$store.commit("graphicEditorObject", undefined);
     }
 }
 </script>

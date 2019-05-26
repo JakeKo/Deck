@@ -41,7 +41,7 @@ export default class SlidePreview extends Vue {
     private focusSlide(event: MouseEvent): void {
         this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
         this.$store.commit("activeSlide", this.id);
-        this.$store.commit("styleEditorObject", undefined);
+        this.$store.commit("graphicEditorObject", undefined);
 
         const self: SlidePreview = this;
         const beginSlideReorder: number = window.setTimeout(reorderSlidePreview, 150);

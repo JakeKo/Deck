@@ -15,7 +15,7 @@ export default class RectangleTool implements ICanvasTool {
             document.addEventListener("keyup", toggleSquare);
 
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
-            slideWrapper.store.commit("styleEditorObject", undefined);
+            slideWrapper.store.commit("graphicEditorObject", undefined);
 
             const start: Vector = slideWrapper.getPosition(event);
             const rectangle: Rectangle = new Rectangle({ origin: new Vector(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
@@ -51,7 +51,7 @@ export default class RectangleTool implements ICanvasTool {
                 document.removeEventListener("keyup", toggleSquare);
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: rectangle.id });
-                slideWrapper.store.commit("styleEditorObject", rectangle);
+                slideWrapper.store.commit("graphicEditorObject", rectangle);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: rectangle.getSnapVectors() });
                 slideWrapper.store.commit("tool", "cursor");
             }

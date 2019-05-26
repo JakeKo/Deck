@@ -22,7 +22,7 @@ export default class PenTool implements ICanvasTool {
             document.addEventListener("Deck.GraphicMouseUp", setFirstControlPoint);
 
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
-            slideWrapper.store.commit("styleEditorObject", undefined);
+            slideWrapper.store.commit("graphicEditorObject", undefined);
 
             // Create SVGs for the primary curve, the editable curve segment, and the control point preview
             const start: Vector = slideWrapper.getPosition(event);
@@ -110,7 +110,7 @@ export default class PenTool implements ICanvasTool {
                 document.removeEventListener("Deck.CanvasMouseMove", preview);
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: curve.id });
-                slideWrapper.store.commit("styleEditorObject", curve);
+                slideWrapper.store.commit("graphicEditorObject", curve);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: curve.getSnapVectors() });
                 slideWrapper.store.commit("tool", "cursor");
             }

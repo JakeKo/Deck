@@ -25,7 +25,7 @@ type State = {
         zoom: number,
         resolution: number
     },
-    styleEditor: {
+    graphicEditor: {
         object: any
     },
     slides: Array<Slide>,
@@ -38,7 +38,7 @@ type Getters = {
     graphic: (state: State) => (slideId: string, graphicId: string) => IGraphic | undefined,
     snapVectors: (state: State) => (slideId: string) => Array<SnapVector>,
     activeSlide: (state: State) => Slide | undefined,
-    styleEditorObject: (state: State) => any,
+    graphicEditorObject: (state: State) => any,
     tool: (state: State) => ICanvasTool,
     focusedGraphic: (state: State) => IGraphic | undefined,
     canvasHeight: (state: State) => number,
@@ -55,7 +55,7 @@ type Mutations = {
     updateGraphic: (state: State, { slideId, graphicId, graphic }: { slideId: string, graphicId: string, graphic: IGraphic }) => void,
     focusGraphic: (state: State, { slideId, graphicId }: { slideId: string, graphicId?: string }) => void,
     tool: (state: State, toolName: string) => void,
-    styleEditorObject: (state: State, object?: IGraphic) => void,
+    graphicEditorObject: (state: State, object?: IGraphic) => void,
     activeSlide: (state: State, slideId: string) => void,
     canvasZoom: (state: State, zoom: number) => void,
     removeSnapVectors: (state: State, { slideId, graphicId }: { slideId: string, graphicId: string }) => void,
@@ -83,7 +83,7 @@ const store: {
             zoom: 1,
             resolution: 1,
         },
-        styleEditor: {
+        graphicEditor: {
             object: undefined
         },
         slides: new Array<Slide>(),
@@ -132,8 +132,8 @@ const store: {
         activeSlide: (state: State): Slide | undefined => {
             return state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
         },
-        styleEditorObject: (state: State): any => {
-            return state.styleEditor.object;
+        graphicEditorObject: (state: State): any => {
+            return state.graphicEditor.object;
         },
         tool: (state: State): ICanvasTool => {
             return state.tools[state.currentTool];
@@ -247,8 +247,8 @@ const store: {
         tool: (state: State, toolName: string): void => {
             state.currentTool = toolName;
         },
-        styleEditorObject: (state: State, object?: IGraphic): void => {
-            state.styleEditor.object = object;
+        graphicEditorObject: (state: State, object?: IGraphic): void => {
+            state.graphicEditor.object = object;
         },
         activeSlide: (state: State, slideId: string): void => {
             state.activeSlideId = slideId;

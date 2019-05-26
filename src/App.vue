@@ -7,7 +7,7 @@
             <editor></editor>
             <roadmap></roadmap>
         </div>
-        <style-editor></style-editor>
+        <graphic-editor></graphic-editor>
     </div>
 </div>
 </template>
@@ -18,7 +18,7 @@ import MenuBar from "./components/MenuBar.vue";
 import Toolbox from "./components/Toolbox.vue";
 import Editor from "./components/Editor.vue";
 import Roadmap from "./components/Roadmap.vue";
-import StyleEditor from "./components/StyleEditor.vue";
+import GraphicEditor from "./components/GraphicEditor.vue";
 import Utilities from "./utilities/general";
 import IGraphic from "./models/graphics/IGraphic";
 
@@ -28,7 +28,7 @@ import IGraphic from "./models/graphics/IGraphic";
         Toolbox,
         Editor,
         Roadmap,
-        StyleEditor
+        GraphicEditor
     }
 })
 export default class App extends Vue {
@@ -44,7 +44,7 @@ export default class App extends Vue {
                 this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
                 this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphicId });
                 this.$store.commit("removeSnapVectors", { slideId: this.$store.getters.activeSlide.id, graphicId: graphicId });
-                this.$store.commit("styleEditorObject", undefined);
+                this.$store.commit("graphicEditorObject", undefined);
             }
         });
 
@@ -78,7 +78,7 @@ export default class App extends Vue {
             graphic.id = Utilities.generateId();
             this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
             this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
-            this.$store.commit("styleEditorObject", graphic);
+            this.$store.commit("graphicEditorObject", graphic);
         });
     }
 }

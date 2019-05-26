@@ -1,10 +1,10 @@
 <template>
-<div id="style-editor">
+<div id="graphic-editor">
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
-    <div id="style-editor-header">Style Editor</div>
-    <div id="style-editor-interaction-message" v-show="$store.getters.focusedGraphic === undefined">Click on a graphic to edit its properties.</div>
-    <form id="style-editor-form" v-show="$store.getters.focusedGraphic !== undefined">
-        <textarea id="style-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
+    <div id="graphic-editor-header">Graphic Editor</div>
+    <div id="graphic-editor-interaction-message" v-show="$store.getters.focusedGraphic === undefined">Click on a graphic to edit its properties.</div>
+    <form id="graphic-editor-form" v-show="$store.getters.focusedGraphic !== undefined">
+        <textarea id="graphic-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
         <button id="submit-button" @click="submit">Update Graphic</button>
     </form>
 </div>
@@ -66,7 +66,7 @@ export default class StyleEditor extends Vue {
 
     // Watch for changes to the style editor object
     get object(): IGraphic {
-        return this.$store.getters.styleEditorObject;
+        return this.$store.getters.graphicEditorObject;
     }
 
     private stretch(event: MouseEvent): void {
@@ -114,7 +114,7 @@ export default class StyleEditor extends Vue {
 <style lang="scss" scoped>
 @import "../styles/application";
 
-#style-editor {
+#graphic-editor {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -125,7 +125,7 @@ export default class StyleEditor extends Vue {
     min-width: 96px;
 }
 
-#style-editor-header {
+#graphic-editor-header {
     font-family: "Roboto Slab";
     font-size: 16px;
     font-weight: 700;
@@ -134,7 +134,7 @@ export default class StyleEditor extends Vue {
     border-bottom: 1px solid $color-tertiary;
 }
 
-#style-editor-interaction-message {
+#graphic-editor-interaction-message {
     flex-grow: 1;
     display: flex;
     justify-content: center;
@@ -146,13 +146,13 @@ export default class StyleEditor extends Vue {
     text-align: center;
 }
 
-#style-editor-form {
+#graphic-editor-form {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
-#style-editor-content {
+#graphic-editor-content {
     font-family: "Roboto Mono";
     font-size: 14px;
     border: none;

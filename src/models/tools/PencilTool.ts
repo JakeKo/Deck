@@ -13,7 +13,7 @@ export default class PencilTool implements ICanvasTool {
 
             // Unfocus the current graphic if any and set initial state of pencil drawing
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
-            slideWrapper.store.commit("styleEditorObject", undefined);
+            slideWrapper.store.commit("graphicEditorObject", undefined);
 
             const sketch: Sketch = new Sketch({ origin: slideWrapper.getPosition(event), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: sketch });
@@ -31,7 +31,7 @@ export default class PencilTool implements ICanvasTool {
                 document.removeEventListener("Deck.GraphicMouseUp", end);
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: sketch.id });
-                slideWrapper.store.commit("styleEditorObject", sketch);
+                slideWrapper.store.commit("graphicEditorObject", sketch);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: sketch.getSnapVectors() });
                 slideWrapper.store.commit("tool", "cursor");
             }
