@@ -15,8 +15,7 @@ export default class Slide extends Vue {
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
 
     private mounted(): void {
-        const canvasResolution: number = this.$store.getters.canvasResolution;
-        const canvas: SVG.Doc = SVG(this.$el.id).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
+        const canvas: SVG.Doc = SVG(this.$el.id).viewbox(0, 0, 1072, 603);
         const slideWrapper: SlideWrapper = new SlideWrapper(this.id, canvas, this.$store, true);
 
         document.addEventListener("Deck.CanvasMouseOver", (event: Event): void => {

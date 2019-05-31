@@ -26,12 +26,11 @@ export default class PenTool implements ICanvasTool {
 
             // Create SVGs for the primary curve, the editable curve segment, and the control point preview
             const start: Vector = slideWrapper.getPosition(event);
-            const resolution: number = slideWrapper.store.getters.canvasResolution;
 
             let segmentPoints: Array<Vector> = [Vector.undefined, Vector.undefined, Vector.undefined];
-            const curve: Curve = new Curve({ origin: start, fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
-            const segment: Curve = new Curve({ origin: start, points: resolveCurve(segmentPoints, new Vector(0, 0)), fillColor: "none", strokeColor: "black", strokeWidth: resolution * 3 });
-            const handle: Sketch = new Sketch({ fillColor: "none", strokeColor: "blue", strokeWidth: resolution });
+            const curve: Curve = new Curve({ origin: start, fillColor: "none", strokeColor: "black", strokeWidth: 3 });
+            const segment: Curve = new Curve({ origin: start, points: resolveCurve(segmentPoints, new Vector(0, 0)), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
+            const handle: Sketch = new Sketch({ fillColor: "none", strokeColor: "blue", strokeWidth: 1 });
 
             // Only add the curve to the store - not the preview segment or handle preview
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: curve });

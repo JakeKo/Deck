@@ -22,8 +22,7 @@ type State = {
     canvas: {
         height: number,
         width: number,
-        zoom: number,
-        resolution: number
+        zoom: number
     },
     graphicEditor: {
         object: any
@@ -43,8 +42,7 @@ type Getters = {
     focusedGraphic: (state: State) => IGraphic | undefined,
     canvasHeight: (state: State) => number,
     canvasWidth: (state: State) => number,
-    canvasZoom: (state: State) => number,
-    canvasResolution: (state: State) => number
+    canvasZoom: (state: State) => number
 };
 
 type Mutations = {
@@ -78,10 +76,9 @@ const store: {
         activeSlideId: "",
         focusedGraphicId: undefined,
         canvas: {
-            height: 2000,
-            width: 4000,
-            zoom: 1,
-            resolution: 1
+            height: 1800,
+            width: 3200,
+            zoom: 1
         },
         graphicEditor: {
             object: undefined
@@ -150,16 +147,13 @@ const store: {
         },
         canvasZoom: (state: State): number => {
             return state.canvas.zoom;
-        },
-        canvasResolution: (state: State): number => {
-            return state.canvas.resolution;
         }
     },
     mutations: {
         addSlide: (state: State, index: number): void => {
             const slide: Slide = new Slide();
-            const width: number = state.canvas.resolution * 1072;
-            const height: number = state.canvas.resolution * 603;
+            const width: number = 1072;
+            const height: number = 603;
             slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, 0), Vector.right));
             slide.snapVectors.push(new SnapVector("slide", new Vector(width, height / 2), Vector.up));
             slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height), Vector.right));
@@ -285,8 +279,7 @@ const store: {
                 slide.setAttribute("class", "slide");
                 exportFrame.appendChild(slide);
 
-                const canvasResolution: number = store.getters.canvasResolution;
-                const canvas: SVG.Doc = SVG(slideModel.id).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
+                const canvas: SVG.Doc = SVG(slideModel.id).viewbox(0, 0, 1072, 603);
                 slideModel.graphics.forEach((graphic: IGraphic): SVG.Element => graphic.render(canvas));
             });
 

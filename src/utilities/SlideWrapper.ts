@@ -223,12 +223,11 @@ export default class SlideWrapper {
 
     public getPosition(event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): Vector {
         const zoom: number = this.store.getters.canvasZoom;
-        const resolution: number = this.store.getters.canvasResolution;
         const bounds: DOMRect = this.absoluteBounds();
 
         return new Vector(
-            Math.round(((event.detail.baseEvent.pageX - bounds.x) / zoom) * resolution),
-            Math.round(((event.detail.baseEvent.pageY - bounds.y) / zoom) * resolution)
+            Math.round((event.detail.baseEvent.pageX - bounds.x) / zoom),
+            Math.round((event.detail.baseEvent.pageY - bounds.y) / zoom)
         );
     }
 }
