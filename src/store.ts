@@ -81,7 +81,7 @@ const store: {
             height: 2000,
             width: 4000,
             zoom: 1,
-            resolution: 1,
+            resolution: 1
         },
         graphicEditor: {
             object: undefined
@@ -285,7 +285,8 @@ const store: {
                 slide.setAttribute("class", "slide");
                 exportFrame.appendChild(slide);
 
-                const canvas: SVG.Doc = SVG(slideModel.id);
+                const canvasResolution: number = store.getters.canvasResolution;
+                const canvas: SVG.Doc = SVG(slideModel.id).viewbox(0, 0, canvasResolution * 1072, canvasResolution * 603);
                 slideModel.graphics.forEach((graphic: IGraphic): SVG.Element => graphic.render(canvas));
             });
 
