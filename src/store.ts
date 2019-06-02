@@ -184,7 +184,7 @@ const store: {
     mutations: {
         addSlide: (state: State, index: number): void => {
             const slide: Slide = new Slide();
-            const { width, height } = state.canvas.rawViewbox;
+            const { width, height } = state.canvas.croppedViewbox;
             slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, 0), Vector.right));
             slide.snapVectors.push(new SnapVector("slide", new Vector(width, height / 2), Vector.up));
             slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height), Vector.right));
