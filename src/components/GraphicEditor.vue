@@ -51,8 +51,6 @@ export default class StyleEditor extends Vue {
         // Set immutable properties to undefined
         const json: any = JSON.parse(JSON.stringify(this.object || {}));
         json.id = undefined;
-        json.boundingBox = undefined;
-        json.boundingBoxId = undefined;
         json.points = undefined;
         json.type = undefined;
         json.source = undefined;
@@ -104,7 +102,6 @@ export default class StyleEditor extends Vue {
         }
 
         const graphic: IGraphic = Utilities.parseGraphic(json);
-        graphic.boundingBoxId = this.object.boundingBoxId;
         this.$store.commit("updateGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id, graphic: graphic });
         this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
     }

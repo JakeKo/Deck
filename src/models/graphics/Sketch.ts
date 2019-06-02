@@ -11,7 +11,6 @@ import CanvasMouseEvent from "../CanvasMouseEvent";
 export default class Sketch implements IGraphic {
     public id: string;
     public type: string = "sketch";
-    public boundingBoxId: string = Utilities.generateId();
     public defaultInteractive: boolean;
     public supplementary: boolean;
     public anchorIds: Array<string> = [];

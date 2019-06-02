@@ -9,7 +9,6 @@ export default interface IGraphic {
     type: string;
     origin: Vector;
     rotation: number;
-    boundingBoxId: string;
     anchorIds: Array<string>;
     defaultInteractive: boolean;
     supplementary: boolean;

@@ -12,7 +12,6 @@ import CanvasMouseEvent from "../CanvasMouseEvent";
 export default class Image implements IGraphic, IRectangularGraphic {
     public id: string;
     public type: string = "image";
-    public boundingBoxId: string = Utilities.generateId();
     public defaultInteractive: boolean;
     public supplementary: boolean;
     public anchorIds: Array<string> = [];

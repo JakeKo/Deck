@@ -11,7 +11,6 @@ import CanvasMouseEvent from "../CanvasMouseEvent";
 export default class Ellipse implements IGraphic {
     public id: string;
     public type: string = "ellipse";
-    public boundingBoxId: string = Utilities.generateId();
     public defaultInteractive: boolean;
     public supplementary: boolean;
     public anchorIds: Array<string> = [];

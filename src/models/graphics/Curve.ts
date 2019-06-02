@@ -11,7 +11,6 @@ import CanvasMouseEvent from "../CanvasMouseEvent";
 export default class Curve implements IGraphic {
     public id: string;
     public type: string = "curve";
-    public boundingBoxId: string = Utilities.generateId();
     public defaultInteractive: boolean;
     public supplementary: boolean;
     public anchorIds: Array<string> = [];

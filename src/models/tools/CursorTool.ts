@@ -119,7 +119,6 @@ export default class CursorTool implements ICanvasTool {
             // Preview moving shape
             function preview(event: Event): void {
                 graphic!.anchorIds.forEach((anchorId: string): void => slideWrapper.removeGraphic(anchorId));
-                slideWrapper.removeGraphic(graphic!.boundingBoxId);
 
                 const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
                 lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);

@@ -9,7 +9,6 @@ import Anchor from "../Anchor";
 export default class Text implements IGraphic {
     public id: string;
     public type: string = "text";
-    public boundingBoxId: string;
     public defaultInteractive: boolean;
     public supplementary: boolean;
     public anchorIds: Array<string> = [];
@@ -26,7 +25,6 @@ export default class Text implements IGraphic {
             { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
     ) {
         this.id = id || Utilities.generateId();
-        this.boundingBoxId = Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
         this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);
