@@ -71,9 +71,6 @@ export default class Editor extends Vue {
 }
 
 #canvas {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background: $color-secondary;
 }
 </style>

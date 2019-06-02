@@ -22,7 +22,19 @@ type State = {
     canvas: {
         height: number,
         width: number,
-        zoom: number
+        zoom: number,
+        rawViewbox: {
+            x: number,
+            y: number,
+            width: number,
+            height: number
+        },
+        croppedViewbox: {
+            x: number,
+            y: number,
+            width: number,
+            height: number
+        }
     },
     graphicEditor: {
         object: any
@@ -42,7 +54,9 @@ type Getters = {
     focusedGraphic: (state: State) => IGraphic | undefined,
     canvasHeight: (state: State) => number,
     canvasWidth: (state: State) => number,
-    canvasZoom: (state: State) => number
+    canvasZoom: (state: State) => number,
+    rawViewbox: (state: State) => { x: number, y: number, width: number, height: number },
+    croppedViewbox: (state: State) => { x: number, y: number, width: number, height: number }
 };
 
 type Mutations = {
@@ -76,9 +90,21 @@ const store: {
         activeSlideId: "",
         focusedGraphicId: undefined,
         canvas: {
-            height: 1800,
-            width: 3200,
-            zoom: 1
+            width: 4000,
+            height: 2250,
+            zoom: 1,
+            rawViewbox: {
+                x: -4000 / 3,
+                y: -2250 / 3,
+                width: 4000,
+                height: 2250
+            },
+            croppedViewbox: {
+                x: 0,
+                y: 0,
+                width: 4000 / 3,
+                height: 2250 / 3
+            }
         },
         graphicEditor: {
             object: undefined
@@ -147,13 +173,18 @@ const store: {
         },
         canvasZoom: (state: State): number => {
             return state.canvas.zoom;
+        },
+        rawViewbox: (state: State): { x: number, y: number, width: number, height: number } => {
+            return state.canvas.rawViewbox;
+        },
+        croppedViewbox: (state: State): { x: number, y: number, width: number, height: number } => {
+            return state.canvas.croppedViewbox;
         }
     },
     mutations: {
         addSlide: (state: State, index: number): void => {
             const slide: Slide = new Slide();
-            const width: number = 1072;
-            const height: number = 603;
+            const { width, height } = state.canvas.rawViewbox;
             slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, 0), Vector.right));
             slide.snapVectors.push(new SnapVector("slide", new Vector(width, height / 2), Vector.up));
             slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height), Vector.right));
@@ -279,7 +310,8 @@ const store: {
                 slide.setAttribute("class", "slide");
                 exportFrame.appendChild(slide);
 
-                const canvas: SVG.Doc = SVG(slideModel.id).viewbox(0, 0, 1072, 603);
+                const viewbox: { x: number, y: number, width: number, height: number } = store.getters.croppedViewbox;
+                const canvas: SVG.Doc = SVG(slideModel.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height);
                 slideModel.graphics.forEach((graphic: IGraphic): SVG.Element => graphic.render(canvas));
             });
 

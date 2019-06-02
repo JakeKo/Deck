@@ -1,5 +1,7 @@
 <template>
-<div :id="`slide_${id}`" :class="{ 'slide': true, 'active-slide': isActive }"></div>
+<div :id="`slide_${id}`" :class="{ 'slide': true, 'active-slide': isActive }">
+    <div class="slide-box"></div>
+</div>
 </template>
 
 <script lang="ts">
@@ -15,7 +17,8 @@ export default class Slide extends Vue {
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
 
     private mounted(): void {
-        const canvas: SVG.Doc = SVG(this.$el.id).viewbox(0, 0, 1072, 603);
+        const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.rawViewbox;
+        const canvas: SVG.Doc = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: "absolute", top: 0, left: 0 });
         const slideWrapper: SlideWrapper = new SlideWrapper(this.id, canvas, this.$store, true);
 
         document.addEventListener("Deck.CanvasMouseOver", (event: Event): void => {
@@ -65,20 +68,23 @@ export default class Slide extends Vue {
 @import "../styles/colors";
 
 .slide {
+    display: none;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.slide-box {
     box-shadow: 0 0 4px 0 $color-tertiary;
     background: $color-primary;
-    display: none;
-    height: 603px;
-    width: 1072px;
-    overflow: hidden;
+    height: calc(100% / 3);
+    width: calc(100% / 3);
 }
 
 .active-slide {
-    display: block !important;
-}
-
-svg {
-    height: 100%;
-    width: 100%;
+    display: flex !important;
 }
 </style>

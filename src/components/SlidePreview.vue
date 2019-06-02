@@ -29,7 +29,8 @@ export default class SlidePreview extends Vue {
         slidePreview.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
 
         // Instantiate the svg.js API on the slide preview and perform the initial render
-        const canvas: SVG.Doc = SVG(`canvas_${this.id}`).viewbox(0, 0, 1072, 603);
+        const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.croppedViewbox;
+        const canvas: SVG.Doc = SVG(`canvas_${this.id}`).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height);
         const slideWrapper: SlideWrapper = new SlideWrapper(this.slideId, canvas, this.$store, false);
 
         this.graphics.forEach((graphic: IGraphic): void => {

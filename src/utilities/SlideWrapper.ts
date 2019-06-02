@@ -224,10 +224,12 @@ export default class SlideWrapper {
     public getPosition(event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): Vector {
         const zoom: number = this.store.getters.canvasZoom;
         const bounds: DOMRect = this.absoluteBounds();
+        const viewbox: { x: number, y: number, width: number, height: number } = this.store.getters.rawViewbox;
 
-        return new Vector(
-            Math.round((event.detail.baseEvent.pageX - bounds.x) / zoom),
-            Math.round((event.detail.baseEvent.pageY - bounds.y) / zoom)
-        );
+        return new Vector(event.detail.baseEvent.pageX, event.detail.baseEvent.pageY)
+            .add(new Vector(-bounds.x, -bounds.y))
+            .scale(1 / zoom)
+            .add(new Vector(viewbox.x, viewbox.y))
+            .transform(Math.round);
     }
 }
