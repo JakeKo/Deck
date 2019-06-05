@@ -61,7 +61,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
     public getSnapVectors(): Array<SnapVector> {
         const snapVectors: Array<SnapVector> = [];
 
-        // Center, upper center, left center, lower center, right center
+        // Center, upper center, right center, lower center, left center
         snapVectors.push(new SnapVector(this.id, this.origin.add(new Vector(this.width / 2, this.height / 2)), Vector.right));
         snapVectors.push(new SnapVector(this.id, this.origin.add(new Vector(this.width / 2, this.height / 2)), Vector.up));
         snapVectors.push(new SnapVector(this.id, this.origin.add(new Vector(this.width / 2, 0)), Vector.right));
