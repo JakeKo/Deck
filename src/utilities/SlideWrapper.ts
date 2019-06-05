@@ -48,7 +48,7 @@ export default class SlideWrapper {
         document.addEventListener("Deck.GraphicFocused", (event: Event): void => {
             // Check that the event pertains to the wrapper's specific slide
             const detail: any = (event as CustomEvent<GraphicEvent>).detail;
-            if (detail.slideId === this.slideId && (detail.graphic !== undefined && (this.renderSupplementary || !detail.graphic!.supplementary))) {
+            if (detail.slideId === this.slideId && (this.renderSupplementary || (detail.graphic !== undefined && !detail.graphic!.supplementary))) {
                 this.focusGraphic(detail.graphic);
             }
         });

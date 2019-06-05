@@ -134,7 +134,7 @@ export default class CursorTool implements ICanvasTool {
                 if (!customEvent.detail.baseEvent.altKey) {
                     const snappableVectors: Array<Vector> = snappableVectorOffsets.map<Vector>((offset: Vector): Vector => position.add(offset));
                     const snaps: Array<Snap> = getSnaps(snapVectors, snappableVectors);
-                    const snapLineScale: number = 1000;
+                    const snapLineScale: number = 5000;
 
                     snaps.forEach((snap: Snap): void => {
                         const snapAngle: number = getTranslation(snap).theta(projection);
