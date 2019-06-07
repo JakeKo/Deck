@@ -54,6 +54,7 @@ export default class RectangleTool implements ICanvasTool {
                 slideWrapper.store.commit("graphicEditorObject", rectangle);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: rectangle.getSnapVectors() });
                 slideWrapper.store.commit("tool", "cursor");
+                slideWrapper.setCursor("default");
             }
 
             function toggleSquare(event: KeyboardEvent): void {
