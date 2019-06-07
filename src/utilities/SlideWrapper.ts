@@ -218,8 +218,8 @@ export default class SlideWrapper {
 
         return new Vector(event.detail.baseEvent.pageX, event.detail.baseEvent.pageY)
             .add(new Vector(-bounds.x, -bounds.y))
-            .scale(1 / zoom)
             .add(new Vector(viewbox.x, viewbox.y))
+            .scale(1 / zoom)
             .transform(Math.round);
     }
 }
