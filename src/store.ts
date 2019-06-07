@@ -51,6 +51,7 @@ type Getters = {
     activeSlide: (state: State) => Slide | undefined,
     graphicEditorObject: (state: State) => any,
     tool: (state: State) => ICanvasTool,
+    toolName: (state: State) => string,
     focusedGraphic: (state: State) => IGraphic | undefined,
     canvasHeight: (state: State) => number,
     canvasWidth: (state: State) => number,
@@ -160,6 +161,9 @@ const store: {
         },
         tool: (state: State): ICanvasTool => {
             return state.tools[state.currentTool];
+        },
+        toolName: (state: State): string => {
+            return state.currentTool;
         },
         focusedGraphic: (state: State): IGraphic | undefined => {
             const activeSlide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId);
