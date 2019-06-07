@@ -73,16 +73,19 @@ export default class SlideSettings extends Vue {
     display: flex;
     justify-content: center;
     width: 100%;
-    padding: 4px 0;
+    padding: 6px 0;
+
+    &:hover {
+        background: $color-secondary;
+    }
 }
 
 #zoom-field {
-    width: 75%;
+    width: 100%;
     outline: none;
     border: none;
     text-align: center;
-    margin: 4px 0;
-    padding: 2px 0;
+    padding: 4px 0;
     font-family: $font-body;
     font-size: 14px;
 

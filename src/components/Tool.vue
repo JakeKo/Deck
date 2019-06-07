@@ -20,6 +20,7 @@ export default class Tool extends Vue {
 @import "../styles/application";
 
 .active-tool {
-    background: $color-tertiary !important;
+    background: $color-information !important;
+    color: $color-primary;
 }
 </style>
