@@ -29,16 +29,14 @@ export default class RectangleTool implements ICanvasTool {
 
                 // Determine dimensions for a rectangle or square (based on if shift is pressed)
                 lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
-                const position: Vector = slideWrapper.getPosition(event as CustomEvent);
-                const rawDimensions: Vector = position.add(start.scale(-1));
+                const rawDimensions: Vector = start.towards(slideWrapper.getPosition(customEvent));
                 const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
+                const resolvedDimensions: Vector = customEvent.detail.baseEvent.shiftKey ? rawDimensions.transform(Math.sign).scale(minimumDimension) : rawDimensions;
 
                 // Enforce that a shape has positive width and height i.e. move the x and y if the width or height are negative
-                rectangle.origin.x = rawDimensions.x < 0 ? start.x + (customEvent.detail.baseEvent.shiftKey ? -minimumDimension : rawDimensions.x) : rectangle.origin.x;
-                rectangle.origin.y = rawDimensions.y < 0 ? start.y + (customEvent.detail.baseEvent.shiftKey ? -minimumDimension : rawDimensions.y) : rectangle.origin.y;
-
-                rectangle.width = customEvent.detail.baseEvent.shiftKey ? minimumDimension : Math.abs(rawDimensions.x);
-                rectangle.height = customEvent.detail.baseEvent.shiftKey ? minimumDimension : Math.abs(rawDimensions.y);
+                rectangle.origin = start.add(resolvedDimensions.scale(0.5)).add(resolvedDimensions.transform(Math.abs).scale(-0.5));
+                rectangle.width = Math.abs(resolvedDimensions.x);
+                rectangle.height = Math.abs(resolvedDimensions.y);
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: rectangle.id, graphic: rectangle });
             }
 

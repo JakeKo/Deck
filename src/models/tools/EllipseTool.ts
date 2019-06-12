@@ -29,16 +29,14 @@ export default class EllipseTool implements ICanvasTool {
 
                 // Determine dimensions for an ellipse or circle (based on if shift is pressed)
                 lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
-                const position: Vector = slideWrapper.getPosition(customEvent);
-                const rawOffset: Vector = position.add(start.scale(-1));
-                const minimumOffset: number = Math.min(Math.abs(rawOffset.x), Math.abs(rawOffset.y));
+                const rawDimensions: Vector = start.towards(slideWrapper.getPosition(customEvent));
+                const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
+                const resolvedDimensions: Vector = customEvent.detail.baseEvent.shiftKey ? rawDimensions.transform(Math.sign).scale(minimumDimension) : rawDimensions;
 
                 // Enforce that a shape has positive width and height i.e. move the x and y if the width or height are negative
-                ellipse.origin.x = start.x + (customEvent.detail.baseEvent.shiftKey ? Math.sign(rawOffset.x) * minimumOffset : rawOffset.x) * 0.5;
-                ellipse.origin.y = start.y + (customEvent.detail.baseEvent.shiftKey ? Math.sign(rawOffset.y) * minimumOffset : rawOffset.y) * 0.5;
-
-                ellipse.width = customEvent.detail.baseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.x);
-                ellipse.height = customEvent.detail.baseEvent.shiftKey ? minimumOffset : Math.abs(rawOffset.y);
+                ellipse.origin = start.add(resolvedDimensions.scale(0.5));
+                ellipse.width = Math.abs(resolvedDimensions.x);
+                ellipse.height = Math.abs(resolvedDimensions.y);
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: ellipse.id, graphic: ellipse });
             }
 
