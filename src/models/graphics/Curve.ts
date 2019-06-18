@@ -99,7 +99,12 @@ export default class Curve implements IGraphic {
                 "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     // Move the specific point on the curve to the mouse position
-                    points[index] = slideWrapper.getPosition(event);
+                    const position: Vector = slideWrapper.getPosition(event);
+                    if (index === 0) {
+                        this.origin = position;
+                    } else {
+                        this.points[index - 1] = this.origin.towards(position);
+                    }
                 }
             );
         });
