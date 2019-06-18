@@ -151,12 +151,17 @@ export default class SlideWrapper {
                     document.addEventListener("Deck.GraphicMouseMove", preview);
                     document.addEventListener("Deck.CanvasMouseUp", end);
                     document.addEventListener("Deck.GraphicMouseUp", end);
+                    document.addEventListener("keydown", toggleSquare);
+                    document.addEventListener("keyup", toggleSquare);
 
                     const self: SlideWrapper = this;
                     focusedGraphic.anchorIds.forEach((anchorId: string): void => self.removeGraphic(anchorId));
+                    let lastPosition: Vector = new Vector(event.clientX, event.clientY);
+                    let shiftPressed = false;
 
                     function preview(event: Event): void {
                         const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
+                        lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
                         anchor.handler(customEvent);
                         focusedGraphic.updateRendering(svg);
 
@@ -170,8 +175,28 @@ export default class SlideWrapper {
                         document.removeEventListener("Deck.GraphicMouseMove", preview);
                         document.removeEventListener("Deck.CanvasMouseUp", end);
                         document.removeEventListener("Deck.GraphicMouseUp", end);
+                        document.removeEventListener("keydown", toggleSquare);
+                        document.removeEventListener("keyup", toggleSquare);
 
                         self.store.commit("focusGraphic", { slideId: self.slideId, graphicId: focusedGraphic.id });
+                    }
+
+                    function toggleSquare(event: KeyboardEvent): void {
+                        if (event.key !== "Shift" || (event.type === "keydown" && shiftPressed)) {
+                            return;
+                        }
+
+                        shiftPressed = event.type === "keydown";
+                        document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseMove", {
+                            detail: new CanvasMouseEvent(
+                                new MouseEvent("mousemove", {
+                                    shiftKey: event.type === "keydown",
+                                    clientX: lastPosition.x,
+                                    clientY: lastPosition.y
+                                }),
+                                self.slideId
+                            )
+                        }));
                     }
                 });
             });
