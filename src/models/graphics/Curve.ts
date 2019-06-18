@@ -87,17 +87,19 @@ export default class Curve implements IGraphic {
     }
 
     public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
+        const points: Array<Vector> = [ new Vector(0, 0), ...this.points ];
+
         // Reset anchorIds with new ids for the to-be rendered anchors
         this.anchorIds.length = 0;
-        this.points.forEach((): void => void this.anchorIds.push(Utilities.generateId()));
+        points.forEach((): void => void this.anchorIds.push(Utilities.generateId()));
 
         return this.anchorIds.map<Anchor>((anchorId: string, index: number): Anchor => {
             return new Anchor(
-                Utilities.makeAnchorGraphic(anchorId, this.points[index]),
+                Utilities.makeAnchorGraphic(anchorId, this.origin.add(points[index])),
                 "move",
                 (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
                     // Move the specific point on the curve to the mouse position
-                    this.points[index] = slideWrapper.getPosition(event);
+                    points[index] = slideWrapper.getPosition(event);
                 }
             );
         });
