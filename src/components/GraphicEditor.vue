@@ -159,6 +159,7 @@ export default class StyleEditor extends Vue {
     resize: none;
     box-sizing: border-box;
     padding: 8px;
+    white-space: nowrap;
 }
 
 #submit-button {
