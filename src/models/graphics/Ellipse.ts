@@ -95,52 +95,38 @@ export default class Ellipse implements IGraphic {
         // Create deep copies of the origin and the point opposite from the origin
         const baseOrigin: Vector = this.origin.add(new Vector(-this.width / 2, -this.height / 2));
         const baseDimensions: Vector = new Vector(this.width, this.height);
+        const self: Ellipse = this;
+
+        function adjust(origin: Vector): (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>) => void {
+            return function (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void {
+                const rawDimensions: Vector = origin.towards(slideWrapper.getPosition(event));
+                const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
+                const resolvedDimensions: Vector = event.detail.baseEvent.shiftKey ? rawDimensions.transform(Math.sign).scale(minimumDimension) : rawDimensions;
+
+                // Enforce that a shape has positive width and height i.e. move the x and y if the width or height are negative
+                self.origin = origin.add(resolvedDimensions.scale(0.5));
+                self.width = Math.abs(resolvedDimensions.x);
+                self.height = Math.abs(resolvedDimensions.y);
+            };
+        }
 
         return [
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin.add(new Vector(-this.width / 2, -this.height / 2))),
                 "move",
-                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
-                    const position: Vector = slideWrapper.getPosition(event);
-                    const adjustment: Vector = baseOrigin.add(baseDimensions).towards(position);
-                    this.origin = baseOrigin.add(baseDimensions).add(adjustment.scale(0.5));
-                    this.width = Math.abs(adjustment.x);
-                    this.height = Math.abs(adjustment.y);
-                }
-            ),
+                adjust(baseOrigin.add(baseDimensions))),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width / 2, -this.height / 2))),
                 "move",
-                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
-                    const position: Vector = slideWrapper.getPosition(event);
-                    const adjustment: Vector = baseOrigin.add(new Vector(0, baseDimensions.y)).towards(position);
-                    this.origin = baseOrigin.add(new Vector(0, baseDimensions.y)).add(adjustment.scale(0.5));
-                    this.width = Math.abs(adjustment.x);
-                    this.height = Math.abs(adjustment.y);
-                }
-            ),
+                adjust(baseOrigin.add(new Vector(0, baseDimensions.y)))),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width / 2, this.height / 2))),
                 "move",
-                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
-                    const position: Vector = slideWrapper.getPosition(event);
-                    const adjustment: Vector = baseOrigin.towards(position);
-                    this.origin = baseOrigin.add(adjustment.scale(0.5));
-                    this.width = Math.abs(adjustment.x);
-                    this.height = Math.abs(adjustment.y);
-                }
-            ),
+                adjust(baseOrigin)),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(-this.width / 2, this.height / 2))),
                 "move",
-                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
-                    const position: Vector = slideWrapper.getPosition(event);
-                    const adjustment: Vector = baseOrigin.add(new Vector(baseDimensions.x, 0)).towards(position);
-                    this.origin = baseOrigin.add(new Vector(baseDimensions.x, 0)).add(adjustment.scale(0.5));
-                    this.width = Math.abs(adjustment.x);
-                    this.height = Math.abs(adjustment.y);
-                }
-            )
+                adjust(baseOrigin.add(new Vector(baseDimensions.x, 0))))
         ];
     }
 }
