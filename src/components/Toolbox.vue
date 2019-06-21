@@ -20,10 +20,9 @@
 <script lang="ts">
 import { Vue, Component } from "vue-property-decorator";
 import Tool from "./Tool.vue";
-import Image from "../models/graphics/Image";
-import Video from "../models/graphics/Video";
+import { Image, Video } from "../models/graphics/graphics";
 import Slide from "../models/Slide";
-import IGraphic from "../models/graphics/IGraphic";
+import { IGraphic } from "../types";
 import Utilities from "../utilities/general";
 
 @Component({

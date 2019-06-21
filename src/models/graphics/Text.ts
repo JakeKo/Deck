@@ -1,9 +1,8 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
-import IGraphic from "./IGraphic";
+import { IGraphic, ISlideWrapper } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
-import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
 
 export default class Text implements IGraphic {
@@ -74,7 +73,7 @@ export default class Text implements IGraphic {
         return snappableVectors;
     }
 
-    public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
+    public getAnchors(slideWrapper: ISlideWrapper): Array<Anchor> {
         return [];
     }
 }

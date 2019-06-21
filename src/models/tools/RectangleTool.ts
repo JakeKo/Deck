@@ -1,14 +1,12 @@
-import ICanvasTool from "./ICanvasTool";
-import Rectangle from "../graphics/Rectangle";
+import { ICanvasTool, CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper } from "../../types";
+import { Rectangle } from "../graphics/graphics";
 import Vector from "../Vector";
-import SlideWrapper from "../../utilities/SlideWrapper";
 import CanvasMouseEvent from "../CanvasMouseEvent";
-import GraphicMouseEvent from "../GraphicMouseEvent";
 
 export default class RectangleTool implements ICanvasTool {
-    public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent<CanvasMouseEvent>) => void {
-        return function (event: CustomEvent<CanvasMouseEvent>): void {
-            document.addEventListener("Deck.CanvasMouseMove", preview);
+    public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
+        return function (event: CustomCanvasMouseEvent): void {
+            document.addEventListener("Deck.CanvasMouseMove", preview as EventListener);
             document.addEventListener("Deck.CanvasMouseUp", end);
             document.addEventListener("Deck.GraphicMouseUp", end);
             document.addEventListener("keydown", toggleSquare);
@@ -24,14 +22,12 @@ export default class RectangleTool implements ICanvasTool {
             let shiftPressed = false;
 
             // Preview drawing rectangle
-            function preview(event: Event): void {
-                const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
-
+            function preview(event: CustomMouseEvent): void {
                 // Determine dimensions for a rectangle or square (based on if shift is pressed)
-                lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
-                const rawDimensions: Vector = start.towards(slideWrapper.getPosition(customEvent));
+                lastPosition = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
+                const rawDimensions: Vector = start.towards(slideWrapper.getPosition(event));
                 const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
-                const resolvedDimensions: Vector = customEvent.detail.baseEvent.shiftKey ? rawDimensions.transform(Math.sign).scale(minimumDimension) : rawDimensions;
+                const resolvedDimensions: Vector = event.detail.baseEvent.shiftKey ? rawDimensions.transform(Math.sign).scale(minimumDimension) : rawDimensions;
 
                 // Enforce that a shape has positive width and height i.e. move the x and y if the width or height are negative
                 rectangle.origin = start.add(resolvedDimensions.scale(0.5)).add(resolvedDimensions.transform(Math.abs).scale(-0.5));
@@ -42,7 +38,7 @@ export default class RectangleTool implements ICanvasTool {
 
             // End drawing rectangle
             function end(): void {
-                document.removeEventListener("Deck.CanvasMouseMove", preview);
+                document.removeEventListener("Deck.CanvasMouseMove", preview as EventListener);
                 document.removeEventListener("Deck.CanvasMouseUp", end);
                 document.removeEventListener("Deck.GraphicMouseUp", end);
                 document.removeEventListener("keydown", toggleSquare);
@@ -75,19 +71,19 @@ export default class RectangleTool implements ICanvasTool {
         };
     }
 
-    public canvasMouseOver(slideWrapper: SlideWrapper): () => void {
+    public canvasMouseOver(slideWrapper: ISlideWrapper): () => void {
         return function () {
             slideWrapper.setCursor("crosshair");
         };
     }
 
-    public canvasMouseOut(slideWrapper: SlideWrapper): () => void {
+    public canvasMouseOut(slideWrapper: ISlideWrapper): () => void {
         return function () {
             slideWrapper.setCursor("default");
         };
     }
 
-    public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
+    public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
         return function () {
             slideWrapper.setCursor("crosshair");
         };

@@ -1,12 +1,12 @@
 import * as SVG from "svg.js";
-import IGraphic from "../models/graphics/IGraphic";
+import { IGraphic, CustomMouseEvent, ISlideWrapper } from "../types";
 import GraphicEvent from "../models/GraphicEvent";
 import CanvasMouseEvent from "../models/CanvasMouseEvent";
 import GraphicMouseEvent from "../models/GraphicMouseEvent";
 import Anchor from "../models/Anchor";
 import Vector from "../models/Vector";
 
-export default class SlideWrapper {
+export default class SlideWrapper implements ISlideWrapper {
     public store: any;
     public slideId: string;
     public renderSupplementary: boolean;
@@ -160,7 +160,7 @@ export default class SlideWrapper {
                     let shiftPressed = false;
 
                     function preview(event: Event): void {
-                        const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
+                        const customEvent: CustomMouseEvent = event as CustomMouseEvent;
                         lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
                         anchor.handler(customEvent);
                         focusedGraphic.updateRendering(svg);
@@ -236,7 +236,7 @@ export default class SlideWrapper {
         }
     }
 
-    public getPosition(event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): Vector {
+    public getPosition(event: CustomMouseEvent): Vector {
         const zoom: number = this.store.getters.canvasZoom;
         const bounds: DOMRect = this.absoluteBounds();
         const viewbox: { x: number, y: number, width: number, height: number } = this.store.getters.rawViewbox;

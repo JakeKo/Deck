@@ -1,15 +1,11 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
-import IGraphic from "./IGraphic";
+import { IGraphic, CustomMouseEvent, ISlideWrapper } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
-import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
-import GraphicMouseEvent from "../GraphicMouseEvent";
-import IRectangularGraphic from "./IRectangularGraphic";
-import CanvasMouseEvent from "../CanvasMouseEvent";
 
-export default class Video implements IGraphic, IRectangularGraphic {
+export default class Video implements IGraphic {
     public id: string;
     public type: string = "video";
     public defaultInteractive: boolean;
@@ -100,7 +96,7 @@ export default class Video implements IGraphic, IRectangularGraphic {
         return snappableVectors;
     }
 
-    public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
+    public getAnchors(slideWrapper: ISlideWrapper): Array<Anchor> {
         // Reset anchorIds with new ids for the to-be rendered anchors
         const anchorCount: number = 4;
         this.anchorIds.length = 0;
@@ -112,28 +108,28 @@ export default class Video implements IGraphic, IRectangularGraphic {
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
                 "move",
-                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
+                (event: CustomMouseEvent): void => {
                     return;
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
                 "move",
-                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
+                (event: CustomMouseEvent): void => {
                     return;
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
                 "move",
-                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
+                (event: CustomMouseEvent): void => {
                     return;
                 }
             ),
             new Anchor(
                 Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
                 "move",
-                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
+                (event: CustomMouseEvent): void => {
                     return;
                 }
             )

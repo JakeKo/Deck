@@ -1,4 +1,4 @@
-import IGraphic from "./graphics/IGraphic";
+import { IGraphic } from "../types";
 
 export default class GraphicEvent {
     public slideId: string;

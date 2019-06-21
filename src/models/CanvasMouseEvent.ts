@@ -1,9 +1,10 @@
-export default class CanvasMouseEvent extends Event {
+import { ICanvasMouseEvent } from "../types";
+
+export default class CanvasMouseEvent implements ICanvasMouseEvent {
     public baseEvent: MouseEvent;
     public slideId: string;
 
     constructor(baseEvent: MouseEvent, slideId: string) {
-        super("CanvasMouseEvent");
         this.baseEvent = baseEvent;
         this.slideId = slideId;
     }

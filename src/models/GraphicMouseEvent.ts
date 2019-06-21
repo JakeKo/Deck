@@ -1,4 +1,6 @@
-export default class GraphicMouseEvent {
+import { IGraphicMouseEvent } from "../types";
+
+export default class GraphicMouseEvent implements IGraphicMouseEvent {
     public baseEvent: MouseEvent;
     public slideId: string;
     public graphicId: string;

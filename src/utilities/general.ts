@@ -1,13 +1,6 @@
 import Vector from "../models/Vector";
-import IGraphic from "../models/graphics/IGraphic";
-import Rectangle from "../models/graphics/Rectangle";
-import Ellipse from "../models/graphics/Ellipse";
-import Curve from "../models/graphics/Curve";
-import Sketch from "../models/graphics/Sketch";
-import Text from "../models/graphics/Text";
-import Image from "../models/graphics/Image";
-import Video from "../models/graphics/Video";
-import IRectangularGraphic from "../models/graphics/IRectangularGraphic";
+import { IGraphic } from "../types";
+import { Rectangle, Ellipse, Curve, Sketch, Text, Image, Video } from "../models/graphics/graphics";
 
 function generateId(): string {
     function term(): string {
@@ -60,31 +53,6 @@ function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
         strokeColor: "hotpink",
         strokeWidth: 2
     });
-}
-
-function adjustUpperLeftAnchor(position: Vector, graphic: IRectangularGraphic) {
-    const adjustment: Vector = graphic.origin.towards(position);
-    graphic.origin = position;
-    graphic.width -= adjustment.x;
-    graphic.height -= adjustment.y;
-}
-
-function adjustUpperRightAnchor(position: Vector, graphic: IRectangularGraphic) {
-    const adjustment: Vector = graphic.origin.add(new Vector(graphic.width, 0)).towards(position);
-    graphic.origin.y += adjustment.y;
-    graphic.width += adjustment.x;
-}
-
-function adjustLowerRightAnchor(position: Vector, graphic: IRectangularGraphic) {
-    const adjustment: Vector = graphic.origin.add(new Vector(graphic.width, graphic.height)).towards(position);
-    graphic.width += adjustment.x;
-    graphic.height += adjustment.y;
-}
-
-function adjustLowerLeftAnchor(position: Vector, graphic: IRectangularGraphic) {
-    const adjustment: Vector = graphic.origin.add(new Vector(0, graphic.height)).towards(position);
-    graphic.origin.x += adjustment.x;
-    graphic.height += adjustment.y;
 }
 
 const deckScript: string = `<style>
@@ -173,9 +141,5 @@ export default {
     generateId,
     parseGraphic,
     makeAnchorGraphic,
-    adjustUpperLeftAnchor,
-    adjustUpperRightAnchor,
-    adjustLowerRightAnchor,
-    adjustLowerLeftAnchor,
     deckScript
 };

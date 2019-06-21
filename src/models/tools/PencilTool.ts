@@ -1,13 +1,10 @@
-import ICanvasTool from "./ICanvasTool";
-import Sketch from "../graphics/Sketch";
-import SlideWrapper from "../../utilities/SlideWrapper";
-import CanvasMouseEvent from "../CanvasMouseEvent";
-import GraphicMouseEvent from "../GraphicMouseEvent";
+import { ICanvasTool, CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper } from "../../types";
+import { Sketch } from "../graphics/graphics";
 
 export default class PencilTool implements ICanvasTool {
-    public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent<CanvasMouseEvent>) => void {
-        return function (event: CustomEvent<CanvasMouseEvent>): void {
-            document.addEventListener("Deck.CanvasMouseMove", preview);
+    public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
+        return function (event: CustomCanvasMouseEvent): void {
+            document.addEventListener("Deck.CanvasMouseMove", preview as EventListener);
             document.addEventListener("Deck.CanvasMouseUp", end);
             document.addEventListener("Deck.GraphicMouseUp", end);
 
@@ -19,14 +16,14 @@ export default class PencilTool implements ICanvasTool {
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: sketch });
 
             // Add the current mouse position to the list of points to plot
-            function preview(event: Event): void {
-                sketch.points.push(slideWrapper.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>).add(sketch.origin.scale(-1)));
+            function preview(event: CustomMouseEvent): void {
+                sketch.points.push(slideWrapper.getPosition(event).add(sketch.origin.scale(-1)));
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: sketch.id, graphic: sketch });
             }
 
             // Unbind handlers and commit graphic to the application
             function end(): void {
-                document.removeEventListener("Deck.CanvasMouseMove", preview);
+                document.removeEventListener("Deck.CanvasMouseMove", preview as EventListener);
                 document.removeEventListener("Deck.CanvasMouseUp", end);
                 document.removeEventListener("Deck.GraphicMouseUp", end);
 
@@ -39,19 +36,19 @@ export default class PencilTool implements ICanvasTool {
         };
     }
 
-    public canvasMouseOver(slideWrapper: SlideWrapper): () => void {
+    public canvasMouseOver(slideWrapper: ISlideWrapper): () => void {
         return function () {
             slideWrapper.setCursor("crosshair");
         };
     }
 
-    public canvasMouseOut(slideWrapper: SlideWrapper): () => void {
+    public canvasMouseOut(slideWrapper: ISlideWrapper): () => void {
         return function () {
             slideWrapper.setCursor("default");
         };
     }
 
-    public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
+    public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
         return function () {
             slideWrapper.setCursor("crosshair");
         };

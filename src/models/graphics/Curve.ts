@@ -1,12 +1,9 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
-import IGraphic from "./IGraphic";
+import { IGraphic, CustomMouseEvent, ISlideWrapper } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
-import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
-import GraphicMouseEvent from "../GraphicMouseEvent";
-import CanvasMouseEvent from "../CanvasMouseEvent";
 
 export default class Curve implements IGraphic {
     public id: string;
@@ -86,7 +83,7 @@ export default class Curve implements IGraphic {
         return snappableVectors;
     }
 
-    public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
+    public getAnchors(slideWrapper: ISlideWrapper): Array<Anchor> {
         const points: Array<Vector> = [ new Vector(0, 0), ...this.points ];
 
         // Reset anchorIds with new ids for the to-be rendered anchors
@@ -97,7 +94,7 @@ export default class Curve implements IGraphic {
             return new Anchor(
                 Utilities.makeAnchorGraphic(anchorId, this.origin.add(points[index])),
                 "move",
-                (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void => {
+                (event: CustomMouseEvent): void => {
                     // Move the specific point on the curve to the mouse position
                     const position: Vector = slideWrapper.getPosition(event);
                     if (index === 0) {

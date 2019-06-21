@@ -13,7 +13,7 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import Vector from "../models/Vector";
 import SlideWrapper from "../utilities/SlideWrapper";
-import IGraphic from "../models/graphics/IGraphic";
+import { IGraphic, ISlideWrapper } from "../types";
 import Slide from "../models/Slide";
 
 @Component
@@ -31,7 +31,7 @@ export default class SlidePreview extends Vue {
         // Instantiate the svg.js API on the slide preview and perform the initial render
         const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.croppedViewbox;
         const canvas: SVG.Doc = SVG(`canvas_${this.id}`).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height);
-        const slideWrapper: SlideWrapper = new SlideWrapper(this.slideId, canvas, this.$store, false);
+        const slideWrapper: ISlideWrapper = new SlideWrapper(this.slideId, canvas, this.$store, false);
 
         this.graphics.forEach((graphic: IGraphic): void => {
             slideWrapper.addGraphic(graphic);

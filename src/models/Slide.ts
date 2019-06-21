@@ -1,5 +1,5 @@
 import Utilities from "../utilities/general";
-import IGraphic from "./graphics/IGraphic";
+import { IGraphic } from "../types";
 import SnapVector from "./SnapVector";
 
 export default class Slide {

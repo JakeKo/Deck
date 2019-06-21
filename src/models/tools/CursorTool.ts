@@ -1,10 +1,7 @@
-import ICanvasTool from "./ICanvasTool";
-import IGraphic from "../graphics/IGraphic";
+import { ICanvasTool, IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper } from "../../types";
 import Vector from "../Vector";
-import SlideWrapper from "../../utilities/SlideWrapper";
 import SnapVector from "../SnapVector";
 import Sketch from "../graphics/Sketch";
-import GraphicMouseEvent from "../GraphicMouseEvent";
 import CanvasMouseEvent from "../CanvasMouseEvent";
 
 type Snap = { source: Vector, destination: SnapVector };
@@ -60,7 +57,7 @@ function getStrictProjectionVector(movement: Vector) {
 }
 
 export default class CursorTool implements ICanvasTool {
-    public canvasMouseDown(slideWrapper: SlideWrapper): () => void {
+    public canvasMouseDown(slideWrapper: ISlideWrapper): () => void {
         return function (): void {
             slideWrapper.focusGraphic(undefined);
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
@@ -76,20 +73,20 @@ export default class CursorTool implements ICanvasTool {
         return (): void => { return; };
     }
 
-    public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
+    public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
         return function (): void {
             slideWrapper.setCursor("pointer");
         };
     }
 
-    public graphicMouseOut(slideWrapper: SlideWrapper): () => void {
+    public graphicMouseOut(slideWrapper: ISlideWrapper): () => void {
         return function (): void {
             slideWrapper.setCursor("default");
         };
     }
 
-    public graphicMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent<GraphicMouseEvent>) => void {
-        return function (event: CustomEvent<GraphicMouseEvent>): void {
+    public graphicMouseDown(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void {
+        return function (event: CustomGraphicMouseEvent): void {
             const graphic: IGraphic | undefined = slideWrapper.store.getters.graphic(slideWrapper.slideId, event.detail.graphicId);
             if (graphic === undefined) {
                 console.error(`ERROR: Could not find a graphic with the id: ${event.detail.graphicId}`);
@@ -110,19 +107,17 @@ export default class CursorTool implements ICanvasTool {
             let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
             let shiftPressed = false;
 
-            document.addEventListener("Deck.CanvasMouseMove", preview);
+            document.addEventListener("Deck.CanvasMouseMove", preview as EventListener);
             document.addEventListener("Deck.CanvasMouseUp", end);
             document.addEventListener("Deck.GraphicMouseUp", end);
             document.addEventListener("keydown", toggleStrictMovement);
             document.addEventListener("keyup", toggleStrictMovement);
 
             // Preview moving shape
-            function preview(event: Event): void {
+            function preview(event: CustomMouseEvent): void {
                 graphic!.anchorIds.forEach((anchorId: string): void => slideWrapper.removeGraphic(anchorId));
-
-                const customEvent: CustomEvent<GraphicMouseEvent | CanvasMouseEvent> = event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>;
-                lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
-                const position: Vector = slideWrapper.getPosition(customEvent);
+                lastPosition = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
+                const position: Vector = slideWrapper.getPosition(event);
                 let movement: Vector = initialPosition.towards(position);
                 const projection: Vector = getStrictProjectionVector(movement);
 
@@ -131,7 +126,7 @@ export default class CursorTool implements ICanvasTool {
                 snapHighlights.length = 0;
 
                 // Do not perform any snapping if the alt key is pressed
-                if (!customEvent.detail.baseEvent.altKey) {
+                if (!event.detail.baseEvent.altKey) {
                     const snappableVectors: Array<Vector> = snappableVectorOffsets.map<Vector>((offset: Vector): Vector => position.add(offset));
                     const snaps: Array<Snap> = getSnaps(snapVectors, snappableVectors);
                     const snapLineScale: number = 5000;
@@ -139,7 +134,7 @@ export default class CursorTool implements ICanvasTool {
                     snaps.forEach((snap: Snap): void => {
                         const snapAngle: number = getTranslation(snap).theta(projection);
                         const snapIsNotParallel: boolean = snapAngle !== 0 && snapAngle !== Math.PI;
-                        if (customEvent.detail.baseEvent.shiftKey && snapIsNotParallel) {
+                        if (event.detail.baseEvent.shiftKey && snapIsNotParallel) {
                             return;
                         }
 
@@ -158,7 +153,7 @@ export default class CursorTool implements ICanvasTool {
                     });
                 }
 
-                graphic!.origin = customEvent.detail.baseEvent.shiftKey ? initialOrigin.add(movement.projectOn(projection)) : initialOrigin.add(movement);
+                graphic!.origin = event.detail.baseEvent.shiftKey ? initialOrigin.add(movement.projectOn(projection)) : initialOrigin.add(movement);
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                 slideWrapper.store.commit("graphicEditorObject", undefined);
                 slideWrapper.store.commit("graphicEditorObject", graphic);
@@ -166,7 +161,7 @@ export default class CursorTool implements ICanvasTool {
 
             // End moving shape
             function end(): void {
-                document.removeEventListener("Deck.CanvasMouseMove", preview);
+                document.removeEventListener("Deck.CanvasMouseMove", preview as EventListener);
                 document.removeEventListener("Deck.CanvasMouseUp", end);
                 document.removeEventListener("Deck.GraphicMouseUp", end);
                 document.removeEventListener("keydown", toggleStrictMovement);

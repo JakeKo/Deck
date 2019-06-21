@@ -13,12 +13,9 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import Utilities from "../utilities/general";
-import IGraphic from "../models/graphics/IGraphic";
-import Sketch from "../models/graphics/Sketch";
-import Curve from "../models/graphics/Curve";
-import Image from "../models/graphics/Image";
+import { IGraphic } from "../types";
+import { Sketch, Curve, Image, Video } from "../models/graphics/graphics";
 import Vector from "../models/Vector";
-import Video from "../models/graphics/Video";
 
 function toPrettyString(object: any, indentDepth: number): string {
     const properties: Array<string> = [];

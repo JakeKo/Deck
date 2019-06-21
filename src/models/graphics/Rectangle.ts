@@ -1,15 +1,11 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
-import IGraphic from "./IGraphic";
+import { IGraphic, CustomMouseEvent, ISlideWrapper } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
-import GraphicMouseEvent from "../GraphicMouseEvent";
-import SlideWrapper from "../../utilities/SlideWrapper";
 import Anchor from "../Anchor";
-import IRectangularGraphic from "./IRectangularGraphic";
-import CanvasMouseEvent from "../CanvasMouseEvent";
 
-export default class Rectangle implements IGraphic, IRectangularGraphic {
+export default class Rectangle implements IGraphic {
     public id: string;
     public type: string = "rectangle";
     public defaultInteractive: boolean;
@@ -85,7 +81,7 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
         return snappableVectors;
     }
 
-    public getAnchors(slideWrapper: SlideWrapper): Array<Anchor> {
+    public getAnchors(slideWrapper: ISlideWrapper): Array<Anchor> {
         // Reset anchorIds with new ids for the to-be rendered anchors
         const anchorCount: number = 4;
         this.anchorIds.length = 0;
@@ -98,8 +94,8 @@ export default class Rectangle implements IGraphic, IRectangularGraphic {
         const baseDimensions: Vector = new Vector(this.width, this.height);
         const self: Rectangle = this;
 
-        function adjust(origin: Vector): (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>) => void {
-            return function (event: CustomEvent<GraphicMouseEvent | CanvasMouseEvent>): void {
+        function adjust(origin: Vector): (event: CustomMouseEvent) => void {
+            return function (event: CustomMouseEvent): void {
                 const rawDimensions: Vector = origin.towards(slideWrapper.getPosition(event));
                 const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
                 const resolvedDimensions: Vector = event.detail.baseEvent.shiftKey ? rawDimensions.transform(Math.sign).scale(minimumDimension) : rawDimensions;

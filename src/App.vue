@@ -20,7 +20,7 @@ import Editor from "./components/Editor.vue";
 import Roadmap from "./components/Roadmap.vue";
 import GraphicEditor from "./components/GraphicEditor.vue";
 import Utilities from "./utilities/general";
-import IGraphic from "./models/graphics/IGraphic";
+import { IGraphic } from "./types";
 
 @Component({
     components: {

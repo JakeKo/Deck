@@ -1,25 +1,21 @@
-import ICanvasTool from "./ICanvasTool";
-import Curve from "../graphics/Curve";
+import { ICanvasTool, CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper } from "../../types";
+import { Curve, Sketch } from "../graphics/graphics";
 import Vector from "../Vector";
-import Sketch from "../graphics/Sketch";
-import SlideWrapper from "../../utilities/SlideWrapper";
-import CanvasMouseEvent from "../CanvasMouseEvent";
-import GraphicMouseEvent from "../GraphicMouseEvent";
 
 export default class PenTool implements ICanvasTool {
     private active: boolean = false;
 
-    public canvasMouseDown(slideWrapper: SlideWrapper): (event: CustomEvent<CanvasMouseEvent>) => void {
+    public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
         const self: PenTool = this;
-        return function (event: CustomEvent<CanvasMouseEvent>): void {
+        return function (event: CustomCanvasMouseEvent): void {
             // Prevent any action on canvas click if a bezier curve is being drawn
             if (self.active) { return; }
             else { self.active = true; }
 
             document.addEventListener("keydown", end);
-            document.addEventListener("Deck.CanvasMouseMove", preview);
-            document.addEventListener("Deck.CanvasMouseUp", setFirstControlPoint);
-            document.addEventListener("Deck.GraphicMouseUp", setFirstControlPoint);
+            document.addEventListener("Deck.CanvasMouseMove", preview as EventListener);
+            document.addEventListener("Deck.CanvasMouseUp", setFirstControlPoint as EventListener);
+            document.addEventListener("Deck.GraphicMouseUp", setFirstControlPoint as EventListener);
 
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("graphicEditorObject", undefined);
@@ -37,30 +33,30 @@ export default class PenTool implements ICanvasTool {
             slideWrapper.addGraphic(segment);
             slideWrapper.addGraphic(handle);
 
-            function setFirstControlPoint(event: Event): void {
-                document.removeEventListener("Deck.CanvasMouseUp", setFirstControlPoint);
-                document.removeEventListener("Deck.GraphicMouseUp", setFirstControlPoint);
-                document.addEventListener("Deck.CanvasMouseDown", setEndpoint);
-                document.addEventListener("Deck.GraphicMouseDown", setEndpoint);
+            function setFirstControlPoint(event: CustomMouseEvent): void {
+                document.removeEventListener("Deck.CanvasMouseUp", setFirstControlPoint as EventListener);
+                document.removeEventListener("Deck.GraphicMouseUp", setFirstControlPoint as EventListener);
+                document.addEventListener("Deck.CanvasMouseDown", setEndpoint as EventListener);
+                document.addEventListener("Deck.GraphicMouseDown", setEndpoint as EventListener);
 
-                segmentPoints[0] = slideWrapper.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>).add(segment.origin.scale(-1));
+                segmentPoints[0] = slideWrapper.getPosition(event).add(segment.origin.scale(-1));
             }
 
-            function setEndpoint(event: Event): void {
-                document.removeEventListener("Deck.CanvasMouseDown", setEndpoint);
-                document.removeEventListener("Deck.GraphicMouseDown", setEndpoint);
-                document.addEventListener("Deck.CanvasMouseUp", setSecondControlPoint);
-                document.addEventListener("Deck.GraphicMouseUp", setSecondControlPoint);
+            function setEndpoint(event: CustomMouseEvent): void {
+                document.removeEventListener("Deck.CanvasMouseDown", setEndpoint as EventListener);
+                document.removeEventListener("Deck.GraphicMouseDown", setEndpoint as EventListener);
+                document.addEventListener("Deck.CanvasMouseUp", setSecondControlPoint as EventListener);
+                document.addEventListener("Deck.GraphicMouseUp", setSecondControlPoint as EventListener);
 
-                segmentPoints[2] = slideWrapper.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>).add(segment.origin.scale(-1));
+                segmentPoints[2] = slideWrapper.getPosition(event).add(segment.origin.scale(-1));
             }
 
-            function setSecondControlPoint(event: Event): void {
-                document.removeEventListener("Deck.CanvasMouseUp", setSecondControlPoint);
-                document.removeEventListener("Deck.GraphicMouseUp", setSecondControlPoint);
+            function setSecondControlPoint(event: CustomMouseEvent): void {
+                document.removeEventListener("Deck.CanvasMouseUp", setSecondControlPoint as EventListener);
+                document.removeEventListener("Deck.GraphicMouseUp", setSecondControlPoint as EventListener);
 
                 // Complete the curve segment and add it to the final curve
-                segmentPoints[1] = slideWrapper.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>).add(segment.origin.scale(-1)).reflect(segmentPoints[2]);
+                segmentPoints[1] = slideWrapper.getPosition(event as CustomMouseEvent).add(segment.origin.scale(-1)).reflect(segmentPoints[2]);
                 curve.points.push(...segmentPoints);
 
                 // Reset the curve segment and set the first control point
@@ -69,9 +65,9 @@ export default class PenTool implements ICanvasTool {
                 setFirstControlPoint(event);
             }
 
-            function preview(event: Event): void {
+            function preview(event: CustomMouseEvent): void {
                 // Redraw the current curve segment as the mouse moves around
-                const position: Vector = slideWrapper.getPosition(event as CustomEvent<GraphicMouseEvent | CanvasMouseEvent>);
+                const position: Vector = slideWrapper.getPosition(event);
                 segment.points = resolveCurve(segmentPoints, position.add(segment.origin.scale(-1)));
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: curve.id, graphic: curve });
                 slideWrapper.updateGraphic(segment.id, segment);
@@ -100,13 +96,13 @@ export default class PenTool implements ICanvasTool {
 
                 // Remove all event handlers
                 document.removeEventListener("keydown", end);
-                document.removeEventListener("Deck.CanvasMouseUp", setFirstControlPoint);
-                document.removeEventListener("Deck.GraphicMouseUp", setFirstControlPoint);
-                document.removeEventListener("Deck.CanvasMouseDown", setEndpoint);
-                document.removeEventListener("Deck.GraphicMouseDown", setEndpoint);
-                document.removeEventListener("Deck.CanvasMouseUp", setSecondControlPoint);
-                document.removeEventListener("Deck.GraphicMouseUp", setSecondControlPoint);
-                document.removeEventListener("Deck.CanvasMouseMove", preview);
+                document.removeEventListener("Deck.CanvasMouseUp", setFirstControlPoint as EventListener);
+                document.removeEventListener("Deck.GraphicMouseUp", setFirstControlPoint as EventListener);
+                document.removeEventListener("Deck.CanvasMouseDown", setEndpoint as EventListener);
+                document.removeEventListener("Deck.GraphicMouseDown", setEndpoint as EventListener);
+                document.removeEventListener("Deck.CanvasMouseUp", setSecondControlPoint as EventListener);
+                document.removeEventListener("Deck.GraphicMouseUp", setSecondControlPoint as EventListener);
+                document.removeEventListener("Deck.CanvasMouseMove", preview as EventListener);
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: curve.id });
                 slideWrapper.store.commit("graphicEditorObject", curve);
@@ -126,19 +122,19 @@ export default class PenTool implements ICanvasTool {
         };
     }
 
-    public canvasMouseOver(slideWrapper: SlideWrapper): () => void {
+    public canvasMouseOver(slideWrapper: ISlideWrapper): () => void {
         return function () {
             slideWrapper.setCursor("crosshair");
         };
     }
 
-    public canvasMouseOut(slideWrapper: SlideWrapper): () => void {
+    public canvasMouseOut(slideWrapper: ISlideWrapper): () => void {
         return function () {
             slideWrapper.setCursor("default");
         };
     }
 
-    public graphicMouseOver(slideWrapper: SlideWrapper): () => void {
+    public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
         return function () {
             slideWrapper.setCursor("crosshair");
         };
