@@ -1,9 +1,12 @@
 <template>
 <div class="slide-preview-container">
     <div ref="slidePreviewSlot" class="slide-preview-slot inactive-slide-preview-slot"></div>
-    <div :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive }">
-        <div :id="`canvas_${id}`" class="slide-preview-canvas"></div>
+    <div :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive, 'add-slide': isAddSlide }">
+        <div v-if="!isAddSlide" :id="`canvas_${id}`" class="slide-preview-canvas"></div>
         <div class="slide-preview-interface" @mousedown="focusSlide"></div>
+        <div v-if="isAddSlide" class="add-slide-icon">
+            <i class="fas fa-plus"></i>
+        </div>
     </div>
 </div>
 </template>
@@ -22,12 +25,17 @@ export default class SlidePreview extends Vue {
     @Prop({ type: String, required: true }) private slideId!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
+    @Prop({ type: Boolean, required: true }) private isAddSlide!: boolean;
 
     private mounted(): void {
         // Set the aspect ratio of the slide preview
         const slidePreview: HTMLElement = document.querySelector<HTMLElement>(`#slide-preview_${this.id}`)!;
         slidePreview.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
         (this.$refs.slidePreviewSlot as HTMLElement).style.width = `${slidePreview.clientHeight * 16 / 9}px`;
+
+        if (this.isAddSlide) {
+            return;
+        }
 
         // Instantiate the svg.js API on the slide preview and perform the initial render
         const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.croppedViewbox;
@@ -37,6 +45,12 @@ export default class SlidePreview extends Vue {
     }
 
     private focusSlide(event: MouseEvent): void {
+        // NOTE: This is pretty bad. Please fix this I beg you.
+        if (this.isAddSlide) {
+            this.$emit("add-slide");
+            return;
+        }
+
         this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
         this.$store.commit("activeSlide", this.id);
         this.$store.commit("graphicEditorObject", undefined);
@@ -137,6 +151,16 @@ export default class SlidePreview extends Vue {
 <style lang="scss" scoped>
 @import "../styles/application";
 
+.add-slide-icon {
+    color: $color-tertiary;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}
+
 .slide-preview-container {
     height: 100%;
     display: flex;
@@ -167,8 +191,12 @@ export default class SlidePreview extends Vue {
     box-sizing: border-box;
 
     &:hover {
-        border: 2px solid rgba(0, 0, 0, 0.35);
+        border-color: rgba(0, 0, 0, 0.35);
     }
+}
+
+.add-slide {
+    border-style: dashed;
 }
 
 .slide-preview-canvas {

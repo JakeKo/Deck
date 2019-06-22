@@ -7,11 +7,10 @@
             :slideId="slide.id"
             :isActive="$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id"
             :graphics="slide.graphics"
+            :isAddSlide="false"
             :key="slide.id"
         ></slide-preview>
-        <div id="new-slide-button" @click="addSlide">
-            <i class="fas fa-plus-square"></i>
-        </div>
+        <slide-preview :id="'addSlide'" :slideId="'-'" :isActive="false" :graphics="[]" :isAddSlide="true" @add-slide="addSlide"></slide-preview>
     </div>
 </div>
 </template>
@@ -27,11 +26,6 @@ import Slide from "../models/Slide";
     }
 })
 export default class Roadmap extends Vue {
-    private mounted(): void {
-        const newSlideButton: HTMLElement = this.$el.querySelector<HTMLElement>("#new-slide-button")!;
-        newSlideButton.style.width = `${newSlideButton.clientHeight}px`;
-    }
-
     private stretch(event: MouseEvent): void {
         event.stopPropagation();
         event.preventDefault();
@@ -39,12 +33,10 @@ export default class Roadmap extends Vue {
         document.addEventListener("mouseup", end);
 
         const self: Roadmap = this;
-        const newSlideButton: HTMLElement = document.querySelector<HTMLElement>("#new-slide-button")!;
         function preview(event: MouseEvent): void {
             // Update the height of the roadmap
             const height: number = Math.max(Math.min(window.innerHeight - event.pageY, 192), 64);
             (self.$el as HTMLElement).style.height = `${height}px`;
-            newSlideButton.style.width = `${newSlideButton.clientHeight}px`;
 
             // Resize the slide previews based on the height of the roadmap
             [
@@ -97,22 +89,5 @@ export default class Roadmap extends Vue {
 
 ::-webkit-scrollbar {
     display: none;
-}
-
-#new-slide-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50%;
-    color: $color-tertiary;
-    border-radius: 50%;
-    font-size: 32px;
-    cursor: pointer;
-    margin: 0 12px;
-    flex-shrink: 0;
-
-    &:hover {
-        color: $color-information;
-    }
 }
 </style>
