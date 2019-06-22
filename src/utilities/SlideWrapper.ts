@@ -1,13 +1,14 @@
 import * as SVG from "svg.js";
-import { IGraphic, CustomMouseEvent, ISlideWrapper } from "../types";
+import { IGraphic, CustomMouseEvent, ISlideWrapper, IRootState } from "../types";
 import GraphicEvent from "../models/GraphicEvent";
 import CanvasMouseEvent from "../models/CanvasMouseEvent";
 import GraphicMouseEvent from "../models/GraphicMouseEvent";
 import Anchor from "../models/Anchor";
 import Vector from "../models/Vector";
+import { Store } from "vuex";
 
 export default class SlideWrapper implements ISlideWrapper {
-    public store: any;
+    public store: Store<IRootState>;
     public slideId: string;
     public renderSupplementary: boolean;
 

@@ -1,6 +1,6 @@
 <template>
 <div class="slide-preview-container">
-    <div class="slide-preview-slot"></div>
+    <div ref="slidePreviewSlot" class="slide-preview-slot inactive-slide-preview-slot"></div>
     <div :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive }">
         <div :id="`canvas_${id}`" class="slide-preview-canvas"></div>
         <div class="slide-preview-interface" @mousedown="focusSlide"></div>
@@ -27,15 +27,13 @@ export default class SlidePreview extends Vue {
         // Set the aspect ratio of the slide preview
         const slidePreview: HTMLElement = document.querySelector<HTMLElement>(`#slide-preview_${this.id}`)!;
         slidePreview.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
+        (this.$refs.slidePreviewSlot as HTMLElement).style.width = `${slidePreview.clientHeight * 16 / 9}px`;
 
         // Instantiate the svg.js API on the slide preview and perform the initial render
         const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.croppedViewbox;
         const canvas: SVG.Doc = SVG(`canvas_${this.id}`).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height);
         const slideWrapper: ISlideWrapper = new SlideWrapper(this.slideId, canvas, this.$store, false);
-
-        this.graphics.forEach((graphic: IGraphic): void => {
-            slideWrapper.addGraphic(graphic);
-        });
+        this.graphics.forEach(slideWrapper.addGraphic);
     }
 
     private focusSlide(event: MouseEvent): void {
@@ -74,6 +72,15 @@ export default class SlidePreview extends Vue {
 
             const slidePreviews: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-container:not([id*='reordering-slide'])"));
             const slidePreviewSlots: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-slot"));
+
+            const destinationIndex: number = getDestinationIndex(bounds.x, slidePreviews);
+            const slidePreviewToMove: HTMLElement | undefined = slidePreviews[destinationIndex];
+            slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
+
+            if (slidePreviewToMove !== undefined) {
+                slidePreviewToMove.querySelector<HTMLElement>(".slide-preview-slot")!.classList.remove("inactive-slide-preview-slot");
+            }
+
             function moveSlidePreview(event: MouseEvent): void {
                 event.stopPropagation();
                 event.preventDefault();
@@ -81,12 +88,12 @@ export default class SlidePreview extends Vue {
                 slidePreview.style.left = `${event.clientX + offset.x}px`;
                 slidePreview.style.top = `${event.clientY + offset.y}px`;
 
-                const destinationIndex: number = getDestinationIndex(event.clientX, slidePreviews);
+                const destinationIndex: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, slidePreviews);
                 const slidePreviewToMove: HTMLElement | undefined = slidePreviews[destinationIndex];
-                slidePreviewSlots.forEach((slot: HTMLElement): void => void (slot.id = ""));
+                slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
 
                 if (slidePreviewToMove !== undefined) {
-                    slidePreviewToMove.querySelector<HTMLElement>(".slide-preview-slot")!.id = "active-slide-preview-slot";
+                    slidePreviewToMove.querySelector<HTMLElement>(".slide-preview-slot")!.classList.remove("inactive-slide-preview-slot");
                 }
             }
 
@@ -94,8 +101,8 @@ export default class SlidePreview extends Vue {
                 document.removeEventListener("mousemove", moveSlidePreview);
                 document.removeEventListener("mouseup", placeSlidePreview);
 
-                const destinationIndex: number = getDestinationIndex(event.clientX, slidePreviews);
-                slidePreviewSlots.forEach((slot: HTMLElement): void => void (slot.id = ""));
+                const destinationIndex: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, slidePreviews);
+                slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
 
                 // Note: replacing the styling must come after fetching the destination index
                 slidePreview.id = "";
@@ -137,18 +144,22 @@ export default class SlidePreview extends Vue {
 
 .slide-preview-slot {
     height: 100%;
-    width: 2px;
+    background: $color-tertiary;
+    margin: 0 8px;
+    border-radius: 4px;
 }
 
-#active-slide-preview-slot {
-    background: $color-information;
+.inactive-slide-preview-slot {
+    width: 0 !important;
+    margin: 0;
 }
 
 .slide-preview {
-    margin: 0 12px;
+    margin: 0 8px;
     cursor: pointer;
     flex-shrink: 0;
     border: 2px solid $color-tertiary;
+    border-radius: 4px;
     height: 100%;
     background: $color-light;
     position: relative;
@@ -156,7 +167,7 @@ export default class SlidePreview extends Vue {
     box-sizing: border-box;
 
     &:hover {
-        border: 2px solid $color-success;
+        border: 2px solid rgba(0, 0, 0, 0.35);
     }
 }
 

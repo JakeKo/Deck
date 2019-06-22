@@ -3,6 +3,7 @@ import Anchor from "./models/Anchor";
 import Vector from "./models/Vector";
 import SnapVector from "./models/SnapVector";
 import * as SVG from "svg.js";
+import { Store } from "vuex";
 
 export interface IRootState {
     activeSlideId: string;
@@ -57,7 +58,7 @@ export interface IGraphic {
 }
 
 export interface ISlideWrapper {
-    store: any;
+    store: Store<IRootState>;
     slideId: string;
     renderSupplementary: boolean;
     focusGraphic(graphic: IGraphic | undefined): void;
