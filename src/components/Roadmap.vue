@@ -38,11 +38,10 @@ export default class Roadmap extends Vue {
             const height: number = Math.max(Math.min(window.innerHeight - event.pageY, 192), 64);
             (self.$el as HTMLElement).style.height = `${height}px`;
 
+            // To this day I do not know the -4 must be applied to slots
             // Resize the slide previews based on the height of the roadmap
-            [
-                ...Array.from(document.querySelectorAll<HTMLElement>(".slide-preview")),
-                ...Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-slot"))
-            ].forEach((slidePreviewComponent: HTMLElement): void => void (slidePreviewComponent.style.width = `${slidePreviewComponent.clientHeight * 16 / 9}px`));
+            Array.from(document.querySelectorAll<HTMLElement>(".slide-preview")).forEach((preview: HTMLElement): void => void (preview.style.width = `${preview.clientHeight * 16 / 9}px`));
+            Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-slot")).forEach((slot: HTMLElement): void => void (slot.style.width = `${(slot.clientHeight - 4) * 16 / 9}px`));
         }
 
         function end(): void {
@@ -71,7 +70,7 @@ export default class Roadmap extends Vue {
     position: relative;
     box-sizing: border-box;
     border-top: 1px solid $color-tertiary;
-    height: 64px;
+    height: 72px;
     display: flex;
     align-items: center;
     flex-shrink: 0;

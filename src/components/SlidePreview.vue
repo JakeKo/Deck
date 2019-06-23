@@ -171,11 +171,14 @@ export default class SlidePreview extends Vue {
     background: $color-tertiary;
     margin: 0 8px;
     border-radius: 4px;
+    border: 2px solid $color-tertiary;
+    box-sizing: border-box;
 }
 
 .inactive-slide-preview-slot {
     width: 0 !important;
     margin: 0;
+    border: 0;
 }
 
 .slide-preview {
