@@ -59,58 +59,40 @@ export default class SlideWrapper implements ISlideWrapper {
 
     private _forwardCanvasEvents(): void {
         this._canvas.on("mousemove", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
             document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseMove", { detail: new CanvasMouseEvent(event, this.slideId) }));
         });
 
         this._canvas.on("mouseover", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
             document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseOver", { detail: new CanvasMouseEvent(event, this.slideId) }));
         });
 
         this._canvas.on("mouseout", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
             document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseOut", { detail: new CanvasMouseEvent(event, this.slideId) }));
         });
 
         this._canvas.on("mouseup", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
             document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseUp", { detail: new CanvasMouseEvent(event, this.slideId) }));
         });
 
         this._canvas.on("mousedown", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
             document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseDown", { detail: new CanvasMouseEvent(event, this.slideId) }));
         });
     }
 
     private _forwardGraphicEvents(graphicId: string, svg: SVG.Element): void {
         svg.on("mouseover", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
             document.dispatchEvent(new CustomEvent<GraphicMouseEvent>("Deck.GraphicMouseOver", { detail: new GraphicMouseEvent(event, this.slideId, graphicId) }));
         });
 
         svg.on("mouseout", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
             document.dispatchEvent(new CustomEvent<GraphicMouseEvent>("Deck.GraphicMouseOut", { detail: new GraphicMouseEvent(event, this.slideId, graphicId) }));
         });
 
         svg.on("mouseup", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
             document.dispatchEvent(new CustomEvent<GraphicMouseEvent>("Deck.GraphicMouseUp", { detail: new GraphicMouseEvent(event, this.slideId, graphicId) }));
         });
 
         svg.on("mousedown", (event: MouseEvent): void => {
-            event.preventDefault();
-            event.stopPropagation();
             document.dispatchEvent(new CustomEvent<GraphicMouseEvent>("Deck.GraphicMouseDown", { detail: new GraphicMouseEvent(event, this.slideId, graphicId) }));
         });
     }
@@ -133,21 +115,14 @@ export default class SlideWrapper implements ISlideWrapper {
                 const svg: SVG.Element = this._canvas.select(`#graphic_${this._focusedGraphic!.id}`).first();
                 const anchorSvg: SVG.Element = this._canvas.select(`#graphic_${anchor.graphic.id}`).first();
                 anchorSvg.on("mouseover", (event: MouseEvent): void => {
-                    event.preventDefault();
-                    event.stopPropagation();
                     this.setCursor(anchor.cursor);
                 });
 
                 anchorSvg.on("mouseout", (event: MouseEvent): void => {
-                    event.preventDefault();
-                    event.stopPropagation();
                     this.setCursor("default");
                 });
 
                 anchorSvg.on("mousedown", (event: MouseEvent): void => {
-                    event.preventDefault();
-                    event.stopPropagation();
-
                     document.addEventListener("Deck.CanvasMouseMove", preview);
                     document.addEventListener("Deck.GraphicMouseMove", preview);
                     document.addEventListener("Deck.CanvasMouseUp", end);
