@@ -72,6 +72,12 @@ export default class SlidePreview extends Vue {
             // Determine the offset of the mouse relative to the slide preview
             const bounds: DOMRect = slidePreview.getBoundingClientRect() as DOMRect;
             const offset: Vector = new Vector(bounds.left - event.clientX, bounds.top - event.clientY);
+            const slidePreviewBounds: Array<DOMRect> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-container"))
+                .map<DOMRect>((element: HTMLElement): DOMRect => element.getBoundingClientRect() as DOMRect);
+
+            const [ first, second, ..._ ]: Array<DOMRect> = slidePreviewBounds;
+            const boundaryOffset: number = (first.x + first.width + second.x) / 2 - first.x;
+            const boundaries: Array<number> = slidePreviewBounds.map<number>((bounds: DOMRect): number => bounds.x + boundaryOffset).slice(0, -1);
 
             document.addEventListener("mousemove", moveSlidePreview);
             document.addEventListener("mouseup", placeSlidePreview);
@@ -87,7 +93,7 @@ export default class SlidePreview extends Vue {
             const slidePreviews: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-container:not([id*='reordering-slide'])"));
             const slidePreviewSlots: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-slot"));
 
-            const destinationIndex: number = getDestinationIndex(bounds.x, slidePreviews);
+            const destinationIndex: number = getDestinationIndex(bounds.x, boundaries);
             const slidePreviewToMove: HTMLElement | undefined = slidePreviews[destinationIndex];
             slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
 
@@ -102,7 +108,7 @@ export default class SlidePreview extends Vue {
                 slidePreview.style.left = `${event.clientX + offset.x}px`;
                 slidePreview.style.top = `${event.clientY + offset.y}px`;
 
-                const destinationIndex: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, slidePreviews);
+                const destinationIndex: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, boundaries);
                 const slidePreviewToMove: HTMLElement | undefined = slidePreviews[destinationIndex];
                 slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
 
@@ -115,7 +121,7 @@ export default class SlidePreview extends Vue {
                 document.removeEventListener("mousemove", moveSlidePreview);
                 document.removeEventListener("mouseup", placeSlidePreview);
 
-                const destinationIndex: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, slidePreviews);
+                const destinationIndex: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, boundaries);
                 slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
 
                 // Note: replacing the styling must come after fetching the destination index
@@ -130,19 +136,14 @@ export default class SlidePreview extends Vue {
             }
         }
 
-        // Returns the potential destination index of a slide if the reordering were to complete
-        // Calculates based on mouse position relative to centers of each slide preview
-        function getDestinationIndex(position: number, slidePreviews: Array<HTMLElement>): number {
-            const boundsList: Array<DOMRect> = slidePreviews.map<DOMRect>((slidePreview: HTMLElement): DOMRect => slidePreview.getBoundingClientRect() as DOMRect);
-            const borders: Array<number> = boundsList.map<number>((bounds: DOMRect): number => bounds.x + bounds.width / 2);
-
-            for (let i = 0; i < borders.length; i++) {
-                if (position < borders[i]) {
+        function getDestinationIndex(position: number, boundaries: Array<number>) {
+            for (let i = 0; i < boundaries.length; i++) {
+                if (position < boundaries[i]) {
                     return i;
                 }
             }
 
-            return borders.length;
+            return boundaries.length - 1;
         }
     }
 }

@@ -82,7 +82,7 @@ export default class Roadmap extends Vue {
     overflow-x: auto;
     display: flex;
     align-items: center;
-    padding: 0 12px;
+    padding: 0 8px;
     box-sizing: border-box;
 }
 
