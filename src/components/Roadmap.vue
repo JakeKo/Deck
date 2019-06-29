@@ -2,15 +2,16 @@
 <div id="roadmap">
     <div class="stretcher-vertical top" @mousedown="stretch"></div>
     <div id="slide-previews">
-        <slide-preview v-for="slide in $store.getters.slides"
+        <slide-preview v-for="(slide, index) in $store.getters.slides"
             :id="slide.id"
+            :index="index"
             :slideId="slide.id"
             :isActive="$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id"
             :graphics="slide.graphics"
             :isAddSlide="false"
             :key="slide.id"
         ></slide-preview>
-        <slide-preview :id="'addSlide'" :slideId="'-'" :isActive="false" :graphics="[]" :isAddSlide="true" @add-slide="addSlide"></slide-preview>
+        <slide-preview :id="'addSlide'" :index="-1" :slideId="'-'" :isActive="false" :graphics="[]" :isAddSlide="true" @add-slide="addSlide"></slide-preview>
     </div>
 </div>
 </template>
