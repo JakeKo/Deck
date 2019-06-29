@@ -140,7 +140,6 @@ export default class SlideWrapper implements ISlideWrapper {
                         lastPosition = new Vector(customEvent.detail.baseEvent.clientX, customEvent.detail.baseEvent.clientY);
                         anchor.handler(customEvent);
                         focusedGraphic.updateRendering(svg);
-
                         self.store.commit("updateGraphic", { slideId: self.slideId, graphicId: focusedGraphic.id, graphic: focusedGraphic });
                         self.store.commit("graphicEditorObject", undefined);
                         self.store.commit("graphicEditorObject", focusedGraphic);
@@ -154,6 +153,8 @@ export default class SlideWrapper implements ISlideWrapper {
                         document.removeEventListener("keydown", toggleSquare);
                         document.removeEventListener("keyup", toggleSquare);
 
+                        self.store.commit("removeSnapVectors", { slideId: self.slideId, graphicId: focusedGraphic.id });
+                        self.store.commit("addSnapVectors", { slideId: self.slideId, snapVectors: focusedGraphic.getSnapVectors() });
                         self.store.commit("focusGraphic", { slideId: self.slideId, graphicId: focusedGraphic.id });
                     }
 
