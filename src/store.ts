@@ -43,7 +43,8 @@ const store: StoreOptions<IRootState> = {
             rectangle: new RectangleTool(),
             ellipse: new EllipseTool(),
             textbox: new TextboxTool()
-        } as { [key: string]: ICanvasTool }
+        } as { [key: string]: ICanvasTool },
+        deckTitle: ""
     },
     getters: {
         slides: (state: IRootState): Array<Slide> => {
@@ -107,6 +108,9 @@ const store: StoreOptions<IRootState> = {
         },
         croppedViewbox: (state: IRootState): { x: number, y: number, width: number, height: number } => {
             return state.canvas.croppedViewbox;
+        },
+        deckTitle: (state: IRootState): string => {
+            return state.deckTitle;
         }
     },
     mutations: {
@@ -226,6 +230,9 @@ const store: StoreOptions<IRootState> = {
             }
 
             slide.snapVectors.push(...snapVectors);
+        },
+        deckTitle: (state: IRootState, deckTitle: string): void => {
+            state.deckTitle = deckTitle;
         }
     },
     actions: {
@@ -262,7 +269,7 @@ const store: StoreOptions<IRootState> = {
 
             const anchor: HTMLAnchorElement = document.createElement("a");
             anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
-            anchor.setAttribute("download", "deck.html");
+            anchor.setAttribute("download", `${store.getters.deckTitle === "" ? "untitled" : store.getters.deckTitle}.html`);
             anchor.click();
             anchor.remove();
 
@@ -275,7 +282,7 @@ const store: StoreOptions<IRootState> = {
 
             const anchor: HTMLAnchorElement = document.createElement("a");
             anchor.setAttribute("href", `data:application/json;charset=UTF-8,${encodeURIComponent(json)}`);
-            anchor.setAttribute("download", "deck.json");
+            anchor.setAttribute("download", `${store.getters.deckTitle === "" ? "untitled" : store.getters.deckTitle}.json`);
             anchor.click();
             anchor.remove();
         },

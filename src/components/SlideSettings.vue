@@ -74,6 +74,7 @@ export default class SlideSettings extends Vue {
     justify-content: center;
     width: 100%;
     padding: 6px 0;
+    transition: 0.25s;
 
     &:hover {
         background: $color-secondary;
@@ -88,6 +89,7 @@ export default class SlideSettings extends Vue {
     padding: 4px 0;
     font-family: $font-body;
     font-size: 14px;
+    transition: 0.25s;
 
     &:focus {
         background: $color-tertiary;

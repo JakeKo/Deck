@@ -31,6 +31,7 @@ export interface IRootState {
     slides: Array<Slide>;
     currentTool: string;
     tools: { [key: string]: ICanvasTool };
+    deckTitle: string;
 }
 
 export interface ICanvasTool {
