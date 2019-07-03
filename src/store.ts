@@ -44,7 +44,8 @@ const store: StoreOptions<IRootState> = {
             ellipse: new EllipseTool(),
             textbox: new TextboxTool()
         } as { [key: string]: ICanvasTool },
-        deckTitle: ""
+        deckTitle: "Untitled",
+        topics: []
     },
     getters: {
         slides: (state: IRootState): Array<Slide> => {
@@ -111,20 +112,26 @@ const store: StoreOptions<IRootState> = {
         },
         deckTitle: (state: IRootState): string => {
             return state.deckTitle;
+        },
+        topics: (state: IRootState): Array<string | undefined> => {
+            return state.topics;
         }
     },
     mutations: {
         addSlide: (state: IRootState, index: number): void => {
             const slide: Slide = new Slide();
             const { width, height } = state.canvas.croppedViewbox;
-            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, 0), Vector.right));
-            slide.snapVectors.push(new SnapVector("slide", new Vector(width, height / 2), Vector.up));
-            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height), Vector.right));
-            slide.snapVectors.push(new SnapVector("slide", new Vector(0, height / 2), Vector.up));
-            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height / 2), Vector.right));
-            slide.snapVectors.push(new SnapVector("slide", new Vector(width / 2, height / 2), Vector.up));
+            slide.snapVectors.push(...[
+                new SnapVector("slide", new Vector(width / 2, 0), Vector.right),
+                new SnapVector("slide", new Vector(width, height / 2), Vector.up),
+                new SnapVector("slide", new Vector(width / 2, height), Vector.right),
+                new SnapVector("slide", new Vector(0, height / 2), Vector.up),
+                new SnapVector("slide", new Vector(width / 2, height / 2), Vector.right),
+                new SnapVector("slide", new Vector(width / 2, height / 2), Vector.up)
+            ]);
 
             state.slides.splice(index, 0, slide);
+            state.topics.splice(index, 0, undefined);
         },
         reorderSlide: (state: IRootState, { source, destination }: { source: number, destination: number }): void => {
             const slide: Slide = state.slides[source];
@@ -233,6 +240,9 @@ const store: StoreOptions<IRootState> = {
         },
         deckTitle: (state: IRootState, deckTitle: string): void => {
             state.deckTitle = deckTitle;
+        },
+        setTopic: (state: IRootState, { index, topic }: { index: number, topic: string | undefined }): void => {
+            state.topics[index] = topic;
         }
     },
     actions: {
@@ -269,7 +279,7 @@ const store: StoreOptions<IRootState> = {
 
             const anchor: HTMLAnchorElement = document.createElement("a");
             anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
-            anchor.setAttribute("download", `${store.getters.deckTitle === "" ? "untitled" : store.getters.deckTitle}.html`);
+            anchor.setAttribute("download", `${store.getters.deckTitle}.html`);
             anchor.click();
             anchor.remove();
 
@@ -282,7 +292,7 @@ const store: StoreOptions<IRootState> = {
 
             const anchor: HTMLAnchorElement = document.createElement("a");
             anchor.setAttribute("href", `data:application/json;charset=UTF-8,${encodeURIComponent(json)}`);
-            anchor.setAttribute("download", `${store.getters.deckTitle === "" ? "untitled" : store.getters.deckTitle}.json`);
+            anchor.setAttribute("download", `${store.getters.deckTitle}.json`);
             anchor.click();
             anchor.remove();
         },

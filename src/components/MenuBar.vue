@@ -1,6 +1,6 @@
 <template>
 <div id="menu-bar">
-    <input id="deck-title" :value="deckTitle" @blur="deckTitle = $event.target.value" @keydown="$event.stopPropagation()" autocomplete="false">
+    <input id="deck-title" :value="$store.getters.deckTitle" @blur="$store.commit('deckTitle', $event.target.value)" @keydown="$event.stopPropagation()" autocomplete="false">
 </div>
 </template>
 
@@ -8,15 +8,7 @@
 import { Vue, Component } from "vue-property-decorator";
 
 @Component
-export default class MenuBar extends Vue {
-    get deckTitle(): string {
-        return this.$store.getters.deckTitle === "" ? "Untitled" : this.$store.getters.deckTitle;
-    }
-
-    set deckTitle(deckTitle: string) {
-        this.$store.commit("deckTitle", deckTitle);
-    }
-}
+export default class MenuBar extends Vue { }
 </script>
 
 <style lang="scss" scoped>

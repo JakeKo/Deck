@@ -1,11 +1,14 @@
 <template>
 <div class="slide-preview-container" :data-index="index">
     <div ref="slide-preview-slot" class="slide-preview-slot inactive-slide-preview-slot" :data-index="index"></div>
-    <div ref="slide-preview" :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive, 'add-slide': isAddSlide }">
-        <div v-if="!isAddSlide" :id="`canvas_${id}`" class="slide-preview-canvas"></div>
-        <div class="slide-preview-interface" @mousedown="focusSlide"></div>
-        <div v-if="isAddSlide" class="add-slide-icon">
-            <i class="fas fa-plus"></i>
+    <div class="slide-preview-content">
+        <input ref="topic-label" class="topic-label" @blur="topic = $event.target.value" @keydown="topicHandler">
+        <div ref="slide-preview" :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive, 'add-slide': isAddSlide }">
+            <div v-if="!isAddSlide" :id="`canvas_${id}`" class="slide-preview-canvas"></div>
+            <div class="slide-preview-interface" @mousedown="focusSlide"></div>
+            <div v-if="isAddSlide" class="add-slide-icon">
+                <i class="fas fa-plus"></i>
+            </div>
         </div>
     </div>
 </div>
@@ -28,11 +31,30 @@ export default class SlidePreview extends Vue {
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
     @Prop({ type: Boolean, required: true }) private isAddSlide!: boolean;
 
+    get topic(): string {
+        return this.$store.getters.topics[this.index] || "New Topic";
+    }
+
+    set topic(value: string) {
+        this.$store.commit("setTopic", { index: this.index, topic: value === "" ? undefined : value });
+        (this.$refs["topic-label"] as HTMLInputElement).value = value;
+    }
+
+    private topicHandler(event: KeyboardEvent): void {
+        event.stopPropagation();
+
+        if (event.key === "Enter") {
+            (event.target as HTMLInputElement).blur();
+        }
+    }
+
     private mounted(): void {
         // Set the aspect ratio of the slide preview
         const slidePreview: HTMLElement = this.$refs["slide-preview"] as HTMLElement;
         const slidePreviewSlot: HTMLElement = this.$refs["slide-preview-slot"] as HTMLElement;
-        slidePreview.style.width = slidePreviewSlot.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
+        const topicLabel: HTMLInputElement = this.$refs["topic-label"] as HTMLInputElement;
+        slidePreview.style.width = slidePreviewSlot.style.width = topicLabel.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
+        topicLabel.value = this.topic;
 
         if (this.isAddSlide) {
             return;
@@ -56,66 +78,56 @@ export default class SlidePreview extends Vue {
         this.$store.commit("activeSlide", this.id);
         this.$store.commit("graphicEditorObject", undefined);
 
-        // Interrupt the slide reordering handlers if the mouse is lifted before the reordering begins
-        const beginSlideReorder: number = window.setTimeout(reorderSlidePreview, 150);
-        document.addEventListener("mouseup", interrupt);
-        function interrupt(): void {
-            document.removeEventListener("mouseup", interrupt);
-            window.clearTimeout(beginSlideReorder);
+        // Calculate the dividing boundaries between slides - used to determine the destination index of the slide-to-reorder
+        const slidePreview: HTMLElement = this.$el as HTMLElement;
+        const slidePreviewBounds: Array<DOMRect> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-container"))
+            .map<DOMRect>((element: HTMLElement): DOMRect => element.getBoundingClientRect() as DOMRect);
+        const [ first, second, ..._ ]: Array<DOMRect> = slidePreviewBounds;
+        const boundaryOffset: number = (first.x + first.width + second.x) / 2 - first.x;
+        const boundaries: Array<number> = slidePreviewBounds.map<number>((bounds: DOMRect): number => bounds.x + boundaryOffset).slice(0, -1);
+
+        document.addEventListener("mousemove", moveSlidePreview);
+        document.addEventListener("mouseup", placeSlidePreview);
+
+        const bounds: DOMRect = slidePreview.getBoundingClientRect() as DOMRect;
+        const offset: Vector = new Vector(bounds.left - event.clientX, bounds.top - event.clientY);
+
+        // Note: height and offset must be set before changing the position
+        slidePreview.style.height = `${slidePreview.clientHeight}px`;
+        slidePreview.style.position = "fixed";
+        slidePreview.style.zIndex = "1";
+
+        const slidePreviews: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(`.slide-preview-container:not([data-index="${this.index}"])`));
+        const slidePreviewSlots: Array<HTMLElement> = slidePreviews.map<HTMLElement>((element: HTMLElement): HTMLElement => element.querySelector<HTMLElement>(".slide-preview-slot")!);
+        moveSlidePreview(event);
+
+        function moveSlidePreview(event: MouseEvent): void {
+            slidePreview.style.left = `${event.clientX + offset.x}px`;
+            slidePreview.style.top = `${event.clientY + offset.y}px`;
+
+            const destinationIndex: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, boundaries);
+            slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
+            slidePreviews[destinationIndex].querySelector<HTMLElement>(".slide-preview-slot")!.classList.remove("inactive-slide-preview-slot");
         }
 
-        const slidePreview: HTMLElement = this.$el as HTMLElement;
         const self: SlidePreview = this;
-        function reorderSlidePreview(): void {
-            // Calculate the dividing boundaries between slides - used to determine the destination index of the slide-to-reorder
-            const slidePreviewBounds: Array<DOMRect> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-container"))
-                .map<DOMRect>((element: HTMLElement): DOMRect => element.getBoundingClientRect() as DOMRect);
-            const [ first, second, ..._ ]: Array<DOMRect> = slidePreviewBounds;
-            const boundaryOffset: number = (first.x + first.width + second.x) / 2 - first.x;
-            const boundaries: Array<number> = slidePreviewBounds.map<number>((bounds: DOMRect): number => bounds.x + boundaryOffset).slice(0, -1);
+        function placeSlidePreview(event: MouseEvent): void {
+            document.removeEventListener("mousemove", moveSlidePreview);
+            document.removeEventListener("mouseup", placeSlidePreview);
 
-            document.addEventListener("mousemove", moveSlidePreview);
-            document.addEventListener("mouseup", placeSlidePreview);
+            slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
 
-            const bounds: DOMRect = slidePreview.getBoundingClientRect() as DOMRect;
-            const offset: Vector = new Vector(bounds.left - event.clientX, bounds.top - event.clientY);
+            // Note: replacing the styling must come after fetching the destination index
+            slidePreview.style.position = "relative";
+            slidePreview.style.top = null;
+            slidePreview.style.left = null;
+            slidePreview.style.height = "100%";
+            slidePreview.style.zIndex = null;
 
-            // Note: height and offset must be set before changing the position
-            slidePreview.style.height = `${slidePreview.clientHeight}px`;
-            slidePreview.style.position = "fixed";
-            slidePreview.style.zIndex = "1";
-
-            const slidePreviews: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(`.slide-preview-container:not([data-index="${self.index}"])`));
-            const slidePreviewSlots: Array<HTMLElement> = slidePreviews.map<HTMLElement>((element: HTMLElement): HTMLElement => element.querySelector<HTMLElement>(".slide-preview-slot")!);
-            moveSlidePreview(event);
-
-            function moveSlidePreview(event: MouseEvent): void {
-                slidePreview.style.left = `${event.clientX + offset.x}px`;
-                slidePreview.style.top = `${event.clientY + offset.y}px`;
-
-                const destinationIndex: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, boundaries);
-                slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
-                slidePreviews[destinationIndex].querySelector<HTMLElement>(".slide-preview-slot")!.classList.remove("inactive-slide-preview-slot");
-            }
-
-            function placeSlidePreview(event: MouseEvent): void {
-                document.removeEventListener("mousemove", moveSlidePreview);
-                document.removeEventListener("mouseup", placeSlidePreview);
-
-                slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
-
-                // Note: replacing the styling must come after fetching the destination index
-                slidePreview.style.position = "relative";
-                slidePreview.style.top = null;
-                slidePreview.style.left = null;
-                slidePreview.style.height = "100%";
-                slidePreview.style.zIndex = null;
-
-                self.$store.commit("reorderSlide", {
-                    source: self.$store.getters.slides.findIndex((slide: Slide): boolean => slide.id === self.slideId),
-                    destination: getDestinationIndex(event.clientX + offset.x + bounds.width / 2, boundaries)
-                });
-            }
+            const destination: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, boundaries);
+            self.$store.commit("setTopic", { index: destination, topic: self.$store.getters.topics[self.index] });
+            self.$store.commit("setTopic", { index: self.index, topic: undefined });
+            self.$store.commit("reorderSlide", { source: self.index, destination: destination });
         }
 
         function getDestinationIndex(position: number, boundaries: Array<number>) {
@@ -152,10 +164,33 @@ export default class SlidePreview extends Vue {
 .slide-preview-slot {
     height: 100%;
     background: $color-tertiary;
-    margin: 0 8px;
+    margin: 18px 8px 0 8px;
     border-radius: 4px;
     border: 2px solid $color-tertiary;
     box-sizing: border-box;
+}
+
+.slide-preview-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.topic-label {
+    font-family: $font-body;
+    font-size: 14px;
+    text-align: center;
+    border: none;
+    outline: none;
+    background: transparent;
+}
+
+.ephemeral-label {
+    opacity: 0;
+
+    &:hover {
+        opacity: 1;
+    }
 }
 
 .inactive-slide-preview-slot {
@@ -170,7 +205,7 @@ export default class SlidePreview extends Vue {
     flex-shrink: 0;
     border: 2px solid $color-tertiary;
     border-radius: 4px;
-    height: 100%;
+    height: calc(100% - 18px);
     background: $color-light;
     position: relative;
     overflow: hidden;

@@ -32,6 +32,7 @@ export interface IRootState {
     currentTool: string;
     tools: { [key: string]: ICanvasTool };
     deckTitle: string;
+    topics: Array<string | undefined>
 }
 
 export interface ICanvasTool {
