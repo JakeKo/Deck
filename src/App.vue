@@ -2,7 +2,7 @@
 <div id="app">
     <menu-bar></menu-bar>
     <div id="interface">
-        <toolbox></toolbox>
+        <toolbox :toolName="$store.getters.toolName"></toolbox>
         <div id="workspace">
             <editor></editor>
             <roadmap></roadmap>

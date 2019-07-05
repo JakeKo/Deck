@@ -1,24 +1,25 @@
 <template>
 <div id="toolbox">
-    <tool @click="$store.commit('tool', 'cursor')" :toolName="'cursor'" :icon="'fas fa-mouse-pointer'" :isActive="$store.getters.toolName === 'cursor'"></tool>
-    <tool @click="$store.commit('tool', 'pencil')" :toolName="'pencil'" :icon="'fas fa-pen'" :isActive="$store.getters.toolName === 'pencil'"></tool>
-    <tool @click="$store.commit('tool', 'pen')" :toolName="'pen'" :icon="'fas fa-pen-nib'" :isActive="$store.getters.toolName === 'pen'"></tool>
-    <tool @click="$store.commit('tool', 'rectangle')" :toolName="'rectangle'" :icon="'fas fa-square'" :isActive="$store.getters.toolName === 'rectangle'"></tool>
-    <tool @click="$store.commit('tool', 'ellipse')" :toolName="'ellipse'" :icon="'fas fa-circle'" :isActive="$store.getters.toolName === 'ellipse'"></tool>
-    <tool @click="$store.commit('tool', 'textbox')" :toolName="'text'" :icon="'fas fa-font'" :isActive="$store.getters.toolName === 'textbox'"></tool>
-    <tool @click="uploadImage" :toolName="'image'" :icon="'fas fa-image'" :isActive="false"></tool>
-    <tool @click="uploadVideo" :toolName="'video'" :icon="'fas fa-video'" :isActive="false"></tool>
-    <tool @click="$store.dispatch('export')" :toolName="'export'" :icon="'fas fa-cloud-download-alt'" :isActive="false"></tool>
-    <tool @click="uploadPresentation" :toolName="'load'" :icon="'fas fa-file-upload'" :isActive="false"></tool>
-    <tool @click="$store.dispatch('save')" :toolName="'save'" :icon="'fas fa-save'" :isActive="false"></tool>
+    <tool @click="$store.commit('tool', 'cursor')"      :toolName="'cursor'"    :icon="'fas fa-mouse-pointer'"      :isActive="toolName === 'cursor'"></tool>
+    <tool @click="$store.commit('tool', 'pencil')"      :toolName="'pencil'"    :icon="'fas fa-pen'"                :isActive="toolName === 'pencil'"></tool>
+    <tool @click="$store.commit('tool', 'pen')"         :toolName="'pen'"       :icon="'fas fa-pen-nib'"            :isActive="toolName === 'pen'"></tool>
+    <tool @click="$store.commit('tool', 'rectangle')"   :toolName="'rectangle'" :icon="'fas fa-square'"             :isActive="toolName === 'rectangle'"></tool>
+    <tool @click="$store.commit('tool', 'ellipse')"     :toolName="'ellipse'"   :icon="'fas fa-circle'"             :isActive="toolName === 'ellipse'"></tool>
+    <tool @click="$store.commit('tool', 'textbox')"     :toolName="'text'"      :icon="'fas fa-font'"               :isActive="toolName === 'textbox'"></tool>
+    <tool @click="uploadImage"                          :toolName="'image'"     :icon="'fas fa-image'"              :isActive="false"></tool>
+    <tool @click="uploadVideo"                          :toolName="'video'"     :icon="'fas fa-video'"              :isActive="false"></tool>
+    <tool @click="$store.dispatch('export')"            :toolName="'export'"    :icon="'fas fa-cloud-download-alt'" :isActive="false"></tool>
+    <tool @click="uploadPresentation"                   :toolName="'load'"      :icon="'fas fa-file-upload'"        :isActive="false"></tool>
+    <tool @click="$store.dispatch('save')"              :toolName="'save'"      :icon="'fas fa-save'"               :isActive="false"></tool>
+
     <a href="https://github.com/JakeKo/Deck/issues/new/choose" target="blank" style="text-decoration: none">
-        <tool :toolName="'feedback'" :icon="'fas fa-info'" :isActive="false"></tool>
+        <tool                                           :toolName="'feedback'"  :icon="'fas fa-info'"               :isActive="false"></tool>
     </a>
 </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Prop } from "vue-property-decorator";
 import Tool from "./Tool.vue";
 import { Image, Video } from "../models/graphics/graphics";
 import Slide from "../models/Slide";
@@ -31,6 +32,8 @@ import Utilities from "../utilities/general";
     }
 })
 export default class Toolbox extends Vue {
+    @Prop({ type: String, required: true }) private toolName!: string;
+
     private input!: HTMLInputElement;
     private fileReader!: FileReader;
 
@@ -54,13 +57,13 @@ export default class Toolbox extends Vue {
     }
 
     private uploadImage(): void {
-        this.fileReader.onloadend = (event: FileReaderProgressEvent): void => {
+        this.fileReader.onloadend = (): void => {
             if (this.$store.getters.activeSlide === undefined) {
                 return;
             }
 
             // Create a promise that waits for the image width and height to be determined
-            const imageUrl: string = `data:image;base64,${btoa(this.fileReader.result)}`;
+            const imageUrl: string = `data:image;base64,${btoa(this.fileReader.result as string)}`;
             const promise = new Promise((resolve, reject): void => {
                 const image: HTMLImageElement = document.createElement<"img">("img");
                 image.src = imageUrl;
@@ -105,8 +108,8 @@ export default class Toolbox extends Vue {
     }
 
     private uploadPresentation(): void {
-        this.fileReader.onloadend = (event: FileReaderProgressEvent): void => {
-            const json: any = JSON.parse(this.fileReader.result);
+        this.fileReader.onloadend = (): void => {
+            const json: any = JSON.parse(this.fileReader.result as string);
             const slides: Array<Slide> = json.map((slide: any): Slide => new Slide({
                 id: slide.id,
                 graphics: slide.graphics.map((graphic: any): IGraphic => Utilities.parseGraphic(graphic))
