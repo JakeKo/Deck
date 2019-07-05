@@ -82,35 +82,37 @@ export default class Image implements IGraphic {
             this.anchorIds.push(Utilities.generateId());
         }
 
+        // Create deep copies of the origin and the point opposite from the origin
+        const baseOrigin: Vector = new Vector(this.origin.x, this.origin.y);
+        const baseDimensions: Vector = new Vector(this.width, this.height);
+        const self: Image = this;
+
+        function adjust(origin: Vector): (event: CustomMouseEvent) => void {
+            return function (event: CustomMouseEvent): void {
+                const rawDimensions: Vector = origin.towards(slideWrapper.getPosition(event));
+                const minimumDimension: number = Math.min(Math.abs(rawDimensions.x), Math.abs(rawDimensions.y));
+                const resolvedDimensions: Vector = event.detail.baseEvent.shiftKey ? rawDimensions.transform(Math.sign).scale(minimumDimension) : rawDimensions;
+
+                // Enforce that a shape has positive width and height i.e. move the x and y if the width or height are negative
+                self.origin = origin.add(resolvedDimensions.scale(0.5)).add(resolvedDimensions.transform(Math.abs).scale(-0.5));
+                self.width = Math.abs(resolvedDimensions.x);
+                self.height = Math.abs(resolvedDimensions.y);
+            };
+        }
+
         return [
-            new Anchor(
-                Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
+            new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
                 "move",
-                (event: CustomMouseEvent): void => {
-                    return;
-                }
-            ),
-            new Anchor(
-                Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
+                adjust(baseOrigin.add(baseDimensions))),
+            new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
                 "move",
-                (event: CustomMouseEvent): void => {
-                    return;
-                }
-            ),
-            new Anchor(
-                Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
+                adjust(baseOrigin.add(new Vector(0, baseDimensions.y)))),
+            new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
                 "move",
-                (event: CustomMouseEvent): void => {
-                    return;
-                }
-            ),
-            new Anchor(
-                Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
+                adjust(baseOrigin)),
+            new Anchor(Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
                 "move",
-                (event: CustomMouseEvent): void => {
-                    return;
-                }
-            )
+                adjust(baseOrigin.add(new Vector(baseDimensions.x, 0))))
         ];
     }
 
@@ -125,7 +127,6 @@ export default class Image implements IGraphic {
             },
             data: {
                 origin: this.origin,
-                source: this.source,
                 width: this.width,
                 height: this.height,
                 rotation: this.rotation
