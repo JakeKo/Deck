@@ -2,7 +2,7 @@
 <div class="slide-preview-container" :data-index="index">
     <div ref="slide-preview-slot" class="slide-preview-slot inactive-slide-preview-slot" :data-index="index"></div>
     <div class="slide-preview-content">
-        <input ref="topic-label" class="topic-label" @blur="topic = $event.target.value" @keydown="topicHandler">
+        <input ref="topic-label" class="topic-label ephemeral-label" @focus="focus" @blur="topic = $event.target.value" @keydown="topicHandler">
         <div ref="slide-preview" :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive, 'add-slide': isAddSlide }">
             <div v-if="!isAddSlide" :id="`canvas_${id}`" class="slide-preview-canvas"></div>
             <div class="slide-preview-interface" @mousedown="focusSlide"></div>
@@ -31,13 +31,19 @@ export default class SlidePreview extends Vue {
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
     @Prop({ type: Boolean, required: true }) private isAddSlide!: boolean;
 
+    private focus(): void {
+        (this.$refs["topic-label"] as HTMLInputElement).classList.remove("ephemeral-label");
+    }
+
     get topic(): string {
-        return this.$store.getters.topics[this.index] || "New Topic";
+        return this.isAddSlide ? "" : this.$store.getters.topics[this.index] || "+ New Topic";
     }
 
     set topic(value: string) {
+        const topicLabel: HTMLInputElement = this.$refs["topic-label"] as HTMLInputElement;
         this.$store.commit("setTopic", { index: this.index, topic: value === "" ? undefined : value });
-        (this.$refs["topic-label"] as HTMLInputElement).value = value;
+        topicLabel.value = value;
+        topicLabel.classList.toggle("ephemeral-label", value === "");
     }
 
     private topicHandler(event: KeyboardEvent): void {
