@@ -1,9 +1,10 @@
-import { ICanvasTool, CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper } from "../../types";
+import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper } from "../../types";
 import { Rectangle } from "../graphics/graphics";
 import Vector from "../Vector";
 import CanvasMouseEvent from "../CanvasMouseEvent";
+import CanvasTool from "./CanvasTool";
 
-export default class RectangleTool implements ICanvasTool {
+export default class RectangleTool extends CanvasTool {
     public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
         return function (event: CustomCanvasMouseEvent): void {
             document.addEventListener("Deck.CanvasMouseMove", preview as EventListener);
@@ -72,28 +73,14 @@ export default class RectangleTool implements ICanvasTool {
     }
 
     public canvasMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return function () {
-            slideWrapper.setCursor("crosshair");
-        };
+        return (): void => slideWrapper.setCursor("crosshair");
     }
 
     public canvasMouseOut(slideWrapper: ISlideWrapper): () => void {
-        return function () {
-            slideWrapper.setCursor("default");
-        };
+        return (): void => slideWrapper.setCursor("default");
     }
 
     public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return function () {
-            slideWrapper.setCursor("crosshair");
-        };
-    }
-
-    public graphicMouseOut(): () => void {
-        return (): void => { return; };
-    }
-
-    public graphicMouseDown(): () => void {
-        return (): void => { return; };
+        return (): void => slideWrapper.setCursor("crosshair");
     }
 }

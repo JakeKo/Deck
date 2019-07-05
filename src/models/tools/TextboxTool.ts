@@ -1,7 +1,8 @@
-import { ICanvasTool, CustomCanvasMouseEvent, ISlideWrapper } from "../../types";
+import { CustomCanvasMouseEvent, ISlideWrapper } from "../../types";
 import { Text } from "../graphics/graphics";
+import CanvasTool from "./CanvasTool";
 
-export default class TextboxTool implements ICanvasTool {
+export default class TextboxTool extends CanvasTool {
     public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
         return function (event: CustomCanvasMouseEvent): void {
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
@@ -18,28 +19,14 @@ export default class TextboxTool implements ICanvasTool {
     }
 
     public canvasMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return function () {
-            slideWrapper.setCursor("text");
-        };
+        return (): void => slideWrapper.setCursor("text");
     }
 
     public canvasMouseOut(slideWrapper: ISlideWrapper): () => void {
-        return function () {
-            slideWrapper.setCursor("default");
-        };
+        return (): void => slideWrapper.setCursor("default");
     }
 
     public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return function () {
-            slideWrapper.setCursor("text");
-        };
-    }
-
-    public graphicMouseOut(): () => void {
-        return (): void => { return; };
-    }
-
-    public graphicMouseDown(): () => void {
-        return (): void => { return; };
+        return (): void => slideWrapper.setCursor("text");
     }
 }

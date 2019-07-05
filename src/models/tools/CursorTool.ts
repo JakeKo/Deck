@@ -1,8 +1,9 @@
-import { ICanvasTool, IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper } from "../../types";
+import { IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 import Sketch from "../graphics/Sketch";
 import CanvasMouseEvent from "../CanvasMouseEvent";
+import CanvasTool from "./CanvasTool";
 
 type Snap = { source: Vector, destination: SnapVector };
 
@@ -56,33 +57,21 @@ function getStrictProjectionVector(movement: Vector) {
     return Math.PI / 4 <= angle && angle < Math.PI * 3 / 4 ? Vector.up : Vector.right;
 }
 
-export default class CursorTool implements ICanvasTool {
+export default class CursorTool extends CanvasTool {
     public canvasMouseDown(slideWrapper: ISlideWrapper): () => void {
-        return function (): void {
+        return (): void => {
             slideWrapper.focusGraphic(undefined);
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("graphicEditorObject", undefined);
         };
     }
 
-    public canvasMouseOver(): () => void {
-        return (): void => { return; };
-    }
-
-    public canvasMouseOut(): () => void {
-        return (): void => { return; };
-    }
-
     public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return function (): void {
-            slideWrapper.setCursor("pointer");
-        };
+        return (): void => slideWrapper.setCursor("pointer");
     }
 
     public graphicMouseOut(slideWrapper: ISlideWrapper): () => void {
-        return function (): void {
-            slideWrapper.setCursor("default");
-        };
+        return (): void => slideWrapper.setCursor("default");
     }
 
     public graphicMouseDown(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void {
