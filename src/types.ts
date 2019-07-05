@@ -44,6 +44,11 @@ export interface ICanvasTool {
     graphicMouseDown(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void;
 }
 
+export type GraphicEditorFormat = {
+    metadata: any;
+    data: any;
+}
+
 export interface IGraphic {
     id: string;
     type: string;
@@ -57,6 +62,7 @@ export interface IGraphic {
     getSnapVectors(): Array<SnapVector>;
     getSnappableVectors(): Array<Vector>;
     getAnchors(slideWrapper: ISlideWrapper): Array<Anchor>;
+    toGraphicEditorFormat(): GraphicEditorFormat;
 }
 
 export interface ISlideWrapper {

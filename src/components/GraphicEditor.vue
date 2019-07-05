@@ -46,21 +46,11 @@ export default class StyleEditor extends Vue {
 
     @Watch("object") private onObjectChanged(): void {
         // Set immutable properties to undefined
-        const json: any = JSON.parse(JSON.stringify(this.object || {}));
-        json.id = undefined;
-        json.points = undefined;
-        json.type = undefined;
-        json.source = undefined;
-        json.metadataLoaded = undefined;
-        json.anchorIds = undefined;
-        json.defaultInteractive = undefined;
-        json.supplementary = undefined;
-
-        this.content = toPrettyString(json, 1);
+        this.content = toPrettyString(this.object === undefined ? {} : this.object.toGraphicEditorFormat().data, 1);
     }
 
     // Watch for changes to the style editor object
-    get object(): IGraphic {
+    get object(): IGraphic | undefined {
         return this.$store.getters.graphicEditorObject;
     }
 
@@ -87,8 +77,8 @@ export default class StyleEditor extends Vue {
 
         // TODO: Style editor content validation
         const json: any = JSON.parse(this.content);
-        json.id = this.object.id;
-        json.type = this.object.type;
+        json.id = this.object!.id;
+        json.type = this.object!.type;
 
         if (this.object instanceof Sketch || this.object instanceof Curve) {
             json.points = this.object.points.map<{ x: number, y: number }>((point: Vector): { x: number, y: number } => ({ x: point.x, y: point.y }));

@@ -1,6 +1,6 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
-import { IGraphic, ISlideWrapper } from "../../types";
+import { IGraphic, ISlideWrapper, GraphicEditorFormat } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 import Anchor from "../Anchor";
@@ -75,5 +75,26 @@ export default class Text implements IGraphic {
 
     public getAnchors(slideWrapper: ISlideWrapper): Array<Anchor> {
         return [];
+    }
+
+    public toGraphicEditorFormat(): GraphicEditorFormat {
+        return {
+            metadata: {
+                id: this.id,
+                type: this.type,
+                defaultInteractive: this.defaultInteractive,
+                supplementary: this.supplementary,
+                anchorIds: this.anchorIds
+            },
+            data: {
+                origin: this.origin,
+                content: this.content,
+                fontSize: this.fontSize,
+                fontWeight: this.fontWeight,
+                fontFamily: this.fontFamily,
+                fillColor: this.fillColor,
+                rotation: this.rotation
+            }
+        };
     }
 }

@@ -1,6 +1,6 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities/general";
-import { IGraphic, CustomMouseEvent, ISlideWrapper } from "../../types";
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 import Anchor from "../Anchor";
@@ -86,5 +86,25 @@ export default class Sketch implements IGraphic {
                 }
             );
         });
+    }
+
+    public toGraphicEditorFormat(): GraphicEditorFormat {
+        return {
+            metadata: {
+                id: this.id,
+                type: this.type,
+                defaultInteractive: this.defaultInteractive,
+                supplementary: this.supplementary,
+                anchorIds: this.anchorIds
+            },
+            data: {
+                origin: this.origin,
+                points: this.points,
+                fillColor: this.fillColor,
+                strokeColor: this.strokeColor,
+                strokeWidth: this.strokeWidth,
+                rotation: this.rotation
+            }
+        };
     }
 }
