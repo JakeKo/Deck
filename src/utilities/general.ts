@@ -20,11 +20,9 @@ function parseGraphic(data: any): IGraphic {
         return new Ellipse(data);
     } else if (data.type === "curve") {
         data.origin = new Vector(data.origin.x, data.origin.y);
-        data.points = data.points.map((point: { x: number, y: number }): Vector => new Vector(point.x, point.y));
         return new Curve(data);
     } else if (data.type === "sketch") {
         data.origin = new Vector(data.origin.x, data.origin.y);
-        data.points = data.points.map((point: { x: number, y: number }): Vector => new Vector(point.x, point.y));
         return new Sketch(data);
     } else if (data.type === "text") {
         data.origin = new Vector(data.origin.x, data.origin.y);

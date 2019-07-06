@@ -25,14 +25,19 @@ export default class StyleEditor extends Vue {
         const graphic: IGraphic | undefined = this.$store.getters.graphicEditorGraphic;
         const { metadata, data }: GraphicEditorFormat = graphic === undefined ? { metadata: {}, data: {} } : graphic.toGraphicEditorFormat();
         this.metadata = metadata;
-        // console.log({ metadata, data });
         return Utilities.toPrettyString(data);
     }
 
     set graphicEditorObject(graphicEditorObject: string) {
-        const graphic: IGraphic = Utilities.parseGraphic({ ...this.metadata, ...JSON.parse(graphicEditorObject) });
-        this.metadata = {};
-        this.$store.commit("updateGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id, graphic: graphic });
+        try {
+            const graphic: IGraphic = Utilities.parseGraphic({ ...this.metadata, ...JSON.parse(graphicEditorObject) });
+            this.$store.commit("updateGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id, graphic: graphic });
+            this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
+        } catch (exception) {
+            // If the JSON in the graphic editor is misformatted (which happens a lot mid-typing), JSON.parse will throw an exception
+            // Somewhat-silently ignore the exception
+            console.log(exception.message);
+        }
     }
 
     private handleKeydown(event: KeyboardEvent): void {

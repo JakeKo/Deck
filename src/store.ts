@@ -228,7 +228,6 @@ const store: StoreOptions<IRootState> = {
             state.currentTool = toolName;
         },
         graphicEditorGraphicId: (state: IRootState, graphicId?: string): void => {
-            console.log(graphicId);
             state.graphicEditorGraphicId = graphicId;
         },
         activeSlide: (state: IRootState, slideId: string): void => {
