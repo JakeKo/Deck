@@ -1,5 +1,6 @@
 import Vector from "../models/Vector";
-import { IGraphic } from "../types";
+import SnapVector from "../models/SnapVector";
+import { IGraphic, Snap } from "../types";
 import { Rectangle, Ellipse, Curve, Sketch, Text, Image, Video } from "../models/graphics/graphics";
 
 function generateId(): string {
@@ -10,33 +11,33 @@ function generateId(): string {
     return `${term()}${term()}-${term()}-${term()}-${term()}-${term()}${term()}${term()}`;
 }
 
-function parseGraphic(json: any): IGraphic {
-    if (json.type === "rectangle") {
-        json.origin = new Vector(json.origin.x, json.origin.y);
-        return new Rectangle(json);
-    } else if (json.type === "ellipse") {
-        json.origin = new Vector(json.origin.x, json.origin.y);
-        return new Ellipse(json);
-    } else if (json.type === "curve") {
-        json.origin = new Vector(json.origin.x, json.origin.y);
-        json.points = json.points.map((point: { x: number, y: number }): Vector => new Vector(point.x, point.y));
-        return new Curve(json);
-    } else if (json.type === "sketch") {
-        json.origin = new Vector(json.origin.x, json.origin.y);
-        json.points = json.points.map((point: { x: number, y: number }): Vector => new Vector(point.x, point.y));
-        return new Sketch(json);
-    } else if (json.type === "text") {
-        json.origin = new Vector(json.origin.x, json.origin.y);
-        return new Text(json);
-    } else if (json.type === "image") {
-        json.origin = new Vector(json.origin.x, json.origin.y);
-        return new Image(json);
-    } else if (json.type === "video") {
-        json.origin = new Vector(json.origin.x, json.origin.y);
-        return new Video(json);
+function parseGraphic(data: any): IGraphic {
+    if (data.type === "rectangle") {
+        data.origin = new Vector(data.origin.x, data.origin.y);
+        return new Rectangle(data);
+    } else if (data.type === "ellipse") {
+        data.origin = new Vector(data.origin.x, data.origin.y);
+        return new Ellipse(data);
+    } else if (data.type === "curve") {
+        data.origin = new Vector(data.origin.x, data.origin.y);
+        data.points = data.points.map((point: { x: number, y: number }): Vector => new Vector(point.x, point.y));
+        return new Curve(data);
+    } else if (data.type === "sketch") {
+        data.origin = new Vector(data.origin.x, data.origin.y);
+        data.points = data.points.map((point: { x: number, y: number }): Vector => new Vector(point.x, point.y));
+        return new Sketch(data);
+    } else if (data.type === "text") {
+        data.origin = new Vector(data.origin.x, data.origin.y);
+        return new Text(data);
+    } else if (data.type === "image") {
+        data.origin = new Vector(data.origin.x, data.origin.y);
+        return new Image(data);
+    } else if (data.type === "video") {
+        data.origin = new Vector(data.origin.x, data.origin.y);
+        return new Video(data);
     }
 
-    throw `Undefined graphic type: ${json.type}`;
+    throw `Undefined graphic type: ${data.type}`;
 }
 
 function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
@@ -55,7 +56,7 @@ function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
     });
 }
 
-function toPrettyString(object: any, indentDepth: number): string {
+function toPrettyString(object: any, indentDepth: number = 1): string {
     const properties: Array<string> = [];
     for (const property in object) {
         const value: any = object[property];
@@ -76,6 +77,56 @@ function toPrettyString(object: any, indentDepth: number): string {
     function space(indentDepth: number): string {
         return new Array(indentDepth * 4).fill(" ").join("");
     }
+}
+
+function getClosestSnap(snaps: Array<Snap>): Snap | undefined {
+    if (snaps.length === 0) {
+        return;
+    }
+
+    let closestSnap: Snap = snaps[0];
+    snaps.forEach((snap: Snap): void => {
+        if (getTranslation(snap).magnitude < getTranslation(closestSnap).magnitude) {
+            closestSnap = snap;
+        }
+    });
+
+    return closestSnap;
+}
+
+function getTranslation(snap: Snap): Vector {
+    return snap.source.towards(snap.destination.getClosestPoint(snap.source));
+}
+
+function getSnaps(snapVectors: Array<SnapVector>, snappableVectors: Array<Vector>): Array<Snap> {
+    const snaps: Array<Snap> = [];
+
+    // List all combinations of snap and snappable vectors
+    snapVectors.forEach((snapVector: SnapVector): void => {
+        snappableVectors.forEach((snappableVector: Vector): void => {
+            snaps.push({ source: snappableVector, destination: snapVector });
+        });
+    });
+
+    // Filter by all snap translations within some epsilon and finish if there are no close translations
+    const closeSnaps: Array<Snap> = snaps.filter((snap: Snap): boolean => getTranslation(snap).magnitude < 10);
+    const mainSnap: Snap | undefined = getClosestSnap(closeSnaps);
+
+    if (mainSnap === undefined) {
+        return [];
+    }
+
+    // Find all translations that could also be performed without interfering with the main translation (i.e. the vectors are orthogonal)
+    const compatibleSnaps: Array<Snap> = closeSnaps.filter((snap: Snap): boolean => getTranslation(snap).dot(getTranslation(mainSnap)) === 0);
+    const compatibleSnap: Snap | undefined = getClosestSnap(compatibleSnaps);
+
+    return compatibleSnap === undefined ? [mainSnap] : [mainSnap, compatibleSnap];
+}
+
+function getStrictProjectionVector(movement: Vector) {
+    // Calculate the angle by which the graphic is being moved
+    const angle: number = movement.theta(Vector.right);
+    return Math.PI / 4 <= angle && angle < Math.PI * 3 / 4 ? Vector.up : Vector.right;
 }
 
 const deckScript: string = `<style>
@@ -165,5 +216,8 @@ export default {
     parseGraphic,
     makeAnchorGraphic,
     toPrettyString,
+    getStrictProjectionVector,
+    getSnaps,
+    getTranslation,
     deckScript
 };

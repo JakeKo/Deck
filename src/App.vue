@@ -44,7 +44,7 @@ export default class App extends Vue {
                 this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
                 this.$store.commit("removeGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphicId });
                 this.$store.commit("removeSnapVectors", { slideId: this.$store.getters.activeSlide.id, graphicId: graphicId });
-                this.$store.commit("graphicEditorObject", undefined);
+                this.$store.commit("graphicEditorGraphicId", undefined);
             }
         });
 
@@ -78,7 +78,7 @@ export default class App extends Vue {
             graphic.id = Utilities.generateId();
             this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
             this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
-            this.$store.commit("graphicEditorObject", graphic);
+            this.$store.commit("graphicEditorGraphicId", graphic.id);
         });
     }
 }

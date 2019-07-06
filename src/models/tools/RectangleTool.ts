@@ -14,7 +14,7 @@ export default class RectangleTool extends CanvasTool {
             document.addEventListener("keyup", toggleSquare);
 
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
-            slideWrapper.store.commit("graphicEditorObject", undefined);
+            slideWrapper.store.commit("graphicEditorGraphicId", undefined);
 
             const start: Vector = slideWrapper.getPosition(event);
             const rectangle: Rectangle = new Rectangle({ origin: new Vector(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
@@ -46,7 +46,7 @@ export default class RectangleTool extends CanvasTool {
                 document.removeEventListener("keyup", toggleSquare);
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: rectangle.id });
-                slideWrapper.store.commit("graphicEditorObject", rectangle);
+                slideWrapper.store.commit("graphicEditorGraphicId", rectangle.id);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: rectangle.getSnapVectors() });
                 slideWrapper.store.commit("tool", "cursor");
                 slideWrapper.setCursor("default");

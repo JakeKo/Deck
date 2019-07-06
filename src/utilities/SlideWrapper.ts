@@ -123,6 +123,7 @@ export default class SlideWrapper implements ISlideWrapper {
                 });
 
                 anchorSvg.on("mousedown", (event: MouseEvent): void => {
+                    event.stopPropagation();
                     document.addEventListener("Deck.CanvasMouseMove", preview);
                     document.addEventListener("Deck.GraphicMouseMove", preview);
                     document.addEventListener("Deck.CanvasMouseUp", end);
@@ -141,8 +142,6 @@ export default class SlideWrapper implements ISlideWrapper {
                         anchor.handler(customEvent);
                         focusedGraphic.updateRendering(svg);
                         self.store.commit("updateGraphic", { slideId: self.slideId, graphicId: focusedGraphic.id, graphic: focusedGraphic });
-                        self.store.commit("graphicEditorObject", undefined);
-                        self.store.commit("graphicEditorObject", focusedGraphic);
                     }
 
                     function end(): void {

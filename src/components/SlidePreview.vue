@@ -82,7 +82,7 @@ export default class SlidePreview extends Vue {
 
         this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
         this.$store.commit("activeSlide", this.id);
-        this.$store.commit("graphicEditorObject", undefined);
+        this.$store.commit("graphicEditorGraphicId", undefined);
 
         // Calculate the dividing boundaries between slides - used to determine the destination index of the slide-to-reorder
         const slidePreview: HTMLElement = this.$el as HTMLElement;

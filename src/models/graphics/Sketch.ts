@@ -99,7 +99,6 @@ export default class Sketch implements IGraphic {
             },
             data: {
                 origin: this.origin,
-                points: this.points,
                 fillColor: this.fillColor,
                 strokeColor: this.strokeColor,
                 strokeWidth: this.strokeWidth,

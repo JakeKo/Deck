@@ -5,10 +5,9 @@ import Slide from "./models/Slide";
 import GraphicEvent from "./models/GraphicEvent";
 import SnapVector from "./models/SnapVector";
 import * as SVG from "svg.js";
-
 import { CursorTool, EllipseTool, PencilTool, PenTool, RectangleTool, TextboxTool } from "./models/tools/tools";
-import Vector from "./models/Vector";
 import { IRootState, ICanvasTool, IGraphic } from "./types";
+import Vector from "./models/Vector";
 
 const store: StoreOptions<IRootState> = {
     state: {
@@ -31,9 +30,7 @@ const store: StoreOptions<IRootState> = {
                 height: 2250 / 3
             }
         },
-        graphicEditor: {
-            object: undefined
-        },
+        graphicEditorGraphicId: undefined,
         slides: new Array<Slide>(),
         currentTool: "cursor",
         tools: {
@@ -44,7 +41,7 @@ const store: StoreOptions<IRootState> = {
             ellipse: new EllipseTool(),
             textbox: new TextboxTool()
         } as { [key: string]: ICanvasTool },
-        deckTitle: "Untitled",
+        deckTitle: undefined,
         topics: []
     },
     getters: {
@@ -82,8 +79,27 @@ const store: StoreOptions<IRootState> = {
         activeSlide: (state: IRootState): Slide | undefined => {
             return state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
         },
-        graphicEditorObject: (state: IRootState): any => {
-            return state.graphicEditor.object;
+        graphicEditorGraphicId: (state: IRootState): string | undefined => {
+            return state.graphicEditorGraphicId;
+        },
+        graphicEditorGraphic: (state: IRootState): IGraphic | undefined => {
+            if (state.graphicEditorGraphicId === undefined) {
+                return undefined;
+            }
+
+            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId);
+            if (slide === undefined) {
+                console.error(`ERROR: No slide exists with id: ${state.activeSlideId}`);
+                return;
+            }
+
+            const index: number = slide.graphics.findIndex((graphic: IGraphic): boolean => graphic.id === state.graphicEditorGraphicId);
+            if (index < 0) {
+                console.error(`ERROR: Could not find graphic ("${state.graphicEditorGraphicId}")`);
+                return;
+            }
+
+            return slide.graphics[index];
         },
         tool: (state: IRootState): ICanvasTool => {
             return state.tools[state.currentTool];
@@ -110,7 +126,7 @@ const store: StoreOptions<IRootState> = {
         croppedViewbox: (state: IRootState): { x: number, y: number, width: number, height: number } => {
             return state.canvas.croppedViewbox;
         },
-        deckTitle: (state: IRootState): string => {
+        deckTitle: (state: IRootState): string | undefined => {
             return state.deckTitle;
         },
         topics: (state: IRootState): Array<string | undefined> => {
@@ -211,8 +227,9 @@ const store: StoreOptions<IRootState> = {
         tool: (state: IRootState, toolName: string): void => {
             state.currentTool = toolName;
         },
-        graphicEditorObject: (state: IRootState, object?: IGraphic): void => {
-            state.graphicEditor.object = object;
+        graphicEditorGraphicId: (state: IRootState, graphicId?: string): void => {
+            console.log(graphicId);
+            state.graphicEditorGraphicId = graphicId;
         },
         activeSlide: (state: IRootState, slideId: string): void => {
             state.activeSlideId = slideId;
@@ -239,7 +256,7 @@ const store: StoreOptions<IRootState> = {
             slide.snapVectors.push(...snapVectors);
         },
         deckTitle: (state: IRootState, deckTitle: string): void => {
-            state.deckTitle = deckTitle;
+            state.deckTitle = deckTitle === "" ? undefined : deckTitle;
         },
         setTopic: (state: IRootState, { index, topic }: { index: number, topic: string | undefined }): void => {
             state.topics[index] = topic;
@@ -279,7 +296,7 @@ const store: StoreOptions<IRootState> = {
 
             const anchor: HTMLAnchorElement = document.createElement("a");
             anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
-            anchor.setAttribute("download", `${store.getters.deckTitle}.html`);
+            anchor.setAttribute("download", `${store.getters.deckTitle || "Untitled"}.html`);
             anchor.click();
             anchor.remove();
 
@@ -292,7 +309,7 @@ const store: StoreOptions<IRootState> = {
 
             const anchor: HTMLAnchorElement = document.createElement("a");
             anchor.setAttribute("href", `data:application/json;charset=UTF-8,${encodeURIComponent(json)}`);
-            anchor.setAttribute("download", `${store.getters.deckTitle}.json`);
+            anchor.setAttribute("download", `${store.getters.deckTitle || "Untitled"}.json`);
             anchor.click();
             anchor.remove();
         },

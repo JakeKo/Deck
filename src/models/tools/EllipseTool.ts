@@ -14,7 +14,7 @@ export default class EllipseTool extends CanvasTool {
             document.addEventListener("keyup", toggleCircle);
 
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
-            slideWrapper.store.commit("graphicEditorObject", undefined);
+            slideWrapper.store.commit("graphicEditorGraphicId", undefined);
 
             const start: Vector = slideWrapper.getPosition(event);
             const ellipse: Ellipse = new Ellipse({ origin: new Vector(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
@@ -46,7 +46,7 @@ export default class EllipseTool extends CanvasTool {
                 document.removeEventListener("keyup", toggleCircle);
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: ellipse.id });
-                slideWrapper.store.commit("graphicEditorObject", ellipse);
+                slideWrapper.store.commit("graphicEditorGraphicId", ellipse.id);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: ellipse.getSnapVectors() });
                 slideWrapper.store.commit("tool", "cursor");
                 slideWrapper.setCursor("default");

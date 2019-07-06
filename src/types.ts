@@ -25,13 +25,11 @@ export interface IRootState {
             height: number
         }
     };
-    graphicEditor: {
-        object: any
-    };
+    graphicEditorGraphicId: string | undefined;
     slides: Array<Slide>;
     currentTool: string;
     tools: { [key: string]: ICanvasTool };
-    deckTitle: string;
+    deckTitle: string | undefined;
     topics: Array<string | undefined>
 }
 
@@ -44,6 +42,7 @@ export interface ICanvasTool {
     graphicMouseDown(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void;
 }
 
+// TODO: Rename this to GraphicEditorObject
 export type GraphicEditorFormat = {
     metadata: any;
     data: any;
@@ -95,3 +94,8 @@ export type CustomCanvasMouseEvent = CustomEvent<ICanvasMouseEvent>
 export type CustomGraphicMouseEvent = CustomEvent<IGraphicMouseEvent>
 
 export type CustomMouseEvent = CustomEvent<ICanvasMouseEvent | IGraphicMouseEvent>
+
+export type Snap = {
+    source: Vector;
+    destination: SnapVector;
+}

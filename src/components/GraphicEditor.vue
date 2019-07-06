@@ -1,11 +1,11 @@
 <template>
 <div id="graphic-editor">
     <div class="stretcher-horizontal left" @mousedown="stretch"></div>
-    <div id="graphic-editor-header">Graphic Editor</div>
-    <div id="graphic-editor-interaction-message" v-show="$store.getters.focusedGraphic === undefined">Click on a graphic to edit its properties.</div>
-    <form id="graphic-editor-form" v-show="$store.getters.focusedGraphic !== undefined">
-        <textarea id="graphic-editor-content" v-model="content" @keydown="$event.stopPropagation()"></textarea>
-        <button id="submit-button" @click="submit">Update Graphic</button>
+    <div id="graphic-editor-interaction-message" v-if="$store.getters.graphicEditorGraphicId === undefined">
+        <strong>Graphic Editor:</strong>Click on a graphic to edit its properties.
+    </div>
+    <form id="graphic-editor-form" v-if="$store.getters.graphicEditorGraphicId !== undefined">
+        <textarea id="graphic-editor-content" v-model="graphicEditorObject" @keydown="handleKeydown"></textarea>
     </form>
 </div>
 </template>
@@ -13,61 +13,52 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import Utilities from "../utilities/general";
-import { IGraphic } from "../types";
+import { IGraphic, GraphicEditorFormat } from "../types";
 import { Sketch, Curve, Image, Video } from "../models/graphics/graphics";
 import Vector from "../models/Vector";
 
 @Component
 export default class StyleEditor extends Vue {
-    private content: string = "";
+    private metadata: any = {};
 
-    @Watch("object") private onObjectChanged(): void {
-        // Set immutable properties to undefined
-        this.content = Utilities.toPrettyString(this.object === undefined ? {} : this.object.toGraphicEditorFormat().data, 1);
+    get graphicEditorObject(): string {
+        const graphic: IGraphic | undefined = this.$store.getters.graphicEditorGraphic;
+        const { metadata, data }: GraphicEditorFormat = graphic === undefined ? { metadata: {}, data: {} } : graphic.toGraphicEditorFormat();
+        this.metadata = metadata;
+        // console.log({ metadata, data });
+        return Utilities.toPrettyString(data);
     }
 
-    // Watch for changes to the style editor object
-    get object(): IGraphic | undefined {
-        return this.$store.getters.graphicEditorObject;
+    set graphicEditorObject(graphicEditorObject: string) {
+        const graphic: IGraphic = Utilities.parseGraphic({ ...this.metadata, ...JSON.parse(graphicEditorObject) });
+        this.metadata = {};
+        this.$store.commit("updateGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id, graphic: graphic });
     }
 
-    private stretch(event: MouseEvent): void {
+    private handleKeydown(event: KeyboardEvent): void {
+        // Prevent propagation so pressing "Delete" or "Backspace" won't remove graphics from the active slide
+        // TODO: Devise better way to handle removing graphics such that graphics are only removed if a delete-ish key is pressed while the editor is "focused"
         event.stopPropagation();
-        event.preventDefault();
+
+        // Submit the input field if "Shift + Enter" is pressed
+        if (event.key === "Enter" && event.shiftKey) {
+            (event.target as HTMLInputElement).blur();
+        }
+    }
+
+    private stretch(): void {
         document.addEventListener("mousemove", preview);
         document.addEventListener("mouseup", end);
 
         const self = this;
         function preview(event: MouseEvent): void {
-            (self.$el as HTMLElement).style.width = `${window.innerWidth - event.pageX}px`;
+            (self.$el as HTMLElement).style.width = `${Math.max(window.innerWidth - event.pageX, 128)}px`;
         }
 
         function end(): void {
             document.removeEventListener("mousemove", preview);
             document.removeEventListener("mouseup", end);
         }
-    }
-
-    private submit(event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-
-        // TODO: Style editor content validation
-        const json: any = JSON.parse(this.content);
-        json.id = this.object!.id;
-        json.type = this.object!.type;
-
-        if (this.object instanceof Sketch || this.object instanceof Curve) {
-            json.points = this.object.points.map<{ x: number, y: number }>((point: Vector): { x: number, y: number } => ({ x: point.x, y: point.y }));
-        }
-
-        if (this.object instanceof Image || this.object instanceof Video) {
-            json.source = this.object.source;
-        }
-
-        const graphic: IGraphic = Utilities.parseGraphic(json);
-        this.$store.commit("updateGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id, graphic: graphic });
-        this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
     }
 }
 </script>
@@ -86,20 +77,11 @@ export default class StyleEditor extends Vue {
     min-width: 96px;
 }
 
-#graphic-editor-header {
-    font-family: "Roboto Slab";
-    font-size: 16px;
-    font-weight: 700;
-    padding: 8px;
-    box-sizing: border-box;
-    border-bottom: 1px solid $color-tertiary;
-}
-
 #graphic-editor-interaction-message {
     flex-grow: 1;
     display: flex;
-    justify-content: center;
-    padding: 36px;
+    flex-direction: column;
+    padding: 36px 10%;
     box-sizing: border-box;
     font-family: "Roboto Mono";
     color: $color-dark;

@@ -19,7 +19,7 @@ export default class PenTool extends CanvasTool {
             document.addEventListener("Deck.GraphicMouseUp", setFirstControlPoint as EventListener);
 
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
-            slideWrapper.store.commit("graphicEditorObject", undefined);
+            slideWrapper.store.commit("graphicEditorGraphicId", undefined);
 
             // Create SVGs for the primary curve, the editable curve segment, and the control point preview
             const start: Vector = slideWrapper.getPosition(event);
@@ -106,7 +106,7 @@ export default class PenTool extends CanvasTool {
                 document.removeEventListener("Deck.CanvasMouseMove", preview as EventListener);
 
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: curve.id });
-                slideWrapper.store.commit("graphicEditorObject", curve);
+                slideWrapper.store.commit("graphicEditorGraphicId", curve.id);
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: curve.getSnapVectors() });
                 slideWrapper.store.commit("tool", "cursor");
                 slideWrapper.setCursor("default");
