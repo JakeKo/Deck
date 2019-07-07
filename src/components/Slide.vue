@@ -7,7 +7,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
-import SlideWrapper from "../utilities/SlideWrapper";
+import SlideWrapper from "../models/SlideWrapper";
 import { IGraphic, CustomCanvasMouseEvent, ISlideWrapper } from "../types";
 
 @Component

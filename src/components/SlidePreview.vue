@@ -18,7 +18,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import Vector from "../models/Vector";
-import SlideWrapper from "../utilities/SlideWrapper";
+import SlideWrapper from "../models/SlideWrapper";
 import { IGraphic, ISlideWrapper } from "../types";
 import Slide from "../models/Slide";
 
