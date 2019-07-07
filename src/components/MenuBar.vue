@@ -54,6 +54,10 @@ export default class MenuBar extends Vue {
     height: 100%;
     background: transparent;
 
+    &:hover {
+        background: $color-secondary;
+    }
+
     &:focus {
         background: $color-tertiary;
     }

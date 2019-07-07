@@ -216,6 +216,7 @@ export default class SlidePreview extends Vue {
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
+    transition: 0.15s;
 
     &:hover {
         border-color: rgba(0, 0, 0, 0.35);

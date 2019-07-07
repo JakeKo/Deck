@@ -2,7 +2,7 @@
 <div id="editor">
     <slide-settings></slide-settings>
     <div id="canvas-container" ref="canvas-container">
-        <div id="canvas" :style="canvasStyle">
+        <div id="canvas" ref="canvas" :style="canvasStyle">
             <slide v-for="slide in $store.getters.slides" 
                 :key="slide.id"
                 :id="slide.id"
@@ -26,19 +26,15 @@ import SlideSettings from "./SlideSettings.vue";
     }
 })
 export default class Editor extends Vue {
-    private container!: HTMLDivElement;
-
-    @Watch("canvasZoom") private onCanvasZoomChanged(): void {
+    @Watch("$store.getters.canvasZoom") private onCanvasZoomChanged(): void {
         // Modify the zoom styling of the editor when the zoom is updated
-        const percentageDown = this.container.scrollTop / this.container.scrollHeight;
-        const percentageOver = this.container.scrollLeft / this.container.scrollWidth;
-        document.getElementById("canvas")!.style.zoom = this.$store.getters.canvasZoom;
-        this.container.scrollTop = this.container.scrollHeight * percentageDown;
-        this.container.scrollLeft = this.container.scrollWidth * percentageOver;
-    }
+        const container: HTMLDivElement = this.$refs["canvas-container"] as HTMLDivElement;
+        const percentageDown = container.scrollTop / container.scrollHeight;
+        const percentageOver = container.scrollLeft / container.scrollWidth;
 
-    get canvasZoom(): number {
-        return this.$store.getters.canvasZoom;
+        (this.$refs["canvas"] as HTMLDivElement).style.zoom = this.$store.getters.canvasZoom;
+        container.scrollTop = container.scrollHeight * percentageDown;
+        container.scrollLeft = container.scrollWidth * percentageOver;
     }
 
     get canvasStyle(): any {
@@ -50,9 +46,9 @@ export default class Editor extends Vue {
 
     private mounted(): void {
         // Scroll to the middle of the editor
-        this.container = this.$refs["canvas-container"] as HTMLDivElement;
-        this.container.scrollTop = (this.$store.getters.canvasHeight - this.container.clientHeight) / 2;
-        this.container.scrollLeft = (this.$store.getters.canvasWidth - this.container.clientWidth) / 2;
+        const container: HTMLDivElement = this.$refs["canvas-container"] as HTMLDivElement;
+        container.scrollTop = (this.$store.getters.canvasHeight - container.clientHeight) / 2;
+        container.scrollLeft = (this.$store.getters.canvasWidth - container.clientWidth) / 2;
     }
 }
 </script>

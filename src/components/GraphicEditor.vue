@@ -4,9 +4,7 @@
     <div id="graphic-editor-interaction-message" v-if="$store.getters.graphicEditorGraphicId === undefined">
         <strong>Graphic Editor:</strong>Click on a graphic to edit its properties.
     </div>
-    <form id="graphic-editor-form" v-if="$store.getters.graphicEditorGraphicId !== undefined">
-        <textarea id="graphic-editor-content" v-model="graphicEditorObject" @keydown="handleKeydown"></textarea>
-    </form>
+    <textarea id="graphic-editor-content" v-if="$store.getters.graphicEditorGraphicId !== undefined" v-model="object" @keydown="handleKeydown"></textarea>
 </div>
 </template>
 
@@ -21,14 +19,14 @@ import Vector from "../models/Vector";
 export default class StyleEditor extends Vue {
     private metadata: any = {};
 
-    get graphicEditorObject(): string {
+    get object(): string {
         const graphic: IGraphic | undefined = this.$store.getters.graphicEditorGraphic;
         const { metadata, data }: GraphicEditorFormat = graphic === undefined ? { metadata: {}, data: {} } : graphic.toGraphicEditorFormat();
         this.metadata = metadata;
         return Utilities.toPrettyString(data);
     }
 
-    set graphicEditorObject(graphicEditorObject: string) {
+    set object(graphicEditorObject: string) {
         try {
             const graphic: IGraphic = Utilities.parseGraphic({ ...this.metadata, ...JSON.parse(graphicEditorObject) });
             this.$store.commit("updateGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id, graphic: graphic });
@@ -94,12 +92,6 @@ export default class StyleEditor extends Vue {
     text-align: center;
 }
 
-#graphic-editor-form {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
 #graphic-editor-content {
     font-family: "Roboto Mono";
     font-size: 14px;
@@ -107,19 +99,10 @@ export default class StyleEditor extends Vue {
     outline: none;
     flex-grow: 1;
     width: 100%;
+    height: 100%;
     resize: none;
     box-sizing: border-box;
     padding: 8px;
     white-space: nowrap;
-}
-
-#submit-button {
-    height: 48px;
-    cursor: pointer;
-    border: none;
-    outline: none;
-    background: $color-secondary;
-    color: $color-dark;
-    font-family: "Roboto Slab";
 }
 </style>

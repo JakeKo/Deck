@@ -1,15 +1,9 @@
 <template>
 <div id="slide-settings">
     <div class="slide-setting">
-        <div class="zoom-icon" @mousedown="modifyZoom(0.05)" @mouseup="loopModify = false">
-            <i class="fas fa-search-plus"></i>
-        </div>
-        
-        <input id="zoom-field" type="number" :value="zoomValue" @blur="zoomValue = $event.target.valueAsNumber" @keydown="$event.stopPropagation()" autocomplete="false"/>
-        
-        <div class="zoom-icon" @mousedown="modifyZoom(-0.05)" @mouseup="loopModify = false">
-            <i class="fas fa-search-minus"></i>
-        </div>
+        <div class="zoom-icon" @mousedown="zoomIn"><i class="fas fa-search-plus"></i></div>
+        <input id="zoom-field" type="number" v-model="zoom" @keydown="handleKeydown" autocomplete="off"/>
+        <div class="zoom-icon" @mousedown="zoomOut"><i class="fas fa-search-minus"></i></div>
     </div>
 </div>
 </template>
@@ -19,30 +13,53 @@ import { Vue, Component } from "vue-property-decorator";
 
 @Component
 export default class SlideSettings extends Vue {
-    private loopModify: boolean = false;
-
-    get zoomValue(): number {
+    get zoom(): number {
         return Math.round(this.$store.getters.canvasZoom * 100);
     }
 
-    set zoomValue(zoomValue: number) {
-        this.$store.commit("canvasZoom", zoomValue / 100);
+    set zoom(zoom: number) {
+        this.$store.commit("canvasZoom", zoom / 100);
     }
 
-    private modifyZoom(modification: number): void {
-        const self: SlideSettings = this;
-        function modify(): void {
-            if (!self.loopModify) {
-                return;
-            }
+    private handleKeydown(event: KeyboardEvent): void {
+        // Prevent propagation so pressing "Delete" or "Backspace" won't remove graphics from the active slide
+        // TODO: Devise better way to handle removing graphics such that graphics are only removed if a delete-ish key is pressed while the editor is "focused"
+        event.stopPropagation();
 
-            self.$store.commit("canvasZoom", self.$store.getters.canvasZoom + modification);
-            setTimeout(modify, 150);
+        // Submit the input field if "Tab" or "Enter" is pressed
+        if (["Tab", "Enter"].indexOf(event.key) !== -1) {
+            (event.target as HTMLInputElement).blur();
         }
+    }
 
-        this.loopModify = true;
-        this.$store.commit("canvasZoom", this.$store.getters.canvasZoom + modification);
-        setTimeout(modify, 500);
+    private zoomOut(event: MouseEvent): void {
+        const self: SlideSettings = this;
+        self.$store.commit("canvasZoom", self.$store.getters.canvasZoom - 0.05);
+
+        let zoomTimeout: number = window.setTimeout(performZoom, 500);
+        event.target!.addEventListener("mouseup", function(): void {
+            window.clearTimeout(zoomTimeout);
+        });
+
+        function performZoom(): void {
+            self.$store.commit("canvasZoom", self.$store.getters.canvasZoom - 0.05);
+            zoomTimeout = window.setTimeout(performZoom, 150);
+        }
+    }
+
+    private zoomIn(event: MouseEvent): void {
+        const self: SlideSettings = this;
+        self.$store.commit("canvasZoom", self.$store.getters.canvasZoom + 0.05);
+
+        let zoomTimeout: number = window.setTimeout(performZoom, 500);
+        event.target!.addEventListener("mouseup", function(): void {
+            window.clearTimeout(zoomTimeout);
+        });
+
+        function performZoom(): void {
+            self.$store.commit("canvasZoom", self.$store.getters.canvasZoom + 0.05);
+            zoomTimeout = window.setTimeout(performZoom, 150);
+        }
     }
 }
 </script>
@@ -90,6 +107,10 @@ export default class SlideSettings extends Vue {
     font-family: $font-body;
     font-size: 14px;
     transition: 0.25s;
+
+    &:hover {
+        background: $color-secondary;
+    }
 
     &:focus {
         background: $color-tertiary;

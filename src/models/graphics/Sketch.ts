@@ -93,6 +93,7 @@ export default class Sketch implements IGraphic {
             metadata: {
                 id: this.id,
                 type: this.type,
+                points: this.points,
                 defaultInteractive: this.defaultInteractive,
                 supplementary: this.supplementary,
                 anchorIds: this.anchorIds
