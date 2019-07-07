@@ -2,7 +2,7 @@
 <div class="slide-preview-container" :data-index="index">
     <div ref="slide-preview-slot" class="slide-preview-slot inactive-slide-preview-slot" :data-index="index"></div>
     <div class="slide-preview-content">
-        <input ref="topic-label" class="topic-label ephemeral-label" @focus="focus" @blur="topic = $event.target.value" @keydown="topicHandler">
+        <input v-if="!isAddSlide" ref="topic-label" :class="{ 'topic-label': true, 'ephemeral-label': topicLabel === '' }" v-model="topicLabel" @keydown="handleKeydown" placeholder="Add Topic">
         <div ref="slide-preview" :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive, 'add-slide': isAddSlide }">
             <div v-if="!isAddSlide" :id="`canvas_${id}`" class="slide-preview-canvas"></div>
             <div class="slide-preview-interface" @mousedown="focusSlide"></div>
@@ -30,26 +30,23 @@ export default class SlidePreview extends Vue {
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
     @Prop({ type: Array, required: true }) private graphics!: Array<IGraphic>;
     @Prop({ type: Boolean, required: true }) private isAddSlide!: boolean;
+    @Prop({ type: String, required: true }) private topic!: string;
 
-    private focus(): void {
-        (this.$refs["topic-label"] as HTMLInputElement).classList.remove("ephemeral-label");
+    get topicLabel(): string {
+        return this.topic;
     }
 
-    get topic(): string {
-        return this.isAddSlide ? "" : this.$store.getters.topics[this.index] || "+ New Topic";
+    set topicLabel(value: string) {
+        this.$store.commit("setTopic", { index: this.index, topic: value });
     }
 
-    set topic(value: string) {
-        const topicLabel: HTMLInputElement = this.$refs["topic-label"] as HTMLInputElement;
-        this.$store.commit("setTopic", { index: this.index, topic: value === "" ? undefined : value });
-        topicLabel.value = value;
-        topicLabel.classList.toggle("ephemeral-label", value === "");
-    }
-
-    private topicHandler(event: KeyboardEvent): void {
+    private handleKeydown(event: KeyboardEvent): void {
+        // Prevent propagation so pressing "Delete" or "Backspace" won't remove graphics from the active slide
+        // TODO: Devise better way to handle removing graphics such that graphics are only removed if a delete-ish key is pressed while the editor is "focused"
         event.stopPropagation();
 
-        if (event.key === "Enter") {
+        // Submit the input field if "Enter" is pressed
+        if (["Tab", "Enter"].indexOf(event.key) !== -1) {
             (event.target as HTMLInputElement).blur();
         }
     }
@@ -58,13 +55,14 @@ export default class SlidePreview extends Vue {
         // Set the aspect ratio of the slide preview
         const slidePreview: HTMLElement = this.$refs["slide-preview"] as HTMLElement;
         const slidePreviewSlot: HTMLElement = this.$refs["slide-preview-slot"] as HTMLElement;
-        const topicLabel: HTMLInputElement = this.$refs["topic-label"] as HTMLInputElement;
-        slidePreview.style.width = slidePreviewSlot.style.width = topicLabel.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
-        topicLabel.value = this.topic;
+        slidePreview.style.width = slidePreviewSlot.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
 
         if (this.isAddSlide) {
             return;
         }
+
+        const topicLabel: HTMLInputElement = this.$refs["topic-label"] as HTMLInputElement;
+        topicLabel.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
 
         // Instantiate the svg.js API on the slide preview and perform the initial render
         const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.croppedViewbox;
@@ -131,8 +129,6 @@ export default class SlidePreview extends Vue {
             slidePreview.style.zIndex = null;
 
             const destination: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, boundaries);
-            self.$store.commit("setTopic", { index: destination, topic: self.$store.getters.topics[self.index] });
-            self.$store.commit("setTopic", { index: self.index, topic: undefined });
             self.$store.commit("reorderSlide", { source: self.index, destination: destination });
         }
 
@@ -189,6 +185,7 @@ export default class SlidePreview extends Vue {
     border: none;
     outline: none;
     background: transparent;
+    height: 16px;
 }
 
 .ephemeral-label {
@@ -225,6 +222,7 @@ export default class SlidePreview extends Vue {
 
 .add-slide {
     border-style: dashed;
+    margin-top: 16px;
 }
 
 .slide-preview-canvas {

@@ -9,9 +9,10 @@
             :isActive="$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id"
             :graphics="slide.graphics"
             :isAddSlide="false"
+            :topic="slide.topic"
             :key="slide.id"
         ></slide-preview>
-        <slide-preview :id="'addSlide'" :index="-1" :slideId="'-'" :isActive="false" :graphics="[]" :isAddSlide="true" @add-slide="addSlide"></slide-preview>
+        <slide-preview :id="'addSlide'" :index="-1" :slideId="'-'" :isActive="false" :graphics="[]" :isAddSlide="true" :topic="''" @add-slide="addSlide"></slide-preview>
     </div>
 </div>
 </template>

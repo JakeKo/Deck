@@ -41,8 +41,7 @@ const store: StoreOptions<IRootState> = {
             ellipse: new EllipseTool(),
             textbox: new TextboxTool()
         } as { [key: string]: ICanvasTool },
-        deckTitle: undefined,
-        topics: []
+        deckTitle: undefined
     },
     getters: {
         slides: (state: IRootState): Array<Slide> => {
@@ -128,9 +127,6 @@ const store: StoreOptions<IRootState> = {
         },
         deckTitle: (state: IRootState): string | undefined => {
             return state.deckTitle;
-        },
-        topics: (state: IRootState): Array<string | undefined> => {
-            return state.topics;
         }
     },
     mutations: {
@@ -147,7 +143,6 @@ const store: StoreOptions<IRootState> = {
             ]);
 
             state.slides.splice(index, 0, slide);
-            state.topics.splice(index, 0, undefined);
         },
         reorderSlide: (state: IRootState, { source, destination }: { source: number, destination: number }): void => {
             const slide: Slide = state.slides[source];
@@ -257,8 +252,8 @@ const store: StoreOptions<IRootState> = {
         deckTitle: (state: IRootState, deckTitle: string): void => {
             state.deckTitle = deckTitle === "" ? undefined : deckTitle;
         },
-        setTopic: (state: IRootState, { index, topic }: { index: number, topic: string | undefined }): void => {
-            state.topics[index] = topic;
+        setTopic: (state: IRootState, { index, topic }: { index: number, topic: string }): void => {
+            state.slides[index].topic = topic;
         }
     },
     actions: {
