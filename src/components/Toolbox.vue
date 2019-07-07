@@ -24,7 +24,7 @@ import Tool from "./Tool.vue";
 import { Image, Video } from "../models/graphics/graphics";
 import Slide from "../models/Slide";
 import { IGraphic } from "../types";
-import Utilities from "../utilities/general";
+import Utilities from "../utilities";
 
 @Component({
     components: {

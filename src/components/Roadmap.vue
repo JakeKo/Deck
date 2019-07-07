@@ -48,7 +48,10 @@ export default class Roadmap extends Vue {
                     const topicLabel: HTMLElement = slidePreviewContainer.querySelector<HTMLElement>(".topic-label")!;
                     slidePreview.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
                     slidePreviewSlot.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
-                    topicLabel.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
+
+                    if (topicLabel !== null) {
+                        topicLabel.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
+                    }
                 });
         }
 

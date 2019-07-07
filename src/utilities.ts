@@ -1,7 +1,7 @@
-import Vector from "../models/Vector";
-import SnapVector from "../models/SnapVector";
-import { IGraphic, Snap } from "../types";
-import { Rectangle, Ellipse, Curve, Sketch, Text, Image, Video } from "../models/graphics/graphics";
+import Vector from "./models/Vector";
+import SnapVector from "./models/SnapVector";
+import { IGraphic, Snap } from "./types";
+import { Rectangle, Ellipse, Curve, Sketch, Text, Image, Video } from "./models/graphics/graphics";
 
 function generateId(): string {
     function term(): string {

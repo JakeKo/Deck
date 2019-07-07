@@ -1,4 +1,4 @@
-import Utilities from "../src/utilities/general";
+import Utilities from "../src/utilities";
 import Vector from "../src/models/Vector";
 import Rectangle from "../src/models/graphics/Rectangle";
 import Ellipse from "../src/models/graphics/Ellipse";

@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Vuex, { StoreOptions } from "vuex";
-import Utilities from "./utilities/general";
+import Utilities from "./utilities";
 import Slide from "./models/Slide";
 import GraphicEvent from "./models/GraphicEvent";
 import SnapVector from "./models/SnapVector";

@@ -4,7 +4,7 @@ import SnapVector from "../SnapVector";
 import Sketch from "../graphics/Sketch";
 import CanvasMouseEvent from "../CanvasMouseEvent";
 import CanvasTool from "./CanvasTool";
-import Utilities from "../../utilities/general";
+import Utilities from "../../utilities";
 
 export default class CursorTool extends CanvasTool {
     public canvasMouseDown(slideWrapper: ISlideWrapper): () => void {

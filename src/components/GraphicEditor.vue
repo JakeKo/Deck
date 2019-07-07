@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
-import Utilities from "../utilities/general";
+import Utilities from "../utilities";
 import { IGraphic, GraphicEditorFormat } from "../types";
 import { Sketch, Curve, Image, Video } from "../models/graphics/graphics";
 import Vector from "../models/Vector";

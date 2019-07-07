@@ -1,5 +1,5 @@
 import * as SVG from "svg.js";
-import Utilities from "../../utilities/general";
+import Utilities from "../../utilities";
 import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";

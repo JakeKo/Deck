@@ -19,7 +19,7 @@ import Toolbox from "./components/Toolbox.vue";
 import Editor from "./components/Editor.vue";
 import Roadmap from "./components/Roadmap.vue";
 import GraphicEditor from "./components/GraphicEditor.vue";
-import Utilities from "./utilities/general";
+import Utilities from "./utilities";
 import { IGraphic } from "./types";
 
 @Component({
@@ -74,8 +74,7 @@ export default class App extends Vue {
                 return;
             }
 
-            const graphic: IGraphic = Utilities.parseGraphic(data);
-            graphic.id = Utilities.generateId();
+            const graphic: IGraphic = Utilities.parseGraphic({ ...data, id: Utilities.generateId() });
             this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
             this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
             this.$store.commit("graphicEditorGraphicId", graphic.id);

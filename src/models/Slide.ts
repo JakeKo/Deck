@@ -1,4 +1,4 @@
-import Utilities from "../utilities/general";
+import Utilities from "../utilities";
 import { IGraphic } from "../types";
 import SnapVector from "./SnapVector";
 
