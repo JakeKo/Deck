@@ -84,24 +84,26 @@ export default class Curve implements IGraphic {
     }
 
     public getAnchors(slideWrapper: ISlideWrapper): Array<Anchor> {
-        const points: Array<Vector> = [ new Vector(0, 0), ...this.points ];
+        const anchorPoints: Array<Vector> = [
+            this.points[0].reflect(Vector.zero),
+            Vector.zero,
+            ...this.points,
+            this.points[this.points.length - 2].reflect(this.points[this.points.length - 1])
+        ].map<Vector>((point: Vector): Vector => point.add(this.origin));
 
-        // Reset anchorIds with new ids for the to-be rendered anchors
+        const anchorGraphics: Array<IGraphic> = [];
+        for (let i = 1; i < anchorPoints.length; i += 3) {
+            anchorGraphics.push(...Utilities.makeBezierCurvePointGraphic(anchorPoints[i], anchorPoints[i - 1], anchorPoints[i + 1]));
+        }
+
         this.anchorIds.length = 0;
-        points.forEach((): void => void this.anchorIds.push(Utilities.generateId()));
+        this.anchorIds.push(...anchorGraphics.map<string>((anchorGraphic: IGraphic): string => anchorGraphic.id));
 
-        return this.anchorIds.map<Anchor>((anchorId: string, index: number): Anchor => {
+        return anchorGraphics.map<Anchor>((anchorGraphic: IGraphic): Anchor => {
             return new Anchor(
-                Utilities.makeAnchorGraphic(anchorId, this.origin.add(points[index])),
+                anchorGraphic,
                 "move",
                 (event: CustomMouseEvent): void => {
-                    // Move the specific point on the curve to the mouse position
-                    const position: Vector = slideWrapper.getPosition(event);
-                    if (index === 0) {
-                        this.origin = position;
-                    } else {
-                        this.points[index - 1] = this.origin.towards(position);
-                    }
                 }
             );
         });

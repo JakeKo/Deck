@@ -127,6 +127,40 @@ function getStrictProjectionVector(movement: Vector) {
     return Math.PI / 4 <= angle && angle < Math.PI * 3 / 4 ? Vector.up : Vector.right;
 }
 
+function makeBezierCurvePointGraphic(origin: Vector, firstAnchor: Vector, secondAnchor: Vector): Array<IGraphic> {
+    // NOTE: The order of graphics matters here so the line is rendered below the anchor graphics
+    return [
+        new Sketch({
+            supplementary: true,
+            defaultInteractive: false,
+            points: [ firstAnchor, secondAnchor ],
+            strokeColor: "hotpink",
+            strokeWidth: 2
+        }),
+        new Rectangle({
+            supplementary: true,
+            defaultInteractive: false,
+            origin: firstAnchor.add(new Vector(-3, -3)),
+            width: 6,
+            height: 6,
+            strokeColor: "hotpink",
+            strokeWidth: 2,
+            fillColor: "white"
+        }),
+        makeAnchorGraphic(generateId(), origin),
+        new Rectangle({
+            supplementary: true,
+            defaultInteractive: false,
+            origin: secondAnchor.add(new Vector(-3, -3)),
+            width: 6,
+            height: 6,
+            strokeColor: "hotpink",
+            strokeWidth: 2,
+            fillColor: "white"
+        })
+    ];
+}
+
 const deckScript: string = `<style>
 html,
 body {
@@ -217,5 +251,6 @@ export default {
     getStrictProjectionVector,
     getSnaps,
     getTranslation,
+    makeBezierCurvePointGraphic,
     deckScript
 };

@@ -1,7 +1,8 @@
-import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper } from "../../types";
-import { Curve, Sketch } from "../graphics/graphics";
+import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, IGraphic } from "../../types";
+import { Curve } from "../graphics/graphics";
 import Vector from "../Vector";
 import CanvasTool from "./CanvasTool";
+import Utilities from "../../utilities";
 
 export default class PenTool extends CanvasTool {
     private active: boolean = false;
@@ -22,17 +23,18 @@ export default class PenTool extends CanvasTool {
             slideWrapper.store.commit("graphicEditorGraphicId", undefined);
 
             // Create SVGs for the primary curve, the editable curve segment, and the control point preview
+            const anchorIds: Array<string> = [];
             const start: Vector = slideWrapper.getPosition(event);
-
             let segmentPoints: Array<Vector> = [Vector.undefined, Vector.undefined, Vector.undefined];
             const curve: Curve = new Curve({ origin: start, fillColor: "none", strokeColor: "black", strokeWidth: 3 });
             const segment: Curve = new Curve({ origin: start, points: resolveCurve(segmentPoints, new Vector(0, 0)), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
-            const handle: Sketch = new Sketch({ fillColor: "none", strokeColor: "blue", strokeWidth: 1 });
+            renderAnchorGraphics(start, start);
 
             // Only add the curve to the store - not the preview segment or handle preview
             slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: curve });
             slideWrapper.addGraphic(segment);
-            slideWrapper.addGraphic(handle);
+
+            let anchorOrigin: Vector = start;
 
             function setFirstControlPoint(event: CustomMouseEvent): void {
                 document.removeEventListener("Deck.CanvasMouseUp", setFirstControlPoint as EventListener);
@@ -41,6 +43,7 @@ export default class PenTool extends CanvasTool {
                 document.addEventListener("Deck.GraphicMouseDown", setEndpoint as EventListener);
 
                 segmentPoints[0] = slideWrapper.getPosition(event).add(segment.origin.scale(-1));
+                anchorOrigin = Vector.undefined;
             }
 
             function setEndpoint(event: CustomMouseEvent): void {
@@ -49,7 +52,9 @@ export default class PenTool extends CanvasTool {
                 document.addEventListener("Deck.CanvasMouseUp", setSecondControlPoint as EventListener);
                 document.addEventListener("Deck.GraphicMouseUp", setSecondControlPoint as EventListener);
 
-                segmentPoints[2] = slideWrapper.getPosition(event).add(segment.origin.scale(-1));
+                const position: Vector = slideWrapper.getPosition(event);
+                segmentPoints[2] = position.add(segment.origin.scale(-1));
+                anchorOrigin = position;
             }
 
             function setSecondControlPoint(event: CustomMouseEvent): void {
@@ -57,7 +62,7 @@ export default class PenTool extends CanvasTool {
                 document.removeEventListener("Deck.GraphicMouseUp", setSecondControlPoint as EventListener);
 
                 // Complete the curve segment and add it to the final curve
-                segmentPoints[1] = slideWrapper.getPosition(event as CustomMouseEvent).add(segment.origin.scale(-1)).reflect(segmentPoints[2]);
+                segmentPoints[1] = slideWrapper.getPosition(event).add(segment.origin.scale(-1)).reflect(segmentPoints[2]);
                 curve.points.push(...segmentPoints);
 
                 // Reset the curve segment and set the first control point
@@ -73,16 +78,10 @@ export default class PenTool extends CanvasTool {
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: curve.id, graphic: curve });
                 slideWrapper.updateGraphic(segment.id, segment);
 
-                // Display the control point shape if the endpoint is defined
-                if (segmentPoints[2] !== Vector.undefined) {
-                    handle.origin = position;
-                    handle.points = [position.reflect(segment.points[2].add(segment.origin)).add(position.scale(-1))];
-                    handle.strokeColor = "blue";
-                } else {
-                    handle.strokeColor = "none";
+                removeAnchorGraphics();
+                if (anchorOrigin !== Vector.undefined) {
+                    renderAnchorGraphics(anchorOrigin, position);
                 }
-
-                slideWrapper.updateGraphic(handle.id, handle);
             }
 
             function end(event: KeyboardEvent): void {
@@ -92,7 +91,6 @@ export default class PenTool extends CanvasTool {
                 }
 
                 self.active = false;
-                slideWrapper.removeGraphic(handle.id);
                 slideWrapper.removeGraphic(segment.id);
 
                 // Remove all event handlers
@@ -119,6 +117,17 @@ export default class PenTool extends CanvasTool {
                     curve[1] === Vector.undefined ? (curve[2] !== Vector.undefined ? defaultPoint.reflect(curve[2]) : defaultPoint) : curve[1],
                     curve[2] === Vector.undefined ? defaultPoint : curve[2],
                 ];
+            }
+
+            function renderAnchorGraphics(origin: Vector, position: Vector): void {
+                const anchorGraphics: Array<IGraphic> = Utilities.makeBezierCurvePointGraphic(origin, position, position.reflect(origin));
+                anchorGraphics.forEach((anchorGraphic: IGraphic): void => slideWrapper.addGraphic(anchorGraphic));
+                anchorIds.push(...anchorGraphics.map<string>((anchorGraphic: IGraphic): string => anchorGraphic.id));
+            }
+
+            function removeAnchorGraphics(): void {
+                anchorIds.forEach((anchorId: string): void => slideWrapper.removeGraphic(anchorId));
+                anchorIds.length = 0;
             }
         };
     }
