@@ -84,12 +84,19 @@ export default class Curve implements IGraphic {
     }
 
     public getAnchors(slideWrapper: ISlideWrapper): Array<Anchor> {
-        const anchorPoints: Array<Vector> = [
-            this.points[0].reflect(Vector.zero),
-            Vector.zero,
-            ...this.points,
-            this.points[this.points.length - 2].reflect(this.points[this.points.length - 1])
-        ].map<Vector>((point: Vector): Vector => point.add(this.origin));
+        let relativeOrigin: Vector = this.origin;
+        const augmentedPoints: Array<Vector> = [Vector.zero, ...this.points];
+        const anchorPoints: Array<Vector> = [this.origin];
+        for (let i = 0; i < augmentedPoints.length; i += 3) {
+            // For each segment, the control points and end point are offset relative to the first point - not the true origin of the curve
+            // Relative origin tracks the offset starting from the origin and following each anchor (not control point) in the curve
+            relativeOrigin = relativeOrigin.add(augmentedPoints[i]);
+            anchorPoints.push(...augmentedPoints.slice(i + 1, i + 4).map<Vector>((point: Vector): Vector => point.add(relativeOrigin)));
+        }
+
+        // Calculate the control points that ought to appear at the end of the curve
+        anchorPoints.unshift(anchorPoints[1].reflect(anchorPoints[0]));
+        anchorPoints.push(anchorPoints[anchorPoints.length - 2].reflect(anchorPoints[anchorPoints.length - 1]));
 
         const anchorGraphics: Array<IGraphic> = [];
         for (let i = 1; i < anchorPoints.length; i += 3) {
@@ -104,6 +111,7 @@ export default class Curve implements IGraphic {
                 anchorGraphic,
                 "move",
                 (event: CustomMouseEvent): void => {
+                    console.log("TBD");
                 }
             );
         });

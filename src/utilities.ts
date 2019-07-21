@@ -133,7 +133,14 @@ function makeBezierCurvePointGraphic(origin: Vector, firstAnchor: Vector, second
         new Sketch({
             supplementary: true,
             defaultInteractive: false,
-            points: [ firstAnchor, secondAnchor ],
+            points: [ firstAnchor, origin ],
+            strokeColor: "hotpink",
+            strokeWidth: 2
+        }),
+        new Sketch({
+            supplementary: true,
+            defaultInteractive: false,
+            points: [ secondAnchor, origin ],
             strokeColor: "hotpink",
             strokeWidth: 2
         }),
