@@ -1,5 +1,4 @@
 import Slide from "./models/Slide";
-import Anchor from "./models/Anchor";
 import Vector from "./models/Vector";
 import SnapVector from "./models/SnapVector";
 import * as SVG from "svg.js";
@@ -43,8 +42,8 @@ export interface ICanvasTool {
 
 // TODO: Rename this to GraphicEditorObject
 export type GraphicEditorFormat = {
-    metadata: any;
-    data: any;
+    metadata: any,
+    data: any
 }
 
 export type BezierAnchorGraphics = {
@@ -85,24 +84,36 @@ export interface ISlideWrapper {
     getPosition(event: CustomMouseEvent): Vector;
 }
 
-export interface ICanvasMouseEvent {
-    baseEvent: MouseEvent;
-    slideId: string;
+export type CanvasMouseEvent = {
+    baseEvent: MouseEvent,
+    slideId: string
 }
 
-export interface IGraphicMouseEvent {
-    baseEvent: MouseEvent;
-    slideId: string;
-    graphicId: string;
+export type GraphicMouseEvent = {
+    baseEvent: MouseEvent,
+    slideId: string,
+    graphicId: string
 }
 
-export type CustomCanvasMouseEvent = CustomEvent<ICanvasMouseEvent>
+export type GraphicEvent = {
+    slideId: string,
+    graphicId?: string,
+    graphic?: IGraphic
+}
 
-export type CustomGraphicMouseEvent = CustomEvent<IGraphicMouseEvent>
+export type CustomCanvasMouseEvent = CustomEvent<CanvasMouseEvent>
 
-export type CustomMouseEvent = CustomEvent<ICanvasMouseEvent | IGraphicMouseEvent>
+export type CustomGraphicMouseEvent = CustomEvent<GraphicMouseEvent>
+
+export type CustomMouseEvent = CustomEvent<CanvasMouseEvent | GraphicMouseEvent>
 
 export type Snap = {
-    source: Vector;
-    destination: SnapVector;
+    source: Vector,
+    destination: SnapVector
+}
+
+export type Anchor = {
+    graphic: IGraphic,
+    cursor: string,
+    handler: (event: CustomMouseEvent) => void
 }

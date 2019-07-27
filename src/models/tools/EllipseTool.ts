@@ -1,7 +1,6 @@
-import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper } from "../../types";
+import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, CanvasMouseEvent } from "../../types";
 import { Ellipse } from "../graphics/graphics";
 import Vector from "../Vector";
-import CanvasMouseEvent from "../CanvasMouseEvent";
 import CanvasTool from "./CanvasTool";
 
 export default class EllipseTool extends CanvasTool {
@@ -59,14 +58,14 @@ export default class EllipseTool extends CanvasTool {
 
                 shiftPressed = event.type === "keydown";
                 document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseMove", {
-                    detail: new CanvasMouseEvent(
-                        new MouseEvent("mousemove", {
+                    detail: {
+                        baseEvent: new MouseEvent("mousemove", {
                             shiftKey: event.type === "keydown",
                             clientX: lastPosition.x,
                             clientY: lastPosition.y
                         }),
-                        slideWrapper.slideId
-                    )
+                        slideId: slideWrapper.slideId
+                    }
                 }));
             }
         };

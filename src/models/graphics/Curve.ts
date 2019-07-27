@@ -1,9 +1,8 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities";
-import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, BezierAnchorGraphics } from "../../types";
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, BezierAnchorGraphics, Anchor } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
-import Anchor from "../Anchor";
 
 export default class Curve implements IGraphic {
     public id: string;
@@ -96,10 +95,10 @@ export default class Curve implements IGraphic {
         this.anchorIds.push(...anchors.map<string>((anchor: { index: number, graphic: IGraphic }): string => anchor.graphic.id));
 
         return anchors.map<Anchor>((anchor: { index: number, graphic: IGraphic }): Anchor => {
-            return new Anchor(
-                anchor.graphic,
-                "move",
-                (event: CustomMouseEvent): void => {
+            return {
+                graphic: anchor.graphic,
+                cursor: "move",
+                handler: (event: CustomMouseEvent): void => {
                     let bezierCurveGraphics: BezierAnchorGraphics;
                     if (anchor.index === 0) {
                         bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
@@ -133,7 +132,7 @@ export default class Curve implements IGraphic {
 
                     slideWrapper.removeGraphic(anchor.graphic.id);
                 }
-            );
+            };
         });
     }
 

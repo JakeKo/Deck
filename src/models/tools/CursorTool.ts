@@ -1,8 +1,7 @@
-import { IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper, Snap } from "../../types";
+import { IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper, Snap, CanvasMouseEvent } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 import Sketch from "../graphics/Sketch";
-import CanvasMouseEvent from "../CanvasMouseEvent";
 import CanvasTool from "./CanvasTool";
 import Utilities from "../../utilities";
 
@@ -123,14 +122,14 @@ export default class CursorTool extends CanvasTool {
 
                 shiftPressed = event.type === "keydown";
                 document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseMove", {
-                    detail: new CanvasMouseEvent(
-                        new MouseEvent("mousemove", {
+                    detail: {
+                        baseEvent: new MouseEvent("mousemove", {
                             shiftKey: event.type === "keydown",
                             clientX: lastPosition.x,
                             clientY: lastPosition.y
                         }),
-                        slideWrapper.slideId
-                    )
+                        slideId: slideWrapper.slideId
+                    }
                 }));
             }
         };

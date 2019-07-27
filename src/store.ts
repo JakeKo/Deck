@@ -2,11 +2,10 @@ import Vue from "vue";
 import Vuex, { StoreOptions } from "vuex";
 import Utilities from "./utilities";
 import Slide from "./models/Slide";
-import GraphicEvent from "./models/GraphicEvent";
 import SnapVector from "./models/SnapVector";
 import * as SVG from "svg.js";
 import { CursorTool, EllipseTool, PencilTool, PenTool, RectangleTool, TextboxTool } from "./models/tools/tools";
-import { IRootState, ICanvasTool, IGraphic } from "./types";
+import { IRootState, ICanvasTool, IGraphic, GraphicEvent } from "./types";
 import Vector from "./models/Vector";
 
 const store: StoreOptions<IRootState> = {
