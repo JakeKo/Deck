@@ -42,7 +42,7 @@ export default class PenTool extends CanvasTool {
                 document.addEventListener("Deck.CanvasMouseDown", setEndpoint as EventListener);
                 document.addEventListener("Deck.GraphicMouseDown", setEndpoint as EventListener);
 
-                segmentPoints[0] = slideWrapper.getPosition(event).add(segment.origin.scale(-1));
+                segmentPoints[0] = segment.origin.towards(slideWrapper.getPosition(event));
                 anchorOrigin = Vector.undefined;
             }
 
@@ -53,7 +53,7 @@ export default class PenTool extends CanvasTool {
                 document.addEventListener("Deck.GraphicMouseUp", setSecondControlPoint as EventListener);
 
                 const position: Vector = slideWrapper.getPosition(event);
-                segmentPoints[2] = position.add(segment.origin.scale(-1));
+                segmentPoints[2] = segment.origin.towards(position);
                 anchorOrigin = position;
             }
 
@@ -62,8 +62,8 @@ export default class PenTool extends CanvasTool {
                 document.removeEventListener("Deck.GraphicMouseUp", setSecondControlPoint as EventListener);
 
                 // Complete the curve segment and add it to the final curve
-                segmentPoints[1] = slideWrapper.getPosition(event).add(segment.origin.scale(-1)).reflect(segmentPoints[2]);
-                curve.points.push(...segmentPoints);
+                segmentPoints[1] = segment.origin.towards(slideWrapper.getPosition(event)).reflect(segmentPoints[2]);
+                curve.points.push(...segmentPoints.map((point: Vector): Vector => curve.origin.towards(segment.origin.add(point))));
 
                 // Reset the curve segment and set the first control point
                 segment.origin = segmentPoints[2].add(segment.origin);
@@ -74,7 +74,7 @@ export default class PenTool extends CanvasTool {
             function preview(event: CustomMouseEvent): void {
                 // Redraw the current curve segment as the mouse moves around
                 const position: Vector = slideWrapper.getPosition(event);
-                segment.points = resolveCurve(segmentPoints, position.add(segment.origin.scale(-1)));
+                segment.points = resolveCurve(segmentPoints, segment.origin.towards(position));
                 slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: curve.id, graphic: curve });
                 slideWrapper.updateGraphic(segment.id, segment);
 

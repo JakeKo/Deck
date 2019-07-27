@@ -37,7 +37,7 @@ export default class Curve implements IGraphic {
         // Reformat points from an array of objects to the bezier curve string
         let points: string = `M 0,0`;
         this.points.forEach((point: Vector, index: number): void => {
-            points += `${index % 3 === 0 ? " c" : ""} ${point.x},${point.y}`;
+            points += `${index % 3 === 0 ? " C" : ""} ${point.x},${point.y}`;
         });
 
         return canvas
@@ -53,7 +53,7 @@ export default class Curve implements IGraphic {
         // Reformat points from an array of objects to the bezier curve string
         let points: string = "M 0,0";
         this.points.forEach((point: Vector, index: number): void => {
-            points += `${index % 3 === 0 ? " c" : ""} ${point.x},${point.y}`;
+            points += `${index % 3 === 0 ? " C" : ""} ${point.x},${point.y}`;
         });
 
         svg.plot(points)
@@ -84,21 +84,11 @@ export default class Curve implements IGraphic {
     }
 
     public getAnchors(slideWrapper: ISlideWrapper): Array<Anchor> {
-        // Form a collection of all points on the curve with absolute positioning
-        let relativeOrigin: Vector = this.origin;
-        const points: Array<Vector> = [Vector.zero, ...this.points];
-        const absolutePoints: Array<Vector> = [relativeOrigin];
-        for (let i = 1; i < points.length; i += 3) {
-            absolutePoints.push(points[i + 0].add(relativeOrigin));
-            absolutePoints.push(points[i + 1].add(relativeOrigin));
-            absolutePoints.push(points[i + 2].add(relativeOrigin));
-            relativeOrigin = points[i + 2].add(relativeOrigin);
-        }
-
         // Form a collection of all anchor points (the set of points that are not bezier handles)
+        const points: Array<Vector> = [Vector.zero, ...this.points].map((point: Vector): Vector => this.origin.add(point));
         const anchors: Array<{ index: number, graphic: IGraphic }> = [];
-        for (let i = 0; i < absolutePoints.length; i += 3) {
-            anchors.push({ index: i, graphic: Utilities.makeAnchorGraphic(Utilities.generateId(), absolutePoints[i]) });
+        for (let i = 0; i < points.length; i += 3) {
+            anchors.push({ index: i, graphic: Utilities.makeAnchorGraphic(Utilities.generateId(), points[i]) });
         }
 
         // Refresh the anchor IDs
@@ -113,19 +103,19 @@ export default class Curve implements IGraphic {
                     let bezierCurveGraphics: BezierAnchorGraphics;
                     if (anchor.index === 0) {
                         bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
-                            anchor: absolutePoints[anchor.index],
-                            firstHandle: absolutePoints[anchor.index + 1]
+                            anchor: points[anchor.index],
+                            firstHandle: points[anchor.index + 1]
                         });
-                    } else if (anchor.index === absolutePoints.length - 1) {
+                    } else if (anchor.index === points.length - 1) {
                         bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
-                            anchor: absolutePoints[anchor.index],
-                            firstHandle: absolutePoints[anchor.index - 1]
+                            anchor: points[anchor.index],
+                            firstHandle: points[anchor.index - 1]
                         });
                     } else {
                         bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
-                            anchor: absolutePoints[anchor.index],
-                            firstHandle: absolutePoints[anchor.index - 1],
-                            secondHandle: absolutePoints[anchor.index + 1]
+                            anchor: points[anchor.index],
+                            firstHandle: points[anchor.index - 1],
+                            secondHandle: points[anchor.index + 1]
                         });
                     }
 
