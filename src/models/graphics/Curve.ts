@@ -106,27 +106,30 @@ export default class Curve implements IGraphic {
                             anchor: points[anchor.index],
                             firstHandle: points[anchor.index + 1]
                         });
+
+                        // NOTE: Do not move origin because that seriously messes with things
                     } else if (anchor.index === points.length - 1) {
                         bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
                             anchor: points[anchor.index],
                             firstHandle: points[anchor.index - 1]
                         });
+
+                        const firstHandleOffset: Vector = this.points[anchor.index - 1].towards(this.points[anchor.index - 2]);
+                        this.points[anchor.index - 1] = this.origin.towards(slideWrapper.getPosition(event));
+                        this.points[anchor.index - 2] = this.points[anchor.index - 1].add(firstHandleOffset);
                     } else {
                         bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
                             anchor: points[anchor.index],
                             firstHandle: points[anchor.index - 1],
                             secondHandle: points[anchor.index + 1]
                         });
-                    }
 
-                    if (bezierCurveGraphics.secondHandle !== undefined && bezierCurveGraphics.secondHandleTrace !== undefined) {
-                        slideWrapper.addGraphic(bezierCurveGraphics.secondHandleTrace);
-                        slideWrapper.addGraphic(bezierCurveGraphics.secondHandle);
+                        const firstHandleOffset: Vector = this.points[anchor.index - 1].towards(this.points[anchor.index - 2]);
+                        const secondHandleOffset: Vector = this.points[anchor.index - 1].towards(this.points[anchor.index]);
+                        this.points[anchor.index - 1] = this.origin.towards(slideWrapper.getPosition(event));
+                        this.points[anchor.index - 2] = this.points[anchor.index - 1].add(firstHandleOffset);
+                        this.points[anchor.index] = this.points[anchor.index - 1].add(secondHandleOffset);
                     }
-
-                    slideWrapper.addGraphic(bezierCurveGraphics.firstHandleTrace);
-                    slideWrapper.addGraphic(bezierCurveGraphics.firstHandle);
-                    slideWrapper.addGraphic(bezierCurveGraphics.anchor);
 
                     slideWrapper.removeGraphic(anchor.graphic.id);
                 }
