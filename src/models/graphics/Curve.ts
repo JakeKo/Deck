@@ -1,6 +1,6 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities";
-import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat } from "../../types";
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, BezierAnchorGraphics } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 import Anchor from "../Anchor";
@@ -84,34 +84,61 @@ export default class Curve implements IGraphic {
     }
 
     public getAnchors(slideWrapper: ISlideWrapper): Array<Anchor> {
+        // Form a collection of all points on the curve with absolute positioning
         let relativeOrigin: Vector = this.origin;
-        const augmentedPoints: Array<Vector> = [Vector.zero, ...this.points];
-        const anchorPoints: Array<Vector> = [this.origin];
-        for (let i = 0; i < augmentedPoints.length; i += 3) {
-            // For each segment, the control points and end point are offset relative to the first point - not the true origin of the curve
-            // Relative origin tracks the offset starting from the origin and following each anchor (not control point) in the curve
-            relativeOrigin = relativeOrigin.add(augmentedPoints[i]);
-            anchorPoints.push(...augmentedPoints.slice(i + 1, i + 4).map<Vector>((point: Vector): Vector => point.add(relativeOrigin)));
+        const points: Array<Vector> = [Vector.zero, ...this.points];
+        const absolutePoints: Array<Vector> = [relativeOrigin];
+        for (let i = 1; i < points.length; i += 3) {
+            absolutePoints.push(points[i + 0].add(relativeOrigin));
+            absolutePoints.push(points[i + 1].add(relativeOrigin));
+            absolutePoints.push(points[i + 2].add(relativeOrigin));
+            relativeOrigin = points[i + 2].add(relativeOrigin);
         }
 
-        // Calculate the control points that ought to appear at the end of the curve
-        anchorPoints.unshift(anchorPoints[1].reflect(anchorPoints[0]));
-        anchorPoints.push(anchorPoints[anchorPoints.length - 2].reflect(anchorPoints[anchorPoints.length - 1]));
-
-        const anchorGraphics: Array<IGraphic> = [];
-        for (let i = 1; i < anchorPoints.length; i += 3) {
-            anchorGraphics.push(...Utilities.makeBezierCurvePointGraphic(anchorPoints[i], anchorPoints[i - 1], anchorPoints[i + 1]));
+        // Form a collection of all anchor points (the set of points that are not bezier handles)
+        const anchors: Array<{ index: number, graphic: IGraphic }> = [];
+        for (let i = 0; i < absolutePoints.length; i += 3) {
+            anchors.push({ index: i, graphic: Utilities.makeAnchorGraphic(Utilities.generateId(), absolutePoints[i]) });
         }
 
+        // Refresh the anchor IDs
         this.anchorIds.length = 0;
-        this.anchorIds.push(...anchorGraphics.map<string>((anchorGraphic: IGraphic): string => anchorGraphic.id));
+        this.anchorIds.push(...anchors.map<string>((anchor: { index: number, graphic: IGraphic }): string => anchor.graphic.id));
 
-        return anchorGraphics.map<Anchor>((anchorGraphic: IGraphic): Anchor => {
+        return anchors.map<Anchor>((anchor: { index: number, graphic: IGraphic }): Anchor => {
             return new Anchor(
-                anchorGraphic,
+                anchor.graphic,
                 "move",
                 (event: CustomMouseEvent): void => {
-                    console.log("TBD");
+                    let bezierCurveGraphics: BezierAnchorGraphics;
+                    if (anchor.index === 0) {
+                        bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
+                            anchor: absolutePoints[anchor.index],
+                            firstHandle: absolutePoints[anchor.index + 1]
+                        });
+                    } else if (anchor.index === absolutePoints.length - 1) {
+                        bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
+                            anchor: absolutePoints[anchor.index],
+                            firstHandle: absolutePoints[anchor.index - 1]
+                        });
+                    } else {
+                        bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
+                            anchor: absolutePoints[anchor.index],
+                            firstHandle: absolutePoints[anchor.index - 1],
+                            secondHandle: absolutePoints[anchor.index + 1]
+                        });
+                    }
+
+                    if (bezierCurveGraphics.secondHandle !== undefined && bezierCurveGraphics.secondHandleTrace !== undefined) {
+                        slideWrapper.addGraphic(bezierCurveGraphics.secondHandleTrace);
+                        slideWrapper.addGraphic(bezierCurveGraphics.secondHandle);
+                    }
+
+                    slideWrapper.addGraphic(bezierCurveGraphics.firstHandleTrace);
+                    slideWrapper.addGraphic(bezierCurveGraphics.firstHandle);
+                    slideWrapper.addGraphic(bezierCurveGraphics.anchor);
+
+                    slideWrapper.removeGraphic(anchor.graphic.id);
                 }
             );
         });

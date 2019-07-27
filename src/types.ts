@@ -47,6 +47,14 @@ export type GraphicEditorFormat = {
     data: any;
 }
 
+export type BezierAnchorGraphics = {
+    anchor: IGraphic,
+    firstHandle: IGraphic,
+    firstHandleTrace: IGraphic,
+    secondHandle?: IGraphic,
+    secondHandleTrace?: IGraphic
+};
+
 export interface IGraphic {
     id: string;
     type: string;

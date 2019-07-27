@@ -1,6 +1,6 @@
 import Vector from "./models/Vector";
 import SnapVector from "./models/SnapVector";
-import { IGraphic, Snap } from "./types";
+import { IGraphic, Snap, BezierAnchorGraphics } from "./types";
 import { Rectangle, Ellipse, Curve, Sketch, Text, Image, Video } from "./models/graphics/graphics";
 
 function generateId(): string {
@@ -127,45 +127,50 @@ function getStrictProjectionVector(movement: Vector) {
     return Math.PI / 4 <= angle && angle < Math.PI * 3 / 4 ? Vector.up : Vector.right;
 }
 
-function makeBezierCurvePointGraphic(origin: Vector, firstAnchor: Vector, secondAnchor: Vector): Array<IGraphic> {
-    // NOTE: The order of graphics matters here so the line is rendered below the anchor graphics
-    return [
-        new Sketch({
+function makeBezierCurvePointGraphic({ anchor, firstHandle, secondHandle }: { anchor: Vector, firstHandle: Vector, secondHandle?: Vector }): BezierAnchorGraphics {
+    const graphics: BezierAnchorGraphics = {
+        anchor: makeAnchorGraphic(generateId(), anchor),
+        firstHandle: new Rectangle({
             supplementary: true,
             defaultInteractive: false,
-            points: [ firstAnchor, origin ],
-            strokeColor: "hotpink",
-            strokeWidth: 2
-        }),
-        new Sketch({
-            supplementary: true,
-            defaultInteractive: false,
-            points: [ secondAnchor, origin ],
-            strokeColor: "hotpink",
-            strokeWidth: 2
-        }),
-        new Rectangle({
-            supplementary: true,
-            defaultInteractive: false,
-            origin: firstAnchor.add(new Vector(-3, -3)),
+            origin: firstHandle.add(new Vector(-3, -3)),
             width: 6,
             height: 6,
             strokeColor: "hotpink",
             strokeWidth: 2,
             fillColor: "white"
         }),
-        makeAnchorGraphic(generateId(), origin),
-        new Rectangle({
+        firstHandleTrace: new Sketch({
             supplementary: true,
             defaultInteractive: false,
-            origin: secondAnchor.add(new Vector(-3, -3)),
-            width: 6,
-            height: 6,
+            points: [firstHandle, anchor],
             strokeColor: "hotpink",
-            strokeWidth: 2,
-            fillColor: "white"
+            strokeWidth: 2
         })
-    ];
+    };
+
+    if (secondHandle !== undefined) {
+        graphics.secondHandle = new Rectangle({
+            supplementary: true,
+            defaultInteractive: false,
+            origin: secondHandle.add(new Vector(-3, -3)),
+            width: 6,
+            height: 6,
+            strokeColor: "hotpink",
+            strokeWidth: 2,
+            fillColor: "white"
+        });
+
+        graphics.secondHandleTrace = new Sketch({
+            supplementary: true,
+            defaultInteractive: false,
+            points: [secondHandle, anchor],
+            strokeColor: "hotpink",
+            strokeWidth: 2
+        });
+    }
+
+    return graphics;
 }
 
 const deckScript: string = `<style>

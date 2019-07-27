@@ -1,4 +1,4 @@
-import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, IGraphic } from "../../types";
+import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, IGraphic, BezierAnchorGraphics } from "../../types";
 import { Curve } from "../graphics/graphics";
 import Vector from "../Vector";
 import CanvasTool from "./CanvasTool";
@@ -120,9 +120,10 @@ export default class PenTool extends CanvasTool {
             }
 
             function renderAnchorGraphics(origin: Vector, position: Vector): void {
-                const anchorGraphics: Array<IGraphic> = Utilities.makeBezierCurvePointGraphic(origin, position, position.reflect(origin));
-                anchorGraphics.forEach((anchorGraphic: IGraphic): void => slideWrapper.addGraphic(anchorGraphic));
-                anchorIds.push(...anchorGraphics.map<string>((anchorGraphic: IGraphic): string => anchorGraphic.id));
+                const anchorGraphics: BezierAnchorGraphics = Utilities.makeBezierCurvePointGraphic({ anchor: origin, firstHandle: position, secondHandle: position.reflect(origin) });
+                const graphicList: Array<IGraphic> = [anchorGraphics.firstHandleTrace, anchorGraphics.secondHandleTrace!, anchorGraphics.anchor, anchorGraphics.firstHandle, anchorGraphics.secondHandle!];
+                graphicList.forEach((anchorGraphic: IGraphic): void => slideWrapper.addGraphic(anchorGraphic));
+                anchorIds.push(...graphicList.map<string>((anchorGraphic: IGraphic): string => anchorGraphic.id));
             }
 
             function removeAnchorGraphics(): void {
