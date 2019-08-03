@@ -209,14 +209,13 @@ export default class SlideWrapper implements ISlideWrapper {
     }
 
     public getPosition(event: CustomMouseEvent): Vector {
-        const zoom: number = this.store.getters.canvasZoom;
         const bounds: DOMRect = this.absoluteBounds();
         const viewbox: { x: number, y: number, width: number, height: number } = this.store.getters.rawViewbox;
 
         return new Vector(event.detail.baseEvent.pageX, event.detail.baseEvent.pageY)
+            .scale(1 / this.store.getters.canvasZoom)
             .add(new Vector(-bounds.x, -bounds.y))
             .add(new Vector(viewbox.x, viewbox.y))
-            .scale(1 / zoom)
             .transform(Math.round);
     }
 }
