@@ -8,9 +8,8 @@
     <tool @click="$store.commit('tool', 'textbox')"     :toolName="'text'"      :icon="'fas fa-font'"               :isActive="toolName === 'textbox'"></tool>
     <tool @click="uploadImage"                          :toolName="'image'"     :icon="'fas fa-image'"              :isActive="false"></tool>
     <tool @click="uploadVideo"                          :toolName="'video'"     :icon="'fas fa-video'"              :isActive="false"></tool>
-    <tool @click="$store.dispatch('export')"            :toolName="'export'"    :icon="'fas fa-cloud-download-alt'" :isActive="false"></tool>
+    <tool @click="$store.dispatch('save')"              :toolName="'save'"      :icon="'fas fa-cloud-download-alt'" :isActive="false"></tool>
     <tool @click="uploadPresentation"                   :toolName="'load'"      :icon="'fas fa-file-upload'"        :isActive="false"></tool>
-    <tool @click="$store.dispatch('save')"              :toolName="'save'"      :icon="'fas fa-save'"               :isActive="false"></tool>
 
     <a href="https://github.com/JakeKo/Deck/issues/new/choose" target="blank" style="text-decoration: none">
         <tool                                           :toolName="'feedback'"  :icon="'fas fa-info'"               :isActive="false"></tool>
@@ -109,10 +108,13 @@ export default class Toolbox extends Vue {
 
     private uploadPresentation(): void {
         this.fileReader.onloadend = (): void => {
-            const json: any = JSON.parse(this.fileReader.result as string);
+            // TODO: Fix how flaky this is
+            const result: RegExpMatchArray | null = (this.fileReader.result as string).match(/\/\/ BEGIN SLIDE DATA (.*) END SLIDE DATA/);
+            const json: any = JSON.parse(result![1]);
             const slides: Array<Slide> = json.map((slide: any): Slide => new Slide({
                 id: slide.id,
-                graphics: slide.graphics.map((graphic: any): IGraphic => Utilities.parseGraphic(graphic))
+                graphics: slide.graphics.map((graphic: any): IGraphic => Utilities.parseGraphic(graphic)),
+                topic: slide.topic
             }));
 
             this.$store.dispatch("resetPresentation", slides);

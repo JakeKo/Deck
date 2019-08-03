@@ -117,3 +117,9 @@ export type Anchor = {
     cursor: string,
     handler: (event: CustomMouseEvent) => void
 }
+
+export type SlideExportObject = {
+    id: string,
+    graphics: Array<IGraphic>,
+    topic: string
+}

@@ -5,7 +5,7 @@ import Slide from "./models/Slide";
 import SnapVector from "./models/SnapVector";
 import * as SVG from "svg.js";
 import { CursorTool, EllipseTool, PencilTool, PenTool, RectangleTool, TextboxTool } from "./models/tools/tools";
-import { IRootState, ICanvasTool, IGraphic, GraphicEvent } from "./types";
+import { IRootState, ICanvasTool, IGraphic, GraphicEvent, SlideExportObject } from "./types";
 import Vector from "./models/Vector";
 
 const store: StoreOptions<IRootState> = {
@@ -256,10 +256,10 @@ const store: StoreOptions<IRootState> = {
         }
     },
     actions: {
-        export: (store: any): void => {
+        save: (store: any): void => {
+            // Construct the slides on a hidden element
             const exportFrame: HTMLElement = document.getElementById("export-frame")!;
-
-            store.getters.slides.forEach((slideModel: Slide) => {
+            store.getters.slides.forEach((slideModel: Slide): void => {
                 const slide: HTMLDivElement = document.createElement("div");
                 slide.setAttribute("id", slideModel.id);
                 slide.setAttribute("class", "slide");
@@ -267,42 +267,36 @@ const store: StoreOptions<IRootState> = {
 
                 const viewbox: { x: number, y: number, width: number, height: number } = store.getters.croppedViewbox;
                 const canvas: SVG.Doc = SVG(slideModel.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height);
-                slideModel.graphics.forEach((graphic: IGraphic): SVG.Element => graphic.render(canvas));
+                slideModel.graphics.forEach((graphic: IGraphic): void => void graphic.render(canvas));
             });
+
+            // Copy the slides over to the exported object and clear the hidden element
+            const body: HTMLBodyElement = document.createElement("body");
+            body.innerHTML = exportFrame.innerHTML;
+            while (exportFrame.firstChild) {
+                exportFrame.removeChild(exportFrame.firstChild);
+            }
 
             const html: HTMLHtmlElement = document.createElement("html");
             const head: HTMLHeadElement = document.createElement("head");
-            const body: HTMLBodyElement = document.createElement("body");
-            html.appendChild(head);
-            html.appendChild(body);
-
-            // Append metadata to head element
             const meta: HTMLMetaElement = document.createElement("meta");
             meta.name = "viewport";
             meta.content = "width=device-width, initial-scale=1.0";
             head.appendChild(meta);
+            html.appendChild(head);
+            html.appendChild(body);
 
-            // Append slide data to body element
-            body.innerHTML = exportFrame.innerHTML;
-
-            const page: string = `${html.outerHTML}${Utilities.deckScript}`;
+            const page: string = `
+                ${html.outerHTML}
+                ${Utilities.deckScript}
+                <script>
+                // BEGIN SLIDE DATA ${JSON.stringify(store.getters.slides.map((slide: Slide): SlideExportObject => slide.toExportObject()))} END SLIDE DATA
+                </script>
+            `;
 
             const anchor: HTMLAnchorElement = document.createElement("a");
             anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
             anchor.setAttribute("download", `${store.getters.deckTitle || "Untitled"}.html`);
-            anchor.click();
-            anchor.remove();
-
-            while (exportFrame.firstChild) {
-                exportFrame.removeChild(exportFrame.firstChild);
-            }
-        },
-        save: (store: any): void => {
-            const json: string = JSON.stringify(store.getters.slides);
-
-            const anchor: HTMLAnchorElement = document.createElement("a");
-            anchor.setAttribute("href", `data:application/json;charset=UTF-8,${encodeURIComponent(json)}`);
-            anchor.setAttribute("download", `${store.getters.deckTitle || "Untitled"}.json`);
             anchor.click();
             anchor.remove();
         },
@@ -318,6 +312,7 @@ const store: StoreOptions<IRootState> = {
                 });
             });
 
+            // If the new slide deck is non-empty, focus the first slide
             if (store.state.slides.length > 0) {
                 const slideId: string = store.state.slides[0].id;
                 store.commit("activeSlide", slideId);

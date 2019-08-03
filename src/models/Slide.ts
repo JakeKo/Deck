@@ -1,5 +1,5 @@
 import Utilities from "../utilities";
-import { IGraphic } from "../types";
+import { IGraphic, SlideExportObject } from "../types";
 import SnapVector from "./SnapVector";
 
 export default class Slide {
@@ -16,5 +16,13 @@ export default class Slide {
         this.graphics = graphics || new Array<IGraphic>();
         this.snapVectors = snapVectors || new Array<SnapVector>();
         this.topic = topic || "";
+    }
+
+    public toExportObject(): SlideExportObject {
+        return {
+            id: this.id,
+            graphics: this.graphics,
+            topic: this.topic
+        };
     }
 }
