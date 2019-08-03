@@ -1,6 +1,6 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities";
-import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, Anchor } from "../../types";
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, Anchor, VideoParameters } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 
@@ -16,10 +16,7 @@ export default class Video implements IGraphic {
     public height: number;
     public rotation: number;
 
-    constructor(
-        { id, defaultInteractive, supplementary, origin, source, width, height, rotation }:
-            { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, source?: string, width?: number, height?: number, rotation?: number } = {}
-    ) {
+    constructor({ id, defaultInteractive, supplementary, origin, source, width, height, rotation }: VideoParameters = {}) {
         this.id = id || Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
         this.supplementary = supplementary === undefined ? false : supplementary;

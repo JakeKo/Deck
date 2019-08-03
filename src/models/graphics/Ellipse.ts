@@ -1,6 +1,6 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities";
-import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, Anchor } from "../../types";
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, Anchor, EllipseParameters } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 
@@ -18,10 +18,7 @@ export default class Ellipse implements IGraphic {
     public strokeWidth: number;
     public rotation: number;
 
-    constructor(
-        { id, defaultInteractive, supplementary, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }:
-            { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, width?: number, height?: number, fillColor?: string, strokeColor?: string, strokeWidth?: number, rotation?: number } = {}
-    ) {
+    constructor({ id, defaultInteractive, supplementary, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }: EllipseParameters = {}) {
         this.id = id || Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
         this.supplementary = supplementary === undefined ? false : supplementary;

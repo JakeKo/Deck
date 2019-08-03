@@ -123,3 +123,88 @@ export type SlideExportObject = {
     graphics: Array<IGraphic>,
     topic: string
 }
+
+export type CurveParameters = {
+    id?: string,
+    defaultInteractive?: boolean,
+    supplementary?: boolean,
+    origin?: Vector,
+    points?: Array<Vector>,
+    fillColor?: string,
+    strokeColor?: string,
+    strokeWidth?: number,
+    rotation?: number
+}
+
+export type EllipseParameters = {
+    id?: string,
+    defaultInteractive?: boolean,
+    supplementary?: boolean,
+    origin?: Vector,
+    width?: number,
+    height?: number,
+    fillColor?: string,
+    strokeColor?: string,
+    strokeWidth?: number,
+    rotation?: number
+}
+
+export type ImageParameters = {
+    id?: string,
+    defaultInteractive?: boolean,
+    supplementary?: boolean,
+    origin?: Vector,
+    source?: string,
+    width?: number,
+    height?: number,
+    rotation?: number
+}
+
+export type RectangleParameters = {
+    id?: string,
+    defaultInteractive?: boolean,
+    supplementary?: boolean,
+    origin?: Vector,
+    width?: number,
+    height?: number,
+    fillColor?: string,
+    strokeColor?: string,
+    strokeWidth?: number,
+    rotation?: number
+}
+
+export type SketchParameters = {
+    id?: string,
+    defaultInteractive?: boolean,
+    supplementary?: boolean,
+    origin?: Vector,
+    points?: Array<Vector>,
+    fillColor?: string,
+    strokeColor?: string,
+    strokeWidth?: number,
+    rotation?: number
+}
+
+export type TextParameters = {
+    id?: string,
+    defaultInteractive?: boolean,
+    supplementary?: boolean,
+    origin?: Vector,
+    content?: string,
+    fontSize?: number,
+    fontWeight?: string,
+    fontFamily?: string,
+    fillColor?: string,
+    rotation?: number
+}
+
+export type VideoParameters = {
+    id?: string,
+    defaultInteractive?: boolean,
+    supplementary?: boolean,
+    origin?: Vector,
+    source?: string,
+    width?: number,
+    height?: number,
+    rotation?: number
+}

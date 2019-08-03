@@ -1,6 +1,6 @@
 import * as SVG from "svg.js";
 import Utilities from "../../utilities";
-import { IGraphic, ISlideWrapper, GraphicEditorFormat, Anchor } from "../../types";
+import { IGraphic, ISlideWrapper, GraphicEditorFormat, Anchor, TextParameters } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 
@@ -18,10 +18,7 @@ export default class Text implements IGraphic {
     public fillColor: string;
     public rotation: number;
 
-    constructor(
-        { id, defaultInteractive, supplementary, origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }:
-            { id?: string, defaultInteractive?: boolean, supplementary?: boolean, origin?: Vector, content?: string, fontSize?: number, fontWeight?: string, fontFamily?: string, fillColor?: string, rotation?: number } = {}
-    ) {
+    constructor({ id, defaultInteractive, supplementary, origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }: TextParameters = {}) {
         this.id = id || Utilities.generateId();
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
         this.supplementary = supplementary === undefined ? false : supplementary;
