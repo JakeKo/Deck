@@ -71,7 +71,7 @@ const store: StoreOptions<IRootState> = {
                     return [];
                 }
 
-                return slide.snapVectors;
+                return new Array<SnapVector>(...slide.snapVectors);
             };
         },
         activeSlide: (state: IRootState): Slide | undefined => {
@@ -129,19 +129,9 @@ const store: StoreOptions<IRootState> = {
         }
     },
     mutations: {
-        addSlide: (state: IRootState, index: number): void => {
-            const slide: Slide = new Slide();
+        addSlide: (state: IRootState, { index, slide }: { index: number, slide?: Slide }): void => {
             const { width, height } = state.canvas.croppedViewbox;
-            slide.snapVectors.push(...[
-                new SnapVector("slide", new Vector(width / 2, 0), Vector.right),
-                new SnapVector("slide", new Vector(width, height / 2), Vector.up),
-                new SnapVector("slide", new Vector(width / 2, height), Vector.right),
-                new SnapVector("slide", new Vector(0, height / 2), Vector.up),
-                new SnapVector("slide", new Vector(width / 2, height / 2), Vector.right),
-                new SnapVector("slide", new Vector(width / 2, height / 2), Vector.up)
-            ]);
-
-            state.slides.splice(index, 0, slide);
+            state.slides.splice(index, 0, slide || new Slide({ width, height }));
         },
         reorderSlide: (state: IRootState, { source, destination }: { source: number, destination: number }): void => {
             const slide: Slide = state.slides[source];
@@ -237,7 +227,7 @@ const store: StoreOptions<IRootState> = {
                 return;
             }
 
-            slide.snapVectors = slide.snapVectors.filter((snapVector: SnapVector): boolean => snapVector.graphicId !== graphicId);
+            slide.snapVectors = new Set<SnapVector>([...slide.snapVectors].filter((snapVector: SnapVector): boolean => snapVector.graphicId !== graphicId));
         },
         addSnapVectors: (state: IRootState, { slideId, snapVectors }: { slideId: string, snapVectors: Array<SnapVector> }): void => {
             const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
@@ -246,7 +236,7 @@ const store: StoreOptions<IRootState> = {
                 return;
             }
 
-            slide.snapVectors.push(...snapVectors);
+            slide.addSnapVectors(...snapVectors);
         },
         deckTitle: (state: IRootState, deckTitle: string): void => {
             state.deckTitle = deckTitle === "" ? undefined : deckTitle;
@@ -301,21 +291,14 @@ const store: StoreOptions<IRootState> = {
             anchor.remove();
         },
         resetPresentation: (store: any, presentation: Array<Slide>): void => {
-            // Wipe the current slide deck and load the new presentation
+            // Wipe the current slide deck
             store.state.slides = [];
-            presentation.forEach((slide: Slide, index: number): void => {
-                store.commit("addSlide", index);
-
-                const slideId: string = store.state.slides[index].id;
-                slide.graphics.forEach((graphic: IGraphic): void => {
-                    store.commit("addGraphic", { slideId, graphic });
-                });
-            });
+            store.commit("activeSlide", undefined);
+            presentation.forEach((slide: Slide, index: number): void => store.commit("addSlide", { index, slide }));
 
             // If the new slide deck is non-empty, focus the first slide
             if (store.state.slides.length > 0) {
-                const slideId: string = store.state.slides[0].id;
-                store.commit("activeSlide", slideId);
+                store.commit("activeSlide", store.state.slides[0].id);
             }
         }
     }

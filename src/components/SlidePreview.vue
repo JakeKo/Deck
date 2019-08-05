@@ -68,7 +68,7 @@ export default class SlidePreview extends Vue {
         const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.croppedViewbox;
         const canvas: SVG.Doc = SVG(`canvas_${this.id}`).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height);
         const slideWrapper: ISlideWrapper = new SlideWrapper(this.slideId, canvas, this.$store, false);
-        this.graphics.forEach(slideWrapper.addGraphic);
+        this.graphics.forEach((graphic: IGraphic): void => slideWrapper.addGraphic(graphic));
     }
 
     private focusSlide(event: MouseEvent): void {

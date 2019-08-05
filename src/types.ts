@@ -121,7 +121,9 @@ export type Anchor = {
 export type SlideExportObject = {
     id: string,
     graphics: Array<IGraphic>,
-    topic: string
+    topic: string,
+    width: number,
+    height: number
 }
 
 export type CurveParameters = {
@@ -207,4 +209,13 @@ export type VideoParameters = {
     width?: number,
     height?: number,
     rotation?: number
+}
+
+export type SlideParameters = {
+    id?: string,
+    graphics?: Array<IGraphic>,
+    snapVectors?: Array<SnapVector>,
+    topic?: string,
+    width: number,
+    height: number
 }

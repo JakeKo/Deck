@@ -114,7 +114,9 @@ export default class Toolbox extends Vue {
             const slides: Array<Slide> = json.map((slide: any): Slide => new Slide({
                 id: slide.id,
                 graphics: slide.graphics.map((graphic: any): IGraphic => Utilities.parseGraphic(graphic)),
-                topic: slide.topic
+                topic: slide.topic,
+                width: slide.width,
+                height: slide.height
             }));
 
             this.$store.dispatch("resetPresentation", slides);
