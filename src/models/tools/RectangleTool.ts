@@ -1,4 +1,4 @@
-import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, CanvasMouseEvent } from "../../types";
+import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, CanvasMouseEvent, CustomCanvasKeyboardEvent } from "../../types";
 import { Rectangle } from "../graphics/graphics";
 import Vector from "../Vector";
 import CanvasTool from "./CanvasTool";
@@ -6,22 +6,24 @@ import CanvasTool from "./CanvasTool";
 export default class RectangleTool extends CanvasTool {
     public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
         return function (event: CustomCanvasMouseEvent): void {
-            document.addEventListener("Deck.CanvasMouseMove", preview as EventListener);
-            document.addEventListener("Deck.CanvasMouseUp", end);
-            document.addEventListener("Deck.GraphicMouseUp", end);
-            document.addEventListener("keydown", toggleSquare);
-            document.addEventListener("keyup", toggleSquare);
-
-            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
-            slideWrapper.store.commit("graphicEditorGraphicId", undefined);
-
+            // Create some initial parameters for managing rectangle creation
             const start: Vector = slideWrapper.getPosition(event);
-            const rectangle: Rectangle = new Rectangle({ origin: new Vector(start.x, start.y), fillColor: "black", strokeColor: "none", width: 1, height: 1 });
-            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: rectangle });
+            const rectangle: Rectangle = new Rectangle({ origin: start, fillColor: "black", strokeColor: "none", width: 1, height: 1 });
             let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
             let shiftPressed = false;
 
-            // Preview drawing rectangle
+            // Clear the currently focused graphic and add the new ellipse
+            slideWrapper.focusGraphic(undefined);
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
+            slideWrapper.store.commit("graphicEditorGraphicId", undefined);
+            slideWrapper.addGraphic(rectangle);
+
+            // Start listening to mouse events
+            slideWrapper.addCanvasEventListener("Deck.CanvasMouseMove", preview as EventListener);
+            slideWrapper.addCanvasEventListener("Deck.CanvasMouseUp", end);
+            slideWrapper.addCanvasEventListener("Deck.CanvasKeyDown", toggleSquare as EventListener);
+            slideWrapper.addCanvasEventListener("Deck.CanvasKeyUp", toggleSquare as EventListener);
+
             function preview(event: CustomMouseEvent): void {
                 // Determine dimensions for a rectangle or square (based on if shift is pressed)
                 lastPosition = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
@@ -33,40 +35,40 @@ export default class RectangleTool extends CanvasTool {
                 rectangle.origin = start.add(resolvedDimensions.scale(0.5)).add(resolvedDimensions.transform(Math.abs).scale(-0.5));
                 rectangle.width = Math.abs(resolvedDimensions.x);
                 rectangle.height = Math.abs(resolvedDimensions.y);
-                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: rectangle.id, graphic: rectangle });
+                slideWrapper.updateGraphic(rectangle.id, rectangle);
             }
 
-            // End drawing rectangle
             function end(): void {
-                document.removeEventListener("Deck.CanvasMouseMove", preview as EventListener);
-                document.removeEventListener("Deck.CanvasMouseUp", end);
-                document.removeEventListener("Deck.GraphicMouseUp", end);
-                document.removeEventListener("keydown", toggleSquare);
-                document.removeEventListener("keyup", toggleSquare);
+                // Unbind event handlers
+                slideWrapper.removeCanvasEventListener("Deck.CanvasMouseMove", preview as EventListener);
+                slideWrapper.removeCanvasEventListener("Deck.CanvasMouseUp", end);
+                slideWrapper.removeCanvasEventListener("Deck.CanvasKeyDown", toggleSquare as EventListener);
+                slideWrapper.removeCanvasEventListener("Deck.CanvasKeyUp", toggleSquare as EventListener);
 
-                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: rectangle.id });
+                // Persist the new rectangle
+                slideWrapper.focusGraphic(rectangle);
+                slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: rectangle });
+                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: rectangle.id });
                 slideWrapper.store.commit("graphicEditorGraphicId", rectangle.id);
-                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: rectangle.getSnapVectors() });
+                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: rectangle.getSnapVectors() });
                 slideWrapper.store.commit("tool", "cursor");
                 slideWrapper.setCursor("default");
             }
 
-            function toggleSquare(event: KeyboardEvent): void {
-                if (event.key !== "Shift" || (event.type === "keydown" && shiftPressed)) {
+            function toggleSquare(event: CustomCanvasKeyboardEvent): void {
+                if (event.detail.baseEvent.key !== "Shift" || (event.detail.baseEvent.type === "keydown" && shiftPressed)) {
                     return;
                 }
 
-                shiftPressed = event.type === "keydown";
-                document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseMove", {
-                    detail: {
-                        baseEvent: new MouseEvent("mousemove", {
-                            shiftKey: event.type === "keydown",
-                            clientX: lastPosition.x,
-                            clientY: lastPosition.y
-                        }),
-                        slideId: slideWrapper.slideId
-                    }
-                }));
+                shiftPressed = event.detail.baseEvent.type === "keydown";
+                slideWrapper.dispatchEventOnCanvas<CanvasMouseEvent>("Deck.CanvasMouseMove", {
+                    baseEvent: new MouseEvent("mousemove", {
+                        shiftKey: event.detail.baseEvent.type === "keydown",
+                        clientX: lastPosition.x,
+                        clientY: lastPosition.y
+                    }),
+                    slideId: slideWrapper.slideId
+                });
             }
         };
     }

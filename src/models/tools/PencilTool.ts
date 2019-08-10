@@ -5,32 +5,36 @@ import CanvasTool from "./CanvasTool";
 export default class PencilTool extends CanvasTool {
     public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
         return function (event: CustomCanvasMouseEvent): void {
-            document.addEventListener("Deck.CanvasMouseMove", preview as EventListener);
-            document.addEventListener("Deck.CanvasMouseUp", end);
-            document.addEventListener("Deck.GraphicMouseUp", end);
+            // Create the sketch graphic
+            const sketch: Sketch = new Sketch({ origin: slideWrapper.getPosition(event), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
 
-            // Unfocus the current graphic if any and set initial state of pencil drawing
+            // Clear the currently focused graphic and add the new sketch
+            slideWrapper.focusGraphic(undefined);
             slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
             slideWrapper.store.commit("graphicEditorGraphicId", undefined);
+            slideWrapper.addGraphic(sketch);
 
-            const sketch: Sketch = new Sketch({ origin: slideWrapper.getPosition(event), fillColor: "none", strokeColor: "black", strokeWidth: 3 });
-            slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: sketch });
+            // Start listening to mouse events
+            slideWrapper.addCanvasEventListener("Deck.CanvasMouseMove", preview as EventListener);
+            slideWrapper.addCanvasEventListener("Deck.CanvasMouseUp", end);
 
-            // Add the current mouse position to the list of points to plot
             function preview(event: CustomMouseEvent): void {
+                // Add the current mouse position to the list of points to plot
                 sketch.points.push(slideWrapper.getPosition(event).add(sketch.origin.scale(-1)));
-                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: sketch.id, graphic: sketch });
+                slideWrapper.updateGraphic(sketch.id, sketch);
             }
 
-            // Unbind handlers and commit graphic to the application
             function end(): void {
-                document.removeEventListener("Deck.CanvasMouseMove", preview as EventListener);
-                document.removeEventListener("Deck.CanvasMouseUp", end);
-                document.removeEventListener("Deck.GraphicMouseUp", end);
+                // Unbind event handlers
+                slideWrapper.removeCanvasEventListener("Deck.CanvasMouseMove", preview as EventListener);
+                slideWrapper.removeCanvasEventListener("Deck.CanvasMouseUp", end);
 
-                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: sketch.id });
+                // Persist the new sketch
+                slideWrapper.focusGraphic(sketch);
+                slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: sketch });
+                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: sketch.id });
                 slideWrapper.store.commit("graphicEditorGraphicId", sketch.id);
-                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.store.getters.activeSlide.id, snapVectors: sketch.getSnapVectors() });
+                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: sketch.getSnapVectors() });
                 slideWrapper.store.commit("tool", "cursor");
                 slideWrapper.setCursor("default");
             }

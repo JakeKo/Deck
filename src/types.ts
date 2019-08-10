@@ -82,10 +82,21 @@ export interface ISlideWrapper {
     updateGraphic(id: string, newGraphic: IGraphic): void;
     removeGraphic(id: string): void;
     getPosition(event: CustomMouseEvent): Vector;
+    addCanvasEventListener(eventName: string, listener: EventListener): void;
+    removeCanvasEventListener(eventName: string, listener: EventListener): void;
+    addGraphicEventListener(graphicId: string, eventName: string, listener: EventListener): void;
+    removeGraphicEventListener(graphicId: string, eventName: string, listener: EventListener): void;
+    dispatchEventOnCanvas<T>(eventName: string, payload: T): void;
+    dispatchEventOnGraphic<T>(graphicId: string, eventName: string, payload: T): void;
 }
 
 export type CanvasMouseEvent = {
     baseEvent: MouseEvent,
+    slideId: string
+}
+
+export type CanvasKeyboardEvent = {
+    baseEvent: KeyboardEvent,
     slideId: string
 }
 
@@ -102,6 +113,8 @@ export type GraphicEvent = {
 }
 
 export type CustomCanvasMouseEvent = CustomEvent<CanvasMouseEvent>
+
+export type CustomCanvasKeyboardEvent = CustomEvent<CanvasKeyboardEvent>
 
 export type CustomGraphicMouseEvent = CustomEvent<GraphicMouseEvent>
 

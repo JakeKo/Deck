@@ -1,4 +1,4 @@
-import { IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper, Snap, CanvasMouseEvent } from "../../types";
+import { IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper, Snap, CanvasMouseEvent, CustomCanvasKeyboardEvent } from "../../types";
 import Vector from "../Vector";
 import SnapVector from "../SnapVector";
 import Sketch from "../graphics/Sketch";
@@ -9,7 +9,7 @@ export default class CursorTool extends CanvasTool {
     public canvasMouseDown(slideWrapper: ISlideWrapper): () => void {
         return (): void => {
             slideWrapper.focusGraphic(undefined);
-            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: undefined });
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: undefined });
             slideWrapper.store.commit("graphicEditorGraphicId", undefined);
         };
     }
@@ -37,7 +37,8 @@ export default class CursorTool extends CanvasTool {
             // Create preview lines to show snapping
             const snapHighlights: Array<Sketch> = [];
 
-            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.store.getters.activeSlide.id, graphicId: graphic.id });
+            slideWrapper.focusGraphic(graphic);
+            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic.id });
             slideWrapper.store.commit("graphicEditorGraphicId", graphic.id);
             slideWrapper.store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphic.id });
 
@@ -48,11 +49,10 @@ export default class CursorTool extends CanvasTool {
             let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
             let shiftPressed = false;
 
-            document.addEventListener("Deck.CanvasMouseMove", preview as EventListener);
-            document.addEventListener("Deck.CanvasMouseUp", end);
-            document.addEventListener("Deck.GraphicMouseUp", end);
-            document.addEventListener("keydown", toggleStrictMovement);
-            document.addEventListener("keyup", toggleStrictMovement);
+            slideWrapper.addCanvasEventListener("Deck.CanvasMouseMove", preview as EventListener);
+            slideWrapper.addCanvasEventListener("Deck.CanvasMouseUp", end);
+            slideWrapper.addCanvasEventListener("Deck.CanvasKeyDown", toggleStrictMovement as EventListener);
+            slideWrapper.addCanvasEventListener("Deck.CanvasKeyUp", toggleStrictMovement as EventListener);
 
             // Preview moving shape
             function preview(event: CustomMouseEvent): void {
@@ -63,7 +63,7 @@ export default class CursorTool extends CanvasTool {
                 const projection: Vector = Utilities.getStrictProjectionVector(movement);
 
                 // Remove the old snap highlights
-                snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: snapHighlight.id }));
+                snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.removeGraphic(snapHighlight.id));
                 snapHighlights.length = 0;
 
                 // Do not perform any snapping if the alt key is pressed
@@ -89,48 +89,47 @@ export default class CursorTool extends CanvasTool {
                             strokeColor: "hotpink"
                         });
 
-                        slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: snapHighlight });
+                        slideWrapper.addGraphic(snapHighlight);
                         snapHighlights.push(snapHighlight);
                     });
                 }
 
                 graphic!.origin = event.detail.baseEvent.shiftKey ? initialOrigin.add(movement.projectOn(projection)) : initialOrigin.add(movement);
-                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
+                slideWrapper.updateGraphic(graphic!.id, graphic!);
             }
 
             // End moving shape
             function end(): void {
-                document.removeEventListener("Deck.CanvasMouseMove", preview as EventListener);
-                document.removeEventListener("Deck.CanvasMouseUp", end);
-                document.removeEventListener("Deck.GraphicMouseUp", end);
-                document.removeEventListener("keydown", toggleStrictMovement);
-                document.removeEventListener("keyup", toggleStrictMovement);
+                slideWrapper.removeCanvasEventListener("Deck.CanvasMouseMove", preview as EventListener);
+                slideWrapper.removeCanvasEventListener("Deck.CanvasMouseUp", end);
+                slideWrapper.removeCanvasEventListener("Deck.CanvasKeyDown", toggleStrictMovement as EventListener);
+                slideWrapper.removeCanvasEventListener("Deck.CanvasKeyUp", toggleStrictMovement as EventListener);
 
                 // Add the new SnapVectors once the graphic move has been finalized
+                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
                 slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors() });
                 slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
+                slideWrapper.focusGraphic(graphic);
 
                 // Remove the old snap highlights
-                snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: snapHighlight.id }));
+                snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.removeGraphic(snapHighlight.id));
                 snapHighlights.length = 0;
             }
 
-            function toggleStrictMovement(event: KeyboardEvent): void {
-                if (event.key !== "Shift" || (event.type === "keydown" && shiftPressed)) {
+            function toggleStrictMovement(event: CustomCanvasKeyboardEvent): void {
+                if (event.detail.baseEvent.key !== "Shift" || (event.detail.baseEvent.type === "keydown" && shiftPressed)) {
                     return;
                 }
 
-                shiftPressed = event.type === "keydown";
-                document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseMove", {
-                    detail: {
-                        baseEvent: new MouseEvent("mousemove", {
-                            shiftKey: event.type === "keydown",
-                            clientX: lastPosition.x,
-                            clientY: lastPosition.y
-                        }),
-                        slideId: slideWrapper.slideId
-                    }
-                }));
+                shiftPressed = event.detail.baseEvent.type === "keydown";
+                slideWrapper.dispatchEventOnCanvas<CanvasMouseEvent>("Deck.CanvasMouseMove", {
+                    baseEvent: new MouseEvent("mousemove", {
+                        shiftKey: event.detail.baseEvent.type === "keydown",
+                        clientX: lastPosition.x,
+                        clientY: lastPosition.y
+                    }),
+                    slideId: slideWrapper.slideId
+                });
             }
         };
     }

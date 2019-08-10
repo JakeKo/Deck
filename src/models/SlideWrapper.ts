@@ -1,5 +1,5 @@
 import * as SVG from "svg.js";
-import { IGraphic, CustomMouseEvent, ISlideWrapper, IRootState, GraphicEvent, CanvasMouseEvent, GraphicMouseEvent, Anchor } from "../types";
+import { IGraphic, CustomMouseEvent, ISlideWrapper, IRootState, CanvasMouseEvent, GraphicMouseEvent, Anchor, CustomCanvasMouseEvent, CanvasKeyboardEvent } from "../types";
 import Vector from "./Vector";
 import { Store } from "vuex";
 
@@ -18,78 +18,59 @@ export default class SlideWrapper implements ISlideWrapper {
         this._canvas = canvas;
         this._focusedGraphic = undefined;
 
-        document.addEventListener("Deck.GraphicAdded", (event: Event): void => {
-            // Check that the event pertains to the wrapper's specific slide
-            const detail: GraphicEvent = (event as CustomEvent<GraphicEvent>).detail;
-            if (detail.slideId === this.slideId && (detail.graphic !== undefined && (this.renderSupplementary || !detail.graphic!.supplementary))) {
-                this.addGraphic(detail.graphic!);
-            }
-        });
-
-        document.addEventListener("Deck.GraphicRemoved", (event: Event): void => {
-            // Check that the event pertains to the wrapper's specific slide
-            const detail: GraphicEvent = (event as CustomEvent<GraphicEvent>).detail;
-            if (detail.slideId === this.slideId && (detail.graphic !== undefined && (this.renderSupplementary || !detail.graphic!.supplementary))) {
-                this.removeGraphic(detail.graphicId!);
-            }
-        });
-
-        document.addEventListener("Deck.GraphicUpdated", (event: Event): void => {
-            // Check that the event pertains to the wrapper's specific slide
-            const detail: any = (event as CustomEvent<GraphicEvent>).detail;
-            if (detail.slideId === this.slideId && (detail.graphic !== undefined && (this.renderSupplementary || !detail.graphic!.supplementary))) {
-                this.updateGraphic(detail.graphicId, detail.graphic);
-            }
-        });
-
-        document.addEventListener("Deck.GraphicFocused", (event: Event): void => {
-            // Check that the event pertains to the wrapper's specific slide
-            const detail: any = (event as CustomEvent<GraphicEvent>).detail;
-            if (detail.slideId === this.slideId && (this.renderSupplementary || (detail.graphic !== undefined && !detail.graphic!.supplementary))) {
-                this.focusGraphic(detail.graphic);
-            }
-        });
-
+        // Add a tab index so the canvas element can be focused, allowing events to be caught at the canvas level
         this._forwardCanvasEvents();
+        this._canvas.node.tabIndex = 0;
+        this._canvas.node.addEventListener("mousedown", (): void => this._canvas.node.focus());
     }
 
     private _forwardCanvasEvents(): void {
-        this._canvas.on("mousemove", (event: MouseEvent): void => {
-            document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseMove", { detail: { baseEvent: event, slideId: this.slideId } }));
+        const slideId: string = this.slideId;
+        this._canvas.on("mousemove", (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnCanvas<CanvasMouseEvent>("Deck.CanvasMouseMove", { baseEvent, slideId });
         });
 
-        this._canvas.on("mouseover", (event: MouseEvent): void => {
-            document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseOver", { detail: { baseEvent: event, slideId: this.slideId } }));
+        this._canvas.on("mouseover", (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnCanvas<CanvasMouseEvent>("Deck.CanvasMouseOver", { baseEvent, slideId });
         });
 
-        this._canvas.on("mouseout", (event: MouseEvent): void => {
-            document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseOut", { detail: { baseEvent: event, slideId: this.slideId } }));
+        this._canvas.on("mouseout", (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnCanvas<CanvasMouseEvent>("Deck.CanvasMouseOut", { baseEvent, slideId });
         });
 
-        this._canvas.on("mouseup", (event: MouseEvent): void => {
-            document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseUp", { detail: { baseEvent: event, slideId: this.slideId } }));
+        this._canvas.on("mouseup", (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnCanvas<CanvasMouseEvent>("Deck.CanvasMouseUp", { baseEvent, slideId });
         });
 
-        this._canvas.on("mousedown", (event: MouseEvent): void => {
-            document.dispatchEvent(new CustomEvent<CanvasMouseEvent>("Deck.CanvasMouseDown", { detail: { baseEvent: event, slideId: this.slideId } }));
+        this._canvas.on("mousedown", (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnCanvas<CanvasMouseEvent>("Deck.CanvasMouseDown", { baseEvent, slideId });
+        });
+
+        this._canvas.node.addEventListener("keydown", (baseEvent: KeyboardEvent): void => {
+            this.dispatchEventOnCanvas<CanvasKeyboardEvent>("Deck.CanvasKeyDown", { baseEvent, slideId });
+        });
+
+        this._canvas.node.addEventListener("keyup", (baseEvent: KeyboardEvent): void => {
+            this.dispatchEventOnCanvas<CanvasKeyboardEvent>("Deck.CanvasKeyUp", { baseEvent, slideId });
         });
     }
 
     private _forwardGraphicEvents(graphicId: string, svg: SVG.Element): void {
-        svg.on("mouseover", (event: MouseEvent): void => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEvent>("Deck.GraphicMouseOver", { detail: { baseEvent: event, slideId: this.slideId, graphicId } }));
+        const slideId: string = this.slideId;
+        svg.on("mouseover", (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnGraphic<GraphicMouseEvent>(graphicId, "Deck.GraphicMouseOver", { baseEvent, slideId, graphicId });
         });
 
-        svg.on("mouseout", (event: MouseEvent): void => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEvent>("Deck.GraphicMouseOut", { detail: { baseEvent: event, slideId: this.slideId, graphicId } }));
+        svg.on("mouseout", (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnGraphic<GraphicMouseEvent>(graphicId, "Deck.GraphicMouseOut", { baseEvent, slideId, graphicId });
         });
 
-        svg.on("mouseup", (event: MouseEvent): void => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEvent>("Deck.GraphicMouseUp", { detail: { baseEvent: event, slideId: this.slideId, graphicId } }));
+        svg.on("mouseup", (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnGraphic<GraphicMouseEvent>(graphicId, "Deck.GraphicMouseUp", { baseEvent, slideId, graphicId });
         });
 
-        svg.on("mousedown", (event: MouseEvent): void => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEvent>("Deck.GraphicMouseDown", { detail: { baseEvent: event, slideId: this.slideId, graphicId } }));
+        svg.on("mousedown", (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnGraphic<GraphicMouseEvent>(graphicId, "Deck.GraphicMouseDown", { baseEvent, slideId, graphicId });
         });
     }
 
@@ -192,19 +173,36 @@ export default class SlideWrapper implements ISlideWrapper {
 
         if (graphic.defaultInteractive) {
             this._forwardGraphicEvents(graphic.id, svg);
+
+            this.addGraphicEventListener(graphic.id, "Deck.GraphicMouseOver", ((event: CustomCanvasMouseEvent): void => {
+                this.store.getters.tool.graphicMouseOver(this)(event);
+            }) as EventListener);
+
+            this.addGraphicEventListener(graphic.id, "Deck.GraphicMouseOver", ((event: CustomCanvasMouseEvent): void => {
+                this.store.getters.tool.graphicMouseOver(this)(event);
+            }) as EventListener);
+
+            this.addGraphicEventListener(graphic.id, "Deck.GraphicMouseOut", ((event: CustomCanvasMouseEvent): void => {
+                this.store.getters.tool.graphicMouseOut(this)(event);
+            }) as EventListener);
+
+            this.addGraphicEventListener(graphic.id, "Deck.GraphicMouseDown", ((event: CustomCanvasMouseEvent): void => {
+                this.store.getters.tool.graphicMouseDown(this)(event);
+            }) as EventListener);
         }
     }
 
     public updateGraphic(id: string, newGraphic: IGraphic): void {
-        const svg: SVG.Element = this._canvas.select(`#graphic_${id}`).first();
+        const svg: SVG.Element = this._getGraphic(id);
         newGraphic.updateRendering(svg);
     }
 
     public removeGraphic(id: string): void {
-        // Remove graphic from the canvas
-        const svg: SVG.Element = this._canvas.select(`#graphic_${id}`).first();
-        if (svg !== undefined) {
+        try {
+            const svg: SVG.Element = this._getGraphic(id);
             svg.remove();
+        } catch {
+            return;
         }
     }
 
@@ -217,5 +215,41 @@ export default class SlideWrapper implements ISlideWrapper {
             .add(new Vector(-bounds.x, -bounds.y))
             .add(new Vector(viewbox.x, viewbox.y))
             .transform(Math.round);
+    }
+
+    public addCanvasEventListener(eventName: string, listener: EventListener): void {
+        this._canvas.node.addEventListener(eventName, listener);
+    }
+
+    public removeCanvasEventListener(eventName: string, listener: EventListener): void {
+        this._canvas.node.removeEventListener(eventName, listener);
+    }
+
+    public dispatchEventOnCanvas<T>(eventName: string, payload: T): void {
+        this._canvas.node.dispatchEvent(new CustomEvent<T>(eventName, { detail: payload }));
+    }
+
+    public addGraphicEventListener(graphicId: string, eventName: string, listener: EventListener): void {
+        this._getGraphic(graphicId).node.addEventListener(eventName, listener);
+    }
+
+    public removeGraphicEventListener(graphicId: string, eventName: string, listener: EventListener): void {
+        this._getGraphic(graphicId).node.removeEventListener(eventName, listener);
+    }
+
+    public dispatchEventOnGraphic<T>(graphicId: string, eventName: string, payload: T): void {
+        this._getGraphic(graphicId).node.dispatchEvent(new CustomEvent<T>(eventName, { detail: payload }));
+    }
+
+    private _getGraphic(graphicId: string): SVG.Element {
+        const list: SVG.Set = this._canvas.select(`#graphic_${graphicId}`);
+
+        if (list.length() === 0) {
+            throw new Error(`No SVG with id ${graphicId} could be found.`);
+        } else if (list.length() > 1) {
+            throw new Error(`More than one SVG were found with the id ${graphicId}.`);
+        }
+
+        return list.first();
     }
 }

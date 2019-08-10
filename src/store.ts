@@ -6,7 +6,6 @@ import SnapVector from "./models/SnapVector";
 import * as SVG from "svg.js";
 import { CursorTool, EllipseTool, PencilTool, PenTool, RectangleTool, TextboxTool } from "./models/tools/tools";
 import { IRootState, ICanvasTool, IGraphic, GraphicEvent, SlideExportObject } from "./types";
-import Vector from "./models/Vector";
 
 const store: StoreOptions<IRootState> = {
     state: {
@@ -54,13 +53,7 @@ const store: StoreOptions<IRootState> = {
                     return;
                 }
 
-                const index: number = slide.graphics.findIndex((graphic: IGraphic): boolean => graphic.id === graphicId);
-                if (index < 0) {
-                    console.error(`ERROR: Could not find graphic ("${graphicId}")`);
-                    return;
-                }
-
-                return slide.graphics[index];
+                return slide.getGraphic(graphicId);
             };
         },
         snapVectors: (state: IRootState): ((slideId: string) => Array<SnapVector>) => {
@@ -91,13 +84,7 @@ const store: StoreOptions<IRootState> = {
                 return;
             }
 
-            const index: number = slide.graphics.findIndex((graphic: IGraphic): boolean => graphic.id === state.graphicEditorGraphicId);
-            if (index < 0) {
-                console.error(`ERROR: Could not find graphic ("${state.graphicEditorGraphicId}")`);
-                return;
-            }
-
-            return slide.graphics[index];
+            return slide.getGraphic(state.graphicEditorGraphicId);
         },
         tool: (state: IRootState): ICanvasTool => {
             return state.tools[state.currentTool];
@@ -107,7 +94,7 @@ const store: StoreOptions<IRootState> = {
         },
         focusedGraphic: (state: IRootState): IGraphic | undefined => {
             const activeSlide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId);
-            return activeSlide === undefined ? undefined : activeSlide.graphics.find((graphic: IGraphic): boolean => graphic.id === state.focusedGraphicId);
+            return activeSlide === undefined ? undefined : activeSlide.getGraphic(state.focusedGraphicId);
         },
         canvasHeight: (state: IRootState): number => {
             return state.canvas.height;
@@ -166,14 +153,8 @@ const store: StoreOptions<IRootState> = {
                 return;
             }
 
-            const index: number = slide.graphics.findIndex((graphic: IGraphic): boolean => graphic.id === graphicId);
-            if (index < 0) {
-                console.error(`ERROR: Could not find graphic ("${graphicId}")`);
-                return;
-            }
-
-            const graphic: IGraphic = slide.graphics.splice(index, 1)[0];
-            document.dispatchEvent(new CustomEvent<GraphicEvent>("Deck.GraphicRemoved", { detail: { slideId: slideId, graphicId: graphicId, graphic: graphic } }));
+            const graphic: IGraphic = slide.removeGraphic(graphicId);
+            document.dispatchEvent(new CustomEvent<GraphicEvent>("Deck.GraphicRemoved", { detail: { slideId, graphicId, graphic } }));
         },
         updateGraphic: (state: IRootState, { slideId, graphicId, graphic }: { slideId: string, graphicId: string, graphic: IGraphic }): void => {
             const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);

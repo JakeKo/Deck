@@ -42,4 +42,18 @@ export default class Slide {
     public addSnapVectors(...snapVectors: Array<SnapVector>): void {
         snapVectors.forEach((snapVector: SnapVector): void => void this.snapVectors.add(snapVector));
     }
+
+    public getGraphic(graphicId: string | undefined): IGraphic | undefined {
+        return this.graphics.find((graphic: IGraphic): boolean => graphic.id === graphicId);
+    }
+
+    public removeGraphic(graphicId: string): IGraphic {
+        const index: number = this.graphics.findIndex((graphic: IGraphic): boolean => graphic.id === graphicId);
+
+        if (index === -1) {
+            throw `No graphic with id ${graphicId} on slide with id ${this.id}`;
+        }
+
+        return this.graphics.splice(index, 1)[0];
+    }
 }

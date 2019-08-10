@@ -8,7 +8,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import * as SVG from "svg.js";
 import SlideWrapper from "../models/SlideWrapper";
-import { IGraphic, CustomCanvasMouseEvent, ISlideWrapper } from "../types";
+import { IGraphic, CustomCanvasMouseEvent, ISlideWrapper, CanvasKeyboardEvent, CustomCanvasKeyboardEvent } from "../types";
 
 @Component
 export default class Slide extends Vue {
@@ -21,45 +21,37 @@ export default class Slide extends Vue {
         const canvas: SVG.Doc = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: "absolute", top: 0, left: 0 });
         const slideWrapper: ISlideWrapper = new SlideWrapper(this.id, canvas, this.$store, true);
 
-        document.addEventListener("Deck.CanvasMouseOver", ((event: CustomCanvasMouseEvent): void => {
-            if (event.detail.slideId === this.id) {
-                this.$store.getters.tool.canvasMouseOver(slideWrapper)(event);
-            }
+        slideWrapper.addCanvasEventListener("Deck.CanvasMouseOver", ((event: CustomCanvasMouseEvent): void => {
+            this.$store.getters.tool.canvasMouseOver(slideWrapper)(event);
         }) as EventListener);
 
-        document.addEventListener("Deck.CanvasMouseOut", ((event: CustomCanvasMouseEvent): void => {
-            if (event.detail.slideId === this.id) {
-                this.$store.getters.tool.canvasMouseOut(slideWrapper)(event);
-            }
+        slideWrapper.addCanvasEventListener("Deck.CanvasMouseOut", ((event: CustomCanvasMouseEvent): void => {
+            this.$store.getters.tool.canvasMouseOut(slideWrapper)(event);
         }) as EventListener);
 
-        document.addEventListener("Deck.CanvasMouseDown", ((event: CustomCanvasMouseEvent): void => {
-            if (event.detail.slideId === this.id) {
-                this.$store.getters.tool.canvasMouseDown(slideWrapper)(event);
-            }
-        }) as EventListener);
-
-        document.addEventListener("Deck.GraphicMouseOver", ((event: CustomCanvasMouseEvent): void => {
-            if (event.detail.slideId === this.id) {
-                this.$store.getters.tool.graphicMouseOver(slideWrapper)(event);
-            }
-        }) as EventListener);
-
-        document.addEventListener("Deck.GraphicMouseOut", ((event: CustomCanvasMouseEvent): void => {
-            if (event.detail.slideId === this.id) {
-                this.$store.getters.tool.graphicMouseOut(slideWrapper)(event);
-            }
-        }) as EventListener);
-
-        document.addEventListener("Deck.GraphicMouseDown", ((event: CustomCanvasMouseEvent): void => {
-            if (event.detail.slideId === this.id) {
-                this.$store.getters.tool.graphicMouseDown(slideWrapper)(event);
-            }
+        slideWrapper.addCanvasEventListener("Deck.CanvasMouseDown", ((event: CustomCanvasMouseEvent): void => {
+            this.$store.getters.tool.canvasMouseDown(slideWrapper)(event);
         }) as EventListener);
 
         this.graphics.forEach((graphic: IGraphic): void => {
             slideWrapper.addGraphic(graphic);
         });
+
+        slideWrapper.addCanvasEventListener("Deck.CanvasKeyDown", ((event: CustomCanvasKeyboardEvent): void => {
+            if (["Delete", "Backspace"].indexOf(event.detail.baseEvent.key) !== -1) {
+                if (this.$store.getters.focusedGraphic === undefined) {
+                    return;
+                }
+
+                // Remove the focused graphic
+                const graphicId: string = this.$store.getters.focusedGraphic.id;
+                this.$store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: undefined });
+                this.$store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: graphicId });
+                this.$store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphicId });
+                this.$store.commit("graphicEditorGraphicId", undefined);
+                slideWrapper.removeGraphic(graphicId);
+            }
+        }) as EventListener);
     }
 }
 </script>
