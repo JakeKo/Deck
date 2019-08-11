@@ -83,6 +83,7 @@ export default class App extends Vue {
     flex-grow: 1;
     flex-basis: 0;
     display: flex;
+    min-height: 0;
 }
 
 #workspace {

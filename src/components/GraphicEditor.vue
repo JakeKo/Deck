@@ -86,14 +86,14 @@ export default class StyleEditor extends Vue {
     flex-direction: column;
     padding: 36px 10%;
     box-sizing: border-box;
-    font-family: "Roboto Mono";
+    font-family: "Roboto Mono", monospace;
     color: $color-dark;
     font-size: 14px;
     text-align: center;
 }
 
 #graphic-editor-content {
-    font-family: "Roboto Mono";
+    font-family: "Roboto Mono", monospace;
     font-size: 14px;
     border: none;
     outline: none;

@@ -45,6 +45,7 @@ export default class Slide extends Vue {
 
                 // Remove the focused graphic
                 const graphicId: string = this.$store.getters.focusedGraphic.id;
+                slideWrapper.focusGraphic(undefined);
                 this.$store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: undefined });
                 this.$store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: graphicId });
                 this.$store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphicId });
