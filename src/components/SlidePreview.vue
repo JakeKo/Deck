@@ -1,26 +1,26 @@
 <template>
-<div class="slide-preview-container" :data-index="index">
-    <div ref="slide-preview-slot" class="slide-preview-slot inactive-slide-preview-slot" :data-index="index"></div>
-    <div class="slide-preview-content">
-        <input v-if="!isAddSlide" ref="topic-label" :class="{ 'topic-label': true, 'ephemeral-label': topicLabel === '' }" v-model="topicLabel" @keydown="handleKeydown" placeholder="Add Topic">
-        <div ref="slide-preview" :id="`slide-preview_${id}`" :class="{ 'slide-preview': true, 'active-slide-preview': isActive, 'add-slide': isAddSlide }">
-            <div v-if="!isAddSlide" :id="`canvas_${id}`" class="slide-preview-canvas"></div>
-            <div class="slide-preview-interface" @mousedown="focusSlide"></div>
-            <div v-if="isAddSlide" class="add-slide-icon">
-                <i class="fas fa-plus"></i>
+<div class='slide-preview-container' :data-index='index'>
+    <div ref='slide-preview-slot' class='slide-preview-slot inactive-slide-preview-slot' :data-index='index'></div>
+    <div class='slide-preview-content'>
+        <input v-if='!isAddSlide' ref='topic-label' :class='{ "topic-label": true, "ephemeral-label": topicLabel === "" }' v-model='topicLabel' @keydown='handleKeydown' placeholder='Add Topic'>
+        <div ref='slide-preview' :id='`slide-preview_${id}`' :class='{ "slide-preview": true, "active-slide-preview": isActive, "add-slide": isAddSlide }'>
+            <div v-if='!isAddSlide' :id='`canvas_${id}`' class='slide-preview-canvas'></div>
+            <div class='slide-preview-interface' @mousedown='focusSlide'></div>
+            <div v-if='isAddSlide' class='add-slide-icon'>
+                <i class='fas fa-plus'></i>
             </div>
         </div>
     </div>
 </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
-import * as SVG from "svg.js";
-import Vector from "../models/Vector";
-import SlideWrapper from "../models/SlideWrapper";
-import { IGraphic, ISlideWrapper } from "../types";
-import Slide from "../models/Slide";
+<script lang='ts'>
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import * as SVG from 'svg.js';
+import Vector from '../models/Vector';
+import SlideWrapper from '../models/SlideWrapper';
+import { IGraphic, ISlideWrapper } from '../types';
+import Slide from '../models/Slide';
 
 @Component
 export default class SlidePreview extends Vue {
@@ -37,31 +37,31 @@ export default class SlidePreview extends Vue {
     }
 
     set topicLabel(value: string) {
-        this.$store.commit("setTopic", { index: this.index, topic: value });
+        this.$store.commit('setTopic', { index: this.index, topic: value });
     }
 
     private handleKeydown(event: KeyboardEvent): void {
-        // Prevent propagation so pressing "Delete" or "Backspace" won't remove graphics from the active slide
-        // TODO: Devise better way to handle removing graphics such that graphics are only removed if a delete-ish key is pressed while the editor is "focused"
+        // Prevent propagation so pressing 'Delete' or 'Backspace' won't remove graphics from the active slide
+        // TODO: Devise better way to handle removing graphics such that graphics are only removed if a delete-ish key is pressed while the editor is 'focused'
         event.stopPropagation();
 
-        // Submit the input field if "Enter" is pressed
-        if (["Tab", "Enter"].indexOf(event.key) !== -1) {
+        // Submit the input field if 'Enter' is pressed
+        if (['Tab', 'Enter'].indexOf(event.key) !== -1) {
             (event.target as HTMLInputElement).blur();
         }
     }
 
     private mounted(): void {
         // Set the aspect ratio of the slide preview
-        const slidePreview: HTMLElement = this.$refs["slide-preview"] as HTMLElement;
-        const slidePreviewSlot: HTMLElement = this.$refs["slide-preview-slot"] as HTMLElement;
+        const slidePreview: HTMLElement = this.$refs['slide-preview'] as HTMLElement;
+        const slidePreviewSlot: HTMLElement = this.$refs['slide-preview-slot'] as HTMLElement;
         slidePreview.style.width = slidePreviewSlot.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
 
         if (this.isAddSlide) {
             return;
         }
 
-        const topicLabel: HTMLInputElement = this.$refs["topic-label"] as HTMLInputElement;
+        const topicLabel: HTMLInputElement = this.$refs['topic-label'] as HTMLInputElement;
         topicLabel.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
 
         // Instantiate the svg.js API on the slide preview and perform the initial render
@@ -74,35 +74,35 @@ export default class SlidePreview extends Vue {
     private focusSlide(event: MouseEvent): void {
         // NOTE: This is pretty bad. Please fix this I beg you.
         if (this.isAddSlide) {
-            this.$emit("add-slide");
+            this.$emit('add-slide');
             return;
         }
 
-        this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
-        this.$store.commit("activeSlide", this.id);
-        this.$store.commit("graphicEditorGraphicId", undefined);
+        this.$store.commit('focusGraphic', { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
+        this.$store.commit('activeSlide', this.id);
+        this.$store.commit('graphicEditorGraphicId', undefined);
 
         // Calculate the dividing boundaries between slides - used to determine the destination index of the slide-to-reorder
         const slidePreview: HTMLElement = this.$el as HTMLElement;
-        const slidePreviewBounds: Array<DOMRect> = Array.from(document.querySelectorAll<HTMLElement>(".slide-preview-container"))
+        const slidePreviewBounds: Array<DOMRect> = Array.from(document.querySelectorAll<HTMLElement>('.slide-preview-container'))
             .map<DOMRect>((element: HTMLElement): DOMRect => element.getBoundingClientRect() as DOMRect);
         const [ first, second, ..._ ]: Array<DOMRect> = slidePreviewBounds;
         const boundaryOffset: number = (first.x + first.width + second.x) / 2 - first.x;
         const boundaries: Array<number> = slidePreviewBounds.map<number>((bounds: DOMRect): number => bounds.x + boundaryOffset).slice(0, -1);
 
-        document.addEventListener("mousemove", moveSlidePreview);
-        document.addEventListener("mouseup", placeSlidePreview);
+        document.addEventListener('mousemove', moveSlidePreview);
+        document.addEventListener('mouseup', placeSlidePreview);
 
         const bounds: DOMRect = slidePreview.getBoundingClientRect() as DOMRect;
         const offset: Vector = new Vector(bounds.left - event.clientX, bounds.top - event.clientY);
 
         // Note: height and offset must be set before changing the position
         slidePreview.style.height = `${slidePreview.clientHeight}px`;
-        slidePreview.style.position = "fixed";
-        slidePreview.style.zIndex = "1";
+        slidePreview.style.position = 'fixed';
+        slidePreview.style.zIndex = '1';
 
-        const slidePreviews: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(`.slide-preview-container:not([data-index="${this.index}"])`));
-        const slidePreviewSlots: Array<HTMLElement> = slidePreviews.map<HTMLElement>((element: HTMLElement): HTMLElement => element.querySelector<HTMLElement>(".slide-preview-slot")!);
+        const slidePreviews: Array<HTMLElement> = Array.from(document.querySelectorAll<HTMLElement>(`.slide-preview-container:not([data-index='${this.index}'])`));
+        const slidePreviewSlots: Array<HTMLElement> = slidePreviews.map<HTMLElement>((element: HTMLElement): HTMLElement => element.querySelector<HTMLElement>('.slide-preview-slot')!);
         moveSlidePreview(event);
 
         function moveSlidePreview(event: MouseEvent): void {
@@ -110,26 +110,26 @@ export default class SlidePreview extends Vue {
             slidePreview.style.top = `${event.clientY + offset.y}px`;
 
             const destinationIndex: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, boundaries);
-            slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
-            slidePreviews[destinationIndex].querySelector<HTMLElement>(".slide-preview-slot")!.classList.remove("inactive-slide-preview-slot");
+            slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add('inactive-slide-preview-slot'));
+            slidePreviews[destinationIndex].querySelector<HTMLElement>('.slide-preview-slot')!.classList.remove('inactive-slide-preview-slot');
         }
 
         const self: SlidePreview = this;
         function placeSlidePreview(event: MouseEvent): void {
-            document.removeEventListener("mousemove", moveSlidePreview);
-            document.removeEventListener("mouseup", placeSlidePreview);
+            document.removeEventListener('mousemove', moveSlidePreview);
+            document.removeEventListener('mouseup', placeSlidePreview);
 
-            slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add("inactive-slide-preview-slot"));
+            slidePreviewSlots.forEach((slot: HTMLElement): void => slot.classList.add('inactive-slide-preview-slot'));
 
             // Note: replacing the styling must come after fetching the destination index
-            slidePreview.style.position = "relative";
+            slidePreview.style.position = 'relative';
             slidePreview.style.top = null;
             slidePreview.style.left = null;
-            slidePreview.style.height = "100%";
+            slidePreview.style.height = '100%';
             slidePreview.style.zIndex = null;
 
             const destination: number = getDestinationIndex(event.clientX + offset.x + bounds.width / 2, boundaries);
-            self.$store.commit("reorderSlide", { source: self.index, destination: destination });
+            self.$store.commit('reorderSlide', { source: self.index, destination: destination });
         }
 
         function getDestinationIndex(position: number, boundaries: Array<number>) {
@@ -145,8 +145,8 @@ export default class SlidePreview extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
-@import "../styles/application";
+<style lang='scss' scoped>
+@import '../styles/application';
 
 .add-slide-icon {
     color: $color-tertiary;

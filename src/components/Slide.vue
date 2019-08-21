@@ -1,14 +1,14 @@
 <template>
-<div :id="`slide_${id}`" :class="{ 'slide': true, 'active-slide': isActive }">
-    <div class="slide-box"></div>
+<div :id='`slide_${id}`' :class='{ "slide": true, "active-slide": isActive }'>
+    <div class='slide-box'></div>
 </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
-import * as SVG from "svg.js";
-import SlideWrapper from "../models/SlideWrapper";
-import { IGraphic, CustomCanvasMouseEvent, ISlideWrapper, CanvasKeyboardEvent, CustomCanvasKeyboardEvent } from "../types";
+<script lang='ts'>
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import * as SVG from 'svg.js';
+import SlideWrapper from '../models/SlideWrapper';
+import { IGraphic, CustomCanvasMouseEvent, ISlideWrapper, CanvasKeyboardEvent, CustomCanvasKeyboardEvent } from '../types';
 
 @Component
 export default class Slide extends Vue {
@@ -18,18 +18,18 @@ export default class Slide extends Vue {
 
     private mounted(): void {
         const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.rawViewbox;
-        const canvas: SVG.Doc = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: "absolute", top: 0, left: 0 });
+        const canvas: SVG.Doc = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
         const slideWrapper: ISlideWrapper = new SlideWrapper(this.id, canvas, this.$store, true);
 
-        slideWrapper.addCanvasEventListener("Deck.CanvasMouseOver", ((event: CustomCanvasMouseEvent): void => {
+        slideWrapper.addCanvasEventListener('Deck.CanvasMouseOver', ((event: CustomCanvasMouseEvent): void => {
             this.$store.getters.tool.canvasMouseOver(slideWrapper)(event);
         }) as EventListener);
 
-        slideWrapper.addCanvasEventListener("Deck.CanvasMouseOut", ((event: CustomCanvasMouseEvent): void => {
+        slideWrapper.addCanvasEventListener('Deck.CanvasMouseOut', ((event: CustomCanvasMouseEvent): void => {
             this.$store.getters.tool.canvasMouseOut(slideWrapper)(event);
         }) as EventListener);
 
-        slideWrapper.addCanvasEventListener("Deck.CanvasMouseDown", ((event: CustomCanvasMouseEvent): void => {
+        slideWrapper.addCanvasEventListener('Deck.CanvasMouseDown', ((event: CustomCanvasMouseEvent): void => {
             this.$store.getters.tool.canvasMouseDown(slideWrapper)(event);
         }) as EventListener);
 
@@ -37,8 +37,8 @@ export default class Slide extends Vue {
             slideWrapper.addGraphic(graphic);
         });
 
-        slideWrapper.addCanvasEventListener("Deck.CanvasKeyDown", ((event: CustomCanvasKeyboardEvent): void => {
-            if (["Delete", "Backspace"].indexOf(event.detail.baseEvent.key) !== -1) {
+        slideWrapper.addCanvasEventListener('Deck.CanvasKeyDown', ((event: CustomCanvasKeyboardEvent): void => {
+            if (['Delete', 'Backspace'].indexOf(event.detail.baseEvent.key) !== -1) {
                 if (this.$store.getters.focusedGraphic === undefined) {
                     return;
                 }
@@ -46,10 +46,10 @@ export default class Slide extends Vue {
                 // Remove the focused graphic
                 const graphicId: string = this.$store.getters.focusedGraphic.id;
                 slideWrapper.focusGraphic(undefined);
-                this.$store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: undefined });
-                this.$store.commit("removeGraphic", { slideId: slideWrapper.slideId, graphicId: graphicId });
-                this.$store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphicId });
-                this.$store.commit("graphicEditorGraphicId", undefined);
+                this.$store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: undefined });
+                this.$store.commit('removeGraphic', { slideId: slideWrapper.slideId, graphicId: graphicId });
+                this.$store.commit('removeSnapVectors', { slideId: slideWrapper.slideId, graphicId: graphicId });
+                this.$store.commit('graphicEditorGraphicId', undefined);
                 slideWrapper.removeGraphic(graphicId);
             }
         }) as EventListener);
@@ -57,8 +57,8 @@ export default class Slide extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
-@import "../styles/colors";
+<style lang='scss' scoped>
+@import '../styles/colors';
 
 .slide {
     display: none;

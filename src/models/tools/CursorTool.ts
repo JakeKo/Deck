@@ -1,25 +1,26 @@
-import { IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper, Snap, CanvasMouseEvent, CustomCanvasKeyboardEvent } from "../../types";
-import Vector from "../Vector";
-import SnapVector from "../SnapVector";
-import Sketch from "../graphics/Sketch";
-import CanvasTool from "./CanvasTool";
-import Utilities from "../../utilities";
+import { IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper, Snap, CanvasMouseEvent, CustomCanvasKeyboardEvent } from '../../types';
+import { EVENT_TYPES } from '../../constants';
+import Vector from '../Vector';
+import SnapVector from '../SnapVector';
+import Sketch from '../graphics/Sketch';
+import CanvasTool from './CanvasTool';
+import Utilities from '../../utilities';
 
 export default class CursorTool extends CanvasTool {
     public canvasMouseDown(slideWrapper: ISlideWrapper): () => void {
         return (): void => {
             slideWrapper.focusGraphic(undefined);
-            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: undefined });
-            slideWrapper.store.commit("graphicEditorGraphicId", undefined);
+            slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: undefined });
+            slideWrapper.store.commit('graphicEditorGraphicId', undefined);
         };
     }
 
     public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor("pointer");
+        return (): void => slideWrapper.setCursor('pointer');
     }
 
     public graphicMouseOut(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor("default");
+        return (): void => slideWrapper.setCursor('default');
     }
 
     public graphicMouseDown(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void {
@@ -38,9 +39,9 @@ export default class CursorTool extends CanvasTool {
             const snapHighlights: Array<Sketch> = [];
 
             slideWrapper.focusGraphic(graphic);
-            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic.id });
-            slideWrapper.store.commit("graphicEditorGraphicId", graphic.id);
-            slideWrapper.store.commit("removeSnapVectors", { slideId: slideWrapper.slideId, graphicId: graphic.id });
+            slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: graphic.id });
+            slideWrapper.store.commit('graphicEditorGraphicId', graphic.id);
+            slideWrapper.store.commit('removeSnapVectors', { slideId: slideWrapper.slideId, graphicId: graphic.id });
 
             const initialOrigin: Vector = new Vector(graphic.origin.x, graphic.origin.y);
             const initialPosition: Vector = slideWrapper.getPosition(event);
@@ -49,10 +50,10 @@ export default class CursorTool extends CanvasTool {
             let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
             let shiftPressed = false;
 
-            slideWrapper.addCanvasEventListener("Deck.CanvasMouseMove", preview as EventListener);
-            slideWrapper.addCanvasEventListener("Deck.CanvasMouseUp", end);
-            slideWrapper.addCanvasEventListener("Deck.CanvasKeyDown", toggleStrictMovement as EventListener);
-            slideWrapper.addCanvasEventListener("Deck.CanvasKeyUp", toggleStrictMovement as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement as EventListener);
 
             // Preview moving shape
             function preview(event: CustomMouseEvent): void {
@@ -86,7 +87,7 @@ export default class CursorTool extends CanvasTool {
                             origin: snap.destination.origin,
                             points: [snap.destination.direction.scale(-snapLineScale), snap.destination.direction.scale(snapLineScale)],
                             strokeWidth: 2,
-                            strokeColor: "hotpink"
+                            strokeColor: 'hotpink'
                         });
 
                         slideWrapper.addGraphic(snapHighlight);
@@ -100,15 +101,15 @@ export default class CursorTool extends CanvasTool {
 
             // End moving shape
             function end(): void {
-                slideWrapper.removeCanvasEventListener("Deck.CanvasMouseMove", preview as EventListener);
-                slideWrapper.removeCanvasEventListener("Deck.CanvasMouseUp", end);
-                slideWrapper.removeCanvasEventListener("Deck.CanvasKeyDown", toggleStrictMovement as EventListener);
-                slideWrapper.removeCanvasEventListener("Deck.CanvasKeyUp", toggleStrictMovement as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement as EventListener);
 
                 // Add the new SnapVectors once the graphic move has been finalized
-                slideWrapper.store.commit("updateGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
-                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors() });
-                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: graphic!.id });
+                slideWrapper.store.commit('updateGraphic', { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
+                slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors() });
+                slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: graphic!.id });
                 slideWrapper.focusGraphic(graphic);
 
                 // Remove the old snap highlights
@@ -117,14 +118,14 @@ export default class CursorTool extends CanvasTool {
             }
 
             function toggleStrictMovement(event: CustomCanvasKeyboardEvent): void {
-                if (event.detail.baseEvent.key !== "Shift" || (event.detail.baseEvent.type === "keydown" && shiftPressed)) {
+                if (event.detail.baseEvent.key !== 'Shift' || (event.detail.baseEvent.type === 'keydown' && shiftPressed)) {
                     return;
                 }
 
-                shiftPressed = event.detail.baseEvent.type === "keydown";
-                slideWrapper.dispatchEventOnCanvas<CanvasMouseEvent>("Deck.CanvasMouseMove", {
-                    baseEvent: new MouseEvent("mousemove", {
-                        shiftKey: event.detail.baseEvent.type === "keydown",
+                shiftPressed = event.detail.baseEvent.type === 'keydown';
+                slideWrapper.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_MOVE, {
+                    baseEvent: new MouseEvent('mousemove', {
+                        shiftKey: event.detail.baseEvent.type === 'keydown',
                         clientX: lastPosition.x,
                         clientY: lastPosition.y
                     }),

@@ -1,12 +1,12 @@
-import * as SVG from "svg.js";
-import Utilities from "../../utilities";
-import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, Anchor, RectangleParameters } from "../../types";
-import Vector from "../Vector";
-import SnapVector from "../SnapVector";
+import * as SVG from 'svg.js';
+import Utilities from '../../utilities';
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, Anchor, RectangleParameters } from '../../types';
+import Vector from '../Vector';
+import SnapVector from '../SnapVector';
 
 export default class Rectangle implements IGraphic {
     public id: string;
-    public type: string = "rectangle";
+    public type: string = 'rectangle';
     public defaultInteractive: boolean;
     public supplementary: boolean;
     public anchorIds: Array<string> = [];
@@ -25,8 +25,8 @@ export default class Rectangle implements IGraphic {
         this.origin = origin || new Vector(0, 0);
         this.width = width || 50;
         this.height = height || 50;
-        this.fillColor = fillColor || "#EEEEEE";
-        this.strokeColor = strokeColor || "#000000";
+        this.fillColor = fillColor || '#EEEEEE';
+        this.strokeColor = strokeColor || '#000000';
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
     }
@@ -106,22 +106,22 @@ export default class Rectangle implements IGraphic {
         return [
             {
                 graphic: Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
-                cursor: "move",
+                cursor: 'move',
                 handler: adjust(baseOrigin.add(baseDimensions))
             },
             {
                 graphic: Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
-                cursor: "move",
+                cursor: 'move',
                 handler: adjust(baseOrigin.add(new Vector(0, baseDimensions.y)))
             },
             {
                 graphic: Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
-                cursor: "move",
+                cursor: 'move',
                 handler: adjust(baseOrigin)
             },
             {
                 graphic: Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
-                cursor: "move",
+                cursor: 'move',
                 handler: adjust(baseOrigin.add(new Vector(baseDimensions.x, 0)))
             }
         ];

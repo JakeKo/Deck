@@ -1,12 +1,12 @@
-import * as SVG from "svg.js";
-import Utilities from "../../utilities";
-import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, Anchor, VideoParameters } from "../../types";
-import Vector from "../Vector";
-import SnapVector from "../SnapVector";
+import * as SVG from 'svg.js';
+import Utilities from '../../utilities';
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, Anchor, VideoParameters } from '../../types';
+import Vector from '../Vector';
+import SnapVector from '../SnapVector';
 
 export default class Video implements IGraphic {
     public id: string;
-    public type: string = "video";
+    public type: string = 'video';
     public defaultInteractive: boolean;
     public supplementary: boolean;
     public anchorIds: Array<string> = [];
@@ -21,7 +21,7 @@ export default class Video implements IGraphic {
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
         this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);
-        this.source = source || "";
+        this.source = source || '';
         this.width = width || 0;
         this.height = height || 0;
         this.rotation = rotation || 0;
@@ -29,16 +29,16 @@ export default class Video implements IGraphic {
 
     public render(canvas: SVG.Doc): SVG.Bare {
         const videoFrame: SVG.Bare = canvas
-            .element("foreignObject")
+            .element('foreignObject')
             .size(this.width, this.height)
             .translate(this.origin.x, this.origin.y)
             .rotate(this.rotation)
             .id(`graphic_${this.id}`);
 
-        const video: HTMLVideoElement = document.createElement("video");
+        const video: HTMLVideoElement = document.createElement('video');
         video.src = this.source;
         video.controls = false;
-        video.style.objectFit = "fill";
+        video.style.objectFit = 'fill';
 
         const boundingRect: DOMRect | ClientRect = videoFrame.node.getBoundingClientRect();
         video.width = boundingRect.width;
@@ -49,7 +49,7 @@ export default class Video implements IGraphic {
     }
 
     public updateRendering(svg: SVG.Bare): void {
-        const video: HTMLVideoElement | null = svg.node.querySelector("video");
+        const video: HTMLVideoElement | null = svg.node.querySelector('video');
         if (video === null) {
             console.error(`ERROR: Video element is missing on graphic with id: ${this.id}`);
             return;
@@ -121,22 +121,22 @@ export default class Video implements IGraphic {
         return [
             {
                 graphic: Utilities.makeAnchorGraphic(this.anchorIds[0], this.origin),
-                cursor: "move",
+                cursor: 'move',
                 handler: adjust(baseOrigin.add(baseDimensions))
             },
             {
                 graphic: Utilities.makeAnchorGraphic(this.anchorIds[1], this.origin.add(new Vector(this.width, 0))),
-                cursor: "move",
+                cursor: 'move',
                 handler: adjust(baseOrigin.add(new Vector(0, baseDimensions.y)))
             },
             {
                 graphic: Utilities.makeAnchorGraphic(this.anchorIds[2], this.origin.add(new Vector(this.width, this.height))),
-                cursor: "move",
+                cursor: 'move',
                 handler: adjust(baseOrigin)
             },
             {
                 graphic: Utilities.makeAnchorGraphic(this.anchorIds[3], this.origin.add(new Vector(0, this.height))),
-                cursor: "move",
+                cursor: 'move',
                 handler: adjust(baseOrigin.add(new Vector(baseDimensions.x, 0)))
             }
         ];

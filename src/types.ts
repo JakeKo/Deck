@@ -1,8 +1,8 @@
-import Slide from "./models/Slide";
-import Vector from "./models/Vector";
-import SnapVector from "./models/SnapVector";
-import * as SVG from "svg.js";
-import { Store } from "vuex";
+import Slide from './models/Slide';
+import Vector from './models/Vector';
+import SnapVector from './models/SnapVector';
+import * as SVG from 'svg.js';
+import { Store } from 'vuex';
 
 export interface IRootState {
     activeSlideId: string;

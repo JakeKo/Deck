@@ -1,7 +1,7 @@
-import Utilities from "../utilities";
-import { IGraphic, SlideExportObject, SlideParameters } from "../types";
-import SnapVector from "./SnapVector";
-import Vector from "./Vector";
+import Utilities from '../utilities';
+import { IGraphic, SlideExportObject, SlideParameters } from '../types';
+import SnapVector from './SnapVector';
+import Vector from './Vector';
 
 export default class Slide {
     public id: string;
@@ -14,14 +14,14 @@ export default class Slide {
     constructor({ id, graphics, snapVectors, topic, width, height }: SlideParameters) {
         this.id = id || Utilities.generateId();
         this.graphics = graphics || new Array<IGraphic>();
-        this.topic = topic || "";
+        this.topic = topic || '';
         this.snapVectors = new Set<SnapVector>([
-            new SnapVector("slide", new Vector(width / 2, 0), Vector.right),
-            new SnapVector("slide", new Vector(width, height / 2), Vector.up),
-            new SnapVector("slide", new Vector(width / 2, height), Vector.right),
-            new SnapVector("slide", new Vector(0, height / 2), Vector.up),
-            new SnapVector("slide", new Vector(width / 2, height / 2), Vector.right),
-            new SnapVector("slide", new Vector(width / 2, height / 2), Vector.up),
+            new SnapVector('slide', new Vector(width / 2, 0), Vector.right),
+            new SnapVector('slide', new Vector(width, height / 2), Vector.up),
+            new SnapVector('slide', new Vector(width / 2, height), Vector.right),
+            new SnapVector('slide', new Vector(0, height / 2), Vector.up),
+            new SnapVector('slide', new Vector(width / 2, height / 2), Vector.right),
+            new SnapVector('slide', new Vector(width / 2, height / 2), Vector.up),
             ...snapVectors || new Array<SnapVector>()
         ]);
 

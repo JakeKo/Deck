@@ -1,5 +1,5 @@
-require("jsdom-global")();
-global.expect = require("expect");
+require('jsdom-global')();
+global.expect = require('expect');
 global.FileReader = window.FileReader;
 
 global.closeEnough = function(a, b, epsilon) {

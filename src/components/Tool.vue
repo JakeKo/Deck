@@ -1,12 +1,12 @@
 <template>   
-<div :class="{ 'tool': true, 'active-tool': isActive }" @click="$emit('click')">
-    <i :class="icon"></i>
+<div :class='{ "tool": true, "active-tool": isActive }' @click='$emit("click")'>
+    <i :class='icon'></i>
     {{toolName}}
 </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
+<script lang='ts'>
+import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class Tool extends Vue {
@@ -16,8 +16,8 @@ export default class Tool extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
-@import "../styles/application";
+<style lang='scss' scoped>
+@import '../styles/application';
 
 .active-tool {
     color: $color-information;

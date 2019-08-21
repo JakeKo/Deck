@@ -1,7 +1,7 @@
-import Vector from "../src/models/Vector";
+import Vector from '../src/models/Vector';
 
-describe("Vector", () => {
-    it("can calculate magnitude", () => {
+describe('Vector', () => {
+    it('can calculate magnitude', () => {
         // Arrange
         const vector1 = new Vector(0, 0);
         const vector2 = new Vector(2, 3);
@@ -29,7 +29,7 @@ describe("Vector", () => {
         expect(actualMagnitude5).toBe(expectedMagnitude5);
     });
 
-    it("can normalize vectors", () => {
+    it('can normalize vectors', () => {
         // Arrange
         const vector1 = new Vector(0, 0);
         const vector2 = new Vector(2, 3);
@@ -57,7 +57,7 @@ describe("Vector", () => {
         expect(actualNormal5).toEqual(expectedNormal5);
     });
 
-    it("can convert vectors to arrays", () => {
+    it('can convert vectors to arrays', () => {
         // Arrange
         const vector1 = new Vector(0, 0);
         const vector2 = new Vector(2, 3);
@@ -85,7 +85,7 @@ describe("Vector", () => {
         expect(actualArray5).toEqual(expectedArray5);
     });
 
-    it("can calculate the sum vectors", () => {
+    it('can calculate the sum vectors', () => {
         // Arrange
         const vector1 = new Vector(-3, 4);
         const vector2 = new Vector(2, 3);
@@ -98,7 +98,7 @@ describe("Vector", () => {
         expect(actualSum).toEqual(expectedSum);
     });
 
-    it("can calculate the difference between two vectors", () => {
+    it('can calculate the difference between two vectors', () => {
         // Arrange
         const vector1 = new Vector(-3, 4);
         const vector2 = new Vector(2, 3);
@@ -111,7 +111,7 @@ describe("Vector", () => {
         expect(actualDifference).toEqual(expectedDifference);
     });
 
-    it("can calculate the dot product of two vectors", () => {
+    it('can calculate the dot product of two vectors', () => {
         // Arrange
         const vector1 = new Vector(-3, 4);
         const vector2 = new Vector(2, 3);
@@ -124,7 +124,7 @@ describe("Vector", () => {
         expect(actualDotProduct).toBe(expectedDotProduct);
     });
 
-    it("can calculate the angle between two vectors (in radians)", () => {
+    it('can calculate the angle between two vectors (in radians)', () => {
         // Arrange
         const epsilon = 1E-5;
         const vector1 = Vector.right;
@@ -150,7 +150,7 @@ describe("Vector", () => {
         expect(closeEnough(actualAngle4, expectedAngle4, epsilon)).toBe(true);
     });
 
-    it("can calculate the projection of one vector onto another", () => {
+    it('can calculate the projection of one vector onto another', () => {
         // Arrange
         const vector1 = new Vector(2, 0);
         const vector2 = new Vector(5, 5);
@@ -163,7 +163,7 @@ describe("Vector", () => {
         expect(actualProjection).toEqual(expectedProjection);
     });
 
-    it("can scale vectors", () => {
+    it('can scale vectors', () => {
         // Arrange
         const vector = new Vector(2, -3);
         const scalar = 3;
@@ -176,7 +176,7 @@ describe("Vector", () => {
         expect(actualScaledVector).toEqual(expectedScaledVector);
     });
 
-    it("can reflect a vector over itself", () => {
+    it('can reflect a vector over itself', () => {
         // Arrange
         const vector = new Vector(2, -3);
         const expectedReflectedVector = new Vector(2, -3);
@@ -188,7 +188,7 @@ describe("Vector", () => {
         expect(actualReflectedVector).toEqual(expectedReflectedVector);
     });
 
-    it("can reflect a vector over an arbitrary origin vector", () => {
+    it('can reflect a vector over an arbitrary origin vector', () => {
         // Arrange
         const vector = new Vector(2, -3);
         const origin = new Vector(-1, 2)
@@ -201,7 +201,7 @@ describe("Vector", () => {
         expect(actualReflectedVector).toEqual(expectedReflectedVector);
     });
 
-    it("can check for equal vectors", () => {
+    it('can check for equal vectors', () => {
         // Arrange
         const vector1 = new Vector(2, -3);
         const vector2 = new Vector(2, -3);

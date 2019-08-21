@@ -1,15 +1,15 @@
-import Vue from "vue";
-import Vuex, { StoreOptions } from "vuex";
-import Utilities from "./utilities";
-import Slide from "./models/Slide";
-import SnapVector from "./models/SnapVector";
-import * as SVG from "svg.js";
-import { CursorTool, EllipseTool, PencilTool, PenTool, RectangleTool, TextboxTool } from "./models/tools/tools";
-import { IRootState, ICanvasTool, IGraphic, GraphicEvent, SlideExportObject } from "./types";
+import Vue from 'vue';
+import Vuex, { StoreOptions } from 'vuex';
+import Utilities from './utilities';
+import Slide from './models/Slide';
+import SnapVector from './models/SnapVector';
+import * as SVG from 'svg.js';
+import { CursorTool, EllipseTool, PencilTool, PenTool, RectangleTool, TextboxTool } from './models/tools/tools';
+import { IRootState, ICanvasTool, IGraphic, GraphicEvent, SlideExportObject } from './types';
 
 const store: StoreOptions<IRootState> = {
     state: {
-        activeSlideId: "",
+        activeSlideId: '',
         focusedGraphicId: undefined,
         canvas: {
             width: 4000,
@@ -30,7 +30,7 @@ const store: StoreOptions<IRootState> = {
         },
         graphicEditorGraphicId: undefined,
         slides: new Array<Slide>(),
-        currentTool: "cursor",
+        currentTool: 'cursor',
         tools: {
             cursor: new CursorTool(),
             pencil: new PencilTool(),
@@ -133,7 +133,7 @@ const store: StoreOptions<IRootState> = {
         },
         addGraphic: (state: IRootState, { slideId, graphic }: { slideId: string, graphic: IGraphic }): void => {
             if (graphic === undefined) {
-                console.error("ERROR: Attempted to add an undefined graphic");
+                console.error('ERROR: Attempted to add an undefined graphic');
                 return;
             }
 
@@ -144,7 +144,7 @@ const store: StoreOptions<IRootState> = {
             }
 
             slide.graphics.push(graphic);
-            document.dispatchEvent(new CustomEvent<GraphicEvent>("Deck.GraphicAdded", { detail: { slideId: slideId, graphicId: graphic.id, graphic: graphic } }));
+            document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicAdded', { detail: { slideId: slideId, graphicId: graphic.id, graphic: graphic } }));
         },
         removeGraphic: (state: IRootState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
             const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
@@ -154,24 +154,24 @@ const store: StoreOptions<IRootState> = {
             }
 
             const graphic: IGraphic = slide.removeGraphic(graphicId);
-            document.dispatchEvent(new CustomEvent<GraphicEvent>("Deck.GraphicRemoved", { detail: { slideId, graphicId, graphic } }));
+            document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicRemoved', { detail: { slideId, graphicId, graphic } }));
         },
         updateGraphic: (state: IRootState, { slideId, graphicId, graphic }: { slideId: string, graphicId: string, graphic: IGraphic }): void => {
             const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
             if (slide === undefined) {
-                console.error(`ERROR: Could not find slide ("${slideId}")`);
+                console.error(`ERROR: Could not find slide ('${slideId}')`);
                 return;
             }
 
             // Update the graphic
             const index: number = slide.graphics.findIndex((g: IGraphic): boolean => g.id === graphicId);
             if (index < 0) {
-                console.error(`ERROR: Could not find graphic ("${graphicId}")`);
+                console.error(`ERROR: Could not find graphic ('${graphicId}')`);
                 return;
             }
 
             slide.graphics[index] = graphic;
-            document.dispatchEvent(new CustomEvent<GraphicEvent>("Deck.GraphicUpdated", { detail: { slideId: slide.id, graphicId: graphic.id, graphic: graphic } }));
+            document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicUpdated', { detail: { slideId: slide.id, graphicId: graphic.id, graphic: graphic } }));
         },
         focusGraphic: (state: IRootState, { slideId, graphicId }: { slideId: string, graphicId?: string }): void => {
             const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
@@ -187,7 +187,7 @@ const store: StoreOptions<IRootState> = {
             }
 
             state.focusedGraphicId = graphicId;
-            document.dispatchEvent(new CustomEvent<GraphicEvent>("Deck.GraphicFocused", { detail: { slideId: slideId, graphicId: graphicId, graphic: graphic } }));
+            document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicFocused', { detail: { slideId: slideId, graphicId: graphicId, graphic: graphic } }));
         },
         tool: (state: IRootState, toolName: string): void => {
             state.currentTool = toolName;
@@ -220,7 +220,7 @@ const store: StoreOptions<IRootState> = {
             slide.addSnapVectors(...snapVectors);
         },
         deckTitle: (state: IRootState, deckTitle: string): void => {
-            state.deckTitle = deckTitle === "" ? undefined : deckTitle;
+            state.deckTitle = deckTitle === '' ? undefined : deckTitle;
         },
         setTopic: (state: IRootState, { index, topic }: { index: number, topic: string }): void => {
             state.slides[index].topic = topic;
@@ -229,11 +229,11 @@ const store: StoreOptions<IRootState> = {
     actions: {
         save: (store: any): void => {
             // Construct the slides on a hidden element
-            const exportFrame: HTMLElement = document.getElementById("export-frame")!;
+            const exportFrame: HTMLElement = document.getElementById('export-frame')!;
             store.getters.slides.forEach((slideModel: Slide): void => {
-                const slide: HTMLDivElement = document.createElement("div");
-                slide.setAttribute("id", slideModel.id);
-                slide.setAttribute("class", "slide");
+                const slide: HTMLDivElement = document.createElement('div');
+                slide.setAttribute('id', slideModel.id);
+                slide.setAttribute('class', 'slide');
                 exportFrame.appendChild(slide);
 
                 const viewbox: { x: number, y: number, width: number, height: number } = store.getters.croppedViewbox;
@@ -242,17 +242,17 @@ const store: StoreOptions<IRootState> = {
             });
 
             // Copy the slides over to the exported object and clear the hidden element
-            const body: HTMLBodyElement = document.createElement("body");
+            const body: HTMLBodyElement = document.createElement('body');
             body.innerHTML = exportFrame.innerHTML;
             while (exportFrame.firstChild) {
                 exportFrame.removeChild(exportFrame.firstChild);
             }
 
-            const html: HTMLHtmlElement = document.createElement("html");
-            const head: HTMLHeadElement = document.createElement("head");
-            const meta: HTMLMetaElement = document.createElement("meta");
-            meta.name = "viewport";
-            meta.content = "width=device-width, initial-scale=1.0";
+            const html: HTMLHtmlElement = document.createElement('html');
+            const head: HTMLHeadElement = document.createElement('head');
+            const meta: HTMLMetaElement = document.createElement('meta');
+            meta.name = 'viewport';
+            meta.content = 'width=device-width, initial-scale=1.0';
             head.appendChild(meta);
             html.appendChild(head);
             html.appendChild(body);
@@ -265,21 +265,21 @@ const store: StoreOptions<IRootState> = {
                 </script>
             `;
 
-            const anchor: HTMLAnchorElement = document.createElement("a");
-            anchor.setAttribute("href", `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
-            anchor.setAttribute("download", `${store.getters.deckTitle || "Untitled"}.html`);
+            const anchor: HTMLAnchorElement = document.createElement('a');
+            anchor.setAttribute('href', `data:text/html;charset=UTF-8,${encodeURIComponent(page)}`);
+            anchor.setAttribute('download', `${store.getters.deckTitle || 'Untitled'}.html`);
             anchor.click();
             anchor.remove();
         },
         resetPresentation: (store: any, presentation: Array<Slide>): void => {
             // Wipe the current slide deck
             store.state.slides = [];
-            store.commit("activeSlide", undefined);
-            presentation.forEach((slide: Slide, index: number): void => store.commit("addSlide", { index, slide }));
+            store.commit('activeSlide', undefined);
+            presentation.forEach((slide: Slide, index: number): void => store.commit('addSlide', { index, slide }));
 
             // If the new slide deck is non-empty, focus the first slide
             if (store.state.slides.length > 0) {
-                store.commit("activeSlide", store.state.slides[0].id);
+                store.commit('activeSlide', store.state.slides[0].id);
             }
         }
     }

@@ -1,6 +1,6 @@
-@import url("https://use.fontawesome.com/releases/v5.5.0/css/all.css");
-@import "./colors";
-@import "./fonts";
+@import url('https://use.fontawesome.com/releases/v5.5.0/css/all.css');
+@import './colors';
+@import './fonts';
 
 html, body {
     margin: 0;
@@ -49,7 +49,7 @@ html, body {
     align-items: center;
     cursor: pointer;
     padding: 8px 0;
-    font-family: "Roboto", sans-serif;
+    font-family: 'Roboto', sans-serif;
     color: $color-dark;
     background: $color-light;
     font-size: 12px;

@@ -1,28 +1,29 @@
-import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, CanvasMouseEvent, CustomCanvasKeyboardEvent } from "../../types";
-import { Ellipse } from "../graphics/graphics";
-import Vector from "../Vector";
-import CanvasTool from "./CanvasTool";
+import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, CanvasMouseEvent, CustomCanvasKeyboardEvent } from '../../types';
+import { EVENT_TYPES } from '../../constants';
+import { Ellipse } from '../graphics/graphics';
+import Vector from '../Vector';
+import CanvasTool from './CanvasTool';
 
 export default class EllipseTool extends CanvasTool {
     public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
         return function (event: CustomCanvasMouseEvent): void {
             // Create some initial parameters for managing ellipse creation
             const start: Vector = slideWrapper.getPosition(event);
-            const ellipse: Ellipse = new Ellipse({ origin: start, fillColor: "black", strokeColor: "none", width: 1, height: 1 });
+            const ellipse: Ellipse = new Ellipse({ origin: start, fillColor: 'black', strokeColor: 'none', width: 1, height: 1 });
             let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
             let shiftPressed = false;
 
             // Clear the currently focused graphic and add the new ellipse
             slideWrapper.focusGraphic(undefined);
-            slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: undefined });
-            slideWrapper.store.commit("graphicEditorGraphicId", undefined);
+            slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: undefined });
+            slideWrapper.store.commit('graphicEditorGraphicId', undefined);
             slideWrapper.addGraphic(ellipse);
 
             // Start listening to mouse events
-            slideWrapper.addCanvasEventListener("Deck.CanvasMouseMove", preview as EventListener);
-            slideWrapper.addCanvasEventListener("Deck.CanvasMouseUp", end);
-            slideWrapper.addCanvasEventListener("Deck.CanvasKeyDown", toggleCircle as EventListener);
-            slideWrapper.addCanvasEventListener("Deck.CanvasKeyUp", toggleCircle as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleCircle as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleCircle as EventListener);
 
             function preview(event: CustomMouseEvent): void {
                 // Determine dimensions for an ellipse or circle (based on if shift is pressed)
@@ -40,30 +41,30 @@ export default class EllipseTool extends CanvasTool {
 
             function end(): void {
                 // Unbind event handlers
-                slideWrapper.removeCanvasEventListener("Deck.CanvasMouseMove", preview as EventListener);
-                slideWrapper.removeCanvasEventListener("Deck.CanvasMouseUp", end);
-                slideWrapper.removeCanvasEventListener("Deck.CanvasKeyDown", toggleCircle as EventListener);
-                slideWrapper.removeCanvasEventListener("Deck.CanvasKeyUp", toggleCircle as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleCircle as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleCircle as EventListener);
 
                 // Persist the new ellipse
                 slideWrapper.focusGraphic(ellipse);
-                slideWrapper.store.commit("addGraphic", { slideId: slideWrapper.slideId, graphic: ellipse });
-                slideWrapper.store.commit("focusGraphic", { slideId: slideWrapper.slideId, graphicId: ellipse.id });
-                slideWrapper.store.commit("graphicEditorGraphicId", ellipse.id);
-                slideWrapper.store.commit("addSnapVectors", { slideId: slideWrapper.slideId, snapVectors: ellipse.getSnapVectors() });
-                slideWrapper.store.commit("tool", "cursor");
-                slideWrapper.setCursor("default");
+                slideWrapper.store.commit('addGraphic', { slideId: slideWrapper.slideId, graphic: ellipse });
+                slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: ellipse.id });
+                slideWrapper.store.commit('graphicEditorGraphicId', ellipse.id);
+                slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: ellipse.getSnapVectors() });
+                slideWrapper.store.commit('tool', 'cursor');
+                slideWrapper.setCursor('default');
             }
 
             function toggleCircle(event: CustomCanvasKeyboardEvent): void {
-                if (event.detail.baseEvent.key !== "Shift" || (event.detail.baseEvent.type === "keydown" && shiftPressed)) {
+                if (event.detail.baseEvent.key !== 'Shift' || (event.detail.baseEvent.type === 'keydown' && shiftPressed)) {
                     return;
                 }
 
-                shiftPressed = event.detail.baseEvent.type === "keydown";
-                slideWrapper.dispatchEventOnCanvas<CanvasMouseEvent>("Deck.CanvasMouseMove", {
-                    baseEvent: new MouseEvent("mousemove", {
-                        shiftKey: event.detail.baseEvent.type === "keydown",
+                shiftPressed = event.detail.baseEvent.type === 'keydown';
+                slideWrapper.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_MOVE, {
+                    baseEvent: new MouseEvent('mousemove', {
+                        shiftKey: event.detail.baseEvent.type === 'keydown',
                         clientX: lastPosition.x,
                         clientY: lastPosition.y
                     }),
@@ -74,14 +75,14 @@ export default class EllipseTool extends CanvasTool {
     }
 
     public canvasMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor("crosshair");
+        return (): void => slideWrapper.setCursor('crosshair');
     }
 
     public canvasMouseOut(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor("default");
+        return (): void => slideWrapper.setCursor('default');
     }
 
     public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor("default");
+        return (): void => slideWrapper.setCursor('default');
     }
 }

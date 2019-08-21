@@ -1,12 +1,12 @@
-import * as SVG from "svg.js";
-import Utilities from "../../utilities";
-import { IGraphic, ISlideWrapper, GraphicEditorFormat, Anchor, TextParameters } from "../../types";
-import Vector from "../Vector";
-import SnapVector from "../SnapVector";
+import * as SVG from 'svg.js';
+import Utilities from '../../utilities';
+import { IGraphic, ISlideWrapper, GraphicEditorFormat, Anchor, TextParameters } from '../../types';
+import Vector from '../Vector';
+import SnapVector from '../SnapVector';
 
 export default class Text implements IGraphic {
     public id: string;
-    public type: string = "text";
+    public type: string = 'text';
     public defaultInteractive: boolean;
     public supplementary: boolean;
     public anchorIds: Array<string> = [];
@@ -23,11 +23,11 @@ export default class Text implements IGraphic {
         this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
         this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);
-        this.content = content || "lorem ipsum dolor sit amet";
+        this.content = content || 'lorem ipsum dolor sit amet';
         this.fontSize = fontSize || 12;
-        this.fontWeight = fontWeight || "400";
-        this.fontFamily = fontFamily || "Arial";
-        this.fillColor = fillColor || "#000000";
+        this.fontWeight = fontWeight || '400';
+        this.fontFamily = fontFamily || 'Arial';
+        this.fillColor = fillColor || '#000000';
         this.rotation = rotation || 0;
     }
 

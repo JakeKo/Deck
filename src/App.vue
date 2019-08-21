@@ -1,9 +1,9 @@
 <template>
-<div id="app">
+<div id='app'>
     <menu-bar></menu-bar>
-    <div id="interface">
-        <toolbox :toolName="$store.getters.toolName"></toolbox>
-        <div id="workspace">
+    <div id='interface'>
+        <toolbox :toolName='$store.getters.toolName'></toolbox>
+        <div id='workspace'>
             <editor></editor>
             <roadmap></roadmap>
         </div>
@@ -12,15 +12,15 @@
 </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
-import MenuBar from "./components/MenuBar.vue";
-import Toolbox from "./components/Toolbox.vue";
-import Editor from "./components/Editor.vue";
-import Roadmap from "./components/Roadmap.vue";
-import GraphicEditor from "./components/GraphicEditor.vue";
-import Utilities from "./utilities";
-import { IGraphic } from "./types";
+<script lang='ts'>
+import { Vue, Component } from 'vue-property-decorator';
+import MenuBar from './components/MenuBar.vue';
+import Toolbox from './components/Toolbox.vue';
+import Editor from './components/Editor.vue';
+import Roadmap from './components/Roadmap.vue';
+import GraphicEditor from './components/GraphicEditor.vue';
+import Utilities from './utilities';
+import { IGraphic } from './types';
 
 @Component({
     components: {
@@ -34,7 +34,7 @@ import { IGraphic } from "./types";
 export default class App extends Vue {
     private created(): void {
         // Overrides the default behavior of copy to copy the graphic model of the focused graphic
-        document.addEventListener("copy", (event: Event): void => {
+        document.addEventListener('copy', (event: Event): void => {
             // Cast event as clipboard event and prevent from copying any user selection
             const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
             clipboardEvent.preventDefault();
@@ -46,30 +46,30 @@ export default class App extends Vue {
 
             // Set the clipboard data to the graphic model associated with the current focused graphic
             const graphic: IGraphic = this.$store.getters.activeSlide.graphics.find((graphic: IGraphic) => graphic.id === focusedGraphic.id)!;
-            clipboardEvent.clipboardData.setData("text/json", JSON.stringify(graphic));
+            clipboardEvent.clipboardData.setData('text/json', JSON.stringify(graphic));
         });
 
-        document.addEventListener("paste", (event: Event): void => {
+        document.addEventListener('paste', (event: Event): void => {
             // Cast event as clipboard event
             const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
             clipboardEvent.preventDefault();
 
-            const data: any = JSON.parse(clipboardEvent.clipboardData.getData("text/json"));
+            const data: any = JSON.parse(clipboardEvent.clipboardData.getData('text/json'));
             if (data === undefined) {
                 return;
             }
 
             const graphic: IGraphic = Utilities.parseGraphic({ ...data, id: Utilities.generateId() });
-            this.$store.commit("addGraphic", { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
-            this.$store.commit("focusGraphic", { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
-            this.$store.commit("graphicEditorGraphicId", graphic.id);
+            this.$store.commit('addGraphic', { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
+            this.$store.commit('focusGraphic', { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
+            this.$store.commit('graphicEditorGraphicId', graphic.id);
         });
     }
 }
 </script>
 
-<style lang="scss">
-@import "./styles/application";
+<style lang='scss'>
+@import './styles/application';
 
 #app {
     height: 100vh;

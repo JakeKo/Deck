@@ -1,12 +1,12 @@
-import * as SVG from "svg.js";
-import Utilities from "../../utilities";
-import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, BezierAnchorGraphics, Anchor, CurveParameters } from "../../types";
-import Vector from "../Vector";
-import SnapVector from "../SnapVector";
+import * as SVG from 'svg.js';
+import Utilities from '../../utilities';
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, BezierAnchorGraphics, Anchor, CurveParameters } from '../../types';
+import Vector from '../Vector';
+import SnapVector from '../SnapVector';
 
 export default class Curve implements IGraphic {
     public id: string;
-    public type: string = "curve";
+    public type: string = 'curve';
     public defaultInteractive: boolean;
     public supplementary: boolean;
     public anchorIds: Array<string> = [];
@@ -23,8 +23,8 @@ export default class Curve implements IGraphic {
         this.supplementary = supplementary === undefined ? false : supplementary;
         this.origin = origin || new Vector(0, 0);
         this.points = points || [];
-        this.fillColor = fillColor || "#EEEEEE";
-        this.strokeColor = strokeColor || "#000000";
+        this.fillColor = fillColor || '#EEEEEE';
+        this.strokeColor = strokeColor || '#000000';
         this.strokeWidth = strokeWidth || 1;
         this.rotation = rotation || 0;
     }
@@ -33,7 +33,7 @@ export default class Curve implements IGraphic {
         // Reformat points from an array of objects to the bezier curve string
         let points: string = `M 0,0`;
         this.points.forEach((point: Vector, index: number): void => {
-            points += `${index % 3 === 0 ? " C" : ""} ${point.x},${point.y}`;
+            points += `${index % 3 === 0 ? ' C' : ''} ${point.x},${point.y}`;
         });
 
         return canvas
@@ -47,9 +47,9 @@ export default class Curve implements IGraphic {
 
     public updateRendering(svg: SVG.Path): void {
         // Reformat points from an array of objects to the bezier curve string
-        let points: string = "M 0,0";
+        let points: string = 'M 0,0';
         this.points.forEach((point: Vector, index: number): void => {
-            points += `${index % 3 === 0 ? " C" : ""} ${point.x},${point.y}`;
+            points += `${index % 3 === 0 ? ' C' : ''} ${point.x},${point.y}`;
         });
 
         svg.plot(points)
@@ -94,7 +94,7 @@ export default class Curve implements IGraphic {
         return anchors.map<Anchor>((anchor: { index: number, graphic: IGraphic }): Anchor => {
             return {
                 graphic: anchor.graphic,
-                cursor: "move",
+                cursor: 'move',
                 handler: (event: CustomMouseEvent): void => {
                     let bezierCurveGraphics: BezierAnchorGraphics;
                     if (anchor.index === 0) {

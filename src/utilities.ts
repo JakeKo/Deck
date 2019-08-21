@@ -1,7 +1,7 @@
-import Vector from "./models/Vector";
-import SnapVector from "./models/SnapVector";
-import { IGraphic, Snap, BezierAnchorGraphics } from "./types";
-import { Rectangle, Ellipse, Curve, Sketch, Text, Image, Video } from "./models/graphics/graphics";
+import Vector from './models/Vector';
+import SnapVector from './models/SnapVector';
+import { IGraphic, Snap, BezierAnchorGraphics } from './types';
+import { Rectangle, Ellipse, Curve, Sketch, Text, Image, Video } from './models/graphics/graphics';
 
 function generateId(): string {
     function term(): string {
@@ -12,25 +12,25 @@ function generateId(): string {
 }
 
 function parseGraphic(data: any): IGraphic {
-    if (data.type === "rectangle") {
+    if (data.type === 'rectangle') {
         data.origin = new Vector(data.origin.x, data.origin.y);
         return new Rectangle(data);
-    } else if (data.type === "ellipse") {
+    } else if (data.type === 'ellipse') {
         data.origin = new Vector(data.origin.x, data.origin.y);
         return new Ellipse(data);
-    } else if (data.type === "curve") {
+    } else if (data.type === 'curve') {
         data.origin = new Vector(data.origin.x, data.origin.y);
         return new Curve(data);
-    } else if (data.type === "sketch") {
+    } else if (data.type === 'sketch') {
         data.origin = new Vector(data.origin.x, data.origin.y);
         return new Sketch(data);
-    } else if (data.type === "text") {
+    } else if (data.type === 'text') {
         data.origin = new Vector(data.origin.x, data.origin.y);
         return new Text(data);
-    } else if (data.type === "image") {
+    } else if (data.type === 'image') {
         data.origin = new Vector(data.origin.x, data.origin.y);
         return new Image(data);
-    } else if (data.type === "video") {
+    } else if (data.type === 'video') {
         data.origin = new Vector(data.origin.x, data.origin.y);
         return new Video(data);
     }
@@ -48,8 +48,8 @@ function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
         origin: origin.add(new Vector(-radius, -radius)),
         height: radius * 2,
         width: radius * 2,
-        fillColor: "white",
-        strokeColor: "hotpink",
+        fillColor: 'white',
+        strokeColor: 'hotpink',
         strokeWidth: 2
     });
 }
@@ -60,20 +60,20 @@ function toPrettyString(object: any, indentDepth: number = 1): string {
         const value: any = object[property];
         const prefix: string = Array.isArray(object) ? space(indentDepth) : `${space(indentDepth)}"${property}": `;
 
-        if (typeof value === "number" || typeof value === "boolean") {
+        if (typeof value === 'number' || typeof value === 'boolean') {
             properties.push(`${prefix}${value}`);
-        } else if (typeof value === "string") {
+        } else if (typeof value === 'string') {
             properties.push(`${prefix}${JSON.stringify(value)}`);
-        } else if (Array.isArray(value) || typeof value === "object") {
+        } else if (Array.isArray(value) || typeof value === 'object') {
             properties.push(`${prefix}${toPrettyString(value, indentDepth + 1)}`);
         }
     }
 
-    const prettyString: string = `\n${properties.join(",\n")}\n${space(indentDepth - 1)}`;
+    const prettyString: string = `\n${properties.join(',\n')}\n${space(indentDepth - 1)}`;
     return Array.isArray(object) ? `[${prettyString}]` : `{${prettyString}}`;
 
     function space(indentDepth: number): string {
-        return new Array(indentDepth * 4).fill(" ").join("");
+        return new Array(indentDepth * 4).fill(' ').join('');
     }
 }
 
@@ -136,15 +136,15 @@ function makeBezierCurvePointGraphic({ anchor, firstHandle, secondHandle }: { an
             origin: firstHandle.add(new Vector(-3, -3)),
             width: 6,
             height: 6,
-            strokeColor: "hotpink",
+            strokeColor: 'hotpink',
             strokeWidth: 2,
-            fillColor: "white"
+            fillColor: 'white'
         }),
         firstHandleTrace: new Sketch({
             supplementary: true,
             defaultInteractive: false,
             points: [firstHandle, anchor],
-            strokeColor: "hotpink",
+            strokeColor: 'hotpink',
             strokeWidth: 2
         })
     };
@@ -156,16 +156,16 @@ function makeBezierCurvePointGraphic({ anchor, firstHandle, secondHandle }: { an
             origin: secondHandle.add(new Vector(-3, -3)),
             width: 6,
             height: 6,
-            strokeColor: "hotpink",
+            strokeColor: 'hotpink',
             strokeWidth: 2,
-            fillColor: "white"
+            fillColor: 'white'
         });
 
         graphics.secondHandleTrace = new Sketch({
             supplementary: true,
             defaultInteractive: false,
             points: [secondHandle, anchor],
-            strokeColor: "hotpink",
+            strokeColor: 'hotpink',
             strokeWidth: 2
         });
     }
@@ -202,15 +202,15 @@ svg {
 
 <script>
 let slideIndex = 0;
-const slides = document.getElementsByClassName("slide");
+const slides = document.getElementsByClassName('slide');
 
 (function () {
-    window.addEventListener("resize", event => {
+    window.addEventListener('resize', event => {
         event.preventDefault();
         resizeSlides();
     });
 
-    window.addEventListener("keydown", event => {
+    window.addEventListener('keydown', event => {
         event = event || window.event;
 
         if (event.keyCode === 37) {
@@ -236,22 +236,22 @@ function resizeSlides() {
     }
 
     for (let i = 0; i < slides.length; i++) {
-        slides[i].style.height = height + "px";
-        slides[i].style.width = width + "px";
+        slides[i].style.height = height + 'px';
+        slides[i].style.width = width + 'px';
     }
 }
 
 function advanceSlide() {
-    slides[slideIndex].style.display = "none";
+    slides[slideIndex].style.display = 'none';
     slideIndex = (slideIndex + 1) % slides.length;
-    slides[slideIndex].style.display = "block";
+    slides[slideIndex].style.display = 'block';
 }
 
 function rewindSlide() {
-    slides[slideIndex].style.display = "none";
+    slides[slideIndex].style.display = 'none';
     if (slideIndex === 0) slideIndex = slides.length - 1;
     else slideIndex = (slideIndex - 1) % slides.length;
-    slides[slideIndex].style.display = "block";
+    slides[slideIndex].style.display = 'block';
 }
 </script>`;
 

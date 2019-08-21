@@ -1,4 +1,4 @@
-import { ICanvasTool, ISlideWrapper, CustomCanvasMouseEvent, CustomGraphicMouseEvent } from "../../types";
+import { ICanvasTool, ISlideWrapper, CustomCanvasMouseEvent, CustomGraphicMouseEvent } from '../../types';
 
 export default class CanvasTool implements ICanvasTool {
     public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
