@@ -20,10 +20,10 @@ export default class RectangleTool extends CanvasTool {
             slideWrapper.addGraphic(rectangle);
 
             // Start listening to mouse events
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
             slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare as EventListener);
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare);
 
             function preview(event: CustomMouseEvent): void {
                 // Determine dimensions for a rectangle or square (based on if shift is pressed)
@@ -41,10 +41,10 @@ export default class RectangleTool extends CanvasTool {
 
             function end(): void {
                 // Unbind event handlers
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
                 slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare as EventListener);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare);
 
                 // Persist the new rectangle
                 slideWrapper.focusGraphic(rectangle);
@@ -53,7 +53,6 @@ export default class RectangleTool extends CanvasTool {
                 slideWrapper.store.commit('graphicEditorGraphicId', rectangle.id);
                 slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: rectangle.getSnapVectors() });
                 slideWrapper.store.commit('tool', 'cursor');
-                slideWrapper.setCursor('default');
             }
 
             function toggleSquare(event: CustomCanvasKeyboardEvent): void {

@@ -1,5 +1,5 @@
 import * as SVG from 'svg.js';
-import { IGraphic, CustomMouseEvent, ISlideWrapper, IRootState, CanvasMouseEvent, GraphicMouseEvent, Anchor, CustomCanvasMouseEvent, CanvasKeyboardEvent } from '../types';
+import { IGraphic, CustomMouseEvent, ISlideWrapper, IRootState, CanvasMouseEvent, GraphicMouseEvent, Anchor, CanvasKeyboardEvent } from '../types';
 import Vector from './Vector';
 import { Store } from 'vuex';
 import { EVENT_TYPES } from '../constants';
@@ -122,21 +122,10 @@ export default class SlideWrapper implements ISlideWrapper {
         this._forwardGraphicEvents(graphic.id, svg);
 
         if (graphic.defaultInteractive) {
-            this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_OVER, ((event: CustomCanvasMouseEvent): void => {
-                this.store.getters.tool.graphicMouseOver(this)(event);
-            }) as EventListener);
-
-            this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_OUT, ((event: CustomCanvasMouseEvent): void => {
-                this.store.getters.tool.graphicMouseOut(this)(event);
-            }) as EventListener);
-
-            this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_UP, ((event: CustomCanvasMouseEvent): void => {
-                this.store.getters.tool.graphicMouseOver(this)(event);
-            }) as EventListener);
-
-            this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_DOWN, ((event: CustomCanvasMouseEvent): void => {
-                this.store.getters.tool.graphicMouseDown(this)(event);
-            }) as EventListener);
+            this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_OVER, this.store.getters.tool.graphicMouseOver(this));
+            this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_OUT, this.store.getters.tool.graphicMouseOut(this));
+            // this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_UP, this.store.getters.tool.graphicMouseUp(this));
+            this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_DOWN, this.store.getters.tool.graphicMouseDown(this));
         }
     }
 
@@ -165,24 +154,24 @@ export default class SlideWrapper implements ISlideWrapper {
             .transform(Math.round);
     }
 
-    public addCanvasEventListener(eventName: string, listener: EventListener): void {
-        this._canvas.node.addEventListener(eventName, listener);
+    public addCanvasEventListener(eventName: string, listener: (event: CustomEvent) => void): void {
+        this._canvas.node.addEventListener(eventName, listener as EventListener);
     }
 
-    public removeCanvasEventListener(eventName: string, listener: EventListener): void {
-        this._canvas.node.removeEventListener(eventName, listener);
+    public removeCanvasEventListener(eventName: string, listener: (event: CustomEvent) => void): void {
+        this._canvas.node.removeEventListener(eventName, listener as EventListener);
     }
 
     public dispatchEventOnCanvas<T>(eventName: string, payload: T): void {
         this._canvas.node.dispatchEvent(new CustomEvent<T>(eventName, { detail: payload }));
     }
 
-    public addGraphicEventListener(graphicId: string, eventName: string, listener: EventListener): void {
-        this._getGraphic(graphicId).node.addEventListener(eventName, listener);
+    public addGraphicEventListener(graphicId: string, eventName: string, listener: (event: CustomEvent) => void): void {
+        this._getGraphic(graphicId).node.addEventListener(eventName, listener as EventListener);
     }
 
-    public removeGraphicEventListener(graphicId: string, eventName: string, listener: EventListener): void {
-        this._getGraphic(graphicId).node.removeEventListener(eventName, listener);
+    public removeGraphicEventListener(graphicId: string, eventName: string, listener: (event: CustomEvent) => void): void {
+        this._getGraphic(graphicId).node.removeEventListener(eventName, listener as EventListener);
     }
 
     public dispatchEventOnGraphic<T>(graphicId: string, eventName: string, payload: T): void {

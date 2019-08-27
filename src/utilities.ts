@@ -176,10 +176,10 @@ function makeBezierCurvePointGraphic({ anchor, firstHandle, secondHandle }: { an
 
 function bindAnchorMouseDown(slideWrapper: ISlideWrapper, anchor: Anchor, parentGraphic: IGraphic): void {
     slideWrapper.addGraphicEventListener(anchor.graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_DOWN, ((event: CustomGraphicMouseEvent): void => {
-        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
         slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
-        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare as EventListener);
-        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare as EventListener);
+        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare);
+        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare);
 
         parentGraphic.anchorIds.forEach((anchorId: string): void => slideWrapper.removeGraphic(anchorId));
         let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
@@ -192,10 +192,10 @@ function bindAnchorMouseDown(slideWrapper: ISlideWrapper, anchor: Anchor, parent
         }
 
         function end(): void {
-            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
             slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
-            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare as EventListener);
-            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare as EventListener);
+            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare);
+            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare);
 
             slideWrapper.store.commit('removeSnapVectors', { slideId: slideWrapper.slideId, graphicId: parentGraphic.id });
             slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: parentGraphic.getSnapVectors() });
@@ -218,7 +218,7 @@ function bindAnchorMouseDown(slideWrapper: ISlideWrapper, anchor: Anchor, parent
                 slideId: slideWrapper.slideId
             });
         }
-    }) as EventListener);
+    }));
 }
 
 const deckScript: string = `<style>

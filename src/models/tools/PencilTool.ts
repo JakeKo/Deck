@@ -16,7 +16,7 @@ export default class PencilTool extends CanvasTool {
             slideWrapper.addGraphic(sketch);
 
             // Start listening to mouse events
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
             slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
 
             function preview(event: CustomMouseEvent): void {
@@ -27,7 +27,7 @@ export default class PencilTool extends CanvasTool {
 
             function end(): void {
                 // Unbind event handlers
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
                 slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
 
                 // Persist the new sketch
@@ -37,7 +37,6 @@ export default class PencilTool extends CanvasTool {
                 slideWrapper.store.commit('graphicEditorGraphicId', sketch.id);
                 slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: sketch.getSnapVectors() });
                 slideWrapper.store.commit('tool', 'cursor');
-                slideWrapper.setCursor('default');
             }
         };
     }

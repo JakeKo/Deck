@@ -190,6 +190,7 @@ const store: StoreOptions<IRootState> = {
             document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicFocused', { detail: { slideId: slideId, graphicId: graphicId, graphic: graphic } }));
         },
         tool: (state: IRootState, toolName: string): void => {
+            console.log(toolName);
             state.currentTool = toolName;
         },
         graphicEditorGraphicId: (state: IRootState, graphicId?: string): void => {

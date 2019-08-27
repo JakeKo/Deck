@@ -32,21 +32,21 @@ export default class PenTool extends CanvasTool {
             renderAnchorGraphics(start, start);
 
             // Start listening to canvas events
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setFirstControlPoint as EventListener);
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, end as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setFirstControlPoint);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, end);
 
             function setFirstControlPoint(event: CustomMouseEvent): void {
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setFirstControlPoint as EventListener);
-                slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_DOWN, setEndpoint as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setFirstControlPoint);
+                slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_DOWN, setEndpoint);
 
                 segmentPoints[0] = segment.origin.towards(slideWrapper.getPosition(event));
                 anchorOrigin = Vector.undefined;
             }
 
             function setEndpoint(event: CustomMouseEvent): void {
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_DOWN, setEndpoint as EventListener);
-                slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setSecondControlPoint as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_DOWN, setEndpoint);
+                slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setSecondControlPoint);
 
                 const position: Vector = slideWrapper.getPosition(event);
                 segmentPoints[2] = segment.origin.towards(position);
@@ -54,7 +54,7 @@ export default class PenTool extends CanvasTool {
             }
 
             function setSecondControlPoint(event: CustomMouseEvent): void {
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setSecondControlPoint as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setSecondControlPoint);
 
                 // Complete the curve segment and add it to the final curve
                 segmentPoints[1] = segment.origin.towards(slideWrapper.getPosition(event)).reflect(segmentPoints[2]);
@@ -89,11 +89,11 @@ export default class PenTool extends CanvasTool {
                 slideWrapper.removeGraphic(segment.id);
 
                 // Remove all event handlers
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setFirstControlPoint as EventListener);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_DOWN, setEndpoint as EventListener);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setSecondControlPoint as EventListener);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, end as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setFirstControlPoint);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_DOWN, setEndpoint);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, setSecondControlPoint);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, end);
 
                 // Persist the new curve
                 slideWrapper.focusGraphic(curve);
@@ -102,7 +102,6 @@ export default class PenTool extends CanvasTool {
                 slideWrapper.store.commit('graphicEditorGraphicId', curve.id);
                 slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: curve.getSnapVectors() });
                 slideWrapper.store.commit('tool', 'cursor');
-                slideWrapper.setCursor('default');
             }
 
             // Convert a curve with possible undefined values to a curve with defined fallback values

@@ -23,15 +23,15 @@ export default class Slide extends Vue {
 
         slideWrapper.addCanvasEventListener('Deck.CanvasMouseOver', ((event: CustomCanvasMouseEvent): void => {
             this.$store.getters.tool.canvasMouseOver(slideWrapper)(event);
-        }) as EventListener);
+        }));
 
         slideWrapper.addCanvasEventListener('Deck.CanvasMouseOut', ((event: CustomCanvasMouseEvent): void => {
             this.$store.getters.tool.canvasMouseOut(slideWrapper)(event);
-        }) as EventListener);
+        }));
 
         slideWrapper.addCanvasEventListener('Deck.CanvasMouseDown', ((event: CustomCanvasMouseEvent): void => {
             this.$store.getters.tool.canvasMouseDown(slideWrapper)(event);
-        }) as EventListener);
+        }));
 
         this.graphics.forEach((graphic: IGraphic): void => {
             slideWrapper.addGraphic(graphic);
@@ -52,7 +52,7 @@ export default class Slide extends Vue {
                 this.$store.commit('graphicEditorGraphicId', undefined);
                 slideWrapper.removeGraphic(graphicId);
             }
-        }) as EventListener);
+        }) );
     }
 }
 </script>

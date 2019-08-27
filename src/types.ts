@@ -82,10 +82,10 @@ export interface ISlideWrapper {
     updateGraphic(id: string, newGraphic: IGraphic): void;
     removeGraphic(id: string): void;
     getPosition(event: CustomMouseEvent): Vector;
-    addCanvasEventListener(eventName: string, listener: EventListener): void;
-    removeCanvasEventListener(eventName: string, listener: EventListener): void;
-    addGraphicEventListener(graphicId: string, eventName: string, listener: EventListener): void;
-    removeGraphicEventListener(graphicId: string, eventName: string, listener: EventListener): void;
+    addCanvasEventListener(eventName: string, listener: (event: CustomEvent) => void): void;
+    removeCanvasEventListener(eventName: string, listener: (event: CustomEvent) => void): void;
+    addGraphicEventListener(graphicId: string, eventName: string, listener: (event: CustomEvent) => void): void;
+    removeGraphicEventListener(graphicId: string, eventName: string, listener: (event: CustomEvent) => void): void;
     dispatchEventOnCanvas<T>(eventName: string, payload: T): void;
     dispatchEventOnGraphic<T>(graphicId: string, eventName: string, payload: T): void;
 }

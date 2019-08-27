@@ -20,10 +20,10 @@ export default class EllipseTool extends CanvasTool {
             slideWrapper.addGraphic(ellipse);
 
             // Start listening to mouse events
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
             slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleCircle as EventListener);
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleCircle as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleCircle);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleCircle);
 
             function preview(event: CustomMouseEvent): void {
                 // Determine dimensions for an ellipse or circle (based on if shift is pressed)
@@ -41,10 +41,10 @@ export default class EllipseTool extends CanvasTool {
 
             function end(): void {
                 // Unbind event handlers
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
                 slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleCircle as EventListener);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleCircle as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleCircle);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleCircle);
 
                 // Persist the new ellipse
                 slideWrapper.focusGraphic(ellipse);
@@ -53,7 +53,6 @@ export default class EllipseTool extends CanvasTool {
                 slideWrapper.store.commit('graphicEditorGraphicId', ellipse.id);
                 slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: ellipse.getSnapVectors() });
                 slideWrapper.store.commit('tool', 'cursor');
-                slideWrapper.setCursor('default');
             }
 
             function toggleCircle(event: CustomCanvasKeyboardEvent): void {

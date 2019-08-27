@@ -16,6 +16,7 @@ export default class CursorTool extends CanvasTool {
     }
 
     public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
+        console.log('hello world');
         return (): void => slideWrapper.setCursor('pointer');
     }
 
@@ -50,10 +51,10 @@ export default class CursorTool extends CanvasTool {
             let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
             let shiftPressed = false;
 
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
             slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement as EventListener);
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement as EventListener);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement);
+            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement);
 
             // Preview moving shape
             function preview(event: CustomMouseEvent): void {
@@ -101,10 +102,10 @@ export default class CursorTool extends CanvasTool {
 
             // End moving shape
             function end(): void {
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
                 slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement as EventListener);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement as EventListener);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement);
+                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement);
 
                 // Add the new SnapVectors once the graphic move has been finalized
                 slideWrapper.store.commit('updateGraphic', { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
