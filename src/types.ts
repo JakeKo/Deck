@@ -1,4 +1,4 @@
-import Slide from './models/Slide';
+import SlideModel from './models/Slide';
 import Vector from './models/Vector';
 import SnapVector from './models/SnapVector';
 import * as SVG from 'svg.js';
@@ -25,7 +25,7 @@ export interface IRootState {
         }
     };
     graphicEditorGraphicId: string | undefined;
-    slides: Array<Slide>;
+    slides: Array<SlideModel>;
     currentTool: string;
     tools: { [key: string]: ICanvasTool };
     deckTitle: string | undefined;
@@ -224,10 +224,12 @@ export type VideoParameters = {
     rotation?: number
 }
 
-export type SlideParameters = {
+export type SlideModelParameters = {
     id?: string,
     graphics?: Array<IGraphic>,
     snapVectors?: Array<SnapVector>,
+    slideWrapper?: ISlideWrapper,
+    isRendered?: boolean,
     topic?: string,
     width: number,
     height: number

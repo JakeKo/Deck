@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex, { StoreOptions } from 'vuex';
 import Utilities from './utilities';
-import Slide from './models/Slide';
+import SlideModel from './models/Slide';
 import SnapVector from './models/SnapVector';
 import * as SVG from 'svg.js';
 import { CursorTool, EllipseTool, PencilTool, PenTool, RectangleTool, TextboxTool } from './models/tools/tools';
@@ -29,7 +29,7 @@ const store: StoreOptions<IRootState> = {
             }
         },
         graphicEditorGraphicId: undefined,
-        slides: new Array<Slide>(),
+        slides: new Array<SlideModel>(),
         currentTool: 'cursor',
         tools: {
             cursor: new CursorTool(),
@@ -42,12 +42,12 @@ const store: StoreOptions<IRootState> = {
         deckTitle: undefined
     },
     getters: {
-        slides: (state: IRootState): Array<Slide> => {
+        slides: (state: IRootState): Array<SlideModel> => {
             return state.slides;
         },
         graphic: (state: IRootState): ((slideId: string, graphicId: string) => IGraphic | undefined) => {
             return function (slideId: string, graphicId: string): IGraphic | undefined {
-                const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+                const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
                 if (slide === undefined) {
                     console.error(`ERROR: No slide exists with id: ${slideId}`);
                     return;
@@ -58,7 +58,7 @@ const store: StoreOptions<IRootState> = {
         },
         snapVectors: (state: IRootState): ((slideId: string) => Array<SnapVector>) => {
             return function (slideId: string): Array<SnapVector> {
-                const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+                const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
                 if (slide === undefined) {
                     console.error(`ERROR: No slide exists with id: ${slideId}`);
                     return [];
@@ -67,8 +67,8 @@ const store: StoreOptions<IRootState> = {
                 return new Array<SnapVector>(...slide.snapVectors);
             };
         },
-        activeSlide: (state: IRootState): Slide | undefined => {
-            return state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId)!;
+        activeSlide: (state: IRootState): SlideModel | undefined => {
+            return state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId)!;
         },
         graphicEditorGraphicId: (state: IRootState): string | undefined => {
             return state.graphicEditorGraphicId;
@@ -78,7 +78,7 @@ const store: StoreOptions<IRootState> = {
                 return undefined;
             }
 
-            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId);
+            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId);
             if (slide === undefined) {
                 console.error(`ERROR: No slide exists with id: ${state.activeSlideId}`);
                 return;
@@ -93,7 +93,7 @@ const store: StoreOptions<IRootState> = {
             return state.currentTool;
         },
         focusedGraphic: (state: IRootState): IGraphic | undefined => {
-            const activeSlide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === state.activeSlideId);
+            const activeSlide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId);
             return activeSlide === undefined ? undefined : activeSlide.getGraphic(state.focusedGraphicId);
         },
         canvasHeight: (state: IRootState): number => {
@@ -116,12 +116,12 @@ const store: StoreOptions<IRootState> = {
         }
     },
     mutations: {
-        addSlide: (state: IRootState, { index, slide }: { index: number, slide?: Slide }): void => {
+        addSlide: (state: IRootState, { index, slide }: { index: number, slide?: SlideModel }): void => {
             const { width, height } = state.canvas.croppedViewbox;
-            state.slides.splice(index, 0, slide || new Slide({ width, height }));
+            state.slides.splice(index, 0, slide || new SlideModel({ width, height }));
         },
         reorderSlide: (state: IRootState, { source, destination }: { source: number, destination: number }): void => {
-            const slide: Slide = state.slides[source];
+            const slide: SlideModel = state.slides[source];
 
             if (slide === undefined) {
                 console.error(`ERROR: No slide exists at index ${source} to reorder`);
@@ -137,7 +137,7 @@ const store: StoreOptions<IRootState> = {
                 return;
             }
 
-            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
             if (slide === undefined) {
                 console.error(`ERROR: No slide exists with id: ${slideId}`);
                 return;
@@ -147,7 +147,7 @@ const store: StoreOptions<IRootState> = {
             document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicAdded', { detail: { slideId: slideId, graphicId: graphic.id, graphic: graphic } }));
         },
         removeGraphic: (state: IRootState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
-            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
             if (slide === undefined) {
                 console.error(`ERROR: No slide exists with id: ${slideId}`);
                 return;
@@ -157,7 +157,7 @@ const store: StoreOptions<IRootState> = {
             document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicRemoved', { detail: { slideId, graphicId, graphic } }));
         },
         updateGraphic: (state: IRootState, { slideId, graphicId, graphic }: { slideId: string, graphicId: string, graphic: IGraphic }): void => {
-            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
             if (slide === undefined) {
                 console.error(`ERROR: Could not find slide ('${slideId}')`);
                 return;
@@ -174,7 +174,7 @@ const store: StoreOptions<IRootState> = {
             document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicUpdated', { detail: { slideId: slide.id, graphicId: graphic.id, graphic: graphic } }));
         },
         focusGraphic: (state: IRootState, { slideId, graphicId }: { slideId: string, graphicId?: string }): void => {
-            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
             if (slide === undefined) {
                 console.error(`ERROR: No slide exists with id: ${slideId}`);
                 return;
@@ -203,7 +203,7 @@ const store: StoreOptions<IRootState> = {
             state.canvas.zoom = Math.max(zoom, 0.25);
         },
         removeSnapVectors: (state: IRootState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
-            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
             if (slide === undefined) {
                 console.error(`ERROR: No slide exists with id: ${slideId}`);
                 return;
@@ -212,7 +212,7 @@ const store: StoreOptions<IRootState> = {
             slide.snapVectors = new Set<SnapVector>([...slide.snapVectors].filter((snapVector: SnapVector): boolean => snapVector.graphicId !== graphicId));
         },
         addSnapVectors: (state: IRootState, { slideId, snapVectors }: { slideId: string, snapVectors: Array<SnapVector> }): void => {
-            const slide: Slide | undefined = state.slides.find((slide: Slide): boolean => slide.id === slideId);
+            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
             if (slide === undefined) {
                 console.error(`ERROR: No slide exists with id: ${slideId}`);
                 return;
@@ -231,7 +231,7 @@ const store: StoreOptions<IRootState> = {
         save: (store: any): void => {
             // Construct the slides on a hidden element
             const exportFrame: HTMLElement = document.getElementById('export-frame')!;
-            store.getters.slides.forEach((slideModel: Slide): void => {
+            store.getters.slides.forEach((slideModel: SlideModel): void => {
                 const slide: HTMLDivElement = document.createElement('div');
                 slide.setAttribute('id', slideModel.id);
                 slide.setAttribute('class', 'slide');
@@ -262,7 +262,7 @@ const store: StoreOptions<IRootState> = {
                 ${html.outerHTML}
                 ${Utilities.deckScript}
                 <script>
-                // BEGIN SLIDE DATA ${JSON.stringify(store.getters.slides.map((slide: Slide): SlideExportObject => slide.toExportObject()))} END SLIDE DATA
+                // BEGIN SLIDE DATA ${JSON.stringify(store.getters.slides.map((slide: SlideModel): SlideExportObject => slide.toExportObject()))} END SLIDE DATA
                 </script>
             `;
 
@@ -272,11 +272,11 @@ const store: StoreOptions<IRootState> = {
             anchor.click();
             anchor.remove();
         },
-        resetPresentation: (store: any, presentation: Array<Slide>): void => {
+        resetPresentation: (store: any, presentation: Array<SlideModel>): void => {
             // Wipe the current slide deck
             store.state.slides = [];
             store.commit('activeSlide', undefined);
-            presentation.forEach((slide: Slide, index: number): void => store.commit('addSlide', { index, slide }));
+            presentation.forEach((slide: SlideModel, index: number): void => store.commit('addSlide', { index, slide }));
 
             // If the new slide deck is non-empty, focus the first slide
             if (store.state.slides.length > 0) {
