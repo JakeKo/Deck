@@ -16,7 +16,6 @@ export default class CursorTool extends CanvasTool {
     }
 
     public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
-        console.log('hello world');
         return (): void => slideWrapper.setCursor('pointer');
     }
 

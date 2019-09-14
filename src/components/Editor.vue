@@ -5,8 +5,7 @@
         <div id='canvas' ref='canvas' :style='canvasStyle'>
             <slide v-for='slide in $store.getters.slides' 
                 :key='slide.id'
-                :id='slide.id'
-                :graphics='slide.graphics'
+                :slideModel='slide'
                 :isActive='$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id'
             ></slide>
         </div>
