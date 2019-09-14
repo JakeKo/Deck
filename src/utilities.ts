@@ -40,15 +40,13 @@ function parseGraphic(data: any): IGraphic {
 }
 
 function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
-    const radius: number = 4;
-
     return new Ellipse({
         id: id,
         defaultInteractive: false,
         supplementary: true,
-        origin: origin.add(new Vector(-radius, -radius)),
-        height: radius * 2,
-        width: radius * 2,
+        origin: origin.add(new Vector(-4, -4)),
+        height: 8,
+        width: 8,
         fillColor: 'white',
         strokeColor: 'hotpink',
         strokeWidth: 2
