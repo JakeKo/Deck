@@ -1,9 +1,20 @@
-import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper } from '../../types';
+import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, ICanvasTool } from '../../types';
 import { Sketch } from '../graphics/graphics';
-import CanvasTool from './CanvasTool';
 import { EVENT_TYPES } from '../../constants';
 
-export default class PencilTool extends CanvasTool {
+export default class PencilTool implements ICanvasTool {
+    public canvasMouseOver(): () => void {
+        return (): void => { return; };
+    }
+
+    public canvasMouseOut(): () => void {
+        return (): void => { return; };
+    }
+
+    public canvasMouseUp(): () => void {
+        return (): void => { return; };
+    }
+
     public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
         return function (event: CustomCanvasMouseEvent): void {
             // Create the sketch graphic
@@ -36,20 +47,33 @@ export default class PencilTool extends CanvasTool {
                 slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: sketch.id });
                 slideWrapper.store.commit('graphicEditorGraphicId', sketch.id);
                 slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: sketch.getSnapVectors() });
+                slideWrapper.setCursor('default');
                 slideWrapper.store.commit('tool', 'cursor');
             }
         };
     }
 
-    public canvasMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('crosshair');
+    public canvasMouseMove(): () => void {
+        return (): void => { return; };
     }
 
-    public canvasMouseOut(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('default');
+    public graphicMouseOver(): () => void {
+        return (): void => { return; };
     }
 
-    public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('crosshair');
+    public graphicMouseOut(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseUp(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseDown(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseMove(): () => void {
+        return (): void => { return; };
     }
 }

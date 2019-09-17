@@ -1,12 +1,23 @@
-import { IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper, Snap, CanvasMouseEvent, CustomCanvasKeyboardEvent } from '../../types';
+import { IGraphic, CustomGraphicMouseEvent, CustomMouseEvent, ISlideWrapper, Snap, CanvasMouseEvent, CustomCanvasKeyboardEvent, ICanvasTool } from '../../types';
 import { EVENT_TYPES } from '../../constants';
 import Vector from '../Vector';
 import SnapVector from '../SnapVector';
 import Sketch from '../graphics/Sketch';
-import CanvasTool from './CanvasTool';
 import Utilities from '../../utilities';
 
-export default class CursorTool extends CanvasTool {
+export default class CursorTool implements ICanvasTool {
+    public canvasMouseOver(): () => void {
+        return (): void => { return; };
+    }
+
+    public canvasMouseOut(): () => void {
+        return (): void => { return; };
+    }
+
+    public canvasMouseUp(): () => void {
+        return (): void => { return; };
+    }
+
     public canvasMouseDown(slideWrapper: ISlideWrapper): () => void {
         return (): void => {
             slideWrapper.focusGraphic(undefined);
@@ -15,12 +26,20 @@ export default class CursorTool extends CanvasTool {
         };
     }
 
-    public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('pointer');
+    public canvasMouseMove(slideWrapper: ISlideWrapper): () => void {
+        return (): void => slideWrapper.setCursor('default');
     }
 
-    public graphicMouseOut(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('default');
+    public graphicMouseOver(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseOut(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseUp(): () => void {
+        return (): void => { return; };
     }
 
     public graphicMouseDown(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void {
@@ -50,8 +69,8 @@ export default class CursorTool extends CanvasTool {
             let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
             let shiftPressed = false;
 
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
-            slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
+            slideWrapper.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_MOVE, preview);
+            slideWrapper.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_UP, end);
             slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement);
             slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement);
 
@@ -101,8 +120,8 @@ export default class CursorTool extends CanvasTool {
 
             // End moving shape
             function end(): void {
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
-                slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
+                slideWrapper.removeGraphicEventListener(graphic!.id, EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
+                slideWrapper.removeGraphicEventListener(graphic!.id, EVENT_TYPES.CANVAS_MOUSE_UP, end);
                 slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement);
                 slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement);
 
@@ -133,5 +152,9 @@ export default class CursorTool extends CanvasTool {
                 });
             }
         };
+    }
+
+    public graphicMouseMove(slideWrapper: ISlideWrapper): () => void {
+        return (): void => slideWrapper.setCursor('pointer');
     }
 }

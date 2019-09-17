@@ -1,10 +1,21 @@
-import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, CanvasMouseEvent, CustomCanvasKeyboardEvent } from '../../types';
+import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, CanvasMouseEvent, CustomCanvasKeyboardEvent, ICanvasTool } from '../../types';
 import { Rectangle } from '../graphics/graphics';
 import Vector from '../Vector';
-import CanvasTool from './CanvasTool';
 import { EVENT_TYPES } from '../../constants';
 
-export default class RectangleTool extends CanvasTool {
+export default class RectangleTool implements ICanvasTool {
+    public canvasMouseOver(): () => void {
+        return (): void => { return; };
+    }
+
+    public canvasMouseOut(): () => void {
+        return (): void => { return; };
+    }
+
+    public canvasMouseUp(): () => void {
+        return (): void => { return; };
+    }
+
     public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
         return function (event: CustomCanvasMouseEvent): void {
             // Create some initial parameters for managing rectangle creation
@@ -73,15 +84,27 @@ export default class RectangleTool extends CanvasTool {
         };
     }
 
-    public canvasMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('crosshair');
+    public canvasMouseMove(): () => void {
+        return (): void => { return; };
     }
 
-    public canvasMouseOut(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('default');
+    public graphicMouseOver(): () => void {
+        return (): void => { return; };
     }
 
-    public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('crosshair');
+    public graphicMouseOut(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseUp(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseDown(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseMove(): () => void {
+        return (): void => { return; };
     }
 }

@@ -28,8 +28,12 @@ export default class SlideWrapper implements ISlideWrapper {
 
     private _forwardCanvasEvents(): void {
         const slideId: string = this.slideId;
-        this._canvas.on('mousemove', (baseEvent: MouseEvent): void => {
-            this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_MOVE, { baseEvent, slideId });
+        this._canvas.on('mouseup', (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_UP, { baseEvent, slideId });
+        });
+
+        this._canvas.on('mousedown', (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_DOWN, { baseEvent, slideId });
         });
 
         this._canvas.on('mouseover', (baseEvent: MouseEvent): void => {
@@ -40,12 +44,8 @@ export default class SlideWrapper implements ISlideWrapper {
             this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_OUT, { baseEvent, slideId });
         });
 
-        this._canvas.on('mouseup', (baseEvent: MouseEvent): void => {
-            this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_UP, { baseEvent, slideId });
-        });
-
-        this._canvas.on('mousedown', (baseEvent: MouseEvent): void => {
-            this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_DOWN, { baseEvent, slideId });
+        this._canvas.on('mousemove', (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_MOVE, { baseEvent, slideId });
         });
 
         this._canvas.node.addEventListener('keydown', (baseEvent: KeyboardEvent): void => {
@@ -73,6 +73,10 @@ export default class SlideWrapper implements ISlideWrapper {
 
         svg.on('mousedown', (baseEvent: MouseEvent): void => {
             this.dispatchEventOnGraphic<GraphicMouseEvent>(graphicId, EVENT_TYPES.GRAPHIC_MOUSE_DOWN, { baseEvent, slideId, graphicId });
+        });
+
+        svg.on('mousemove', (baseEvent: MouseEvent): void => {
+            this.dispatchEventOnGraphic<GraphicMouseEvent>(graphicId, EVENT_TYPES.GRAPHIC_MOUSE_MOVE, { baseEvent, slideId, graphicId });
         });
     }
 
@@ -124,8 +128,9 @@ export default class SlideWrapper implements ISlideWrapper {
         if (graphic.defaultInteractive) {
             this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_OVER, this.store.getters.tool.graphicMouseOver(this));
             this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_OUT, this.store.getters.tool.graphicMouseOut(this));
-            // this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_UP, this.store.getters.tool.graphicMouseUp(this));
+            this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_UP, this.store.getters.tool.graphicMouseUp(this));
             this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_DOWN, this.store.getters.tool.graphicMouseDown(this));
+            this.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_MOVE, this.store.getters.tool.graphicMouseMove(this));
         }
     }
 
@@ -155,27 +160,27 @@ export default class SlideWrapper implements ISlideWrapper {
     }
 
     public addCanvasEventListener(eventName: string, listener: (event: CustomEvent) => void): void {
-        this._canvas.node.addEventListener(eventName, listener as EventListener);
+        this._canvas.on(eventName, listener);
     }
 
     public removeCanvasEventListener(eventName: string, listener: (event: CustomEvent) => void): void {
-        this._canvas.node.removeEventListener(eventName, listener as EventListener);
+        this._canvas.off(eventName, listener);
     }
 
     public dispatchEventOnCanvas<T>(eventName: string, payload: T): void {
-        this._canvas.node.dispatchEvent(new CustomEvent<T>(eventName, { detail: payload }));
+        this._canvas.fire(eventName, payload);
     }
 
     public addGraphicEventListener(graphicId: string, eventName: string, listener: (event: CustomEvent) => void): void {
-        this._getGraphic(graphicId).node.addEventListener(eventName, listener as EventListener);
+        this._getGraphic(graphicId).on(eventName, listener);
     }
 
     public removeGraphicEventListener(graphicId: string, eventName: string, listener: (event: CustomEvent) => void): void {
-        this._getGraphic(graphicId).node.removeEventListener(eventName, listener as EventListener);
+        this._getGraphic(graphicId).off(eventName, listener);
     }
 
     public dispatchEventOnGraphic<T>(graphicId: string, eventName: string, payload: T): void {
-        this._getGraphic(graphicId).node.dispatchEvent(new CustomEvent<T>(eventName, { detail: payload }));
+        this._getGraphic(graphicId).fire(eventName, payload);
     }
 
     private _getGraphic(graphicId: string): SVG.Element {

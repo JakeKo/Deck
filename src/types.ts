@@ -31,15 +31,6 @@ export interface IRootState {
     deckTitle: string | undefined;
 }
 
-export interface ICanvasTool {
-    canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void;
-    canvasMouseOver(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void;
-    canvasMouseOut(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void;
-    graphicMouseOver(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void;
-    graphicMouseOut(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void;
-    graphicMouseDown(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void;
-}
-
 // TODO: Rename this to GraphicEditorObject
 export type GraphicEditorFormat = {
     metadata: any,
@@ -233,4 +224,17 @@ export type SlideModelParameters = {
     topic?: string,
     width: number,
     height: number
+}
+
+export interface ICanvasTool {
+    canvasMouseOver: (slideWrapper: ISlideWrapper) => (event: CustomCanvasMouseEvent) => void;
+    canvasMouseOut: (slideWrapper: ISlideWrapper) => (event: CustomCanvasMouseEvent) => void;
+    canvasMouseUp: (slideWrapper: ISlideWrapper) => (event: CustomCanvasMouseEvent) => void;
+    canvasMouseDown: (slideWrapper: ISlideWrapper) => (event: CustomCanvasMouseEvent) => void;
+    canvasMouseMove: (slideWrapper: ISlideWrapper) => (event: CustomCanvasMouseEvent) => void;
+    graphicMouseOver: (slideWrapper: ISlideWrapper) => (event: CustomGraphicMouseEvent) => void;
+    graphicMouseOut: (slideWrapper: ISlideWrapper) => (event: CustomGraphicMouseEvent) => void;
+    graphicMouseUp: (slideWrapper: ISlideWrapper) => (event: CustomGraphicMouseEvent) => void;
+    graphicMouseDown: (slideWrapper: ISlideWrapper) => (event: CustomGraphicMouseEvent) => void;
+    graphicMouseMove: (slideWrapper: ISlideWrapper) => (event: CustomGraphicMouseEvent) => void;
 }

@@ -1,10 +1,21 @@
-import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, CanvasMouseEvent, CustomCanvasKeyboardEvent } from '../../types';
+import { CustomCanvasMouseEvent, CustomMouseEvent, ISlideWrapper, CanvasMouseEvent, CustomCanvasKeyboardEvent, ICanvasTool } from '../../types';
 import { EVENT_TYPES } from '../../constants';
 import { Ellipse } from '../graphics/graphics';
 import Vector from '../Vector';
-import CanvasTool from './CanvasTool';
 
-export default class EllipseTool extends CanvasTool {
+export default class EllipseTool implements ICanvasTool {
+    public canvasMouseOver(): () => void {
+        return (): void => { return; };
+    }
+
+    public canvasMouseOut(): () => void {
+        return (): void => { return; };
+    }
+
+    public canvasMouseUp(): () => void {
+        return (): void => { return; };
+    }
+
     public canvasMouseDown(slideWrapper: ISlideWrapper): (event: CustomCanvasMouseEvent) => void {
         return function (event: CustomCanvasMouseEvent): void {
             // Create some initial parameters for managing ellipse creation
@@ -52,6 +63,7 @@ export default class EllipseTool extends CanvasTool {
                 slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: ellipse.id });
                 slideWrapper.store.commit('graphicEditorGraphicId', ellipse.id);
                 slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: ellipse.getSnapVectors() });
+                slideWrapper.setCursor('default');
                 slideWrapper.store.commit('tool', 'cursor');
             }
 
@@ -73,15 +85,27 @@ export default class EllipseTool extends CanvasTool {
         };
     }
 
-    public canvasMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('crosshair');
+    public canvasMouseMove(): () => void {
+        return (): void => { return; };
     }
 
-    public canvasMouseOut(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('default');
+    public graphicMouseOver(): () => void {
+        return (): void => { return; };
     }
 
-    public graphicMouseOver(slideWrapper: ISlideWrapper): () => void {
-        return (): void => slideWrapper.setCursor('default');
+    public graphicMouseOut(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseUp(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseDown(): () => void {
+        return (): void => { return; };
+    }
+
+    public graphicMouseMove(): () => void {
+        return (): void => { return; };
     }
 }
