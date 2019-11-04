@@ -184,7 +184,7 @@ export default class SlideWrapper implements ISlideWrapper {
     }
 
     public removeCanvasEventListener(eventName: string, listener: (event: CustomEvent) => void): void {
-        this._canvas.node.addEventListener(eventName, listener as EventListener);
+        this._canvas.node.removeEventListener(eventName, listener as EventListener);
     }
 
     public dispatchEventOnCanvas<T>(eventName: string, payload: T): void {
@@ -196,7 +196,7 @@ export default class SlideWrapper implements ISlideWrapper {
     }
 
     public removeGraphicEventListener(graphicId: string, eventName: string, listener: (event: CustomEvent) => void): void {
-        this._getGraphic(graphicId).node.addEventListener(eventName, listener as EventListener);
+        this._getGraphic(graphicId).node.removeEventListener(eventName, listener as EventListener);
     }
 
     public dispatchEventOnGraphic<T>(graphicId: string, eventName: string, payload: T): void {
