@@ -22,27 +22,6 @@ export default class Slide extends Vue {
         const canvas: SVG.Doc = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
         this.slideModel.slideWrapper = new SlideWrapper(this.slideModel.id, canvas, this.$store, true);
 
-        this.slideModel.slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_OVER, (event: CustomCanvasMouseEvent): void => {
-            this.$store.getters.tool.canvasMouseOver(this.slideModel.slideWrapper)(event);
-        });
-
-        this.slideModel.slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_OUT, (event: CustomCanvasMouseEvent): void => {
-            this.$store.getters.tool.canvasMouseOut(this.slideModel.slideWrapper)(event);
-        });
-
-        this.slideModel.slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, (event: CustomCanvasMouseEvent): void => {
-            this.$store.getters.tool.canvasMouseUp(this.slideModel.slideWrapper)(event);
-        });
-
-        this.slideModel.slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_DOWN, (event: CustomCanvasMouseEvent): void => {
-            this.$store.getters.tool.canvasMouseDown(this.slideModel.slideWrapper)(event);
-        });
-
-        this.slideModel.slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, (event: CustomCanvasMouseEvent): void => {
-            // console.log('mousemove');
-            this.$store.getters.tool.canvasMouseMove(this.slideModel.slideWrapper)(event);
-        });
-
         this.slideModel.graphics.forEach((graphic: IGraphic): void => {
             this.slideModel.slideWrapper!.addGraphic(graphic);
         });
