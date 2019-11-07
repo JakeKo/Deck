@@ -68,7 +68,7 @@ export interface ISlideWrapper {
     focusGraphic(graphic: IGraphic | undefined): void;
     setCursor(cursor: string): void;
     absoluteBounds(): DOMRect;
-    getRenderedGraphic(id: string): SVG.Element;
+    getGraphic(graphicId: string): SVG.Element;
     addGraphic(graphic: IGraphic): void;
     updateGraphic(id: string, newGraphic: IGraphic): void;
     removeGraphic(id: string): void;

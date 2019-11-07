@@ -186,7 +186,7 @@ function bindAnchorMouseDown(slideWrapper: ISlideWrapper, anchor: Anchor, parent
         function preview(event: CustomCanvasMouseEvent): void {
             lastPosition = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
             anchor.handler(event);
-            parentGraphic.updateRendering(slideWrapper.getRenderedGraphic(parentGraphic.id));
+            parentGraphic.updateRendering(slideWrapper.getGraphic(parentGraphic.id));
         }
 
         function end(): void {

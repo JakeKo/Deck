@@ -157,8 +157,16 @@ export default class SlideWrapper implements ISlideWrapper {
         return this._canvas.node.getBoundingClientRect() as DOMRect;
     }
 
-    public getRenderedGraphic(id: string): SVG.Element {
-        return this._canvas.select(`#graphic_${id}`).first();
+    public getGraphic(graphicId: string): SVG.Element {
+        const list: SVG.Set = this._canvas.select(`#graphic_${graphicId}`);
+
+        if (list.length() === 0) {
+            throw new Error(`No SVG with id ${graphicId} could be found.`);
+        } else if (list.length() > 1) {
+            throw new Error(`More than one SVG were found with the id ${graphicId}.`);
+        }
+
+        return list.first();
     }
 
     public addGraphic(graphic: IGraphic): void {
@@ -167,13 +175,13 @@ export default class SlideWrapper implements ISlideWrapper {
     }
 
     public updateGraphic(id: string, newGraphic: IGraphic): void {
-        const svg: SVG.Element = this._getGraphic(id);
+        const svg: SVG.Element = this.getGraphic(id);
         newGraphic.updateRendering(svg);
     }
 
     public removeGraphic(id: string): void {
         try {
-            const svg: SVG.Element = this._getGraphic(id);
+            const svg: SVG.Element = this.getGraphic(id);
             svg.remove();
         } catch {
             return;
@@ -204,26 +212,14 @@ export default class SlideWrapper implements ISlideWrapper {
     }
 
     public addGraphicEventListener(graphicId: string, eventName: string, listener: (event: CustomEvent) => void): void {
-        this._getGraphic(graphicId).node.addEventListener(eventName, listener as EventListener);
+        this.getGraphic(graphicId).node.addEventListener(eventName, listener as EventListener);
     }
 
     public removeGraphicEventListener(graphicId: string, eventName: string, listener: (event: CustomEvent) => void): void {
-        this._getGraphic(graphicId).node.removeEventListener(eventName, listener as EventListener);
+        this.getGraphic(graphicId).node.removeEventListener(eventName, listener as EventListener);
     }
 
     public dispatchEventOnGraphic<T>(graphicId: string, eventName: string, payload: T): void {
-        this._getGraphic(graphicId).node.dispatchEvent(new CustomEvent<T>(eventName, { detail: payload }));
-    }
-
-    private _getGraphic(graphicId: string): SVG.Element {
-        const list: SVG.Set = this._canvas.select(`#graphic_${graphicId}`);
-
-        if (list.length() === 0) {
-            throw new Error(`No SVG with id ${graphicId} could be found.`);
-        } else if (list.length() > 1) {
-            throw new Error(`More than one SVG were found with the id ${graphicId}.`);
-        }
-
-        return list.first();
+        this.getGraphic(graphicId).node.dispatchEvent(new CustomEvent<T>(eventName, { detail: payload }));
     }
 }
