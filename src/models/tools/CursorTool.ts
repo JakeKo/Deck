@@ -120,8 +120,8 @@ export default class CursorTool implements ICanvasTool {
 
             // End moving shape
             function end(): void {
-                slideWrapper.removeGraphicEventListener(graphic!.id, EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
-                slideWrapper.removeGraphicEventListener(graphic!.id, EVENT_TYPES.CANVAS_MOUSE_UP, end);
+                slideWrapper.removeGraphicEventListener(graphic!.id, EVENT_TYPES.GRAPHIC_MOUSE_MOVE, preview);
+                slideWrapper.removeGraphicEventListener(graphic!.id, EVENT_TYPES.GRAPHIC_MOUSE_UP, end);
                 slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement);
                 slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement);
 

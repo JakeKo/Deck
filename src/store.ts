@@ -144,7 +144,6 @@ const store: StoreOptions<IRootState> = {
             }
 
             slide.graphics.push(graphic);
-            document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicAdded', { detail: { slideId: slideId, graphicId: graphic.id, graphic: graphic } }));
         },
         removeGraphic: (state: IRootState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
             const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
