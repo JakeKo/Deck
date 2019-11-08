@@ -7,8 +7,7 @@ import SnapVector from '../SnapVector';
 export default class Text implements IGraphic {
     public id: string;
     public type: string = 'text';
-    public defaultInteractive: boolean;
-    public supplementary: boolean;
+    public role: string;
     public anchorIds: Array<string> = [];
     public origin: Vector;
     public content: string;
@@ -18,10 +17,9 @@ export default class Text implements IGraphic {
     public fillColor: string;
     public rotation: number;
 
-    constructor({ id, defaultInteractive, supplementary, origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }: TextParameters = {}) {
+    constructor({ id, role, origin, content, fontSize, fontWeight, fontFamily, fillColor, rotation }: TextParameters = {}) {
         this.id = id || Utilities.generateId();
-        this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
-        this.supplementary = supplementary === undefined ? false : supplementary;
+        this.role = role || 'default';
         this.origin = origin || new Vector(0, 0);
         this.content = content || 'lorem ipsum dolor sit amet';
         this.fontSize = fontSize || 12;
@@ -78,8 +76,6 @@ export default class Text implements IGraphic {
             metadata: {
                 id: this.id,
                 type: this.type,
-                defaultInteractive: this.defaultInteractive,
-                supplementary: this.supplementary,
                 anchorIds: this.anchorIds
             },
             data: {

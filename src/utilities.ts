@@ -42,8 +42,7 @@ function parseGraphic(data: any): IGraphic {
 function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
     return new Ellipse({
         id: id,
-        defaultInteractive: false,
-        supplementary: true,
+        role: 'anchor',
         origin: origin.add(new Vector(-4, -4)),
         height: 8,
         width: 8,
@@ -130,8 +129,7 @@ function makeBezierCurvePointGraphic({ anchor, firstHandle, secondHandle }: { an
     const graphics: BezierAnchorGraphics = {
         anchor: makeAnchorGraphic(generateId(), anchor),
         firstHandle: new Rectangle({
-            supplementary: true,
-            defaultInteractive: false,
+            role: 'anchor',
             origin: firstHandle.add(new Vector(-3, -3)),
             width: 6,
             height: 6,
@@ -140,8 +138,7 @@ function makeBezierCurvePointGraphic({ anchor, firstHandle, secondHandle }: { an
             fillColor: 'white'
         }),
         firstHandleTrace: new Sketch({
-            supplementary: true,
-            defaultInteractive: false,
+            role: 'anchor',
             points: [firstHandle, anchor],
             strokeColor: 'hotpink',
             strokeWidth: 2
@@ -150,8 +147,7 @@ function makeBezierCurvePointGraphic({ anchor, firstHandle, secondHandle }: { an
 
     if (secondHandle !== undefined) {
         graphics.secondHandle = new Rectangle({
-            supplementary: true,
-            defaultInteractive: false,
+            role: 'anchor',
             origin: secondHandle.add(new Vector(-3, -3)),
             width: 6,
             height: 6,
@@ -161,8 +157,7 @@ function makeBezierCurvePointGraphic({ anchor, firstHandle, secondHandle }: { an
         });
 
         graphics.secondHandleTrace = new Sketch({
-            supplementary: true,
-            defaultInteractive: false,
+            role: 'anchor',
             points: [secondHandle, anchor],
             strokeColor: 'hotpink',
             strokeWidth: 2
@@ -279,7 +274,7 @@ function defaultCursorHandler(slideWrapper: ISlideWrapper): (event: CustomGraphi
                     movement = movement.add(getTranslation(snap));
 
                     const snapHighlight: Sketch = new Sketch({
-                        supplementary: true,
+                        role: 'snap-highlight',
                         origin: snap.destination.origin,
                         points: [snap.destination.direction.scale(-snapLineScale), snap.destination.direction.scale(snapLineScale)],
                         strokeWidth: 2,

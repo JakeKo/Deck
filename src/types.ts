@@ -48,11 +48,10 @@ export type BezierAnchorGraphics = {
 export interface IGraphic {
     id: string;
     type: string;
+    role: string;
     origin: Vector;
     rotation: number;
     anchorIds: Array<string>;
-    defaultInteractive: boolean;
-    supplementary: boolean;
     render(canvas: SVG.Doc): SVG.Element;
     updateRendering(svg: SVG.Element): void;
     getSnapVectors(): Array<SnapVector>;
@@ -132,8 +131,7 @@ export type SlideExportObject = {
 
 export type CurveParameters = {
     id?: string,
-    defaultInteractive?: boolean,
-    supplementary?: boolean,
+    role?: string,
     origin?: Vector,
     points?: Array<Vector>,
     fillColor?: string,
@@ -144,8 +142,7 @@ export type CurveParameters = {
 
 export type EllipseParameters = {
     id?: string,
-    defaultInteractive?: boolean,
-    supplementary?: boolean,
+    role?: string,
     origin?: Vector,
     width?: number,
     height?: number,
@@ -157,8 +154,7 @@ export type EllipseParameters = {
 
 export type ImageParameters = {
     id?: string,
-    defaultInteractive?: boolean,
-    supplementary?: boolean,
+    role?: string,
     origin?: Vector,
     source?: string,
     width?: number,
@@ -168,8 +164,7 @@ export type ImageParameters = {
 
 export type RectangleParameters = {
     id?: string,
-    defaultInteractive?: boolean,
-    supplementary?: boolean,
+    role?: string,
     origin?: Vector,
     width?: number,
     height?: number,
@@ -181,8 +176,7 @@ export type RectangleParameters = {
 
 export type SketchParameters = {
     id?: string,
-    defaultInteractive?: boolean,
-    supplementary?: boolean,
+    role?: string,
     origin?: Vector,
     points?: Array<Vector>,
     fillColor?: string,
@@ -193,8 +187,7 @@ export type SketchParameters = {
 
 export type TextParameters = {
     id?: string,
-    defaultInteractive?: boolean,
-    supplementary?: boolean,
+    role?: string,
     origin?: Vector,
     content?: string,
     fontSize?: number,
@@ -206,8 +199,7 @@ export type TextParameters = {
 
 export type VideoParameters = {
     id?: string,
-    defaultInteractive?: boolean,
-    supplementary?: boolean,
+    role?: string,
     origin?: Vector,
     source?: string,
     width?: number,

@@ -7,8 +7,7 @@ import SnapVector from '../SnapVector';
 export default class Ellipse implements IGraphic {
     public id: string;
     public type: string = 'ellipse';
-    public defaultInteractive: boolean;
-    public supplementary: boolean;
+    public role: string;
     public anchorIds: Array<string> = [];
     public origin: Vector;
     public width: number;
@@ -18,10 +17,9 @@ export default class Ellipse implements IGraphic {
     public strokeWidth: number;
     public rotation: number;
 
-    constructor({ id, defaultInteractive, supplementary, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }: EllipseParameters = {}) {
+    constructor({ id, role, origin, width, height, fillColor, strokeColor, strokeWidth, rotation }: EllipseParameters = {}) {
         this.id = id || Utilities.generateId();
-        this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
-        this.supplementary = supplementary === undefined ? false : supplementary;
+        this.role = role || 'default';
         this.origin = origin || new Vector(0, 0);
         this.width = width || 50;
         this.height = height || 50;
@@ -132,8 +130,6 @@ export default class Ellipse implements IGraphic {
             metadata: {
                 id: this.id,
                 type: this.type,
-                defaultInteractive: this.defaultInteractive,
-                supplementary: this.supplementary,
                 anchorIds: this.anchorIds
             },
             data: {

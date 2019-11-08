@@ -7,8 +7,7 @@ import SnapVector from '../SnapVector';
 export default class Video implements IGraphic {
     public id: string;
     public type: string = 'video';
-    public defaultInteractive: boolean;
-    public supplementary: boolean;
+    public role: string;
     public anchorIds: Array<string> = [];
     public origin: Vector;
     public source: string;
@@ -16,10 +15,9 @@ export default class Video implements IGraphic {
     public height: number;
     public rotation: number;
 
-    constructor({ id, defaultInteractive, supplementary, origin, source, width, height, rotation }: VideoParameters = {}) {
+    constructor({ id, role, origin, source, width, height, rotation }: VideoParameters = {}) {
         this.id = id || Utilities.generateId();
-        this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
-        this.supplementary = supplementary === undefined ? false : supplementary;
+        this.role = role || 'default';
         this.origin = origin || new Vector(0, 0);
         this.source = source || '';
         this.width = width || 0;
@@ -147,8 +145,6 @@ export default class Video implements IGraphic {
             metadata: {
                 id: this.id,
                 type: this.type,
-                defaultInteractive: this.defaultInteractive,
-                supplementary: this.supplementary,
                 anchorIds: this.anchorIds
             },
             data: {

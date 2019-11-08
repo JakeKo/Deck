@@ -7,8 +7,7 @@ import SnapVector from '../SnapVector';
 export default class Curve implements IGraphic {
     public id: string;
     public type: string = 'curve';
-    public defaultInteractive: boolean;
-    public supplementary: boolean;
+    public role: string;
     public anchorIds: Array<string> = [];
     public origin: Vector;
     public points: Array<Vector>;
@@ -17,10 +16,9 @@ export default class Curve implements IGraphic {
     public strokeWidth: number;
     public rotation: number;
 
-    constructor({ id, defaultInteractive, supplementary, origin, points, fillColor, strokeColor, strokeWidth, rotation }: CurveParameters = {}) {
+    constructor({ id, role, origin, points, fillColor, strokeColor, strokeWidth, rotation }: CurveParameters = {}) {
         this.id = id || Utilities.generateId();
-        this.defaultInteractive = defaultInteractive === undefined ? true : defaultInteractive;
-        this.supplementary = supplementary === undefined ? false : supplementary;
+        this.role = role || 'default';
         this.origin = origin || new Vector(0, 0);
         this.points = points || [];
         this.fillColor = fillColor || '#EEEEEE';
@@ -139,8 +137,6 @@ export default class Curve implements IGraphic {
                 id: this.id,
                 type: this.type,
                 points: this.points,
-                defaultInteractive: this.defaultInteractive,
-                supplementary: this.supplementary,
                 anchorIds: this.anchorIds
             },
             data: {
