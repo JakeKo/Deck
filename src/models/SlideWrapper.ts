@@ -1,9 +1,10 @@
 import * as SVG from 'svg.js';
-import { IGraphic, CustomMouseEvent, ISlideWrapper, IRootState, CanvasMouseEvent, GraphicMouseEvent, Anchor, CanvasKeyboardEvent, CustomCanvasMouseEvent, CustomGraphicMouseEvent } from '../types';
+import { IGraphic, CustomMouseEvent, ISlideWrapper, IRootState, CanvasMouseEvent, GraphicMouseEvent, CanvasKeyboardEvent, CustomCanvasMouseEvent, CustomGraphicMouseEvent } from '../types';
 import Vector from './Vector';
 import { Store } from 'vuex';
 import { EVENT_TYPES } from '../constants';
 import Utilities from '../utilities';
+import Anchor from './graphics/Anchor';
 
 export default class SlideWrapper implements ISlideWrapper {
     public store: Store<IRootState>;
@@ -129,22 +130,10 @@ export default class SlideWrapper implements ISlideWrapper {
 
         this._focusedGraphic = graphic;
         if (this._focusedGraphic !== undefined && this.renderSupplementary) {
-
             // Render the anchor graphics
             const focusedGraphic: IGraphic = this._focusedGraphic;
             focusedGraphic.getAnchors(this).forEach((anchor: Anchor): void => {
-                this.addGraphic(anchor.graphic);
-
-                const anchorSvg: SVG.Element = this._canvas.select(`#graphic_${anchor.graphic.id}`).first();
-                anchorSvg.on('mouseover', (): void => {
-                    this.setCursor(anchor.cursor);
-                });
-
-                anchorSvg.on('mouseout', (): void => {
-                    this.setCursor('default');
-                });
-
-                Utilities.bindAnchorMouseDown(this, anchor, focusedGraphic);
+                this.addGraphic(anchor);
             });
         }
     }

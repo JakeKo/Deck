@@ -1,8 +1,9 @@
 import * as SVG from 'svg.js';
 import Utilities from '../../utilities';
-import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, BezierAnchorGraphics, Anchor, CurveParameters } from '../../types';
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, BezierAnchorGraphics, CurveParameters } from '../../types';
 import Vector from '../Vector';
 import SnapVector from '../SnapVector';
+import Anchor from './Anchor';
 
 export default class Curve implements IGraphic {
     public id: string;
@@ -80,54 +81,50 @@ export default class Curve implements IGraphic {
     public getAnchors(slideWrapper: ISlideWrapper): Array<Anchor> {
         // Form a collection of all anchor points (the set of points that are not bezier handles)
         const points: Array<Vector> = [Vector.zero, ...this.points].map((point: Vector): Vector => this.origin.add(point));
-        const anchors: Array<{ index: number, graphic: IGraphic }> = [];
+        const anchors: Array<{ index: number, graphicId: string }> = [];
         for (let i = 0; i < points.length; i += 3) {
-            anchors.push({ index: i, graphic: Utilities.makeAnchorGraphic(Utilities.generateId(), points[i]) });
+            anchors.push({ index: i, graphicId: Utilities.generateId() });
         }
 
         // Refresh the anchor IDs
         this.anchorIds.length = 0;
-        this.anchorIds.push(...anchors.map<string>((anchor: { index: number, graphic: IGraphic }): string => anchor.graphic.id));
+        this.anchorIds.push(...anchors.map<string>(({ graphicId }: { graphicId: string }): string => graphicId));
 
-        return anchors.map<Anchor>((anchor: { index: number, graphic: IGraphic }): Anchor => {
-            return {
-                graphic: anchor.graphic,
-                cursor: 'move',
-                handler: (event: CustomMouseEvent): void => {
-                    let bezierCurveGraphics: BezierAnchorGraphics;
-                    if (anchor.index === 0) {
-                        bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
-                            anchor: points[anchor.index],
-                            firstHandle: points[anchor.index + 1]
-                        });
+        return anchors.map<Anchor>((anchor: { index: number, graphicId: string }): Anchor => {
+            return Utilities.makeAnchorGraphic(this.id, (event: CustomMouseEvent): void => {
+                let bezierCurveGraphics: BezierAnchorGraphics;
+                if (anchor.index === 0) {
+                    bezierCurveGraphics = Utilities.makeBezierCurveAnchor(this.id, {
+                        baseOrigin: points[anchor.index],
+                        firstOrigin: points[anchor.index + 1]
+                    });
 
-                        // NOTE: Do not move origin because that seriously messes with things
-                    } else if (anchor.index === points.length - 1) {
-                        bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
-                            anchor: points[anchor.index],
-                            firstHandle: points[anchor.index - 1]
-                        });
+                    // NOTE: Do not move origin because that seriously messes with things
+                } else if (anchor.index === points.length - 1) {
+                    bezierCurveGraphics = Utilities.makeBezierCurveAnchor(this.id, {
+                        baseOrigin: points[anchor.index],
+                        firstOrigin: points[anchor.index - 1]
+                    });
 
-                        const firstHandleOffset: Vector = this.points[anchor.index - 1].towards(this.points[anchor.index - 2]);
-                        this.points[anchor.index - 1] = this.origin.towards(slideWrapper.getPosition(event));
-                        this.points[anchor.index - 2] = this.points[anchor.index - 1].add(firstHandleOffset);
-                    } else {
-                        bezierCurveGraphics = Utilities.makeBezierCurvePointGraphic({
-                            anchor: points[anchor.index],
-                            firstHandle: points[anchor.index - 1],
-                            secondHandle: points[anchor.index + 1]
-                        });
+                    const firstHandleOffset: Vector = this.points[anchor.index - 1].towards(this.points[anchor.index - 2]);
+                    this.points[anchor.index - 1] = this.origin.towards(slideWrapper.getPosition(event));
+                    this.points[anchor.index - 2] = this.points[anchor.index - 1].add(firstHandleOffset);
+                } else {
+                    bezierCurveGraphics = Utilities.makeBezierCurveAnchor(this.id, {
+                        baseOrigin: points[anchor.index],
+                        firstOrigin: points[anchor.index - 1],
+                        secondOrigin: points[anchor.index + 1]
+                    });
 
-                        const firstHandleOffset: Vector = this.points[anchor.index - 1].towards(this.points[anchor.index - 2]);
-                        const secondHandleOffset: Vector = this.points[anchor.index - 1].towards(this.points[anchor.index]);
-                        this.points[anchor.index - 1] = this.origin.towards(slideWrapper.getPosition(event));
-                        this.points[anchor.index - 2] = this.points[anchor.index - 1].add(firstHandleOffset);
-                        this.points[anchor.index] = this.points[anchor.index - 1].add(secondHandleOffset);
-                    }
-
-                    slideWrapper.removeGraphic(anchor.graphic.id);
+                    const firstHandleOffset: Vector = this.points[anchor.index - 1].towards(this.points[anchor.index - 2]);
+                    const secondHandleOffset: Vector = this.points[anchor.index - 1].towards(this.points[anchor.index]);
+                    this.points[anchor.index - 1] = this.origin.towards(slideWrapper.getPosition(event));
+                    this.points[anchor.index - 2] = this.points[anchor.index - 1].add(firstHandleOffset);
+                    this.points[anchor.index] = this.points[anchor.index - 1].add(secondHandleOffset);
                 }
-            };
+
+                slideWrapper.removeGraphic(anchor.graphicId);
+            }, anchor.graphicId, points[anchor.index]);
         });
     }
 

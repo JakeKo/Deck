@@ -126,7 +126,7 @@ export default class PenTool implements ICanvasTool {
             }
 
             function renderAnchorGraphics(origin: Vector, position: Vector): void {
-                const anchorGraphics: BezierAnchorGraphics = Utilities.makeBezierCurvePointGraphic({ anchor: origin, firstHandle: position, secondHandle: position.reflect(origin) });
+                const anchorGraphics: BezierAnchorGraphics = Utilities.makeBezierCurveAnchor(curve.id, { baseOrigin: origin, firstOrigin: position, secondOrigin: position.reflect(origin) });
                 const graphicList: Array<IGraphic> = [anchorGraphics.firstHandleTrace, anchorGraphics.secondHandleTrace!, anchorGraphics.anchor, anchorGraphics.firstHandle, anchorGraphics.secondHandle!];
                 graphicList.forEach((anchorGraphic: IGraphic): void => slideWrapper.addGraphic(anchorGraphic));
                 anchorIds.push(...graphicList.map<string>((anchorGraphic: IGraphic): string => anchorGraphic.id));

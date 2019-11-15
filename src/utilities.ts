@@ -1,8 +1,9 @@
 import Vector from './models/Vector';
 import SnapVector from './models/SnapVector';
-import { IGraphic, Snap, BezierAnchorGraphics, ISlideWrapper, Anchor, CustomMouseEvent, CanvasMouseEvent, CustomGraphicMouseEvent, CustomCanvasMouseEvent, CustomCanvasKeyboardEvent } from './types';
+import { IGraphic, Snap, BezierAnchorGraphics, ISlideWrapper, CustomMouseEvent, CanvasMouseEvent, CustomGraphicMouseEvent, CustomCanvasMouseEvent, CustomCanvasKeyboardEvent } from './types';
 import { Rectangle, Ellipse, Curve, Sketch, Text, Image, Video } from './models/graphics/graphics';
 import { EVENT_TYPES } from './constants';
+import Anchor from './models/graphics/Anchor';
 
 function generateId(): string {
     function term(): string {
@@ -39,8 +40,8 @@ function parseGraphic(data: any): IGraphic {
     throw `Undefined graphic type: ${data.type}`;
 }
 
-function makeAnchorGraphic(id: string, origin: Vector): Ellipse {
-    return new Ellipse({
+function makeAnchorGraphic(parentGraphicId: string, handler: (event: CustomMouseEvent) => void, id: string, origin: Vector): Anchor {
+    return new Anchor(parentGraphicId, handler, {
         id: id,
         role: 'anchor',
         origin: origin.add(new Vector(-4, -4)),
@@ -125,203 +126,198 @@ function getStrictProjectionVector(movement: Vector) {
     return Math.PI / 4 <= angle && angle < Math.PI * 3 / 4 ? Vector.up : Vector.right;
 }
 
-function makeBezierCurvePointGraphic({ anchor, firstHandle, secondHandle }: { anchor: Vector, firstHandle: Vector, secondHandle?: Vector }): BezierAnchorGraphics {
+function makeBezierCurveAnchor(parentGraphicId: string, { baseOrigin, firstOrigin, secondOrigin }: { baseOrigin: Vector, firstOrigin: Vector, secondOrigin?: Vector }): BezierAnchorGraphics {
     const graphics: BezierAnchorGraphics = {
-        anchor: makeAnchorGraphic(generateId(), anchor),
-        firstHandle: new Rectangle({
-            role: 'anchor',
-            origin: firstHandle.add(new Vector(-3, -3)),
-            width: 6,
-            height: 6,
-            strokeColor: 'hotpink',
-            strokeWidth: 2,
-            fillColor: 'white'
-        }),
+        anchor: makeAnchorGraphic(parentGraphicId, (): void => { return; }, generateId(), baseOrigin),
+        firstHandle: makeAnchorGraphic(parentGraphicId, (): void => { return; }, generateId(), firstOrigin),
         firstHandleTrace: new Sketch({
             role: 'anchor',
-            points: [firstHandle, anchor],
+            points: [firstOrigin, baseOrigin],
             strokeColor: 'hotpink',
             strokeWidth: 2
         })
     };
 
-    if (secondHandle !== undefined) {
-        graphics.secondHandle = new Rectangle({
+    return secondOrigin === undefined ? graphics : {
+        ...graphics,
+        secondHandle: makeAnchorGraphic(parentGraphicId, (): void => { return; }, generateId(), secondOrigin),
+        secondHandleTrace: new Sketch({
             role: 'anchor',
-            origin: secondHandle.add(new Vector(-3, -3)),
-            width: 6,
-            height: 6,
-            strokeColor: 'hotpink',
-            strokeWidth: 2,
-            fillColor: 'white'
-        });
-
-        graphics.secondHandleTrace = new Sketch({
-            role: 'anchor',
-            points: [secondHandle, anchor],
+            points: [secondOrigin, baseOrigin],
             strokeColor: 'hotpink',
             strokeWidth: 2
-        });
+        })
+    };
+}
+
+// TODO: Make Anchor a type which extends Ellipse (or IGraphic?) so the graphic here can be cast as an Anchor with parentGraphicId and handlers
+function anchorCursorHandler(slideWrapper: ISlideWrapper, event: CustomGraphicMouseEvent, anchor: Anchor): void {
+    slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
+    slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
+    slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare);
+    slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare);
+
+    const parentGraphic: IGraphic | undefined = slideWrapper.store.getters.graphic(slideWrapper.slideId, anchor.parentGraphicId);
+    if (parentGraphic === undefined) {
+        console.error(`ERROR: Could not find a graphic with the id: ${event.detail.graphicId}`);
+        return;
     }
 
-    return graphics;
+    parentGraphic.anchorIds.forEach((anchorId: string): void => slideWrapper.removeGraphic(anchorId));
+    let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
+    let shiftPressed = false;
+
+    function preview(event: CustomCanvasMouseEvent): void {
+        lastPosition = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
+        anchor.handler(event);
+        parentGraphic!.updateRendering(slideWrapper.getGraphic(parentGraphic!.id));
+    }
+
+    function end(): void {
+        slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
+        slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
+        slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare);
+        slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare);
+
+        slideWrapper.store.commit('removeSnapVectors', { slideId: slideWrapper.slideId, graphicId: parentGraphic!.id });
+        slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: parentGraphic!.getSnapVectors() });
+        slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: parentGraphic!.id });
+        slideWrapper.store.commit('updateGraphic', { slideId: slideWrapper.slideId, graphicId: parentGraphic!.id, graphic: parentGraphic });
+    }
+
+    function toggleSquare(event: CustomCanvasKeyboardEvent): void {
+        if (event.detail.baseEvent.key !== 'Shift' || (event.detail.baseEvent.type === 'keydown' && shiftPressed)) {
+            return;
+        }
+
+        shiftPressed = event.detail.baseEvent.type === 'keydown';
+        slideWrapper.dispatchEventOnCanvas(EVENT_TYPES.CANVAS_MOUSE_MOVE, {
+            baseEvent: new MouseEvent('mousemove', {
+                shiftKey: event.type === 'keydown',
+                clientX: lastPosition.x,
+                clientY: lastPosition.y
+            }),
+            slideId: slideWrapper.slideId
+        });
+    }
 }
 
-function bindAnchorMouseDown(slideWrapper: ISlideWrapper, anchor: Anchor, parentGraphic: IGraphic): void {
-    slideWrapper.addGraphicEventListener(anchor.graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_DOWN, ((event: CustomGraphicMouseEvent): void => {
-        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
-        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
-        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare);
-        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare);
+function defaultCursorHandler(slideWrapper: ISlideWrapper, event: CustomGraphicMouseEvent, graphic: IGraphic): void {
+    // Stop propagation of the event when clicking on a graphic so the event does not propagate to the canvas level
+    // Otherwise, the graphicEditorGraphicId will be set to undefined
+    event.detail.baseEvent.stopPropagation();
 
-        parentGraphic.anchorIds.forEach((anchorId: string): void => slideWrapper.removeGraphic(anchorId));
-        let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
-        let shiftPressed = false;
+    // Create preview lines to show snapping
+    const snapHighlights: Array<Sketch> = [];
 
-        function preview(event: CustomCanvasMouseEvent): void {
-            lastPosition = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
-            anchor.handler(event);
-            parentGraphic.updateRendering(slideWrapper.getGraphic(parentGraphic.id));
-        }
+    slideWrapper.focusGraphic(graphic);
+    slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: graphic.id });
+    slideWrapper.store.commit('graphicEditorGraphicId', graphic.id);
+    slideWrapper.store.commit('removeSnapVectors', { slideId: slideWrapper.slideId, graphicId: graphic.id });
 
-        function end(): void {
-            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
-            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
-            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleSquare);
-            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleSquare);
+    const initialOrigin: Vector = new Vector(graphic.origin.x, graphic.origin.y);
+    const initialPosition: Vector = slideWrapper.getPosition(event);
+    const snapVectors: Array<SnapVector> = slideWrapper.store.getters.snapVectors(slideWrapper.slideId);
+    const snappableVectorOffsets: Array<Vector> = graphic.getSnappableVectors().map((snappableVector: Vector): Vector => initialPosition.towards(snappableVector));
+    let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
+    let shiftPressed = false;
 
-            slideWrapper.store.commit('removeSnapVectors', { slideId: slideWrapper.slideId, graphicId: parentGraphic.id });
-            slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: parentGraphic.getSnapVectors() });
-            slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: parentGraphic.id });
-            slideWrapper.store.commit('updateGraphic', { slideId: slideWrapper.slideId, graphicId: parentGraphic.id, graphic: parentGraphic });
-        }
+    slideWrapper.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_MOVE, preview);
+    slideWrapper.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_UP, end);
+    slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement);
+    slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement);
 
-        function toggleSquare(event: CustomCanvasKeyboardEvent): void {
-            if (event.detail.baseEvent.key !== 'Shift' || (event.detail.baseEvent.type === 'keydown' && shiftPressed)) {
-                return;
-            }
+    // Preview moving shape
+    function preview(event: CustomMouseEvent): void {
+        graphic.anchorIds.forEach((anchorId: string): void => slideWrapper.removeGraphic(anchorId));
+        lastPosition = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
+        const position: Vector = slideWrapper.getPosition(event);
+        let movement: Vector = initialPosition.towards(position);
+        const projection: Vector = getStrictProjectionVector(movement);
 
-            shiftPressed = event.detail.baseEvent.type === 'keydown';
-            slideWrapper.dispatchEventOnCanvas(EVENT_TYPES.CANVAS_MOUSE_MOVE, {
-                baseEvent: new MouseEvent('mousemove', {
-                    shiftKey: event.type === 'keydown',
-                    clientX: lastPosition.x,
-                    clientY: lastPosition.y
-                }),
-                slideId: slideWrapper.slideId
+        // Remove the old snap highlights
+        snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.removeGraphic(snapHighlight.id));
+        snapHighlights.length = 0;
+
+        // Do not perform any snapping if the alt key is pressed
+        if (!event.detail.baseEvent.altKey) {
+            const snappableVectors: Array<Vector> = snappableVectorOffsets.map<Vector>((offset: Vector): Vector => position.add(offset));
+            const snaps: Array<Snap> = getSnaps(snapVectors, snappableVectors);
+            const snapLineScale: number = 5000;
+
+            snaps.forEach((snap: Snap): void => {
+                const snapAngle: number = getTranslation(snap).theta(projection);
+                const snapIsNotParallel: boolean = snapAngle !== 0 && snapAngle !== Math.PI;
+                if (event.detail.baseEvent.shiftKey && snapIsNotParallel) {
+                    return;
+                }
+
+                movement = movement.add(getTranslation(snap));
+
+                const snapHighlight: Sketch = new Sketch({
+                    role: 'snap-highlight',
+                    origin: snap.destination.origin,
+                    points: [snap.destination.direction.scale(-snapLineScale), snap.destination.direction.scale(snapLineScale)],
+                    strokeWidth: 2,
+                    strokeColor: 'hotpink'
+                });
+
+                slideWrapper.addGraphic(snapHighlight);
+                snapHighlights.push(snapHighlight);
             });
         }
-    }));
+
+        graphic.origin = event.detail.baseEvent.shiftKey ? initialOrigin.add(movement.projectOn(projection)) : initialOrigin.add(movement);
+        slideWrapper.updateGraphic(graphic.id, graphic!);
+    }
+
+    // End moving shape
+    function end(): void {
+        slideWrapper.removeGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_MOVE, preview);
+        slideWrapper.removeGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_UP, end);
+        slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement);
+        slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement);
+
+        // Add the new SnapVectors once the graphic move has been finalized
+        slideWrapper.store.commit('updateGraphic', { slideId: slideWrapper.slideId, graphicId: graphic.id, graphic: graphic });
+        slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: graphic.getSnapVectors() });
+        slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: graphic.id });
+        slideWrapper.focusGraphic(graphic);
+
+        // Remove the old snap highlights
+        snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.removeGraphic(snapHighlight.id));
+        snapHighlights.length = 0;
+    }
+
+    function toggleStrictMovement(event: CustomCanvasKeyboardEvent): void {
+        if (event.detail.baseEvent.key !== 'Shift' || (event.detail.baseEvent.type === 'keydown' && shiftPressed)) {
+            return;
+        }
+
+        shiftPressed = event.detail.baseEvent.type === 'keydown';
+        slideWrapper.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_MOVE, {
+            baseEvent: new MouseEvent('mousemove', {
+                shiftKey: event.detail.baseEvent.type === 'keydown',
+                clientX: lastPosition.x,
+                clientY: lastPosition.y
+            }),
+            slideId: slideWrapper.slideId
+        });
+    }
 }
 
-function defaultCursorHandler(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void {
+function selectCursorHandler(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void {
     return function (event: CustomGraphicMouseEvent): void {
-        // Stop propagation of the event when clicking on a graphic so the event does not propagate to the canvas level
-        // Otherwise, the graphicEditorGraphicId will be set to undefined
-        event.detail.baseEvent.stopPropagation();
-
         const graphic: IGraphic | undefined = slideWrapper.store.getters.graphic(slideWrapper.slideId, event.detail.graphicId);
         if (graphic === undefined) {
             console.error(`ERROR: Could not find a graphic with the id: ${event.detail.graphicId}`);
             return;
         }
 
-        // Create preview lines to show snapping
-        const snapHighlights: Array<Sketch> = [];
-
-        slideWrapper.focusGraphic(graphic);
-        slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: graphic.id });
-        slideWrapper.store.commit('graphicEditorGraphicId', graphic.id);
-        slideWrapper.store.commit('removeSnapVectors', { slideId: slideWrapper.slideId, graphicId: graphic.id });
-
-        const initialOrigin: Vector = new Vector(graphic.origin.x, graphic.origin.y);
-        const initialPosition: Vector = slideWrapper.getPosition(event);
-        const snapVectors: Array<SnapVector> = slideWrapper.store.getters.snapVectors(slideWrapper.slideId);
-        const snappableVectorOffsets: Array<Vector> = graphic.getSnappableVectors().map((snappableVector: Vector): Vector => initialPosition.towards(snappableVector));
-        let lastPosition: Vector = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
-        let shiftPressed = false;
-
-        slideWrapper.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_MOVE, preview);
-        slideWrapper.addGraphicEventListener(graphic.id, EVENT_TYPES.GRAPHIC_MOUSE_UP, end);
-        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement);
-        slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement);
-
-        // Preview moving shape
-        function preview(event: CustomMouseEvent): void {
-            graphic!.anchorIds.forEach((anchorId: string): void => slideWrapper.removeGraphic(anchorId));
-            lastPosition = new Vector(event.detail.baseEvent.clientX, event.detail.baseEvent.clientY);
-            const position: Vector = slideWrapper.getPosition(event);
-            let movement: Vector = initialPosition.towards(position);
-            const projection: Vector = getStrictProjectionVector(movement);
-
-            // Remove the old snap highlights
-            snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.removeGraphic(snapHighlight.id));
-            snapHighlights.length = 0;
-
-            // Do not perform any snapping if the alt key is pressed
-            if (!event.detail.baseEvent.altKey) {
-                const snappableVectors: Array<Vector> = snappableVectorOffsets.map<Vector>((offset: Vector): Vector => position.add(offset));
-                const snaps: Array<Snap> = getSnaps(snapVectors, snappableVectors);
-                const snapLineScale: number = 5000;
-
-                snaps.forEach((snap: Snap): void => {
-                    const snapAngle: number = getTranslation(snap).theta(projection);
-                    const snapIsNotParallel: boolean = snapAngle !== 0 && snapAngle !== Math.PI;
-                    if (event.detail.baseEvent.shiftKey && snapIsNotParallel) {
-                        return;
-                    }
-
-                    movement = movement.add(getTranslation(snap));
-
-                    const snapHighlight: Sketch = new Sketch({
-                        role: 'snap-highlight',
-                        origin: snap.destination.origin,
-                        points: [snap.destination.direction.scale(-snapLineScale), snap.destination.direction.scale(snapLineScale)],
-                        strokeWidth: 2,
-                        strokeColor: 'hotpink'
-                    });
-
-                    slideWrapper.addGraphic(snapHighlight);
-                    snapHighlights.push(snapHighlight);
-                });
-            }
-
-            graphic!.origin = event.detail.baseEvent.shiftKey ? initialOrigin.add(movement.projectOn(projection)) : initialOrigin.add(movement);
-            slideWrapper.updateGraphic(graphic!.id, graphic!);
-        }
-
-        // End moving shape
-        function end(): void {
-            slideWrapper.removeGraphicEventListener(graphic!.id, EVENT_TYPES.GRAPHIC_MOUSE_MOVE, preview);
-            slideWrapper.removeGraphicEventListener(graphic!.id, EVENT_TYPES.GRAPHIC_MOUSE_UP, end);
-            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, toggleStrictMovement);
-            slideWrapper.removeCanvasEventListener(EVENT_TYPES.CANVAS_KEY_UP, toggleStrictMovement);
-
-            // Add the new SnapVectors once the graphic move has been finalized
-            slideWrapper.store.commit('updateGraphic', { slideId: slideWrapper.slideId, graphicId: graphic!.id, graphic: graphic });
-            slideWrapper.store.commit('addSnapVectors', { slideId: slideWrapper.slideId, snapVectors: graphic!.getSnapVectors() });
-            slideWrapper.store.commit('focusGraphic', { slideId: slideWrapper.slideId, graphicId: graphic!.id });
-            slideWrapper.focusGraphic(graphic);
-
-            // Remove the old snap highlights
-            snapHighlights.forEach((snapHighlight: Sketch): void => slideWrapper.removeGraphic(snapHighlight.id));
-            snapHighlights.length = 0;
-        }
-
-        function toggleStrictMovement(event: CustomCanvasKeyboardEvent): void {
-            if (event.detail.baseEvent.key !== 'Shift' || (event.detail.baseEvent.type === 'keydown' && shiftPressed)) {
-                return;
-            }
-
-            shiftPressed = event.detail.baseEvent.type === 'keydown';
-            slideWrapper.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_MOVE, {
-                baseEvent: new MouseEvent('mousemove', {
-                    shiftKey: event.detail.baseEvent.type === 'keydown',
-                    clientX: lastPosition.x,
-                    clientY: lastPosition.y
-                }),
-                slideId: slideWrapper.slideId
-            });
+        if (graphic.role === 'default') {
+            defaultCursorHandler(slideWrapper, event, graphic);
+        } else if (graphic.role === 'anchor') {
+            anchorCursorHandler(slideWrapper, event, graphic as Anchor);
         }
     };
 }
@@ -416,8 +412,7 @@ export default {
     getStrictProjectionVector,
     getSnaps,
     getTranslation,
-    makeBezierCurvePointGraphic,
-    bindAnchorMouseDown,
-    defaultCursorHandler,
+    makeBezierCurveAnchor,
+    selectCursorHandler,
     deckScript
 };

@@ -39,7 +39,7 @@ export default class CursorTool implements ICanvasTool {
     }
 
     public graphicMouseDown(slideWrapper: ISlideWrapper): (event: CustomGraphicMouseEvent) => void {
-        return Utilities.defaultCursorHandler(slideWrapper);
+        return Utilities.selectCursorHandler(slideWrapper);
     }
 
     public graphicMouseMove(slideWrapper: ISlideWrapper): () => void {

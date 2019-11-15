@@ -1,8 +1,9 @@
 import * as SVG from 'svg.js';
 import Utilities from '../../utilities';
-import { IGraphic, ISlideWrapper, GraphicEditorFormat, Anchor, TextParameters } from '../../types';
+import { IGraphic, ISlideWrapper, GraphicEditorFormat, TextParameters } from '../../types';
 import Vector from '../Vector';
 import SnapVector from '../SnapVector';
+import Anchor from './Anchor';
 
 export default class Text implements IGraphic {
     public id: string;

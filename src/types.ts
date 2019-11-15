@@ -3,6 +3,7 @@ import Vector from './models/Vector';
 import SnapVector from './models/SnapVector';
 import * as SVG from 'svg.js';
 import { Store } from 'vuex';
+import Anchor from './models/graphics/Anchor';
 
 export interface IRootState {
     activeSlideId: string;
@@ -38,10 +39,10 @@ export type GraphicEditorFormat = {
 }
 
 export type BezierAnchorGraphics = {
-    anchor: IGraphic,
-    firstHandle: IGraphic,
+    anchor: Anchor,
+    firstHandle: Anchor,
     firstHandleTrace: IGraphic,
-    secondHandle?: IGraphic,
+    secondHandle?: Anchor,
     secondHandleTrace?: IGraphic
 };
 
@@ -113,12 +114,6 @@ export type CustomMouseEvent = CustomEvent<CanvasMouseEvent | GraphicMouseEvent>
 export type Snap = {
     source: Vector,
     destination: SnapVector
-}
-
-export type Anchor = {
-    graphic: IGraphic,
-    cursor: string,
-    handler: (event: CustomMouseEvent) => void
 }
 
 export type SlideExportObject = {
