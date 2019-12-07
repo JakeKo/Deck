@@ -150,9 +150,9 @@ export default class SlideWrapper implements ISlideWrapper {
         const list: SVG.Set = this._canvas.select(`#graphic_${graphicId}`);
 
         if (list.length() === 0) {
-            throw new Error(`No SVG with id ${graphicId} could be found.`);
+            throw new Error(`No SVG (${graphicId}) could be found`);
         } else if (list.length() > 1) {
-            throw new Error(`More than one SVG were found with the id ${graphicId}.`);
+            throw new Error(`More than one SVG (${graphicId}) was found`);
         }
 
         return list.first();

@@ -50,8 +50,7 @@ export default class Video implements IGraphic {
     public updateRendering(svg: SVG.Bare): void {
         const video: HTMLVideoElement | null = svg.node.querySelector('video');
         if (video === null) {
-            console.error(`ERROR: Video element is missing on graphic with id: ${this.id}`);
-            return;
+            throw new Error(`Video element is missing on graphic (${this.id})`);
         }
 
         svg.rotate(0)

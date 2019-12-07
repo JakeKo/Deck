@@ -5,7 +5,16 @@ import SlideModel from './models/Slide';
 import SnapVector from './models/SnapVector';
 import * as SVG from 'svg.js';
 import { CursorTool, EllipseTool, PencilTool, PenTool, RectangleTool, TextboxTool } from './models/tools/tools';
-import { IRootState, ICanvasTool, IGraphic, GraphicEvent, SlideExportObject } from './types';
+import { IRootState, ICanvasTool, IGraphic, SlideExportObject } from './types';
+
+function getSlide(state: IRootState, slideId: string): SlideModel {
+    const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
+    if (slide === undefined) {
+        throw new Error(`Could not find slide (${slideId})`);
+    }
+
+    return slide;
+}
 
 const store: StoreOptions<IRootState> = {
     state: {
@@ -47,44 +56,22 @@ const store: StoreOptions<IRootState> = {
         },
         graphic: (state: IRootState): ((slideId: string, graphicId: string) => IGraphic | undefined) => {
             return function (slideId: string, graphicId: string): IGraphic | undefined {
-                const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
-                if (slide === undefined) {
-                    console.error(`ERROR: No slide exists with id: ${slideId}`);
-                    return;
-                }
-
-                return slide.getGraphic(graphicId);
+                return getSlide(state, slideId).getGraphic(graphicId);
             };
         },
         snapVectors: (state: IRootState): ((slideId: string) => Array<SnapVector>) => {
             return function (slideId: string): Array<SnapVector> {
-                const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
-                if (slide === undefined) {
-                    console.error(`ERROR: No slide exists with id: ${slideId}`);
-                    return [];
-                }
-
-                return new Array<SnapVector>(...slide.snapVectors);
+                return new Array<SnapVector>(...getSlide(state, slideId).snapVectors);
             };
         },
         activeSlide: (state: IRootState): SlideModel | undefined => {
-            return state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId)!;
+            return state.activeSlideId === '' ? undefined : getSlide(state, state.activeSlideId);
         },
         graphicEditorGraphicId: (state: IRootState): string | undefined => {
             return state.graphicEditorGraphicId;
         },
         graphicEditorGraphic: (state: IRootState): IGraphic | undefined => {
-            if (state.graphicEditorGraphicId === undefined) {
-                return undefined;
-            }
-
-            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId);
-            if (slide === undefined) {
-                console.error(`ERROR: No slide exists with id: ${state.activeSlideId}`);
-                return;
-            }
-
-            return slide.getGraphic(state.graphicEditorGraphicId);
+            return state.graphicEditorGraphicId === undefined ? undefined : getSlide(state, state.activeSlideId).getGraphic(state.graphicEditorGraphicId);
         },
         tool: (state: IRootState): ICanvasTool => {
             return state.tools[state.currentTool];
@@ -93,7 +80,7 @@ const store: StoreOptions<IRootState> = {
             return state.currentTool;
         },
         focusedGraphic: (state: IRootState): IGraphic | undefined => {
-            const activeSlide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === state.activeSlideId);
+            const activeSlide: SlideModel | undefined = getSlide(state, state.activeSlideId);
             return activeSlide === undefined ? undefined : activeSlide.getGraphic(state.focusedGraphicId);
         },
         canvasHeight: (state: IRootState): number => {
@@ -124,8 +111,7 @@ const store: StoreOptions<IRootState> = {
             const slide: SlideModel = state.slides[source];
 
             if (slide === undefined) {
-                console.error(`ERROR: No slide exists at index ${source} to reorder`);
-                return;
+                throw new Error(`No slide exists at index ${source} to reorder`);
             }
 
             state.slides.splice(destination + (destination > source ? 1 : 0), 0, slide);
@@ -133,60 +119,32 @@ const store: StoreOptions<IRootState> = {
         },
         addGraphic: (state: IRootState, { slideId, graphic }: { slideId: string, graphic: IGraphic }): void => {
             if (graphic === undefined) {
-                console.error('ERROR: Attempted to add an undefined graphic');
-                return;
+                throw new Error('Attempted to add an undefined graphic');
             }
 
-            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
-            if (slide === undefined) {
-                console.error(`ERROR: No slide exists with id: ${slideId}`);
-                return;
-            }
-
-            slide.graphics.push(graphic);
+            getSlide(state, slideId).graphics.push(graphic);
         },
         removeGraphic: (state: IRootState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
-            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
-            if (slide === undefined) {
-                console.error(`ERROR: No slide exists with id: ${slideId}`);
-                return;
-            }
-
-            const graphic: IGraphic = slide.removeGraphic(graphicId);
-            document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicRemoved', { detail: { slideId, graphicId, graphic } }));
+            getSlide(state, slideId).removeGraphic(graphicId);
         },
         updateGraphic: (state: IRootState, { slideId, graphicId, graphic }: { slideId: string, graphicId: string, graphic: IGraphic }): void => {
-            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
-            if (slide === undefined) {
-                console.error(`ERROR: Could not find slide ('${slideId}')`);
-                return;
-            }
+            const slide: SlideModel = getSlide(state, slideId);
 
             // Update the graphic
             const index: number = slide.graphics.findIndex((g: IGraphic): boolean => g.id === graphicId);
             if (index < 0) {
-                console.error(`ERROR: Could not find graphic ('${graphicId}')`);
-                return;
+                throw new Error(`Could not find graphic ('${graphicId}')`);
             }
 
             slide.graphics[index] = graphic;
-            document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicUpdated', { detail: { slideId: slide.id, graphicId: graphic.id, graphic: graphic } }));
         },
         focusGraphic: (state: IRootState, { slideId, graphicId }: { slideId: string, graphicId?: string }): void => {
-            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
-            if (slide === undefined) {
-                console.error(`ERROR: No slide exists with id: ${slideId}`);
-                return;
-            }
-
-            const graphic: IGraphic | undefined = slide.graphics.find((graphic: IGraphic): boolean => graphic.id === graphicId);
+            const graphic: IGraphic | undefined = getSlide(state, slideId).graphics.find((graphic: IGraphic): boolean => graphic.id === graphicId);
             if (graphicId !== undefined && graphic === undefined) {
-                console.error(`ERROR: No graphic (${graphicId}) exists on slide (${slideId})`);
-                return;
+                throw new Error(`Could not find graphic (${graphicId}) on slide (${slideId})`);
             }
 
             state.focusedGraphicId = graphicId;
-            document.dispatchEvent(new CustomEvent<GraphicEvent>('Deck.GraphicFocused', { detail: { slideId: slideId, graphicId: graphicId, graphic: graphic } }));
         },
         tool: (state: IRootState, toolName: string): void => {
             state.currentTool = toolName;
@@ -201,22 +159,11 @@ const store: StoreOptions<IRootState> = {
             state.canvas.zoom = Math.max(zoom, 0.25);
         },
         removeSnapVectors: (state: IRootState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
-            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
-            if (slide === undefined) {
-                console.error(`ERROR: No slide exists with id: ${slideId}`);
-                return;
-            }
-
+            const slide: SlideModel = getSlide(state, slideId);
             slide.snapVectors = new Set<SnapVector>([...slide.snapVectors].filter((snapVector: SnapVector): boolean => snapVector.graphicId !== graphicId));
         },
         addSnapVectors: (state: IRootState, { slideId, snapVectors }: { slideId: string, snapVectors: Array<SnapVector> }): void => {
-            const slide: SlideModel | undefined = state.slides.find((slide: SlideModel): boolean => slide.id === slideId);
-            if (slide === undefined) {
-                console.error(`ERROR: No slide exists with id: ${slideId}`);
-                return;
-            }
-
-            slide.addSnapVectors(...snapVectors);
+            getSlide(state, slideId).addSnapVectors(...snapVectors);
         },
         deckTitle: (state: IRootState, deckTitle: string): void => {
             state.deckTitle = deckTitle === '' ? undefined : deckTitle;

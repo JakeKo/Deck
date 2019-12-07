@@ -150,7 +150,6 @@ function makeBezierCurveAnchor(parentGraphicId: string, { baseOrigin, firstOrigi
     };
 }
 
-// TODO: Make Anchor a type which extends Ellipse (or IGraphic?) so the graphic here can be cast as an Anchor with parentGraphicId and handlers
 function anchorCursorHandler(slideWrapper: ISlideWrapper, event: CustomGraphicMouseEvent, anchor: Anchor): void {
     slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_MOVE, preview);
     slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_MOUSE_UP, end);
@@ -159,8 +158,7 @@ function anchorCursorHandler(slideWrapper: ISlideWrapper, event: CustomGraphicMo
 
     const parentGraphic: IGraphic | undefined = slideWrapper.store.getters.graphic(slideWrapper.slideId, anchor.parentGraphicId);
     if (parentGraphic === undefined) {
-        console.error(`ERROR: Could not find a graphic with the id: ${event.detail.graphicId}`);
-        return;
+        throw new Error(`Could not find graphic (${event.detail.graphicId})`);
     }
 
     parentGraphic.anchorIds.forEach((anchorId: string): void => slideWrapper.removeGraphic(anchorId));
@@ -310,8 +308,7 @@ function selectCursorHandler(slideWrapper: ISlideWrapper): (event: CustomGraphic
     return function (event: CustomGraphicMouseEvent): void {
         const graphic: IGraphic | undefined = slideWrapper.store.getters.graphic(slideWrapper.slideId, event.detail.graphicId);
         if (graphic === undefined) {
-            console.error(`ERROR: Could not find a graphic with the id: ${event.detail.graphicId}`);
-            return;
+            throw new Error(`Could not find graphic (${event.detail.graphicId})`);
         }
 
         if (graphic.role === 'default') {
