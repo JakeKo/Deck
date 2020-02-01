@@ -1,6 +1,6 @@
 import * as SVG from 'svg.js';
 import Utilities from '../../utilities';
-import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, VideoParameters } from '../../types';
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorObject, VideoParameters, Field } from '../../types';
 import Vector from '../Vector';
 import SnapVector from '../SnapVector';
 import Anchor from './Anchor';
@@ -124,19 +124,45 @@ export default class Video implements IGraphic {
         ];
     }
 
-    public toGraphicEditorFormat(): GraphicEditorFormat {
+    public toGraphicEditorObject(): GraphicEditorObject {
         return {
             metadata: {
                 id: this.id,
                 type: this.type,
                 anchorIds: this.anchorIds
             },
-            data: {
-                origin: this.origin,
-                width: this.width,
-                height: this.height,
-                rotation: this.rotation
-            }
+            data: [
+                {
+                    displayName: 'Source',
+                    inputType: 'text',
+                    value: this.source
+                },
+                {
+                    displayName: 'X',
+                    inputType: 'number',
+                    value: this.origin.x
+                },
+                {
+                    displayName: 'Y',
+                    inputType: 'number',
+                    value: this.origin.y
+                },
+                {
+                    displayName: 'Width',
+                    inputType: 'number',
+                    value: this.width
+                },
+                {
+                    displayName: 'Height',
+                    inputType: 'number',
+                    value: this.height
+                },
+                {
+                    displayName: 'Rotation',
+                    inputType: 'number',
+                    value: this.rotation
+                }
+            ]
         };
     }
 }

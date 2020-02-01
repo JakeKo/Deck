@@ -1,6 +1,6 @@
 import * as SVG from 'svg.js';
 import Utilities from '../../utilities';
-import { IGraphic, ISlideWrapper, GraphicEditorFormat, TextParameters } from '../../types';
+import { IGraphic, ISlideWrapper, GraphicEditorObject, TextParameters, Field } from '../../types';
 import Vector from '../Vector';
 import SnapVector from '../SnapVector';
 import Anchor from './Anchor';
@@ -72,22 +72,55 @@ export default class Text implements IGraphic {
         return [];
     }
 
-    public toGraphicEditorFormat(): GraphicEditorFormat {
+    public toGraphicEditorObject(): GraphicEditorObject {
         return {
             metadata: {
                 id: this.id,
                 type: this.type,
                 anchorIds: this.anchorIds
             },
-            data: {
-                origin: this.origin,
-                content: this.content,
-                fontSize: this.fontSize,
-                fontWeight: this.fontWeight,
-                fontFamily: this.fontFamily,
-                fillColor: this.fillColor,
-                rotation: this.rotation
-            }
+            data: [
+                {
+                    displayName: 'X',
+                    inputType: 'number',
+                    value: this.origin.x
+                },
+                {
+                    displayName: 'Y',
+                    inputType: 'number',
+                    value: this.origin.y
+                },
+                {
+                    displayName: 'Text',
+                    inputType: 'text',
+                    value: this.content
+                },
+                {
+                    displayName: 'Font Size',
+                    inputType: 'number',
+                    value: this.fontSize,
+                },
+                {
+                    displayName: 'Font Weight',
+                    inputType: 'number',
+                    value: Number(this.fontWeight)
+                },
+                {
+                    displayName: 'Font Family',
+                    inputType: 'text',
+                    value: this.fontFamily
+                },
+                {
+                    displayName: 'Fill Color',
+                    inputType: 'color',
+                    value: this.fillColor
+                },
+                {
+                    displayName: 'Rotation',
+                    inputType: 'number',
+                    value: this.rotation
+                }
+            ]
         };
     }
 }

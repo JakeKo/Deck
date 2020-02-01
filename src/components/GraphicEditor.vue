@@ -4,14 +4,17 @@
     <div id='graphic-editor-interaction-message' v-if='$store.getters.graphicEditorGraphicId === undefined'>
         <strong>Graphic Editor:</strong>Click on a graphic to edit its properties.
     </div>
-    <textarea id='graphic-editor-content' v-if='$store.getters.graphicEditorGraphicId !== undefined' v-model='object' @keydown='handleKeydown'></textarea>
+    <div id='graphic-editor-views' v-if='$store.getters.graphicEditorGraphicId !== undefined'>
+        <textarea id='graphic-editor-json-view' v-model='object' @keydown='handleKeydown'></textarea>
+        <div id='graphic-editor-fields-view'></div>
+    </div>
 </div>
 </template>
 
 <script lang='ts'>
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import Utilities from '../utilities';
-import { IGraphic, GraphicEditorFormat } from '../types';
+import { IGraphic, GraphicEditorObject } from '../types';
 import { Sketch, Curve, Image, Video } from '../models/graphics/graphics';
 import Vector from '../models/Vector';
 
@@ -21,9 +24,9 @@ export default class StyleEditor extends Vue {
 
     get object(): string {
         const graphic: IGraphic | undefined = this.$store.getters.graphicEditorGraphic;
-        const { metadata, data }: GraphicEditorFormat = graphic === undefined ? { metadata: {}, data: {} } : graphic.toGraphicEditorFormat();
-        this.metadata = metadata;
-        return Utilities.toPrettyString(data);
+        const graphicEditorObject: GraphicEditorObject = graphic === undefined ? { metadata: {}, data: [] } : graphic.toGraphicEditorObject();
+        this.metadata = graphicEditorObject.metadata;
+        return Utilities.toPrettyString(graphicEditorObject.data);
     }
 
     set object(graphicEditorObject: string) {
@@ -92,7 +95,7 @@ export default class StyleEditor extends Vue {
     text-align: center;
 }
 
-#graphic-editor-content {
+#graphic-editor-json-view {
     font-family: 'Roboto Mono', monospace;
     font-size: 14px;
     border: none;

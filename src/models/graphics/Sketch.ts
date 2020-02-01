@@ -1,6 +1,6 @@
 import * as SVG from 'svg.js';
 import Utilities from '../../utilities';
-import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorFormat, SketchParameters } from '../../types';
+import { IGraphic, CustomMouseEvent, ISlideWrapper, GraphicEditorObject, SketchParameters, Field } from '../../types';
 import Vector from '../Vector';
 import SnapVector from '../SnapVector';
 import Anchor from './Anchor';
@@ -78,7 +78,7 @@ export default class Sketch implements IGraphic {
             }, anchorId, this.points[index].add(this.origin)));
     }
 
-    public toGraphicEditorFormat(): GraphicEditorFormat {
+    public toGraphicEditorObject(): GraphicEditorObject {
         return {
             metadata: {
                 id: this.id,
@@ -86,13 +86,38 @@ export default class Sketch implements IGraphic {
                 points: this.points,
                 anchorIds: this.anchorIds
             },
-            data: {
-                origin: this.origin,
-                fillColor: this.fillColor,
-                strokeColor: this.strokeColor,
-                strokeWidth: this.strokeWidth,
-                rotation: this.rotation
-            }
+            data: [
+                {
+                    displayName: 'X',
+                    inputType: 'number',
+                    value: this.origin.x
+                },
+                {
+                    displayName: 'Y',
+                    inputType: 'number',
+                    value: this.origin.y
+                },
+                {
+                    displayName: 'Fill Color',
+                    inputType: 'color',
+                    value: this.fillColor
+                },
+                {
+                    displayName: 'Stroke Color',
+                    inputType: 'color',
+                    value: this.strokeColor
+                },
+                {
+                    displayName: 'Stroke Width',
+                    inputType: 'number',
+                    value: this.strokeWidth
+                },
+                {
+                    displayName: 'Rotation',
+                    inputType: 'number',
+                    value: this.rotation
+                }
+            ]
         };
     }
 }

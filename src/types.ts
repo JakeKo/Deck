@@ -32,10 +32,9 @@ export interface IRootState {
     deckTitle: string | undefined;
 }
 
-// TODO: Rename this to GraphicEditorObject
-export type GraphicEditorFormat = {
+export type GraphicEditorObject = {
     metadata: any,
-    data: any
+    data: Field[]
 }
 
 export type BezierAnchorGraphics = {
@@ -58,7 +57,7 @@ export interface IGraphic {
     getSnapVectors(): Array<SnapVector>;
     getSnappableVectors(): Array<Vector>;
     getAnchors(slideWrapper: ISlideWrapper): Array<Anchor>;
-    toGraphicEditorFormat(): GraphicEditorFormat;
+    toGraphicEditorObject(): GraphicEditorObject;
 }
 
 export interface ISlideWrapper {
@@ -225,3 +224,28 @@ export interface ICanvasTool {
     graphicMouseDown: (slideWrapper: ISlideWrapper) => (event: CustomGraphicMouseEvent) => void;
     graphicMouseMove: (slideWrapper: ISlideWrapper) => (event: CustomGraphicMouseEvent) => void;
 }
+
+export type Field = TextField | NumberField | ColorField;
+
+export type TextField = {
+    displayName: string,
+    inputType: 'text',
+    maxLength?: number,
+    minLength?: number,
+    value: string
+};
+
+export type NumberField = {
+    displayName: string,
+    inputType: 'number',
+    max?: number,
+    min?: number,
+    step?: number,
+    value: number
+};
+
+export type ColorField = {
+    displayName: string,
+    inputType: 'color',
+    value: string
+};
