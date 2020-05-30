@@ -64,6 +64,7 @@ export interface ISlideWrapper {
     store: Store<IRootState>;
     slideId: string;
     renderSupplementary: boolean;
+    canvas: SVG.Doc;
     focusGraphic(graphic: IGraphic | undefined): void;
     setCursor(cursor: string): void;
     absoluteBounds(): DOMRect;

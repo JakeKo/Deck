@@ -14,28 +14,20 @@ function generateId(): string {
 }
 
 function parseGraphic(data: any): IGraphic {
-    console.log(data);
     if (data.type === 'rectangle') {
-        data.origin = new Vector(data.origin.x, data.origin.y);
-        return new Rectangle(data);
+        return new Rectangle({ ...data, origin: new Vector(data.origin.x, data.origin.y) });
     } else if (data.type === 'ellipse') {
-        data.origin = new Vector(data.origin.x, data.origin.y);
-        return new Ellipse(data);
+        return new Ellipse({ ...data, origin: new Vector(data.origin.x, data.origin.y) });
     } else if (data.type === 'curve') {
-        data.origin = new Vector(data.origin.x, data.origin.y);
-        return new Curve(data);
+        return new Curve({ ...data, origin: new Vector(data.origin.x, data.origin.y) });
     } else if (data.type === 'sketch') {
-        data.origin = new Vector(data.origin.x, data.origin.y);
-        return new Sketch(data);
+        return new Sketch({ ...data, origin: new Vector(data.origin.x, data.origin.y) });
     } else if (data.type === 'text') {
-        data.origin = new Vector(data.origin.x, data.origin.y);
-        return new Text(data);
+        return new Text({ ...data, origin: new Vector(data.origin.x, data.origin.y) });
     } else if (data.type === 'image') {
-        data.origin = new Vector(data.origin.x, data.origin.y);
-        return new Image(data);
+        return new Image({ ...data, origin: new Vector(data.origin.x, data.origin.y) });
     } else if (data.type === 'video') {
-        data.origin = new Vector(data.origin.x, data.origin.y);
-        return new Video(data);
+        return new Video({ ...data, origin: new Vector(data.origin.x, data.origin.y) });
     }
 
     throw `Undefined graphic type: ${data.type}`;

@@ -128,15 +128,8 @@ const store: StoreOptions<IRootState> = {
             getSlide(state, slideId).removeGraphic(graphicId);
         },
         updateGraphic: (state: IRootState, { slideId, graphicId, graphic }: { slideId: string, graphicId: string, graphic: IGraphic }): void => {
-            const slide: SlideModel = getSlide(state, slideId);
-
-            // Update the graphic
-            const index: number = slide.graphics.findIndex((g: IGraphic): boolean => g.id === graphicId);
-            if (index < 0) {
-                throw new Error(`Could not find graphic ('${graphicId}')`);
-            }
-
-            slide.graphics[index] = graphic;
+            const slide = getSlide(state, slideId);
+            slide.updateGraphic(graphicId, graphic);
         },
         focusGraphic: (state: IRootState, { slideId, graphicId }: { slideId: string, graphicId?: string }): void => {
             const graphic: IGraphic | undefined = getSlide(state, slideId).graphics.find((graphic: IGraphic): boolean => graphic.id === graphicId);

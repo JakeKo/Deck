@@ -3,57 +3,56 @@ import { IGraphic, CustomMouseEvent, ISlideWrapper, IRootState, CanvasMouseEvent
 import Vector from './Vector';
 import { Store } from 'vuex';
 import { EVENT_TYPES } from '../constants';
-import Utilities from '../utilities';
 import Anchor from './graphics/Anchor';
 
 export default class SlideWrapper implements ISlideWrapper {
     public store: Store<IRootState>;
     public slideId: string;
     public renderSupplementary: boolean;
+    public canvas: SVG.Doc;
 
-    private _canvas: SVG.Doc;
     private _focusedGraphic: IGraphic | undefined;
 
     constructor(slideId: string, canvas: SVG.Doc, store: Store<IRootState>, renderSupplementary: boolean) {
         this.store = store;
         this.slideId = slideId;
         this.renderSupplementary = renderSupplementary;
-        this._canvas = canvas;
+        this.canvas = canvas;
         this._focusedGraphic = undefined;
 
         // Add a tab index so the canvas element can be focused, allowing events to be caught at the canvas level
         this._forwardCanvasEvents();
-        this._canvas.node.tabIndex = 0;
-        this._canvas.node.addEventListener('mousedown', (): void => this._canvas.node.focus());
+        this.canvas.node.tabIndex = 0;
+        this.canvas.node.addEventListener('mousedown', (): void => this.canvas.node.focus());
     }
 
     private _forwardCanvasEvents(): void {
         const slideId: string = this.slideId;
-        this._canvas.node.addEventListener('mouseover', (baseEvent: MouseEvent): void => {
+        this.canvas.node.addEventListener('mouseover', (baseEvent: MouseEvent): void => {
             this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_OVER, { baseEvent, slideId });
         });
 
-        this._canvas.node.addEventListener('mouseout', (baseEvent: MouseEvent): void => {
+        this.canvas.node.addEventListener('mouseout', (baseEvent: MouseEvent): void => {
             this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_OUT, { baseEvent, slideId });
         });
 
-        this._canvas.node.addEventListener('mouseup', (baseEvent: MouseEvent): void => {
+        this.canvas.node.addEventListener('mouseup', (baseEvent: MouseEvent): void => {
             this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_UP, { baseEvent, slideId });
         });
 
-        this._canvas.node.addEventListener('mousedown', (baseEvent: MouseEvent): void => {
+        this.canvas.node.addEventListener('mousedown', (baseEvent: MouseEvent): void => {
             this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_DOWN, { baseEvent, slideId });
         });
 
-        this._canvas.node.addEventListener('mousemove', (baseEvent: MouseEvent): void => {
+        this.canvas.node.addEventListener('mousemove', (baseEvent: MouseEvent): void => {
             this.dispatchEventOnCanvas<CanvasMouseEvent>(EVENT_TYPES.CANVAS_MOUSE_MOVE, { baseEvent, slideId });
         });
 
-        this._canvas.node.addEventListener('keydown', (baseEvent: KeyboardEvent): void => {
+        this.canvas.node.addEventListener('keydown', (baseEvent: KeyboardEvent): void => {
             this.dispatchEventOnCanvas<CanvasKeyboardEvent>(EVENT_TYPES.CANVAS_KEY_DOWN, { baseEvent, slideId });
         });
 
-        this._canvas.node.addEventListener('keyup', (baseEvent: KeyboardEvent): void => {
+        this.canvas.node.addEventListener('keyup', (baseEvent: KeyboardEvent): void => {
             this.dispatchEventOnCanvas<CanvasKeyboardEvent>(EVENT_TYPES.CANVAS_KEY_UP, { baseEvent, slideId });
         });
 
@@ -139,15 +138,15 @@ export default class SlideWrapper implements ISlideWrapper {
     }
 
     public setCursor(cursor: string): void {
-        this._canvas.style('cursor', cursor);
+        this.canvas.style('cursor', cursor);
     }
 
     public absoluteBounds(): DOMRect {
-        return this._canvas.node.getBoundingClientRect() as DOMRect;
+        return this.canvas.node.getBoundingClientRect() as DOMRect;
     }
 
     public getGraphic(graphicId: string): SVG.Element {
-        const list: SVG.Set = this._canvas.select(`#graphic_${graphicId}`);
+        const list: SVG.Set = this.canvas.select(`#graphic_${graphicId}`);
 
         if (list.length() === 0) {
             throw new Error(`No SVG (${graphicId}) could be found`);
@@ -159,13 +158,14 @@ export default class SlideWrapper implements ISlideWrapper {
     }
 
     public addGraphic(graphic: IGraphic): void {
-        const svg: SVG.Element = graphic.render(this._canvas);
+        const svg: SVG.Element = graphic.render(this.canvas);
         this._forwardGraphicEvents(graphic.id, svg);
     }
 
     public updateGraphic(id: string, newGraphic: IGraphic): void {
         const svg: SVG.Element = this.getGraphic(id);
         newGraphic.updateRendering(svg);
+        this.focusGraphic(newGraphic);
     }
 
     public removeGraphic(id: string): void {
@@ -189,15 +189,15 @@ export default class SlideWrapper implements ISlideWrapper {
     }
 
     public addCanvasEventListener(eventName: string, listener: (event: CustomEvent) => void): void {
-        this._canvas.node.addEventListener(eventName, listener as EventListener);
+        this.canvas.node.addEventListener(eventName, listener as EventListener);
     }
 
     public removeCanvasEventListener(eventName: string, listener: (event: CustomEvent) => void): void {
-        this._canvas.node.removeEventListener(eventName, listener as EventListener);
+        this.canvas.node.removeEventListener(eventName, listener as EventListener);
     }
 
     public dispatchEventOnCanvas<T>(eventName: string, payload: T): void {
-        this._canvas.node.dispatchEvent(new CustomEvent<T>(eventName, { detail: payload }));
+        this.canvas.node.dispatchEvent(new CustomEvent<T>(eventName, { detail: payload }));
     }
 
     public addGraphicEventListener(graphicId: string, eventName: string, listener: (event: CustomEvent) => void): void {

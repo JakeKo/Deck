@@ -58,6 +58,23 @@ export default class SlideModel {
             throw `No graphic with id ${graphicId} on slide with id ${this.id}`;
         }
 
+        this.slideWrapper!.removeGraphic(graphicId);
         return this.graphics.splice(index, 1)[0];
+    }
+
+    public addGraphic(graphic: IGraphic): void {
+        this.slideWrapper!.addGraphic(graphic);
+        this.graphics.push(graphic);
+    }
+
+    public updateGraphic(id: string, graphic: IGraphic): void {
+        const index: number = this.graphics.findIndex((graphic: IGraphic): boolean => graphic.id === id);
+
+        if (index === -1) {
+            throw `No graphic with id ${id} on slide with id ${this.id}`;
+        }
+
+        this.graphics[index] = graphic;
+        this.slideWrapper!.updateGraphic(id, graphic);
     }
 }
