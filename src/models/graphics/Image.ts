@@ -113,31 +113,37 @@ export default class Image implements IGraphic {
             data: [
                 {
                     displayName: 'Source',
+                    propertyName: 'source',
                     inputType: 'text',
                     value: this.source
                 },
                 {
                     displayName: 'X',
+                    propertyName: 'x',
                     inputType: 'number',
                     value: this.origin.x
                 },
                 {
                     displayName: 'Y',
+                    propertyName: 'y',
                     inputType: 'number',
                     value: this.origin.y
                 },
                 {
                     displayName: 'Width',
+                    propertyName: 'width',
                     inputType: 'number',
                     value: this.width
                 },
                 {
                     displayName: 'Height',
+                    propertyName: 'height',
                     inputType: 'number',
                     value: this.height
                 },
                 {
                     displayName: 'Rotation',
+                    propertyName: 'rotation',
                     inputType: 'number',
                     value: this.rotation
                 }

@@ -82,41 +82,49 @@ export default class Text implements IGraphic {
             data: [
                 {
                     displayName: 'X',
+                    propertyName: 'x',
                     inputType: 'number',
                     value: this.origin.x
                 },
                 {
                     displayName: 'Y',
+                    propertyName: 'y',
                     inputType: 'number',
                     value: this.origin.y
                 },
                 {
                     displayName: 'Text',
+                    propertyName: 'text',
                     inputType: 'text',
                     value: this.content
                 },
                 {
                     displayName: 'Font Size',
+                    propertyName: 'fontSize',
                     inputType: 'number',
                     value: this.fontSize,
                 },
                 {
                     displayName: 'Font Weight',
+                    propertyName: 'fontWeight',
                     inputType: 'number',
                     value: Number(this.fontWeight)
                 },
                 {
                     displayName: 'Font Family',
+                    propertyName: 'fontFamily',
                     inputType: 'text',
                     value: this.fontFamily
                 },
                 {
                     displayName: 'Fill Color',
+                    propertyName: 'fillColor',
                     inputType: 'color',
                     value: this.fillColor
                 },
                 {
                     displayName: 'Rotation',
+                    propertyName: 'rotation',
                     inputType: 'number',
                     value: this.rotation
                 }

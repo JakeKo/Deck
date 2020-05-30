@@ -120,41 +120,49 @@ export default class Rectangle implements IGraphic {
             data: [
                 {
                     displayName: 'X',
+                    propertyName: 'x',
                     inputType: 'number',
                     value: this.origin.x
                 },
                 {
                     displayName: 'Y',
+                    propertyName: 'y',
                     inputType: 'number',
                     value: this.origin.y
                 },
                 {
                     displayName: 'Width',
+                    propertyName: 'width',
                     inputType: 'number',
                     value: this.width
                 },
                 {
                     displayName: 'Height',
+                    propertyName: 'height',
                     inputType: 'number',
                     value: this.height
                 },
                 {
                     displayName: 'Fill Color',
+                    propertyName: 'fillColor',
                     inputType: 'color',
                     value: this.fillColor
                 },
                 {
                     displayName: 'Stroke Color',
+                    propertyName: 'strokeColor',
                     inputType: 'color',
                     value: this.strokeColor
                 },
                 {
                     displayName: 'Stroke Width',
+                    propertyName: 'strokeWidth',
                     inputType: 'number',
                     value: this.strokeWidth
                 },
                 {
                     displayName: 'Rotation',
+                    propertyName: 'rotation',
                     inputType: 'number',
                     value: this.rotation
                 }

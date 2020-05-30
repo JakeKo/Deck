@@ -139,31 +139,37 @@ export default class Curve implements IGraphic {
             data: [
                 {
                     displayName: 'X',
+                    propertyName: 'x',
                     inputType: 'number',
                     value: this.origin.x
                 },
                 {
                     displayName: 'Y',
+                    propertyName: 'y',
                     inputType: 'number',
                     value: this.origin.y
                 },
                 {
                     displayName: 'Fill Color',
+                    propertyName: 'fillColor',
                     inputType: 'color',
                     value: this.fillColor
                 },
                 {
                     displayName: 'Stroke Color',
+                    propertyName: 'strokeColor',
                     inputType: 'color',
                     value: this.strokeColor
                 },
                 {
                     displayName: 'Stroke Width',
+                    propertyName: 'strokeWidth',
                     inputType: 'number',
                     value: this.strokeWidth
                 },
                 {
                     displayName: 'Rotation',
+                    propertyName: 'rotation',
                     inputType: 'number',
                     value: this.rotation
                 }

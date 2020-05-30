@@ -6,7 +6,7 @@
     </div>
     <div id='graphic-editor-views' v-if='$store.getters.graphicEditorGraphicId !== undefined'>
         <textarea id='graphic-editor-json-view' v-model='object' @keydown='handleKeydown'></textarea>
-        <div id='graphic-editor-fields-view'></div>
+        <!-- <div id='graphic-editor-fields-view'></div> -->
     </div>
 </div>
 </template>
@@ -24,14 +24,17 @@ export default class StyleEditor extends Vue {
 
     get object(): string {
         const graphic: IGraphic | undefined = this.$store.getters.graphicEditorGraphic;
-        const graphicEditorObject: GraphicEditorObject = graphic === undefined ? { metadata: {}, data: [] } : graphic.toGraphicEditorObject();
+        const graphicEditorObject = graphic === undefined ? { metadata: {}, data: [] } : graphic.toGraphicEditorObject();
         this.metadata = graphicEditorObject.metadata;
-        return Utilities.toPrettyString(graphicEditorObject.data);
+
+        const fields = graphicEditorObject.data.reduce((o, field) => ({ ...o, [field.propertyName]: field.value }), {});
+        return Utilities.toPrettyString(fields);
     }
 
     set object(graphicEditorObject: string) {
         try {
-            const graphic: IGraphic = Utilities.parseGraphic({ ...this.metadata, ...JSON.parse(graphicEditorObject) });
+            const json = JSON.parse(graphicEditorObject);
+            const graphic = Utilities.parseGraphic({ ...this.metadata, ...json, origin: { x: json.x, y: json.y } });
             this.$store.commit('updateGraphic', { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id, graphic: graphic });
             this.$store.commit('focusGraphic', { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
         } catch (exception) {
@@ -93,6 +96,10 @@ export default class StyleEditor extends Vue {
     color: $color-dark;
     font-size: 14px;
     text-align: center;
+}
+
+#graphic-editor-views {
+    height: 100%;
 }
 
 #graphic-editor-json-view {

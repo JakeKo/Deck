@@ -14,6 +14,7 @@ function generateId(): string {
 }
 
 function parseGraphic(data: any): IGraphic {
+    console.log(data);
     if (data.type === 'rectangle') {
         data.origin = new Vector(data.origin.x, data.origin.y);
         return new Rectangle(data);

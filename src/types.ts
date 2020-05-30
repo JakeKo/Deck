@@ -229,6 +229,7 @@ export type Field = TextField | NumberField | ColorField;
 
 export type TextField = {
     displayName: string,
+    propertyName: string,
     inputType: 'text',
     maxLength?: number,
     minLength?: number,
@@ -237,6 +238,7 @@ export type TextField = {
 
 export type NumberField = {
     displayName: string,
+    propertyName: string,
     inputType: 'number',
     max?: number,
     min?: number,
@@ -246,6 +248,7 @@ export type NumberField = {
 
 export type ColorField = {
     displayName: string,
+    propertyName: string,
     inputType: 'color',
     value: string
 };
