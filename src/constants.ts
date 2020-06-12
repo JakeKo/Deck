@@ -14,3 +14,11 @@ export const EVENT_TYPES = {
     GRAPHIC_KEY_UP: 'Deck.GraphicKeyUp',
     GRAPHIC_KEY_DOWN: 'Deck.GraphicKeyDown',
 };
+
+export const GRAPHIC_ROLES = {
+    STANDARD: 'standard'
+};
+
+export const GRAPHIC_TYPES = {
+    RECTANGLE: 'rectangle'
+};
