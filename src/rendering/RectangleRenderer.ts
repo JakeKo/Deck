@@ -2,7 +2,7 @@ import * as SVG from 'svg.js';
 import Vector from '../models/Vector';
 import { GRAPHIC_TYPES, GRAPHIC_ROLES } from './constants';
 import AnchorRenderer from './AnchorRenderer';
-import { GraphicRenderer } from './types';
+import { GraphicRenderer, AnchorHandler } from './types';
 
 type RectangleRendererArgs = {
     role: string | undefined;
@@ -16,10 +16,22 @@ type RectangleRendererArgs = {
 };
 
 type RectangleAnchors = {
-    topLeft: AnchorRenderer,
-    topRight: AnchorRenderer,
-    bottomRight: AnchorRenderer,
-    bottomLeft: AnchorRenderer
+    'top-left': {
+        initializeHander: () => AnchorHandler,
+        renderer: AnchorRenderer
+    },
+    'top-right': {
+        initializeHander: () => AnchorHandler,
+        renderer: AnchorRenderer
+    },
+    'bottom-right': {
+        initializeHander: () => AnchorHandler,
+        renderer: AnchorRenderer
+    },
+    'bottom-left': {
+        initializeHander: () => AnchorHandler,
+        renderer: AnchorRenderer
+    },
 };
 
 const DEFAULT_ARGS = {
@@ -60,22 +72,34 @@ class RectangleRenderer implements GraphicRenderer {
 
         // TODO: Decide if anchors should be absolutely or relatively positioned
         this._anchors = {
-            topLeft: new AnchorRenderer({
-                parent: this,
-                center: this._origin
-            }),
-            topRight: new AnchorRenderer({
-                parent: this,
-                center: this._origin.add(new Vector(this._width, 0))
-            }),
-            bottomRight: new AnchorRenderer({
-                parent: this,
-                center: this._origin.add(new Vector(this._width, this._height))
-            }),
-            bottomLeft: new AnchorRenderer({
-                parent: this,
-                center: this._origin.add(new Vector(0, this._height))
-            })
+            'top-left': {
+                initializeHander: this._topLeftAnchorHandler,
+                renderer: new AnchorRenderer({
+                    parent: this,
+                    center: this._origin
+                })
+            },
+            'top-right': {
+                initializeHander: this._topRightAnchorHandler,
+                renderer: new AnchorRenderer({
+                    parent: this,
+                    center: this._origin.add(new Vector(this._width, 0))
+                })
+            },
+            'bottom-right': {
+                initializeHander: this._bottomRightAnchorHandler,
+                renderer: new AnchorRenderer({
+                    parent: this,
+                    center: this._origin.add(new Vector(this._width, this._height))
+                })
+            },
+            'bottom-left': {
+                initializeHander: this._bottomLeftAnchorHandler,
+                renderer: new AnchorRenderer({
+                    parent: this,
+                    center: this._origin.add(new Vector(0, this._height))
+                })
+            }
         };
     }
 
@@ -101,10 +125,10 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg !== undefined && this._svg.rotate(this._rotation);
 
         // Update anchors
-        this._anchors.topLeft.center = this._origin;
-        this._anchors.topRight.center = this._origin.add(new Vector(this._width, 0));
-        this._anchors.bottomRight.center = this._origin.add(new Vector(this._width, this._height));
-        this._anchors.bottomLeft.center = this._origin.add(new Vector(0, this._height));
+        this._anchors['top-left'].renderer.center = this._origin;
+        this._anchors['top-right'].renderer.center = this._origin.add(new Vector(this._width, 0));
+        this._anchors['bottom-right'].renderer.center = this._origin.add(new Vector(this._width, this._height));
+        this._anchors['bottom-left'].renderer.center = this._origin.add(new Vector(0, this._height));
     }
 
     public set width(width: number) {
@@ -115,8 +139,8 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg !== undefined && this._svg.width(this._width);
 
         // Update anchors
-        this._anchors.topRight.center = this._origin.add(new Vector(this._width, 0));
-        this._anchors.bottomRight.center = this._origin.add(new Vector(this._width, this._height));
+        this._anchors['top-right'].renderer.center = this._origin.add(new Vector(this._width, 0));
+        this._anchors['bottom-right'].renderer.center = this._origin.add(new Vector(this._width, this._height));
     }
 
     public set height(height: number) {
@@ -127,8 +151,8 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg !== undefined && this._svg.height(this._height);
 
         // Update anchors
-        this._anchors.bottomRight.center = this._origin.add(new Vector(this._width, this._height));
-        this._anchors.bottomLeft.center = this._origin.add(new Vector(0, this._height));
+        this._anchors['bottom-right'].renderer.center = this._origin.add(new Vector(this._width, this._height));
+        this._anchors['bottom-left'].renderer.center = this._origin.add(new Vector(0, this._height));
     }
 
     public set fillColor(fillColor: string) {
@@ -175,6 +199,52 @@ class RectangleRenderer implements GraphicRenderer {
         // Silently fail if the SVG was not rendered in the first place
         this._svg !== undefined && this._svg.remove();
         this._svg = undefined;
+    }
+
+    private _topLeftAnchorHandler(): AnchorHandler {
+        const opposingCorner = this._origin.add(new Vector(this._width, this._height));
+
+        return position => {
+            // If the position is beyond the corner opposite the original origin
+            if (position.x > opposingCorner.x && position.y > opposingCorner.y) {
+                this.origin = opposingCorner;
+                this.width = position.x - opposingCorner.x;
+                this.height = position.y - opposingCorner.y;
+            }
+
+            // If the position is beyond the width of the rectangle
+            else if (position.x > opposingCorner.x) {
+                this.origin = new Vector(opposingCorner.x, position.y);
+                this.width = position.x - opposingCorner.x;
+                this.height = opposingCorner.y - position.y;
+            }
+
+            // If the position is beyond the height of the rectangle
+            else if (position.y > opposingCorner.y) {
+                this.origin = new Vector(position.x, opposingCorner.y);
+                this.width = opposingCorner.x - position.x;
+                this.height = position.y - opposingCorner.y;
+            }
+
+            // If the position is within the original corner
+            else {
+                this.origin = position;
+                this.width = opposingCorner.x - position.x;
+                this.height = opposingCorner.y - position.y;
+            }
+        };
+    }
+
+    private _topRightAnchorHandler(): AnchorHandler {
+        return () => { };
+    }
+
+    private _bottomRightAnchorHandler(): AnchorHandler {
+        return () => { };
+    }
+
+    private _bottomLeftAnchorHandler(): AnchorHandler {
+        return () => { };
     }
 }
 

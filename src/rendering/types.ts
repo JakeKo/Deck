@@ -1,4 +1,5 @@
 import * as SVG from 'svg.js';
+import Vector from '../models/Vector';
 
 export type GraphicRenderer = {
     type: string;
@@ -7,3 +8,5 @@ export type GraphicRenderer = {
     render: (canvas: SVG.Doc) => void;
     unrender: () => void;
 };
+
+export type AnchorHandler = (position: Vector) => void;
