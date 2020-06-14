@@ -19,20 +19,20 @@ type RectangleRendererArgs = {
 
 type RectangleAnchors = {
     'top-left': {
-        initializeHander: () => AnchorHandler,
-        graphic: AnchorRenderer
+        initializeHander: () => AnchorHandler;
+        graphic: AnchorRenderer;
     },
     'top-right': {
-        initializeHander: () => AnchorHandler,
-        graphic: AnchorRenderer
+        initializeHander: () => AnchorHandler;
+        graphic: AnchorRenderer;
     },
     'bottom-right': {
-        initializeHander: () => AnchorHandler,
-        graphic: AnchorRenderer
+        initializeHander: () => AnchorHandler;
+        graphic: AnchorRenderer;
     },
     'bottom-left': {
-        initializeHander: () => AnchorHandler,
-        graphic: AnchorRenderer
+        initializeHander: () => AnchorHandler;
+        graphic: AnchorRenderer;
     },
 };
 
@@ -129,9 +129,9 @@ class RectangleRenderer implements GraphicRenderer {
         this._origin = origin;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.rotate(0);
-        this._svg !== undefined && this._svg.translate(this._origin.x, this._origin.y);
-        this._svg !== undefined && this._svg.rotate(this._rotation);
+        this._svg !== undefined && this._svg.rotate(0)
+            .translate(this._origin.x, this._origin.y)
+            .rotate(this._rotation);
 
         // Update anchors
         this._anchors['top-left'].graphic.center = this._origin;
@@ -197,6 +197,9 @@ class RectangleRenderer implements GraphicRenderer {
     }
 
     public render(): void {
+        // Silently fail if the SVG was already rendered
+        if (this.isRendered) return;
+
         this._svg = this._canvas.rect(this._width, this._height)
             .translate(this._origin.x, this._origin.y)
             .fill(this._fillColor)

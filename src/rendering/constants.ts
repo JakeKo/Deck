@@ -5,5 +5,6 @@ export const GRAPHIC_ROLES = {
 
 export const GRAPHIC_TYPES = {
     RECTANGLE: 'rectangle',
-    ELLIPSE: 'ellipse'
+    ELLIPSE: 'ellipse',
+    CURVE: 'curve'
 };
