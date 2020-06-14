@@ -7,6 +7,8 @@ export type GraphicRenderer = {
     isRendered: boolean;
     render: (canvas: SVG.Doc) => void;
     unrender: () => void;
+    showFocus: () => void;
+    hideFocus: () => void;
 };
 
 export type AnchorHandler = (position: Vector) => void;

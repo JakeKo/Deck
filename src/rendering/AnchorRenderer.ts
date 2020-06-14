@@ -1,7 +1,6 @@
 import * as SVG from 'svg.js';
 import Vector from '../models/Vector';
 import { GRAPHIC_TYPES, GRAPHIC_ROLES } from './constants';
-import { GraphicRenderer } from './types';
 
 type AnchorRendererArgs = {
     canvas: SVG.Doc;
@@ -12,7 +11,7 @@ const DEFAULT_ARGS = {
     center: Vector.zero
 };
 
-class AnchorRenderer implements GraphicRenderer {
+class AnchorRenderer {
     private _canvas: SVG.Doc;
     private _svg: SVG.Ellipse | undefined;
     private _type: string;

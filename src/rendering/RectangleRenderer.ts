@@ -210,12 +210,18 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg = undefined;
     }
 
-    public focus(): void {
-
+    public showFocus(): void {
+        this._anchors['top-left'].graphic.render();
+        this._anchors['top-right'].graphic.render();
+        this._anchors['bottom-right'].graphic.render();
+        this._anchors['bottom-left'].graphic.render();
     }
 
-    public unfocus(): void {
-
+    public hideFocus(): void {
+        this._anchors['top-left'].graphic.unrender();
+        this._anchors['top-right'].graphic.unrender();
+        this._anchors['bottom-right'].graphic.unrender();
+        this._anchors['bottom-left'].graphic.unrender();
     }
 
     // TODO: Determine if this is the best place for anchor handlers
