@@ -4,8 +4,8 @@ import { GRAPHIC_TYPES, GRAPHIC_ROLES } from './constants';
 import { GraphicRenderer } from './types';
 
 type AnchorRendererArgs = {
-    parent: GraphicRenderer;
-    center: Vector | undefined;
+    canvas: SVG.Doc;
+    center?: Vector;
 };
 
 const DEFAULT_ARGS = {
@@ -13,18 +13,18 @@ const DEFAULT_ARGS = {
 };
 
 class AnchorRenderer implements GraphicRenderer {
+    private _canvas: SVG.Doc;
     private _svg: SVG.Ellipse | undefined;
     private _type: string;
     private _role: string;
-    private _parent: GraphicRenderer;
     private _width: number;
     private _height: number;
     private _center: Vector;
 
     constructor(args: AnchorRendererArgs) {
+        this._canvas = args.canvas;
         this._type = GRAPHIC_TYPES.ELLIPSE;
         this._role = GRAPHIC_ROLES.ANCHOR;
-        this._parent = args.parent;
         this._center = args.center || DEFAULT_ARGS.center;
         this._width = 4;
         this._height = 4;
@@ -47,8 +47,8 @@ class AnchorRenderer implements GraphicRenderer {
         this._svg !== undefined && this._svg.translate(this._center.x - this._width / 2, this._center.y - this._height / 2);
     }
 
-    public render(canvas: SVG.Doc): void {
-        this._svg = canvas.ellipse(this._width, this._height)
+    public render(): void {
+        this._svg = this._canvas.ellipse(this._width, this._height)
             .translate(this._center.x - this._width / 2, this._center.y - this._height / 2)
             .fill('#FFFFFF')
             .stroke({ color: '#888888', width: 1 });

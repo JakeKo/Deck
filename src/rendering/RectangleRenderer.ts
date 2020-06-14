@@ -5,32 +5,34 @@ import AnchorRenderer from './AnchorRenderer';
 import { GraphicRenderer, AnchorHandler } from './types';
 
 type RectangleRendererArgs = {
-    role: string | undefined;
-    origin: Vector | undefined;
-    width: number | undefined;
-    height: number | undefined;
-    fillColor: string | undefined;
-    strokeColor: string | undefined;
-    strokeWidth: number | undefined;
-    rotation: number | undefined;
+    id: string;
+    canvas: SVG.Doc;
+    role?: string;
+    origin?: Vector;
+    width?: number;
+    height?: number;
+    fillColor?: string;
+    strokeColor?: string;
+    strokeWidth?: number;
+    rotation?: number;
 };
 
 type RectangleAnchors = {
     'top-left': {
         initializeHander: () => AnchorHandler,
-        renderer: AnchorRenderer
+        graphic: AnchorRenderer
     },
     'top-right': {
         initializeHander: () => AnchorHandler,
-        renderer: AnchorRenderer
+        graphic: AnchorRenderer
     },
     'bottom-right': {
         initializeHander: () => AnchorHandler,
-        renderer: AnchorRenderer
+        graphic: AnchorRenderer
     },
     'bottom-left': {
         initializeHander: () => AnchorHandler,
-        renderer: AnchorRenderer
+        graphic: AnchorRenderer
     },
 };
 
@@ -46,7 +48,8 @@ const DEFAULT_ARGS = {
 };
 
 class RectangleRenderer implements GraphicRenderer {
-    // TODO: Determine if SVG canvas should be passed in
+    private _id: string;
+    private _canvas: SVG.Doc;
     private _svg: SVG.Rect | undefined;
     private _type: string;
     private _role: string;
@@ -60,6 +63,8 @@ class RectangleRenderer implements GraphicRenderer {
     private _anchors: RectangleAnchors;
 
     constructor(args: RectangleRendererArgs) {
+        this._id = args.id;
+        this._canvas = args.canvas;
         this._type = GRAPHIC_TYPES.RECTANGLE;
         this._role = args.role || DEFAULT_ARGS.role;
         this._origin = args.origin || DEFAULT_ARGS.origin;
@@ -74,33 +79,37 @@ class RectangleRenderer implements GraphicRenderer {
         this._anchors = {
             'top-left': {
                 initializeHander: this._topLeftAnchorHandler,
-                renderer: new AnchorRenderer({
-                    parent: this,
+                graphic: new AnchorRenderer({
+                    canvas: this._canvas,
                     center: this._origin
                 })
             },
             'top-right': {
                 initializeHander: this._topRightAnchorHandler,
-                renderer: new AnchorRenderer({
-                    parent: this,
+                graphic: new AnchorRenderer({
+                    canvas: this._canvas,
                     center: this._origin.add(new Vector(this._width, 0))
                 })
             },
             'bottom-right': {
                 initializeHander: this._bottomRightAnchorHandler,
-                renderer: new AnchorRenderer({
-                    parent: this,
+                graphic: new AnchorRenderer({
+                    canvas: this._canvas,
                     center: this._origin.add(new Vector(this._width, this._height))
                 })
             },
             'bottom-left': {
                 initializeHander: this._bottomLeftAnchorHandler,
-                renderer: new AnchorRenderer({
-                    parent: this,
+                graphic: new AnchorRenderer({
+                    canvas: this._canvas,
                     center: this._origin.add(new Vector(0, this._height))
                 })
             }
         };
+    }
+
+    public get id(): string {
+        return this._id;
     }
 
     public get type(): string {
@@ -125,10 +134,10 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg !== undefined && this._svg.rotate(this._rotation);
 
         // Update anchors
-        this._anchors['top-left'].renderer.center = this._origin;
-        this._anchors['top-right'].renderer.center = this._origin.add(new Vector(this._width, 0));
-        this._anchors['bottom-right'].renderer.center = this._origin.add(new Vector(this._width, this._height));
-        this._anchors['bottom-left'].renderer.center = this._origin.add(new Vector(0, this._height));
+        this._anchors['top-left'].graphic.center = this._origin;
+        this._anchors['top-right'].graphic.center = this._origin.add(new Vector(this._width, 0));
+        this._anchors['bottom-right'].graphic.center = this._origin.add(new Vector(this._width, this._height));
+        this._anchors['bottom-left'].graphic.center = this._origin.add(new Vector(0, this._height));
     }
 
     public set width(width: number) {
@@ -139,8 +148,8 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg !== undefined && this._svg.width(this._width);
 
         // Update anchors
-        this._anchors['top-right'].renderer.center = this._origin.add(new Vector(this._width, 0));
-        this._anchors['bottom-right'].renderer.center = this._origin.add(new Vector(this._width, this._height));
+        this._anchors['top-right'].graphic.center = this._origin.add(new Vector(this._width, 0));
+        this._anchors['bottom-right'].graphic.center = this._origin.add(new Vector(this._width, this._height));
     }
 
     public set height(height: number) {
@@ -151,8 +160,8 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg !== undefined && this._svg.height(this._height);
 
         // Update anchors
-        this._anchors['bottom-right'].renderer.center = this._origin.add(new Vector(this._width, this._height));
-        this._anchors['bottom-left'].renderer.center = this._origin.add(new Vector(0, this._height));
+        this._anchors['bottom-right'].graphic.center = this._origin.add(new Vector(this._width, this._height));
+        this._anchors['bottom-left'].graphic.center = this._origin.add(new Vector(0, this._height));
     }
 
     public set fillColor(fillColor: string) {
@@ -187,8 +196,8 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg !== undefined && this._svg.rotate(this._rotation);
     }
 
-    public render(canvas: SVG.Doc): void {
-        this._svg = canvas.rect(this._width, this._height)
+    public render(): void {
+        this._svg = this._canvas.rect(this._width, this._height)
             .translate(this._origin.x, this._origin.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
@@ -201,6 +210,15 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg = undefined;
     }
 
+    public focus(): void {
+
+    }
+
+    public unfocus(): void {
+
+    }
+
+    // TODO: Determine if this is the best place for anchor handlers
     private _topLeftAnchorHandler(): AnchorHandler {
         const opposingCorner = this._origin.add(new Vector(this._width, this._height));
 
@@ -235,6 +253,7 @@ class RectangleRenderer implements GraphicRenderer {
         };
     }
 
+    // TODO: Complete anchor handlers
     private _topRightAnchorHandler(): AnchorHandler {
         return () => { };
     }
