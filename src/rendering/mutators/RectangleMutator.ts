@@ -1,26 +1,26 @@
-import SlideRenderer from "../SlideRenderer";
 import RectangleRenderer from "../graphics/RectangleRenderer";
+import SlideRenderer from "../SlideRenderer";
+import VertexRenderer from '../helpers/VertexRenderer';
 import Vector from "../../models/Vector";
-import VertexRenderer from "../helpers/VertexRenderer";
 
-type RectangleMakerArgs = {
+type RectangleMutatorArgs = {
     rectangle: RectangleRenderer;
     slide: SlideRenderer;
-};
+}
 
-type RectangleMakerHelpers = {
+type RectangleMutatorHelpers = {
     topLeft: VertexRenderer,
     topRight: VertexRenderer,
     bottomLeft: VertexRenderer,
     bottomRight: VertexRenderer
 };
 
-class RectangleMaker {
+class RectangleMutator {
     private _rectangle: RectangleRenderer;
     private _slide: SlideRenderer;
-    private _helpers: RectangleMakerHelpers;
+    private _helpers: RectangleMutatorHelpers;
 
-    constructor(args: RectangleMakerArgs) {
+    constructor(args: RectangleMutatorArgs) {
         this._rectangle = args.rectangle;
         this._slide = args.slide;
 
@@ -73,6 +73,8 @@ class RectangleMaker {
         this._helpers.bottomRight.center = this._rectangle.origin.add(new Vector(this._rectangle.width, this._rectangle.height));
     }
 
+    // TODO: Include methods for other mutations
+
     public complete(): void {
         // Remove helper graphics
         this._helpers.topLeft.unrender();
@@ -82,4 +84,4 @@ class RectangleMaker {
     }
 }
 
-export default RectangleMaker;
+export default RectangleMutator;
