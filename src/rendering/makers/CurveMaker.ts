@@ -25,22 +25,37 @@ class CurveMaker {
         this._curve.move(origin);
 
         // Update helper graphics
+        const anchors = this._curve.getAnchors();
+        this._helpers.forEach((helper, index) => {
+            helper.setInHandle(anchors[index].inHandle);
+            helper.setPoint(anchors[index].point);
+            helper.setOutHandle(anchors[index].outHandle);
+        });
     }
 
     public addAnchor(anchor: CurveAnchor): number {
         // Update rendering
+        const anchorIndex = this._curve.addAnchor(anchor);
 
         // Update helper graphics
+        this._helpers.push(new CurveAnchorRenderer({ canvas: this._slide.canvas, ...anchor }));
+        this._helpers[anchorIndex].render();
+
+        return anchorIndex;
     }
 
     public setAnchor(index: number, anchor: CurveAnchor): void {
         // Update rendering
+        this.setAnchor(index, anchor);
 
         // Update helper graphics
+        this._helpers[index].setInHandle(anchor.inHandle);
+        this._helpers[index].setPoint(anchor.point);
+        this._helpers[index].setOutHandle(anchor.outHandle);
     }
 
     public complete(): void {
-
+        this._helpers.forEach(helper => helper.unrender());
     }
 }
 

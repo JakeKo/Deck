@@ -75,7 +75,13 @@ class CurveRenderer implements GraphicRenderer {
         this._anchors[index] = anchor;
         this._svg?.plot(this._formattedPoints);
     }
+
+    public getAnchors(): CurveAnchor[] {
+        return this._anchors;
+    }
     
+    // TODO: Convert setters to functions
+    // TODO: Create getter functions
     public set fillColor(fillColor: string) {
         this._fillColor = fillColor;
         this._svg?.fill(this._fillColor);

@@ -63,6 +63,8 @@ class RectangleRenderer implements GraphicRenderer {
         return this._svg !== undefined;
     }
 
+    // TODO: Convert setters to functions
+    // TODO: Create getter functions
     public set origin(origin: Vector) {
         this._origin = origin;
         this._svg?.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
