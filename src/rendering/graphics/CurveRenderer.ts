@@ -54,42 +54,45 @@ class CurveRenderer implements GraphicRenderer {
     public get isRendered(): boolean {
         return this._svg !== undefined;
     }
+
+    public move(origin: Vector): void {
+        const changeInPosition = this._anchors[0].point.towards(origin);
+        this._anchors = this._anchors.map(anchor => ({
+            inHandle: anchor.inHandle?.add(changeInPosition),
+            point: anchor.point.add(changeInPosition),
+            outHandle: anchor.outHandle?.add(changeInPosition)
+        }));
+        this._svg?.plot(this._formattedPoints);
+    }
+
+    public addAnchor(anchor: CurveAnchor): number {
+        this._anchors.push(anchor);
+        this._svg?.plot(this._formattedPoints);
+        return this._anchors.length - 1;
+    }
+
+    public setAnchor(index: number, anchor: CurveAnchor): void {
+        this._anchors[index] = anchor;
+        this._svg?.plot(this._formattedPoints);
+    }
     
     public set fillColor(fillColor: string) {
-        // Update property
         this._fillColor = fillColor;
-
-        // Update SVG if it exists
         this._svg?.fill(this._fillColor);
     }
     
     public set strokeColor(strokeColor: string) {
-        // Update property
         this._strokeColor = strokeColor;
-
-        // Update SVG if it exists
-        this._svg?.stroke({
-            color: this._strokeColor,
-            width: this._strokeWidth
-        });
+        this._svg?.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
     
     public set strokeWidth(strokeWidth: number) {
-        // Update property
         this._strokeWidth = strokeWidth;
-
-        // Update SVG if it exists
-        this._svg?.stroke({
-            color: this._strokeColor,
-            width: this._strokeWidth
-        });
+        this._svg?.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
     
     public set rotation(rotation: number) {
-        // Update property
         this._rotation = rotation;
-
-        // Update SVG if it exists
         this._svg?.rotate(this._rotation);
     }
     
@@ -108,37 +111,6 @@ class CurveRenderer implements GraphicRenderer {
     public unrender(): void {
         this._svg?.remove();
         this._svg = undefined;
-    }
-
-    public move(origin: Vector) {
-        // Update property
-        const changeInPosition = this._anchors[0].point.towards(origin);
-        this._anchors = this._anchors.map(anchor => ({
-            inHandle: anchor.inHandle?.add(changeInPosition),
-            point: anchor.point.add(changeInPosition),
-            outHandle: anchor.outHandle?.add(changeInPosition)
-        }));
-
-        // Update SVG if it exists
-        this._svg?.plot(this._formattedPoints);
-    }
-
-    public addAnchor(anchor: CurveAnchor): number {
-        // Update property
-        this._anchors.push(anchor);
-
-        // Update SVG if it exists
-        this._svg?.plot(this._formattedPoints);
-
-        return this._anchors.length - 1;
-    }
-
-    public setAnchor(index: number, anchor: CurveAnchor): void {
-        // Update property
-        this._anchors[index] = anchor;
-
-        // Update SVG if it exists
-        this._svg?.plot(this._formattedPoints);
     }
 
     // Reformat points from an array of objects to the bezier curve string

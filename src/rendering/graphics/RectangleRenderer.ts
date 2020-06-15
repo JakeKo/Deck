@@ -64,66 +64,37 @@ class RectangleRenderer implements GraphicRenderer {
     }
 
     public set origin(origin: Vector) {
-        // Update property
         this._origin = origin;
-
-        // Update SVG if it exists
-        this._svg?.rotate(0)
-            .translate(this._origin.x, this._origin.y)
-            .rotate(this._rotation);
+        this._svg?.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
     }
 
     public set width(width: number) {
-        // Update property
         this._width = width;
-
-        // Update SVG if it exists
         this._svg?.width(this._width);
     }
 
     public set height(height: number) {
-        // Update property
         this._height = height;
-
-        // Update SVG if it exists
         this._svg?.height(this._height);
     }
 
     public set fillColor(fillColor: string) {
-        // Update property
         this._fillColor = fillColor;
-
-        // Update SVG if it exists
         this._svg?.fill(this._fillColor);
     }
 
     public set strokeColor(strokeColor: string) {
-        // Update property
         this._strokeColor = strokeColor;
-
-        // Update SVG if it exists
-        this._svg?.stroke({
-            color: this._strokeColor,
-            width: this._strokeWidth
-        });
+        this._svg?.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
     public set strokeWidth(strokeWidth: number) {
-        // Update property
         this._strokeWidth = strokeWidth;
-
-        // Update SVG if it exists
-        this._svg?.stroke({
-            color: this._strokeColor,
-            width: this._strokeWidth
-        });
+        this._svg?.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
     public set rotation(rotation: number) {
-        // Update property
         this._rotation = rotation;
-
-        // Update SVG if it exists
         this._svg?.rotate(this._rotation);
     }
 
