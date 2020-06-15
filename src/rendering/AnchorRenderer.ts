@@ -44,10 +44,15 @@ class AnchorRenderer {
 
     public set center(center: Vector) {
         this._center = center;
-        this._svg !== undefined && this._svg.translate(this._center.x - this._width / 2, this._center.y - this._height / 2);
+        this._svg?.translate(this._center.x - this._width / 2, this._center.y - this._height / 2);
     }
 
     public render(): void {
+        // Silently fail if the SVG is already rendered
+        if (this.isRendered) {
+            return;
+        }
+
         this._svg = this._canvas.ellipse(this._width, this._height)
             .translate(this._center.x - this._width / 2, this._center.y - this._height / 2)
             .fill('#FFFFFF')
@@ -55,8 +60,7 @@ class AnchorRenderer {
     }
 
     public unrender(): void {
-        // Silently fail if the SVG was not rendered in the first place
-        this._svg !== undefined && this._svg.remove();
+        this._svg?.remove();
         this._svg = undefined;
     }
 }

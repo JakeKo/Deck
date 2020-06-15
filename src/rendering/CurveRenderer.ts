@@ -68,7 +68,6 @@ class CurveRenderer implements GraphicRenderer {
         this._strokeColor = args.strokeColor || DEFAULT_ARGS.strokeColor;
         this._strokeWidth = args.strokeWidth || DEFAULT_ARGS.strokeWidth;
         this._rotation = args.rotation || DEFAULT_ARGS.rotation;
-        
         this._anchors = this._segments.map(this.createSegmentAnchor);
     }
 
@@ -93,7 +92,7 @@ class CurveRenderer implements GraphicRenderer {
         this._fillColor = fillColor;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.fill(this._fillColor);
+        this._svg?.fill(this._fillColor);
     }
     
     public set strokeColor(strokeColor: string) {
@@ -101,7 +100,10 @@ class CurveRenderer implements GraphicRenderer {
         this._strokeColor = strokeColor;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        this._svg?.stroke({
+            color: this._strokeColor,
+            width: this._strokeWidth
+        });
     }
     
     public set strokeWidth(strokeWidth: number) {
@@ -109,7 +111,10 @@ class CurveRenderer implements GraphicRenderer {
         this._strokeWidth = strokeWidth;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        this._svg?.stroke({
+            color: this._strokeColor,
+            width: this._strokeWidth
+        });
     }
     
     public set rotation(rotation: number) {
@@ -117,12 +122,14 @@ class CurveRenderer implements GraphicRenderer {
         this._rotation = rotation;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.rotate(this._rotation);
+        this._svg?.rotate(this._rotation);
     }
     
     public render(): void {
-        // Silently fail if the SVG was already rendered
-        if (this.isRendered) return;
+        // Silently fail if the SVG is already rendered
+        if (this.isRendered) {
+            return;
+        }
 
         this._svg = this._canvas.path(this._formattedPoints)
             .fill(this._fillColor)
@@ -131,24 +138,23 @@ class CurveRenderer implements GraphicRenderer {
     }
 
     public unrender(): void {
-        // Silently fail if the SVG was not rendered in the first place
-        this._svg !== undefined && this._svg.remove();
+        this._svg?.remove();
         this._svg = undefined;
     }
 
     public showFocus(): void {
         this._anchors.forEach(anchor => {
-            anchor.inHandle !== undefined && anchor.inHandle.graphic.render();
+            anchor.inHandle?.graphic.render();
             anchor.point.graphic.render();
-            anchor.outHandle !== undefined && anchor.outHandle.graphic.render();
+            anchor.outHandle?.graphic.render();
         });
     }
 
     public hideFocus(): void {
         this._anchors.forEach(anchor => {
-            anchor.inHandle !== undefined && anchor.inHandle.graphic.unrender();
+            anchor.inHandle?.graphic.unrender();
             anchor.point.graphic.unrender();
-            anchor.outHandle !== undefined && anchor.outHandle.graphic.unrender();
+            anchor.outHandle?.graphic.unrender();
         });
     }
 
@@ -160,7 +166,8 @@ class CurveRenderer implements GraphicRenderer {
             outHandle: segment.outHandle?.add(changeInPosition)
         }));
 
-        this._svg !== undefined && this._svg.plot(this._formattedPoints);
+        // Update SVG if it exists
+        this._svg?.plot(this._formattedPoints);
     }
 
     public addSegment(segment: CurveSegment): number {

@@ -130,7 +130,7 @@ class RectangleRenderer implements GraphicRenderer {
         this._origin = origin;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.rotate(0)
+        this._svg?.rotate(0)
             .translate(this._origin.x, this._origin.y)
             .rotate(this._rotation);
 
@@ -146,7 +146,7 @@ class RectangleRenderer implements GraphicRenderer {
         this._width = width;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.width(this._width);
+        this._svg?.width(this._width);
 
         // Update anchors
         this._anchors['top-right'].graphic.center = this._origin.add(new Vector(this._width, 0));
@@ -158,7 +158,7 @@ class RectangleRenderer implements GraphicRenderer {
         this._height = height;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.height(this._height);
+        this._svg?.height(this._height);
 
         // Update anchors
         this._anchors['bottom-right'].graphic.center = this._origin.add(new Vector(this._width, this._height));
@@ -170,7 +170,7 @@ class RectangleRenderer implements GraphicRenderer {
         this._fillColor = fillColor;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.fill(this._fillColor);
+        this._svg?.fill(this._fillColor);
     }
 
     public set strokeColor(strokeColor: string) {
@@ -178,7 +178,10 @@ class RectangleRenderer implements GraphicRenderer {
         this._strokeColor = strokeColor;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        this._svg?.stroke({
+            color: this._strokeColor,
+            width: this._strokeWidth
+        });
     }
 
     public set strokeWidth(strokeWidth: number) {
@@ -186,7 +189,10 @@ class RectangleRenderer implements GraphicRenderer {
         this._strokeWidth = strokeWidth;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        this._svg?.stroke({
+            color: this._strokeColor,
+            width: this._strokeWidth
+        });
     }
 
     public set rotation(rotation: number) {
@@ -194,12 +200,14 @@ class RectangleRenderer implements GraphicRenderer {
         this._rotation = rotation;
 
         // Update SVG if it exists
-        this._svg !== undefined && this._svg.rotate(this._rotation);
+        this._svg?.rotate(this._rotation);
     }
 
     public render(): void {
-        // Silently fail if the SVG was already rendered
-        if (this.isRendered) return;
+        // Silently fail if the SVG is already rendered
+        if (this.isRendered) {
+            return;
+        }
 
         this._svg = this._canvas.rect(this._width, this._height)
             .translate(this._origin.x, this._origin.y)
@@ -209,8 +217,7 @@ class RectangleRenderer implements GraphicRenderer {
     }
 
     public unrender(): void {
-        // Silently fail if the SVG was not rendered in the first place
-        this._svg !== undefined && this._svg.remove();
+        this._svg?.remove();
         this._svg = undefined;
     }
 
