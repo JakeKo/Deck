@@ -76,6 +76,7 @@ class RectangleRenderer implements GraphicRenderer {
         this._rotation = args.rotation || DEFAULT_ARGS.rotation;
 
         // TODO: Decide if anchors should be absolutely or relatively positioned
+        // TODO: Do away with string indices
         this._anchors = {
             'top-left': {
                 initializeHander: this._topLeftAnchorHandler,

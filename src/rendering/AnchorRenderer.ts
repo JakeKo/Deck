@@ -11,6 +11,7 @@ const DEFAULT_ARGS = {
     center: Vector.zero
 };
 
+// Figure out how to make anchors zoom-insensitive
 class AnchorRenderer {
     private _canvas: SVG.Doc;
     private _svg: SVG.Ellipse | undefined;
