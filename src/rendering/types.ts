@@ -12,3 +12,9 @@ export type GraphicRenderer = {
 };
 
 export type AnchorHandler = (position: Vector) => void;
+
+export type CurveAnchor = {
+    inHandle: Vector | undefined;
+    point: Vector;
+    outHandle: Vector | undefined;
+};
