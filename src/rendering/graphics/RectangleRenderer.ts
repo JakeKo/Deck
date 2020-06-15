@@ -1,12 +1,11 @@
 import * as SVG from 'svg.js';
 import Vector from '../../models/Vector';
-import { GRAPHIC_TYPES, GRAPHIC_ROLES } from '../constants';
+import { GRAPHIC_TYPES } from '../constants';
 import { GraphicRenderer } from '../types';
 
 type RectangleRendererArgs = {
     id: string;
     canvas: SVG.Doc;
-    role?: string;
     origin?: Vector;
     width?: number;
     height?: number;
@@ -17,7 +16,6 @@ type RectangleRendererArgs = {
 };
 
 const DEFAULT_ARGS = {
-    role: GRAPHIC_ROLES.STANDARD,
     origin: Vector.zero,
     width: 0,
     height: 0,
@@ -32,7 +30,6 @@ class RectangleRenderer implements GraphicRenderer {
     private _canvas: SVG.Doc;
     private _svg: SVG.Rect | undefined;
     private _type: string;
-    private _role: string;
     private _origin: Vector;
     private _width: number;
     private _height: number;
@@ -45,7 +42,6 @@ class RectangleRenderer implements GraphicRenderer {
         this._id = args.id;
         this._canvas = args.canvas;
         this._type = GRAPHIC_TYPES.RECTANGLE;
-        this._role = args.role || DEFAULT_ARGS.role;
         this._origin = args.origin || DEFAULT_ARGS.origin;
         this._width = args.width || DEFAULT_ARGS.width;
         this._height = args.height || DEFAULT_ARGS.height;
@@ -61,10 +57,6 @@ class RectangleRenderer implements GraphicRenderer {
 
     public get type(): string {
         return this._type;
-    }
-
-    public get role(): string {
-        return this._role;
     }
 
     public get isRendered(): boolean {
@@ -151,13 +143,6 @@ class RectangleRenderer implements GraphicRenderer {
     public unrender(): void {
         this._svg?.remove();
         this._svg = undefined;
-    }
-
-    public showFocus(): void {
-    }
-
-    public hideFocus(): void {
-        
     }
 }
 

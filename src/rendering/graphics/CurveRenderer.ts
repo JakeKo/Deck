@@ -1,12 +1,11 @@
 import * as SVG from 'svg.js';
 import { GraphicRenderer, CurveAnchor } from "../types";
 import Vector from '../../models/Vector';
-import { GRAPHIC_TYPES, GRAPHIC_ROLES } from '../constants';
+import { GRAPHIC_TYPES } from '../constants';
 
 type CurveRendererArgs = {
     id: string;
     canvas: SVG.Doc;
-    role?: string;
     anchors: CurveAnchor[];
     fillColor: string;
     strokeColor: string;
@@ -15,7 +14,6 @@ type CurveRendererArgs = {
 };
 
 const DEFAULT_ARGS = {
-    role: GRAPHIC_ROLES.STANDARD,
     anchors: [],
     fillColor: '#FFFFFF',
     strokeColor: '#000000',
@@ -27,9 +25,7 @@ class CurveRenderer implements GraphicRenderer {
     private _id: string;
     private _canvas: SVG.Doc;
     private _svg: SVG.Path | undefined;
-    private _isFocused: boolean;
     private _type: string;
-    private _role: string;
     private _anchors: CurveAnchor[];
     private _fillColor: string;
     private _strokeColor: string;
@@ -39,9 +35,7 @@ class CurveRenderer implements GraphicRenderer {
     constructor(args: CurveRendererArgs) {
         this._id = args.id;
         this._canvas = args.canvas;
-        this._isFocused = false;
         this._type = GRAPHIC_TYPES.CURVE;
-        this._role = args.role || DEFAULT_ARGS.role;
         this._anchors = args.anchors || DEFAULT_ARGS.anchors;
         this._fillColor = args.fillColor || DEFAULT_ARGS.fillColor;
         this._strokeColor = args.strokeColor || DEFAULT_ARGS.strokeColor;
@@ -57,16 +51,8 @@ class CurveRenderer implements GraphicRenderer {
         return this._type;
     }
     
-    public get role(): string {
-        return this._role;
-    }
-    
     public get isRendered(): boolean {
         return this._svg !== undefined;
-    }
-
-    public get isFocused(): boolean {
-        return this._isFocused;
     }
     
     public set fillColor(fillColor: string) {
@@ -122,14 +108,6 @@ class CurveRenderer implements GraphicRenderer {
     public unrender(): void {
         this._svg?.remove();
         this._svg = undefined;
-    }
-
-    public showFocus(): void {
-        
-    }
-
-    public hideFocus(): void {
-        
     }
 
     public move(origin: Vector) {
