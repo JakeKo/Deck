@@ -1,8 +1,8 @@
 import * as SVG from 'svg.js';
-import Vector from '../models/Vector';
-import { GRAPHIC_TYPES, GRAPHIC_ROLES } from './constants';
-import AnchorRenderer from './AnchorRenderer';
-import { GraphicRenderer, AnchorHandler } from './types';
+import Vector from '../../models/Vector';
+import { GRAPHIC_TYPES, GRAPHIC_ROLES } from '../constants';
+import AnchorRenderer from '../helpers/AnchorRenderer';
+import { GraphicRenderer, AnchorHandler } from '../types';
 
 type RectangleRendererArgs = {
     id: string;

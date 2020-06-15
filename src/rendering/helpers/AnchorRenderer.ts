@@ -1,6 +1,6 @@
 import * as SVG from 'svg.js';
-import Vector from '../models/Vector';
-import { GRAPHIC_TYPES, GRAPHIC_ROLES } from './constants';
+import Vector from '../../models/Vector';
+import { GRAPHIC_TYPES, GRAPHIC_ROLES } from '../constants';
 
 type AnchorRendererArgs = {
     canvas: SVG.Doc;
@@ -11,7 +11,8 @@ const DEFAULT_ARGS = {
     center: Vector.zero
 };
 
-// Figure out how to make anchors zoom-insensitive
+// TODO: Figure out how to make anchors zoom-insensitive
+// TODO: Implement other anchor handlers for more niche functionality
 class AnchorRenderer {
     private _canvas: SVG.Doc;
     private _svg: SVG.Ellipse | undefined;

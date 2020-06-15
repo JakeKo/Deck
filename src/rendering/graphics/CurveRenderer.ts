@@ -1,8 +1,8 @@
 import * as SVG from 'svg.js';
-import { GraphicRenderer, AnchorHandler } from "./types";
-import Vector from '../models/Vector';
-import AnchorRenderer from './AnchorRenderer';
-import { GRAPHIC_TYPES, GRAPHIC_ROLES } from './constants';
+import { GraphicRenderer, AnchorHandler } from "../types";
+import Vector from '../../models/Vector';
+import AnchorRenderer from '../helpers/AnchorRenderer';
+import { GRAPHIC_TYPES, GRAPHIC_ROLES } from '../constants';
 
 type CurveRendererArgs = {
     id: string;

@@ -1,6 +1,6 @@
 import * as SVG from 'svg.js';
 import { GraphicRenderer } from './types';
-import RectangleRenderer from './RectangleRenderer';
+import RectangleRenderer from './graphics/RectangleRenderer';
 
 type SlideRendererArgs = {
     canvas: SVG.Doc | undefined;
