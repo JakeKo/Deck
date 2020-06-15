@@ -6,11 +6,11 @@ import { GRAPHIC_TYPES } from '../constants';
 type CurveRendererArgs = {
     id: string;
     canvas: SVG.Doc;
-    anchors: CurveAnchor[];
-    fillColor: string;
-    strokeColor: string;
-    strokeWidth: number;
-    rotation: number;
+    anchors?: CurveAnchor[];
+    fillColor?: string;
+    strokeColor?: string;
+    strokeWidth?: number;
+    rotation?: number;
 };
 
 const DEFAULT_ARGS = {

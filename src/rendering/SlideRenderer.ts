@@ -1,6 +1,11 @@
 import * as SVG from 'svg.js';
 import { GraphicRenderer } from './types';
 import RectangleRenderer from './graphics/RectangleRenderer';
+import RectangleMaker from './makers/RectangleMaker';
+import RectangleMutator from './mutators/RectangleMutator';
+import CurveMaker from './makers/CurveMaker';
+import CurveRenderer from './graphics/CurveRenderer';
+import CurveMutator from './mutators/CurveMutator';
 
 type SlideRendererArgs = {
     canvas: SVG.Doc;
@@ -24,21 +29,28 @@ class SlideRenderer {
     }
 
     // TODO: Implement ID provider
-    // TODO: Implement error handling for if canvas is not defined (better define if graphics should render on creation)
-    public createRectangle(): string {
+    public startMakingRectangle(): RectangleMaker {
         const id = Math.random().toString();
-        this._graphics[id] = new RectangleRenderer({ id, canvas: this._canvas! });
-        this._canvas !== undefined && this._graphics[id].render(this._canvas);
+        this._graphics[id] = new RectangleRenderer({ id, canvas: this._canvas });
+        this._graphics[id].render();
 
-        return id;
+        return new RectangleMaker({ rectangle: this._graphics[id] as RectangleRenderer, slide: this });
     }
 
-    public focusGraphic(id: string): void {
-        this._graphics[id].showFocus();
+    public startMutatingRectangle(id: string): RectangleMutator {
+        return new RectangleMutator({ rectangle: this._graphics[id] as RectangleRenderer, slide: this });
     }
 
-    public unfocusGraphic(id: string): void {
-        this._graphics[id].hideFocus();
+    public startMakingCurve(): CurveMaker {
+        const id = Math.random().toString();
+        this._graphics[id] = new CurveRenderer({ id, canvas: this._canvas });
+        this._graphics[id].render();
+
+        return new CurveMaker({ curve: this._graphics[id] as CurveRenderer, slide: this });
+    }
+
+    public startMutatingCurve(id: string): CurveMutator {
+        return new CurveMutator({ curve: this._graphics[id] as CurveRenderer, slide: this });
     }
 }
 
