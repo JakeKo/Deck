@@ -49,6 +49,7 @@ class CurveRenderer implements GraphicRenderer {
     private _id: string;
     private _canvas: SVG.Doc;
     private _svg: SVG.Path | undefined;
+    private _isFocused: boolean;
     private _type: string;
     private _role: string;
     private _segments: CurveSegment[];
@@ -61,6 +62,7 @@ class CurveRenderer implements GraphicRenderer {
     constructor(args: CurveRendererArgs) {
         this._id = args.id;
         this._canvas = args.canvas;
+        this._isFocused = false;
         this._type = GRAPHIC_TYPES.CURVE;
         this._role = args.role || DEFAULT_ARGS.role;
         this._segments = args.segments || DEFAULT_ARGS.segments;
@@ -85,6 +87,10 @@ class CurveRenderer implements GraphicRenderer {
     
     public get isRendered(): boolean {
         return this._svg !== undefined;
+    }
+
+    public get isFocused(): boolean {
+        return this._isFocused;
     }
     
     public set fillColor(fillColor: string) {
@@ -143,6 +149,7 @@ class CurveRenderer implements GraphicRenderer {
     }
 
     public showFocus(): void {
+        this._isFocused = true;
         this._anchors.forEach(anchor => {
             anchor.inHandle?.graphic.render();
             anchor.point.graphic.render();
@@ -151,6 +158,7 @@ class CurveRenderer implements GraphicRenderer {
     }
 
     public hideFocus(): void {
+        this._isFocused = false;
         this._anchors.forEach(anchor => {
             anchor.inHandle?.graphic.unrender();
             anchor.point.graphic.unrender();
@@ -160,60 +168,36 @@ class CurveRenderer implements GraphicRenderer {
 
     public moveCurve(origin: Vector) {
         const changeInPosition = this._segments[0].point.towards(origin);
-        this._segments = this._segments.map(segment => ({
-            inHandle: segment.inHandle?.add(changeInPosition),
-            point: segment.point.add(changeInPosition),
-            outHandle: segment.outHandle?.add(changeInPosition)
-        }));
-
-        // Update SVG if it exists
-        this._svg?.plot(this._formattedPoints);
+        this._segments.forEach((segment, index) => {
+            this.setSegment(index, {
+                inHandle: segment.inHandle?.add(changeInPosition),
+                point: segment.point.add(changeInPosition),
+                outHandle: segment.outHandle?.add(changeInPosition)
+            });
+        });
     }
 
     public addSegment(segment: CurveSegment): number {
+        // Update properties
         this._segments.push(segment);
         this._anchors.push(this.createSegmentAnchor(segment));
+
+        // Update SVG if it exists
+        this._svg?.plot(this._formattedPoints);
+        if (this.isFocused) {
+            this._anchors[this._anchors.length - 1].inHandle?.graphic.render;
+            this._anchors[this._anchors.length - 1].point.graphic.render;
+            this._anchors[this._anchors.length - 1].outHandle?.graphic.render;
+        }
 
         return this._segments.length - 1;
     }
 
-    // TODO: Make this better
     public setSegment(index: number, segment: CurveSegment): void {
         this._segments[index] = segment;
+        this.setSegmentAnchor(index, segment);
 
-        const anchor = this._anchors[index];
-        if (segment.inHandle === undefined) {
-            // Unrender the inHandle graphic (if it existed)
-            anchor.inHandle?.graphic.unrender();
-            anchor.inHandle = undefined;
-        } else {
-            if (anchor.inHandle === undefined) {
-                anchor.inHandle = {
-                    initializeHandler: () => () => { },
-                    graphic: new AnchorRenderer({ canvas: this._canvas, center: segment.inHandle })
-                };
-            } else {
-                anchor.inHandle.graphic.center = segment.inHandle;
-            }
-        }
-
-        // point was defined, point is defined
-        this._anchors[index].point.graphic.center = segment.point;
-
-        if (segment.outHandle === undefined) {
-            // Unrender the outHandle graphic (if it existed)
-            anchor.outHandle?.graphic.unrender();
-            anchor.outHandle = undefined;
-        } else {
-            if (anchor.outHandle === undefined) {
-                anchor.outHandle = {
-                    initializeHandler: () => () => { },
-                    graphic: new AnchorRenderer({ canvas: this._canvas, center: segment.outHandle })
-                };
-            } else {
-                anchor.outHandle.graphic.center = segment.outHandle;
-            }
-        }
+        this._svg?.plot(this._formattedPoints);
     }
 
     // Reformat points from an array of objects to the bezier curve string
@@ -238,7 +222,49 @@ class CurveRenderer implements GraphicRenderer {
                 graphic: new AnchorRenderer({ canvas: this._canvas, center: segment.outHandle })
             }
         };
-    } 
+    }
+    
+    // TODO: Make this better
+    private setSegmentAnchor(index: number, segment: CurveSegment): void {
+        const anchor = this._anchors[index];
+        if (segment.inHandle === undefined) {
+            // Unrender the inHandle graphic (if it existed)
+            anchor.inHandle?.graphic.unrender();
+            anchor.inHandle = undefined;
+        } else {
+            if (anchor.inHandle === undefined) {
+                anchor.inHandle = {
+                    initializeHandler: () => () => { },
+                    graphic: new AnchorRenderer({ canvas: this._canvas, center: segment.inHandle })
+                };
+            } else {
+                anchor.inHandle.graphic.center = segment.inHandle;
+            }
+        }
+
+        anchor.point.graphic.center = segment.point;
+
+        if (segment.outHandle === undefined) {
+            // Unrender the outHandle graphic (if it existed)
+            anchor.outHandle?.graphic.unrender();
+            anchor.outHandle = undefined;
+        } else {
+            if (anchor.outHandle === undefined) {
+                anchor.outHandle = {
+                    initializeHandler: () => () => { },
+                    graphic: new AnchorRenderer({ canvas: this._canvas, center: segment.outHandle })
+                };
+            } else {
+                anchor.outHandle.graphic.center = segment.outHandle;
+            }
+        }
+
+        if (this.isFocused) {
+            anchor.inHandle?.graphic.render();
+            anchor.point.graphic.render();
+            anchor.outHandle?.graphic.render();
+        }
+    }
 }
 
 export default CurveRenderer;
