@@ -3,11 +3,11 @@ import { GraphicRenderer } from './types';
 import RectangleRenderer from './graphics/RectangleRenderer';
 
 type SlideRendererArgs = {
-    canvas: SVG.Doc | undefined;
+    canvas: SVG.Doc;
 }
 
 class SlideRenderer {
-    private _canvas: SVG.Doc | undefined;
+    private _canvas: SVG.Doc;
     private _graphics: { [index: string]: GraphicRenderer };
 
     constructor(args: SlideRendererArgs) {
@@ -15,12 +15,12 @@ class SlideRenderer {
         this._graphics = {};
     }
 
+    public get canvas(): SVG.Doc {
+        return this._canvas;
+    }
+
     public set canvas(canvas: SVG.Doc) {
         this._canvas = canvas;
-    }
-    
-    public get canvasIsMounted(): boolean {
-        return this._canvas !== undefined;
     }
 
     // TODO: Implement ID provider
