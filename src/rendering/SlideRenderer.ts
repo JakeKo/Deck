@@ -25,49 +25,49 @@ class SlideRenderer {
 
     private _decorateCanvasEvents(): void {
         this._canvas.node.addEventListener('mouseup', baseEvent => {
-            this._canvas.node.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEUP, { detail: {
+            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEUP, { detail: {
                 slideRenderer: this,
                 baseEvent
             }}));
         });
         
         this._canvas.node.addEventListener('mousedown', baseEvent => {
-            this._canvas.node.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEDOWN, { detail: {
+            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEDOWN, { detail: {
                 slideRenderer: this,
                 baseEvent
             }}));
         });
         
         this._canvas.node.addEventListener('mouseover', baseEvent => {
-            this._canvas.node.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOVER, { detail: {
+            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOVER, { detail: {
                 slideRenderer: this,
                 baseEvent
             }}));
         });
         
         this._canvas.node.addEventListener('mouseout', baseEvent => {
-            this._canvas.node.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOUT, { detail: {
+            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOUT, { detail: {
                 slideRenderer: this,
                 baseEvent
             }}));
         });
         
         this._canvas.node.addEventListener('mousemove', baseEvent => {
-            this._canvas.node.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, { detail: {
+            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, { detail: {
                 slideRenderer: this,
                 baseEvent
             }}));
         });
         
         this._canvas.node.addEventListener('keyup', baseEvent => {
-            this._canvas.node.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYUP, { detail: {
+            document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYUP, { detail: {
                 slideRenderer: this,
                 baseEvent
             }}));
         });
         
         this._canvas.node.addEventListener('keydown', baseEvent => {
-            this._canvas.node.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYDOWN, { detail: {
+            document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYDOWN, { detail: {
                 slideRenderer: this,
                 baseEvent
             }}));
