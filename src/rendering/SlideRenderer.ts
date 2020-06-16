@@ -20,10 +20,10 @@ class SlideRenderer {
         this._canvas = args.canvas;
         this._graphics = {};
 
-        this._decorateCanvasEvents();
+        this._decorateSlideEvents();
     }
 
-    private _decorateCanvasEvents(): void {
+    private _decorateSlideEvents(): void {
         this._canvas.node.addEventListener('mouseup', baseEvent => {
             document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEUP, { detail: {
                 slideRenderer: this,
@@ -85,7 +85,7 @@ class SlideRenderer {
     // TODO: Implement ID provider
     public startMakingRectangle(): RectangleMaker {
         const id = Math.random().toString();
-        this._graphics[id] = new RectangleRenderer({ id, canvas: this._canvas });
+        this._graphics[id] = new RectangleRenderer({ id, slideRenderer: this });
         this._graphics[id].render();
 
         return new RectangleMaker({ rectangle: this._graphics[id] as RectangleRenderer, slide: this });
@@ -97,7 +97,7 @@ class SlideRenderer {
 
     public startMakingCurve(): CurveMaker {
         const id = Math.random().toString();
-        this._graphics[id] = new CurveRenderer({ id, canvas: this._canvas });
+        this._graphics[id] = new CurveRenderer({ id, slideRenderer: this });
         this._graphics[id].render();
 
         return new CurveMaker({ curve: this._graphics[id] as CurveRenderer, slide: this });

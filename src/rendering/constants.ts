@@ -13,3 +13,13 @@ export const SLIDE_EVENTS = {
     KEYDOWN: 'deck-slide-keydown',
     KEYUP: 'deck-slide-keyup'
 };
+
+export const GRAPHIC_EVENTS = {
+    MOUSEUP: 'deck-graphic-mouseup',
+    MOUSEDOWN: 'deck-graphic-mousedown',
+    MOUSEOVER: 'deck-graphic-mouseover',
+    MOUSEOUT: 'deck-graphic-mouseout',
+    MOUSEMOVE: 'deck-graphic-mousemove',
+    KEYDOWN: 'deck-graphic-keydown',
+    KEYUP: 'deck-graphic-keyup'
+};
