@@ -52,6 +52,7 @@ class RectangleRenderer implements GraphicRenderer {
         this._rotation = args.rotation || DEFAULT_ARGS.rotation;
     }
 
+    // TODO: Determine if slide events need to be propagated here
     private _decorateGraphicEvents(): void {
         this._svg?.node.addEventListener('mouseup', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEUP, { detail: {
