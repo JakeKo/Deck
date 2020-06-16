@@ -5,10 +5,14 @@ export type SlideMouseEventPayload = {
     slideRenderer: SlideRenderer;
 };
 
+export type SlideMouseEvent = CustomEvent<SlideMouseEventPayload>;
+
 export type SlideKeyboardEventPayload = {
     baseEvent: KeyboardEvent;
     slideRenderer: SlideRenderer;
 };
+
+export type SlideKeyboardEvent = CustomEvent<SlideKeyboardEventPayload>;
 
 export type GraphicMouseEventPayload = {
     baseEvent: MouseEvent;
@@ -16,8 +20,12 @@ export type GraphicMouseEventPayload = {
     graphicId: string;
 };
 
+export type GraphicMouseEvent = CustomEvent<GraphicMouseEventPayload>;
+
 export type GraphicKeyboardEventPayload = {
     baseEvent: KeyboardEvent;
     slideRenderer: SlideRenderer;
     graphicId: string;
 };
+
+export type GraphicKeyboardEvent = CustomEvent<GraphicKeyboardEventPayload>;

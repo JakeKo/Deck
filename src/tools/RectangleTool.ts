@@ -1,10 +1,11 @@
 import { Store } from "vuex";
 import { ApplicationState } from "../store/types";
-import { SlideMouseEventPayload } from "../events/types";
+import { SlideMouseEvent } from "../events/types";
 import Vector from "../models/Vector";
-import { SLIDE_EVENTS } from "../rendering/constants";
+import { SLIDE_EVENTS } from "../events/constants";
+import { listen, unlisten } from "../events/utilities";
 
-const make: (event: CustomEvent<SlideMouseEventPayload>) => void = event => {
+const make: (event: SlideMouseEvent) => void = event => {
     const { slideRenderer, baseEvent } = event.detail;
 
     // TODO: Implement method for resolving true position on slide
@@ -12,11 +13,11 @@ const make: (event: CustomEvent<SlideMouseEventPayload>) => void = event => {
     const maker = slideRenderer.startMakingRectangle();
     maker.move(initialPosition);
 
-    document.removeEventListener(SLIDE_EVENTS.MOUSEDOWN, make as EventListener);
-    document.addEventListener(SLIDE_EVENTS.MOUSEMOVE, update as EventListener);
-    document.addEventListener(SLIDE_EVENTS.MOUSEUP, complete as EventListener);
+    unlisten(SLIDE_EVENTS.MOUSEDOWN, make);
+    listen(SLIDE_EVENTS.MOUSEMOVE, update);
+    listen(SLIDE_EVENTS.MOUSEUP, complete);
 
-    function update(event: CustomEvent<SlideMouseEventPayload>): void {
+    function update(event: SlideMouseEvent): void {
         const { baseEvent } = event.detail;
 
         // TODO: Incorporate shift, alt, ctrl, and snapping into position calculation
@@ -25,15 +26,15 @@ const make: (event: CustomEvent<SlideMouseEventPayload>) => void = event => {
     }
 
     function complete(): void {
-        document.addEventListener(SLIDE_EVENTS.MOUSEDOWN, make as EventListener);
-        document.removeEventListener(SLIDE_EVENTS.MOUSEMOVE, update as EventListener);
-        document.removeEventListener(SLIDE_EVENTS.MOUSEUP, complete as EventListener);
+        listen(SLIDE_EVENTS.MOUSEDOWN, make);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
+        unlisten(SLIDE_EVENTS.MOUSEUP, complete);
     }
 };
 
 // TODO: Find more elegant method of using store types
 export const mount: (store: Store<ApplicationState>) => void = store => {
-    document.addEventListener(SLIDE_EVENTS.MOUSEDOWN, make as EventListener)
+    listen(SLIDE_EVENTS.MOUSEDOWN, make);
 };
 
 export const unmount: () => void = () => {

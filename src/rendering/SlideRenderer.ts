@@ -6,8 +6,8 @@ import RectangleMutator from './mutators/RectangleMutator';
 import CurveMaker from './makers/CurveMaker';
 import CurveRenderer from './graphics/CurveRenderer';
 import CurveMutator from './mutators/CurveMutator';
-import { SLIDE_EVENTS } from './constants';
 import { SlideMouseEventPayload, SlideKeyboardEventPayload } from '../events/types';
+import { SLIDE_EVENTS } from '../events/constants';
 
 type SlideRendererArgs = {
     canvas: SVG.Doc;

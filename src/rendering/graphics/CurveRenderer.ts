@@ -1,9 +1,10 @@
 import * as SVG from 'svg.js';
 import { GraphicRenderer, CurveAnchor } from "../types";
 import Vector from '../../models/Vector';
-import { GRAPHIC_TYPES, GRAPHIC_EVENTS } from '../constants';
+import { GRAPHIC_TYPES } from '../constants';
 import SlideRenderer from '../SlideRenderer';
 import { GraphicMouseEventPayload, GraphicKeyboardEventPayload } from '../../events/types';
+import { GRAPHIC_EVENTS } from '../../events/constants';
 
 type CurveRendererArgs = {
     id: string;
