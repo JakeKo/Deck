@@ -5,7 +5,7 @@ import Vector from "../models/Vector";
 import { SLIDE_EVENTS } from "../events/constants";
 import { listen, unlisten } from "../events/utilities";
 
-const make: (event: SlideMouseEvent) => void = event => {
+function make(event: SlideMouseEvent): void {
     const { slideRenderer, baseEvent } = event.detail;
 
     // TODO: Implement method for resolving true position on slide
@@ -21,7 +21,8 @@ const make: (event: SlideMouseEvent) => void = event => {
         const { baseEvent } = event.detail;
 
         // TODO: Incorporate shift, alt, ctrl, and snapping into position calculation
-        const position = new Vector(baseEvent.clientX, baseEvent.y);
+        // TODO: Handle ctrl case (symmetric around center)
+        const position = new Vector(baseEvent.clientX, baseEvent.clientY);
         maker.setDimensions(initialPosition.towards(position));
     }
 
@@ -33,10 +34,10 @@ const make: (event: SlideMouseEvent) => void = event => {
 };
 
 // TODO: Find more elegant method of using store types
-export const mount: (store: Store<ApplicationState>) => void = store => {
+export function mount(store: Store<ApplicationState>): void {
     listen(SLIDE_EVENTS.MOUSEDOWN, make);
 };
 
-export const unmount: () => void = () => {
-
+export function unmount(): void {
+    unlisten(SLIDE_EVENTS.MOUSEDOWN, make);
 };
