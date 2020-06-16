@@ -1,5 +1,5 @@
 import * as SVG from 'svg.js';
-import { GraphicRenderer, SlideMouseEventPayload, SlideKeyboardEventPayload } from './types';
+import { GraphicRenderer } from './types';
 import RectangleRenderer from './graphics/RectangleRenderer';
 import RectangleMaker from './makers/RectangleMaker';
 import RectangleMutator from './mutators/RectangleMutator';
@@ -7,6 +7,7 @@ import CurveMaker from './makers/CurveMaker';
 import CurveRenderer from './graphics/CurveRenderer';
 import CurveMutator from './mutators/CurveMutator';
 import { SLIDE_EVENTS } from './constants';
+import { SlideMouseEventPayload, SlideKeyboardEventPayload } from '../events/types';
 
 type SlideRendererArgs = {
     canvas: SVG.Doc;

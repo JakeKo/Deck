@@ -1,6 +1,6 @@
 import { Store } from "vuex";
 import { ApplicationState } from "../store/types";
-import { SlideMouseEventPayload } from "../rendering/types";
+import { SlideMouseEventPayload } from "../events/types";
 import Vector from "../models/Vector";
 import { SLIDE_EVENTS } from "../rendering/constants";
 
