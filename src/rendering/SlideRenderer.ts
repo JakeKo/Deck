@@ -1,11 +1,12 @@
 import * as SVG from 'svg.js';
-import { GraphicRenderer } from './types';
+import { GraphicRenderer, SlideMouseEventPayload, SlideKeyboardEventPayload } from './types';
 import RectangleRenderer from './graphics/RectangleRenderer';
 import RectangleMaker from './makers/RectangleMaker';
 import RectangleMutator from './mutators/RectangleMutator';
 import CurveMaker from './makers/CurveMaker';
 import CurveRenderer from './graphics/CurveRenderer';
 import CurveMutator from './mutators/CurveMutator';
+import { SLIDE_EVENTS } from './constants';
 
 type SlideRendererArgs = {
     canvas: SVG.Doc;
@@ -18,6 +19,59 @@ class SlideRenderer {
     constructor(args: SlideRendererArgs) {
         this._canvas = args.canvas;
         this._graphics = {};
+
+        this._decorateCanvasEvents();
+    }
+
+    private _decorateCanvasEvents(): void {
+        this._canvas.node.addEventListener('mouseup', baseEvent => {
+            this._canvas.node.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEUP, { detail: {
+                slideRenderer: this,
+                baseEvent
+            }}));
+        });
+        
+        this._canvas.node.addEventListener('mousedown', baseEvent => {
+            this._canvas.node.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEDOWN, { detail: {
+                slideRenderer: this,
+                baseEvent
+            }}));
+        });
+        
+        this._canvas.node.addEventListener('mouseover', baseEvent => {
+            this._canvas.node.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOVER, { detail: {
+                slideRenderer: this,
+                baseEvent
+            }}));
+        });
+        
+        this._canvas.node.addEventListener('mouseout', baseEvent => {
+            this._canvas.node.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOUT, { detail: {
+                slideRenderer: this,
+                baseEvent
+            }}));
+        });
+        
+        this._canvas.node.addEventListener('mousemove', baseEvent => {
+            this._canvas.node.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, { detail: {
+                slideRenderer: this,
+                baseEvent
+            }}));
+        });
+        
+        this._canvas.node.addEventListener('keyup', baseEvent => {
+            this._canvas.node.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYUP, { detail: {
+                slideRenderer: this,
+                baseEvent
+            }}));
+        });
+        
+        this._canvas.node.addEventListener('keydown', baseEvent => {
+            this._canvas.node.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYDOWN, { detail: {
+                slideRenderer: this,
+                baseEvent
+            }}));
+        });
     }
 
     public get canvas(): SVG.Doc {

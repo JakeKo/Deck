@@ -1,4 +1,5 @@
 import Vector from '../models/Vector';
+import SlideRenderer from './SlideRenderer';
 
 export type GraphicRenderer = {
     id: string;
@@ -12,4 +13,14 @@ export type CurveAnchor = {
     inHandle: Vector | undefined;
     point: Vector;
     outHandle: Vector | undefined;
+};
+
+export type SlideMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slideRenderer: SlideRenderer;
+};
+
+export type SlideKeyboardEventPayload = {
+    baseEvent: KeyboardEvent;
+    slideRenderer: SlideRenderer;
 };

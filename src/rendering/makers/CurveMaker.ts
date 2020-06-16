@@ -9,6 +9,7 @@ type CurveMakerArgs = {
     slide: SlideRenderer;
 };
 
+// TODO: Reduce helpers to a single CurveAnchorRenderer
 class CurveMaker {
     private _curve: CurveRenderer;
     private _slide: SlideRenderer;
