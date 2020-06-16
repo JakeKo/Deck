@@ -1,43 +1,56 @@
 import { Store } from "vuex";
 import { ApplicationState } from "../store/types";
 import { SlideMouseEvent } from "../events/types";
-import Vector from "../models/Vector";
 import { SLIDE_EVENTS } from "../events/constants";
 import { listen, unlisten } from "../events/utilities";
+import { resolvePosition } from "./utilities";
 
-function make(event: SlideMouseEvent): void {
-    const { slideRenderer, baseEvent } = event.detail;
+type RectangleToolArgs = {
+    store: Store<ApplicationState>;
+};
 
-    // TODO: Implement method for resolving true position on slide
-    const initialPosition = new Vector(baseEvent.clientX, baseEvent.clientY);
-    const maker = slideRenderer.startMakingRectangle();
-    maker.move(initialPosition);
+class RectangleTool {
+    private _store: Store<ApplicationState>;
 
-    unlisten(SLIDE_EVENTS.MOUSEDOWN, make);
-    listen(SLIDE_EVENTS.MOUSEMOVE, update);
-    listen(SLIDE_EVENTS.MOUSEUP, complete);
-
-    function update(event: SlideMouseEvent): void {
-        const { baseEvent } = event.detail;
-
-        // TODO: Incorporate shift, alt, ctrl, and snapping into position calculation
-        // TODO: Handle ctrl case (symmetric around center)
-        const position = new Vector(baseEvent.clientX, baseEvent.clientY);
-        maker.setDimensions(initialPosition.towards(position));
+    constructor(args: RectangleToolArgs) {
+        this._store = args.store;
     }
 
-    function complete(): void {
-        listen(SLIDE_EVENTS.MOUSEDOWN, make);
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
-        unlisten(SLIDE_EVENTS.MOUSEUP, complete);
+    private _make(event: SlideMouseEvent): void {
+        const self = this;
+        const { slideRenderer, baseEvent } = event.detail;
+
+        const initialPosition = resolvePosition(baseEvent, slideRenderer, self._store);
+        const maker = slideRenderer.startMakingRectangle();
+        maker.move(initialPosition);
+    
+        unlisten(SLIDE_EVENTS.MOUSEDOWN, self._make);
+        listen(SLIDE_EVENTS.MOUSEMOVE, update);
+        listen(SLIDE_EVENTS.MOUSEUP, complete);
+    
+        function update(event: SlideMouseEvent): void {
+            const { baseEvent } = event.detail;
+    
+            // TODO: Incorporate shift, alt, ctrl, and snapping into position calculation
+            // TODO: Handle ctrl case (symmetric around center)
+            const position = resolvePosition(baseEvent, slideRenderer, self._store);
+            maker.setDimensions(initialPosition.towards(position));
+        }
+    
+        function complete(): void {
+            listen(SLIDE_EVENTS.MOUSEDOWN, self._make);
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
+            unlisten(SLIDE_EVENTS.MOUSEUP, complete);
+        }
     }
-};
 
-// TODO: Find more elegant method of using store types
-export function mount(store: Store<ApplicationState>): void {
-    listen(SLIDE_EVENTS.MOUSEDOWN, make);
-};
+    public mount(): void {
+        listen(SLIDE_EVENTS.MOUSEDOWN, this._make);
+    }
 
-export function unmount(): void {
-    unlisten(SLIDE_EVENTS.MOUSEDOWN, make);
-};
+    public unmount(): void {
+        unlisten(SLIDE_EVENTS.MOUSEDOWN, this._make);
+    }
+}
+
+export default RectangleTool;

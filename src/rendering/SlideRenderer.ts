@@ -8,6 +8,7 @@ import CurveRenderer from './graphics/CurveRenderer';
 import CurveMutator from './mutators/CurveMutator';
 import { SlideMouseEventPayload, SlideKeyboardEventPayload } from '../events/types';
 import { SLIDE_EVENTS } from '../events/constants';
+import Vector from '../models/Vector';
 
 type SlideRendererArgs = {
     canvas: SVG.Doc;
@@ -81,6 +82,11 @@ class SlideRenderer {
 
     public set canvas(canvas: SVG.Doc) {
         this._canvas = canvas;
+    }
+
+    public get bounds(): { origin: Vector, height: number, width: number } {
+        const bounds = this._canvas.node.getBoundingClientRect() as DOMRect;
+        return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
     }
 
     // TODO: Implement ID provider
