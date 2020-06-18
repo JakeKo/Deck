@@ -21,7 +21,7 @@ import Tool from './Tool.vue';
 })
 export default class Toolbox extends Vue {
     @Prop({ type: String, required: true }) private toolName!: string;
-    
+
     private tools = [
         {
             key: Math.random(),

@@ -10,11 +10,11 @@ const getters: AppGetters = {
     slide: (state: AppState): (slideId: string) => any => {
         return slideId => {
             const slide = state.slides.find(s => s.id === slideId);
-    
+
             if (slide === undefined) {
                 throw new Error(`Could not find slide (${slideId})`);
             }
-        
+
             return slide;
         };
     },

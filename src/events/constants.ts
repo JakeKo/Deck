@@ -6,7 +6,7 @@ export enum SLIDE_EVENTS {
     MOUSEMOVE = 'deck-slide-mousemove',
     KEYDOWN = 'deck-slide-keydown',
     KEYUP = 'deck-slide-keyup'
-};
+}
 
 export enum GRAPHIC_EVENTS {
     MOUSEUP = 'deck-graphic-mouseup',
@@ -16,4 +16,4 @@ export enum GRAPHIC_EVENTS {
     MOUSEMOVE = 'deck-graphic-mousemove',
     KEYDOWN = 'deck-graphic-keydown',
     KEYUP = 'deck-graphic-keyup'
-};
+}

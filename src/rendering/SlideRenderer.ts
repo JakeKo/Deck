@@ -12,7 +12,7 @@ import Vector from '../models/Vector';
 
 type SlideRendererArgs = {
     canvas: SVG.Doc;
-}
+};
 
 class SlideRenderer {
     private _canvas: SVG.Doc;
@@ -27,52 +27,66 @@ class SlideRenderer {
 
     private _decorateSlideEvents(): void {
         this._canvas.node.addEventListener('mouseup', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEUP, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEUP, {
+                detail: {
+                    slideRenderer: this,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._canvas.node.addEventListener('mousedown', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEDOWN, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEDOWN, {
+                detail: {
+                    slideRenderer: this,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._canvas.node.addEventListener('mouseover', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOVER, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOVER, {
+                detail: {
+                    slideRenderer: this,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._canvas.node.addEventListener('mouseout', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOUT, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOUT, {
+                detail: {
+                    slideRenderer: this,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._canvas.node.addEventListener('mousemove', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, {
+                detail: {
+                    slideRenderer: this,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._canvas.node.addEventListener('keyup', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYUP, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYUP, {
+                detail: {
+                    slideRenderer: this,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._canvas.node.addEventListener('keydown', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYDOWN, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYDOWN, {
+                detail: {
+                    slideRenderer: this,
+                    baseEvent
+                }
+            }));
         });
     }
 

@@ -57,59 +57,73 @@ class RectangleRenderer implements GraphicRenderer {
     // TODO: Determine if slide events need to be propagated here
     private _decorateGraphicEvents(): void {
         this._svg?.node.addEventListener('mouseup', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEUP, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEUP, {
+                detail: {
+                    slideRenderer: this._slideRenderer,
+                    graphicId: this._id,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._svg?.node.addEventListener('mousedown', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEDOWN, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEDOWN, {
+                detail: {
+                    slideRenderer: this._slideRenderer,
+                    graphicId: this._id,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._svg?.node.addEventListener('mouseover', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOVER, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOVER, {
+                detail: {
+                    slideRenderer: this._slideRenderer,
+                    graphicId: this._id,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._svg?.node.addEventListener('mouseout', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOUT, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOUT, {
+                detail: {
+                    slideRenderer: this._slideRenderer,
+                    graphicId: this._id,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._svg?.node.addEventListener('mousemove', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEMOVE, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEMOVE, {
+                detail: {
+                    slideRenderer: this._slideRenderer,
+                    graphicId: this._id,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._svg?.node.addEventListener('keyup', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYUP, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYUP, {
+                detail: {
+                    slideRenderer: this._slideRenderer,
+                    graphicId: this._id,
+                    baseEvent
+                }
+            }));
         });
-        
+
         this._svg?.node.addEventListener('keydown', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYDOWN, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
+            document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYDOWN, {
+                detail: {
+                    slideRenderer: this._slideRenderer,
+                    graphicId: this._id,
+                    baseEvent
+                }
+            }));
         });
     }
 

@@ -6,7 +6,7 @@ import Vector from "../../models/Vector";
 type RectangleMutatorArgs = {
     rectangle: RectangleRenderer;
     slide: SlideRenderer;
-}
+};
 
 type RectangleMutatorHelpers = {
     topLeft: VertexRenderer,
