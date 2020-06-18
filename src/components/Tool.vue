@@ -1,6 +1,6 @@
 <template>   
-<div :class='{ "tool": true, "active-tool": isActive }' @click='$emit("click")'>
-    <i :class='icon'></i>
+<div :class='{ "tool": true, "active-tool": isActive }' @click='$emit("tool-click")'>
+    <i :class='icon' />
     {{toolName}}
 </div>
 </template>

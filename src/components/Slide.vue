@@ -1,5 +1,5 @@
 <template>
-<div :id='`slide_${slideModel.id}`' :class='{ "slide": true, "active-slide": isActive }'>
+<div :id='`slide_${Math.random()}`' :class='{ "slide": true, "active-slide": isActive }'>
     <div class='slide-box'></div>
 </div>
 </template>
@@ -9,17 +9,17 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as SVG from 'svg.js';
 // import { IGraphic, CustomCanvasMouseEvent, ISlideWrapper, CanvasKeyboardEvent, CustomCanvasKeyboardEvent } from '../types';
 // import { EVENT_TYPES } from '../constants';
-import SlideModel from '../models/Slide';
+// import SlideModel from '../models/Slide';
 import SlideRenderer from '../rendering/SlideRenderer';
 
 @Component
 export default class Slide extends Vue {
-    @Prop({ type: SlideModel, required: true }) private slideModel!: SlideModel;
+    // @Prop({ type: SlideModel, required: true }) private slideModel!: SlideModel;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
 
     private mounted(): void {
-        const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.rawViewbox;
-        const canvas: SVG.Doc = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
+        const viewbox = this.$store.getters.rawEditorViewbox;
+        const canvas = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
         const renderer = new SlideRenderer({ canvas });
 
 

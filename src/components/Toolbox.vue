@@ -2,11 +2,11 @@
 <div id='toolbox'>
     <tool v-for='t in tools'
         :key='t.key'
-        @click='t.clickHandler'
+        @tool-click='t.clickHandler'
         :toolName='t.toolName'
         :icon='t.icon'
         :isActive='t.isActive'
-    ></tool>
+    />
 </div>
 </template>
 
@@ -22,24 +22,24 @@ import Tool from './Tool.vue';
 export default class Toolbox extends Vue {
     @Prop({ type: String, required: true }) private toolName!: string;
     
-    private tools: any[] = [
+    private tools = [
         {
             key: Math.random(),
-            clickHandler: () => this.$store.commit('tool', 'pointer'),
+            clickHandler: () => this.$store.commit('setActiveToolName', 'pointer'),
             toolName: 'cursor',
             icon: 'fas fa-mouse-pointer',
             isActive: this.toolName === 'cursor'
         },
         {
             key: Math.random(),
-            clickHandler: () => this.$store.commit('tool', 'rectangle'),
+            clickHandler: () => this.$store.commit('setActiveToolName', 'rectangle'),
             toolName: 'rectangle',
             icon: 'fas fa-square',
             isActive: this.toolName === 'rectangle'
         },
         {
             key: Math.random(),
-            clickHandler: () => this.$store.commit('tool', 'curve'),
+            clickHandler: () => this.$store.commit('setActiveToolName', 'curve'),
             toolName: 'curve',
             icon: 'fas fa-pen-nib',
             isActive: this.toolName === 'curve'

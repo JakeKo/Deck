@@ -4,6 +4,9 @@ const getters: AppGetters = {
     slides: (state: AppState): any[] => {
         return state.slides;
     },
+    lastSlide: (state: AppState): any => {
+        return state.slides[state.slides.length - 1];
+    },
     slide: (state: AppState): (slideId: string) => any => {
         return slideId => {
             const slide = state.slides.find(s => s.id === slideId);

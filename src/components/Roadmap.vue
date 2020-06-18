@@ -13,7 +13,7 @@ import { Vue, Component } from 'vue-property-decorator';
 export default class Roadmap extends Vue {
     private addSlide(): void {
         this.$store.commit('addSlide', this.$store.getters.slides.length);
-        this.$store.commit('activeSlide', this.$store.getters.slides[this.$store.getters.slides.length - 1].id);
+        this.$store.commit('setActiveSlideId', this.$store.getters.lastSlide.id);
     }
 }
 </script>

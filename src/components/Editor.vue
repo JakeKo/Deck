@@ -3,11 +3,10 @@
     <!-- <slide-settings></slide-settings> -->
     <div id='canvas-container' ref='canvas-container'>
         <div id='canvas' ref='canvas' :style='canvasStyle'>
-            <slide v-for='slide in $store.getters.slides' 
-                :key='slide.id'
-                :slideModel='slide'
-                :isActive='$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id'
-            ></slide>
+            <slide v-for='slide in slides' 
+                :key='slide.key'
+                :isActive='slide.isActive'
+            />
         </div>
     </div>
 </div>
@@ -16,12 +15,12 @@
 <script lang='ts'>
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import Slide from './Slide.vue';
-import SlideSettings from './SlideSettings.vue';
+// import SlideSettings from './SlideSettings.vue';
 
 @Component({
     components: {
         Slide,
-        SlideSettings
+        // SlideSettings
     }
 })
 export default class Editor extends Vue {
@@ -36,18 +35,25 @@ export default class Editor extends Vue {
     //     container.scrollLeft = container.scrollWidth * percentageOver;
     // }
 
+    private slides = [
+        {
+            key: Math.random(),
+            isActive: true
+        }
+    ];
+
     get canvasStyle(): any {
         return {
-            width: `${this.$store.getters.canvasWidth}px`,
-            height: `${this.$store.getters.canvasHeight}px`
+            width: `${this.$store.getters.rawEditorViewbox.width}px`,
+            height: `${this.$store.getters.rawEditorViewbox.height}px`
         };
     }
 
     private mounted(): void {
         // Scroll to the middle of the editor
-        const container: HTMLDivElement = this.$refs['canvas-container'] as HTMLDivElement;
-        container.scrollTop = (this.$store.getters.canvasHeight - container.clientHeight) / 2;
-        container.scrollLeft = (this.$store.getters.canvasWidth - container.clientWidth) / 2;
+        const container = this.$refs['canvas-container'] as HTMLDivElement;
+        container.scrollLeft = (this.$store.getters.rawEditorViewbox.width - container.clientWidth) / 2;
+        container.scrollTop = (this.$store.getters.rawEditorViewbox.height - container.clientHeight) / 2;
     }
 }
 </script>

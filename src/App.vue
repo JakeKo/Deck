@@ -2,7 +2,7 @@
 <div id='app'>
     <!-- <menu-bar></menu-bar> -->
     <div id='interface'>
-        <toolbox :toolName='$store.getters.toolName'></toolbox>
+        <toolbox :toolName='$store.getters.activeToolName'></toolbox>
         <div id='workspace'>
             <editor></editor>
             <roadmap></roadmap>
@@ -14,21 +14,21 @@
 
 <script lang='ts'>
 import { Vue, Component } from 'vue-property-decorator';
-import MenuBar from './components/MenuBar.vue';
+// import MenuBar from './components/MenuBar.vue';
 import Toolbox from './components/Toolbox.vue';
 import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
-import GraphicEditor from './components/GraphicEditor.vue';
-import Utilities from './utilities';
-import { IGraphic } from './types';
+// import GraphicEditor from './components/GraphicEditor.vue';
+// import Utilities from './utilities';
+// import { IGraphic } from './types';
 
 @Component({
     components: {
-        MenuBar,
+        // MenuBar,
         Toolbox,
         Editor,
         Roadmap,
-        GraphicEditor
+        // GraphicEditor
     }
 })
 export default class App extends Vue {}
