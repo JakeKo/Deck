@@ -56,7 +56,7 @@ class RectangleRenderer implements GraphicRenderer {
 
     // TODO: Determine if slide events need to be propagated here
     private _decorateGraphicEvents(): void {
-        this._svg?.node.addEventListener('mouseup', baseEvent => {
+        this._svg && this._svg.node.addEventListener('mouseup', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEUP, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -66,7 +66,7 @@ class RectangleRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('mousedown', baseEvent => {
+        this._svg && this._svg.node.addEventListener('mousedown', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEDOWN, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -76,7 +76,7 @@ class RectangleRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('mouseover', baseEvent => {
+        this._svg && this._svg.node.addEventListener('mouseover', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOVER, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -86,7 +86,7 @@ class RectangleRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('mouseout', baseEvent => {
+        this._svg && this._svg.node.addEventListener('mouseout', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOUT, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -96,7 +96,7 @@ class RectangleRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('mousemove', baseEvent => {
+        this._svg && this._svg.node.addEventListener('mousemove', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEMOVE, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -106,7 +106,7 @@ class RectangleRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('keyup', baseEvent => {
+        this._svg && this._svg.node.addEventListener('keyup', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYUP, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -116,7 +116,7 @@ class RectangleRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('keydown', baseEvent => {
+        this._svg && this._svg.node.addEventListener('keydown', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYDOWN, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -143,37 +143,37 @@ class RectangleRenderer implements GraphicRenderer {
     // TODO: Create getter functions
     public set origin(origin: Vector) {
         this._origin = origin;
-        this._svg?.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
+        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
     }
 
     public set width(width: number) {
         this._width = width;
-        this._svg?.width(this._width);
+        this._svg && this._svg.width(this._width);
     }
 
     public set height(height: number) {
         this._height = height;
-        this._svg?.height(this._height);
+        this._svg && this._svg.height(this._height);
     }
 
     public set fillColor(fillColor: string) {
         this._fillColor = fillColor;
-        this._svg?.fill(this._fillColor);
+        this._svg && this._svg.fill(this._fillColor);
     }
 
     public set strokeColor(strokeColor: string) {
         this._strokeColor = strokeColor;
-        this._svg?.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
     public set strokeWidth(strokeWidth: number) {
         this._strokeWidth = strokeWidth;
-        this._svg?.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
     public set rotation(rotation: number) {
         this._rotation = rotation;
-        this._svg?.rotate(this._rotation);
+        this._svg && this._svg.rotate(this._rotation);
     }
 
     public render(): void {
@@ -191,7 +191,7 @@ class RectangleRenderer implements GraphicRenderer {
     }
 
     public unrender(): void {
-        this._svg?.remove();
+        this._svg && this._svg.remove();
         this._svg = undefined;
     }
 }

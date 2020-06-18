@@ -31,7 +31,7 @@ class VertexRenderer {
 
     public set center(center: Vector) {
         this._center = center;
-        this._svg?.translate(this._center.x - this._width / 2, this._center.y - this._height / 2);
+        this._svg && this._svg.translate(this._center.x - this._width / 2, this._center.y - this._height / 2);
     }
 
     public render(): void {
@@ -47,7 +47,7 @@ class VertexRenderer {
     }
 
     public unrender(): void {
-        this._svg?.remove();
+        this._svg && this._svg.remove();
         this._svg = undefined;
     }
 }

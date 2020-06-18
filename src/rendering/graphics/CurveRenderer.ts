@@ -47,7 +47,7 @@ class CurveRenderer implements GraphicRenderer {
     }
 
     private _decorateGraphicEvents(): void {
-        this._svg?.node.addEventListener('mouseup', baseEvent => {
+        this._svg && this._svg.node.addEventListener('mouseup', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEUP, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -57,7 +57,7 @@ class CurveRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('mousedown', baseEvent => {
+        this._svg && this._svg.node.addEventListener('mousedown', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEDOWN, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -67,7 +67,7 @@ class CurveRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('mouseover', baseEvent => {
+        this._svg && this._svg.node.addEventListener('mouseover', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOVER, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -77,7 +77,7 @@ class CurveRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('mouseout', baseEvent => {
+        this._svg && this._svg.node.addEventListener('mouseout', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOUT, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -87,7 +87,7 @@ class CurveRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('mousemove', baseEvent => {
+        this._svg && this._svg.node.addEventListener('mousemove', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEMOVE, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -97,7 +97,7 @@ class CurveRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('keyup', baseEvent => {
+        this._svg && this._svg.node.addEventListener('keyup', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYUP, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -107,7 +107,7 @@ class CurveRenderer implements GraphicRenderer {
             }));
         });
 
-        this._svg?.node.addEventListener('keydown', baseEvent => {
+        this._svg && this._svg.node.addEventListener('keydown', baseEvent => {
             document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYDOWN, {
                 detail: {
                     slideRenderer: this._slideRenderer,
@@ -133,22 +133,22 @@ class CurveRenderer implements GraphicRenderer {
     public move(origin: Vector): void {
         const changeInPosition = this._anchors[0].point.towards(origin);
         this._anchors = this._anchors.map(anchor => ({
-            inHandle: anchor.inHandle?.add(changeInPosition),
+            inHandle: anchor.inHandle === undefined ? undefined : anchor.inHandle.add(changeInPosition),
             point: anchor.point.add(changeInPosition),
-            outHandle: anchor.outHandle?.add(changeInPosition)
+            outHandle: anchor.outHandle === undefined ? undefined : anchor.outHandle.add(changeInPosition)
         }));
-        this._svg?.plot(this._formattedPoints);
+        this._svg && this._svg.plot(this._formattedPoints);
     }
 
     public addAnchor(anchor: CurveAnchor): number {
         this._anchors.push(anchor);
-        this._svg?.plot(this._formattedPoints);
+        this._svg && this._svg.plot(this._formattedPoints);
         return this._anchors.length - 1;
     }
 
     public setAnchor(index: number, anchor: CurveAnchor): void {
         this._anchors[index] = anchor;
-        this._svg?.plot(this._formattedPoints);
+        this._svg && this._svg.plot(this._formattedPoints);
     }
 
     public getAnchors(): CurveAnchor[] {
@@ -159,22 +159,22 @@ class CurveRenderer implements GraphicRenderer {
     // TODO: Create getter functions
     public set fillColor(fillColor: string) {
         this._fillColor = fillColor;
-        this._svg?.fill(this._fillColor);
+        this._svg && this._svg.fill(this._fillColor);
     }
 
     public set strokeColor(strokeColor: string) {
         this._strokeColor = strokeColor;
-        this._svg?.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
     public set strokeWidth(strokeWidth: number) {
         this._strokeWidth = strokeWidth;
-        this._svg?.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
     public set rotation(rotation: number) {
         this._rotation = rotation;
-        this._svg?.rotate(this._rotation);
+        this._svg && this._svg.rotate(this._rotation);
     }
 
     public render(): void {
@@ -191,7 +191,7 @@ class CurveRenderer implements GraphicRenderer {
     }
 
     public unrender(): void {
-        this._svg?.remove();
+        this._svg && this._svg.remove();
         this._svg = undefined;
     }
 

@@ -34,32 +34,32 @@ class CurveAnchorRenderer {
         this._inHandle = inHandle;
 
         if (this._inHandle === undefined) {
-            this._inHandleSvg?.remove();
-            this._inHandleSpanSvg?.remove();
+            this._inHandleSvg && this._inHandleSvg.remove();
+            this._inHandleSpanSvg && this._inHandleSpanSvg.remove();
             this._inHandleSvg = undefined;
             this._inHandleSpanSvg = undefined;
         } else {
-            this._inHandleSvg?.translate(this._inHandle.x - 2, this._inHandle.y - 2);
-            this._inHandleSpanSvg?.plot(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y);
+            this._inHandleSvg && this._inHandleSvg.translate(this._inHandle.x - 2, this._inHandle.y - 2);
+            this._inHandleSpanSvg && this._inHandleSpanSvg.plot(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y);
         }
     }
 
     public setPoint(point: Vector) {
         this._point = point;
-        this._pointSvg?.translate(this._point.x, this._point.y);
+        this._pointSvg && this._pointSvg.translate(this._point.x, this._point.y);
     }
 
     public setOutHandle(outHandle: Vector | undefined) {
         this._outHandle = outHandle;
 
         if (this._outHandle === undefined) {
-            this._outHandleSvg?.remove();
-            this._outHandleSpanSvg?.remove();
+            this._outHandleSvg && this._outHandleSvg.remove();
+            this._outHandleSpanSvg && this._outHandleSpanSvg.remove();
             this._outHandleSvg = undefined;
             this._outHandleSpanSvg = undefined;
         } else {
-            this._outHandleSvg?.translate(this._outHandle.x - 2, this._outHandle.y - 2);
-            this._outHandleSpanSvg?.plot(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y);
+            this._outHandleSvg && this._outHandleSvg.translate(this._outHandle.x - 2, this._outHandle.y - 2);
+            this._outHandleSpanSvg && this._outHandleSpanSvg.plot(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y);
         }
     }
 
@@ -110,11 +110,11 @@ class CurveAnchorRenderer {
     }
 
     public unrender(): void {
-        this._inHandleSvg?.remove();
-        this._inHandleSpanSvg?.remove();
-        this._pointSvg?.remove();
-        this._outHandleSvg?.remove();
-        this._outHandleSpanSvg?.remove();
+        this._inHandleSvg && this._inHandleSvg.remove();
+        this._inHandleSpanSvg && this._inHandleSpanSvg.remove();
+        this._pointSvg && this._pointSvg.remove();
+        this._outHandleSvg && this._outHandleSvg.remove();
+        this._outHandleSpanSvg && this._outHandleSpanSvg.remove();
 
         this._inHandleSvg = undefined;
         this._inHandleSpanSvg = undefined;
