@@ -1,6 +1,6 @@
 <template>
 <div id='editor'>
-    <slide-settings></slide-settings>
+    <!-- <slide-settings></slide-settings> -->
     <div id='canvas-container' ref='canvas-container'>
         <div id='canvas' ref='canvas' :style='canvasStyle'>
             <slide v-for='slide in $store.getters.slides' 
@@ -25,16 +25,16 @@ import SlideSettings from './SlideSettings.vue';
     }
 })
 export default class Editor extends Vue {
-    @Watch('$store.getters.canvasZoom') private onCanvasZoomChanged(): void {
-        // Modify the zoom styling of the editor when the zoom is updated
-        const container: HTMLDivElement = this.$refs['canvas-container'] as HTMLDivElement;
-        const percentageDown = container.scrollTop / container.scrollHeight;
-        const percentageOver = container.scrollLeft / container.scrollWidth;
+    // @Watch('$store.getters.canvasZoom') private onCanvasZoomChanged(): void {
+    //     // Modify the zoom styling of the editor when the zoom is updated
+    //     const container: HTMLDivElement = this.$refs['canvas-container'] as HTMLDivElement;
+    //     const percentageDown = container.scrollTop / container.scrollHeight;
+    //     const percentageOver = container.scrollLeft / container.scrollWidth;
 
-        (this.$refs['canvas'] as HTMLDivElement).style.zoom = this.$store.getters.canvasZoom;
-        container.scrollTop = container.scrollHeight * percentageDown;
-        container.scrollLeft = container.scrollWidth * percentageOver;
-    }
+    //     (this.$refs['canvas'] as HTMLDivElement).style.zoom = this.$store.getters.canvasZoom;
+    //     container.scrollTop = container.scrollHeight * percentageDown;
+    //     container.scrollLeft = container.scrollWidth * percentageOver;
+    // }
 
     get canvasStyle(): any {
         return {

@@ -7,10 +7,10 @@
 <script lang='ts'>
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as SVG from 'svg.js';
-import SlideWrapper from '../models/SlideWrapper';
-import { IGraphic, CustomCanvasMouseEvent, ISlideWrapper, CanvasKeyboardEvent, CustomCanvasKeyboardEvent } from '../types';
-import { EVENT_TYPES } from '../constants';
+// import { IGraphic, CustomCanvasMouseEvent, ISlideWrapper, CanvasKeyboardEvent, CustomCanvasKeyboardEvent } from '../types';
+// import { EVENT_TYPES } from '../constants';
 import SlideModel from '../models/Slide';
+import SlideRenderer from '../rendering/SlideRenderer';
 
 @Component
 export default class Slide extends Vue {
@@ -20,28 +20,31 @@ export default class Slide extends Vue {
     private mounted(): void {
         const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.rawViewbox;
         const canvas: SVG.Doc = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
-        this.slideModel.slideWrapper = new SlideWrapper(this.slideModel.id, canvas, this.$store, true);
+        const renderer = new SlideRenderer({ canvas });
 
-        this.slideModel.graphics.forEach((graphic: IGraphic): void => {
-            this.slideModel.slideWrapper!.addGraphic(graphic);
-        });
 
-        this.slideModel.slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, ((event: CustomCanvasKeyboardEvent): void => {
-            if (['Delete', 'Backspace'].indexOf(event.detail.baseEvent.key) !== -1) {
-                if (this.$store.getters.focusedGraphic === undefined) {
-                    return;
-                }
+        // this.slideModel.slideWrapper = new SlideWrapper(this.slideModel.id, canvas, this.$store, true);
 
-                // Remove the focused graphic
-                const graphicId: string = this.$store.getters.focusedGraphic.id;
-                this.slideModel.slideWrapper!.focusGraphic(undefined);
-                this.$store.commit('focusGraphic', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: undefined });
-                this.$store.commit('removeGraphic', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: graphicId });
-                this.$store.commit('removeSnapVectors', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: graphicId });
-                this.$store.commit('graphicEditorGraphicId', undefined);
-                this.slideModel.slideWrapper!.removeGraphic(graphicId);
-            }
-        }));
+        // this.slideModel.graphics.forEach((graphic: IGraphic): void => {
+        //     this.slideModel.slideWrapper!.addGraphic(graphic);
+        // });
+
+        // this.slideModel.slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, ((event: CustomCanvasKeyboardEvent): void => {
+        //     if (['Delete', 'Backspace'].indexOf(event.detail.baseEvent.key) !== -1) {
+        //         if (this.$store.getters.focusedGraphic === undefined) {
+        //             return;
+        //         }
+
+        //         // Remove the focused graphic
+        //         const graphicId: string = this.$store.getters.focusedGraphic.id;
+        //         this.slideModel.slideWrapper!.focusGraphic(undefined);
+        //         this.$store.commit('focusGraphic', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: undefined });
+        //         this.$store.commit('removeGraphic', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: graphicId });
+        //         this.$store.commit('removeSnapVectors', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: graphicId });
+        //         this.$store.commit('graphicEditorGraphicId', undefined);
+        //         this.slideModel.slideWrapper!.removeGraphic(graphicId);
+        //     }
+        // }));
     }
 }
 </script>
