@@ -20,7 +20,6 @@ export default function rectangleTool(store: any): EditorTool {
         function update(event: SlideMouseEvent): void {
             const { baseEvent } = event.detail;
 
-            // TODO: Incorporate shift, alt, ctrl, and snapping into position calculation
             // TODO: Handle ctrl case (symmetric around center)
             const position = resolvePosition(baseEvent, slideRenderer, store);
             maker.setDimensions(initialPosition.towards(position));

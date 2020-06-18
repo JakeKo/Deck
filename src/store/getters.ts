@@ -4,6 +4,9 @@ const getters: AppGetters = {
     slides: (state: AppState): any[] => {
         return state.slides;
     },
+    roadmapSlides: (state: AppState): any[] => {
+        return state.slides.map(() => ({ key: Math.random() }));
+    },
     lastSlide: (state: AppState): any => {
         return state.slides[state.slides.length - 1];
     },
