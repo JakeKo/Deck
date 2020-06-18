@@ -1,10 +1,8 @@
 import * as SVG from 'svg.js';
 import Vector from '../../models/Vector';
-import { GRAPHIC_TYPES } from '../constants';
-import { GraphicRenderer } from '../types';
+import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicMouseEventPayload, GraphicKeyboardEventPayload } from '../../events/types';
-import { GRAPHIC_EVENTS } from '../../events/constants';
+import { GraphicMouseEventPayload, GraphicKeyboardEventPayload, GRAPHIC_EVENTS } from '../../events/types';
 
 type RectangleRendererArgs = {
     id: string;
@@ -52,8 +50,6 @@ class RectangleRenderer implements GraphicRenderer {
         this._strokeColor = args.strokeColor || DEFAULT_ARGS.strokeColor;
         this._strokeWidth = args.strokeWidth || DEFAULT_ARGS.strokeWidth;
         this._rotation = args.rotation || DEFAULT_ARGS.rotation;
-
-        console.log(this._origin.x, this._origin.y);
     }
 
     // TODO: Determine if slide events need to be propagated here
@@ -141,8 +137,6 @@ class RectangleRenderer implements GraphicRenderer {
         return this._svg !== undefined;
     }
 
-    // TODO: Convert setters to functions
-    // TODO: Create getter functions
     public get origin(): Vector {
         return this._origin;
     }

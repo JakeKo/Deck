@@ -1,4 +1,4 @@
-import { SLIDE_EVENTS, GRAPHIC_EVENTS } from "./constants";
+import { SLIDE_EVENTS, GRAPHIC_EVENTS } from "./types";
 
 export function listen(eventName: SLIDE_EVENTS | GRAPHIC_EVENTS, handler: (event: CustomEvent) => void): void {
     document.addEventListener(eventName, handler as EventListener);

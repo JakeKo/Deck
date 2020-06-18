@@ -1,4 +1,4 @@
-import { TOOL_NAMES } from "./constants";
+import { TOOL_NAMES } from "./types";
 
 export default {
     name: TOOL_NAMES.NULL,

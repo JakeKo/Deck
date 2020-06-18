@@ -1,9 +1,7 @@
-import { SlideMouseEvent } from "../events/types";
-import { SLIDE_EVENTS } from "../events/constants";
+import { SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
 import { listen, unlisten } from "../events/utilities";
 import { resolvePosition } from "./utilities";
-import { EditorTool } from "./types";
-import { TOOL_NAMES } from "./constants";
+import { EditorTool, TOOL_NAMES } from "./types";
 
 export default function rectangleTool(store: any): EditorTool {
     console.log('Initialized Rectangle Tool');

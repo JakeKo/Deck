@@ -1,5 +1,4 @@
-import { EditorTool } from "./types";
-import { TOOL_NAMES } from "./constants";
+import { EditorTool, TOOL_NAMES } from "./types";
 
 export default function pointerTool(store: any): EditorTool {
     return {

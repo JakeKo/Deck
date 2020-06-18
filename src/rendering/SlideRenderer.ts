@@ -6,8 +6,7 @@ import RectangleMutator from './mutators/RectangleMutator';
 import CurveMaker from './makers/CurveMaker';
 import CurveRenderer from './graphics/CurveRenderer';
 import CurveMutator from './mutators/CurveMutator';
-import { SlideMouseEventPayload, SlideKeyboardEventPayload } from '../events/types';
-import { SLIDE_EVENTS } from '../events/constants';
+import { SlideMouseEventPayload, SlideKeyboardEventPayload, SLIDE_EVENTS } from '../events/types';
 import Vector from '../models/Vector';
 
 type SlideRendererArgs = {

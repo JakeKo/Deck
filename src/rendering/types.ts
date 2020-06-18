@@ -1,4 +1,5 @@
 import Vector from '../models/Vector';
+
 export type GraphicRenderer = {
     id: string;
     type: string;
@@ -12,3 +13,9 @@ export type CurveAnchor = {
     point: Vector;
     outHandle: Vector | undefined;
 };
+
+export enum GRAPHIC_TYPES {
+    RECTANGLE = 'rectangle',
+    ELLIPSE = 'ellipse',
+    CURVE = 'curve'
+}
