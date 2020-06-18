@@ -5,7 +5,7 @@ const mutations: AppMutations = {
     addSlide: (state: AppState, index: number): void => {
         state.slides = [
             ...state.slides.slice(0, index),
-            {},
+            { id: Math.random().toString() },
             ...state.slides.slice(index)
         ];
     },

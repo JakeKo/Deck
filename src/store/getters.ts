@@ -1,16 +1,16 @@
-import { AppState, Viewbox, AppGetters } from "./types";
+import { AppState, Viewbox, AppGetters, Slide, RoadmapSlide } from "./types";
 
 const getters: AppGetters = {
-    slides: (state: AppState): any[] => {
+    slides: (state: AppState): Slide[] => {
         return state.slides;
     },
-    roadmapSlides: (state: AppState): any[] => {
-        return state.slides.map(() => ({ key: Math.random() }));
+    roadmapSlides: (state: AppState): RoadmapSlide[] => {
+        return state.slides.map<RoadmapSlide>(s => ({ id: s.id }));
     },
-    lastSlide: (state: AppState): any => {
+    lastSlide: (state: AppState): Slide => {
         return state.slides[state.slides.length - 1];
     },
-    slide: (state: AppState): (slideId: string) => any => {
+    slide: (state: AppState): (slideId: string) => Slide => {
         return slideId => {
             const slide = state.slides.find(s => s.id === slideId);
 
@@ -22,7 +22,7 @@ const getters: AppGetters = {
         };
     },
     // TODO: Figure out what is the type of getters
-    activeSlide: (state: AppState, getters: any): any => {
+    activeSlide: (state: AppState, getters: any): Slide => {
         return state.activeSlideId === '' ? undefined : getters.slide(state.activeSlideId);
     },
     activeToolName: (state: AppState): string => {

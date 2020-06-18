@@ -56,6 +56,7 @@ export default class App extends Vue {}
     display: flex;
     flex-direction: column;
     height: 100%;
+    flex-grow: 1;
     min-width: 0; // Override min-width default for flex items
 }
 </style>

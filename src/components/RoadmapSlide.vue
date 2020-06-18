@@ -1,16 +1,17 @@
 <template>
     <div class='roadmap-slide'>
-        <div class='slide-topic'>Topic</div>
+        <div class='slide-topic'>{{id}} {{isActive ? '*' : ''}}</div>
         <canvas class='slide-preview' />
     </div>
 </template>
 
 <script lang='ts'>
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class RoadmapSlide extends Vue {
-
+    @Prop({ type: String, required: true }) private id!: string;
+    @Prop({ type: Boolean, required: true }) private isActive!: boolean;
 }
 </script>
 

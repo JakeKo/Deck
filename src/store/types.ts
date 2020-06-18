@@ -3,7 +3,7 @@ import { EditorTool } from "../tools/types";
 
 export type AppState = {
     activeSlideId: string;
-    slides: any[];
+    slides: Slide[];
     activeTool: EditorTool;
     editorViewbox: {
         zoom: number;
@@ -26,4 +26,12 @@ export type Viewbox = {
     y: number;
     width: number;
     height: number;
+};
+
+export type Slide = {
+    id: string;
+};
+
+export type RoadmapSlide = {
+    id: string;
 };

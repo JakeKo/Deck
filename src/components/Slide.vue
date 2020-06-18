@@ -1,5 +1,5 @@
 <template>
-<div :id='`slide_${Math.random()}`' :class='{ "slide": true, "active-slide": isActive }'>
+<div :id='`slide_${Math.random()}`' :class='{ "slide": true, "active-slide": isActive }' :style='slideStyle'>
     <div class='slide-box'></div>
 </div>
 </template>
@@ -7,44 +7,23 @@
 <script lang='ts'>
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as SVG from 'svg.js';
-// import { IGraphic, CustomCanvasMouseEvent, ISlideWrapper, CanvasKeyboardEvent, CustomCanvasKeyboardEvent } from '../types';
-// import { EVENT_TYPES } from '../constants';
-// import SlideModel from '../models/Slide';
 import SlideRenderer from '../rendering/SlideRenderer';
 
 @Component
 export default class Slide extends Vue {
-    // @Prop({ type: SlideModel, required: true }) private slideModel!: SlideModel;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
+
+    get slideStyle(): { minWidth: string; minHeight: string; } {
+        return {
+            minWidth: `${this.$store.getters.rawEditorViewbox.width}px`,
+            minHeight: `${this.$store.getters.rawEditorViewbox.height}px`,
+        };
+    }
 
     private mounted(): void {
         const viewbox = this.$store.getters.rawEditorViewbox;
         const canvas = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
         const renderer = new SlideRenderer({ canvas });
-
-
-        // this.slideModel.slideWrapper = new SlideWrapper(this.slideModel.id, canvas, this.$store, true);
-
-        // this.slideModel.graphics.forEach((graphic: IGraphic): void => {
-        //     this.slideModel.slideWrapper!.addGraphic(graphic);
-        // });
-
-        // this.slideModel.slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, ((event: CustomCanvasKeyboardEvent): void => {
-        //     if (['Delete', 'Backspace'].indexOf(event.detail.baseEvent.key) !== -1) {
-        //         if (this.$store.getters.focusedGraphic === undefined) {
-        //             return;
-        //         }
-
-        //         // Remove the focused graphic
-        //         const graphicId: string = this.$store.getters.focusedGraphic.id;
-        //         this.slideModel.slideWrapper!.focusGraphic(undefined);
-        //         this.$store.commit('focusGraphic', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: undefined });
-        //         this.$store.commit('removeGraphic', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: graphicId });
-        //         this.$store.commit('removeSnapVectors', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: graphicId });
-        //         this.$store.commit('graphicEditorGraphicId', undefined);
-        //         this.slideModel.slideWrapper!.removeGraphic(graphicId);
-        //     }
-        // }));
     }
 }
 </script>

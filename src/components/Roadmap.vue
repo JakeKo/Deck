@@ -1,7 +1,9 @@
 <template>
 <div id='roadmap'>
     <roadmap-slide v-for='slide in $store.getters.roadmapSlides'
-        :key='slide.key'
+        :key='slide.id'
+        :id='slide.id'
+        :isActive='slide.id === $store.getters.activeSlide.id'
     />
     <div id='add-slide-button' @click='addSlide'></div>
 </div>
