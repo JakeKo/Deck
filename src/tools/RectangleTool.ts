@@ -1,16 +1,16 @@
 import { Store } from "vuex";
-import { ApplicationState } from "../store/types";
+import { AppState } from "../store/types";
 import { SlideMouseEvent } from "../events/types";
 import { SLIDE_EVENTS } from "../events/constants";
 import { listen, unlisten } from "../events/utilities";
 import { resolvePosition } from "./utilities";
 
 type RectangleToolArgs = {
-    store: Store<ApplicationState>;
+    store: Store<AppState>;
 };
 
 class RectangleTool {
-    private _store: Store<ApplicationState>;
+    private _store: Store<AppState>;
 
     constructor(args: RectangleToolArgs) {
         this._store = args.store;
