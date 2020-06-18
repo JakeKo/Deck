@@ -1,30 +1,19 @@
-import { Store } from "vuex";
-import { AppState } from "../store/types";
 import { SlideMouseEvent } from "../events/types";
 import { SLIDE_EVENTS } from "../events/constants";
 import { listen, unlisten } from "../events/utilities";
 import { resolvePosition } from "./utilities";
+import { EditorTool } from "./types";
+import { TOOL_NAMES } from "./constants";
 
-type RectangleToolArgs = {
-    store: Store<AppState>;
-};
-
-class RectangleTool {
-    private _store: Store<AppState>;
-
-    constructor(args: RectangleToolArgs) {
-        this._store = args.store;
-    }
-
-    private _make(event: SlideMouseEvent): void {
-        const self = this;
+export default function rectangleTool(store: any): EditorTool {
+    function make(event: SlideMouseEvent): void {
         const { slideRenderer, baseEvent } = event.detail;
 
-        const initialPosition = resolvePosition(baseEvent, slideRenderer, self._store);
+        const initialPosition = resolvePosition(baseEvent, slideRenderer, store);
         const maker = slideRenderer.startMakingRectangle();
         maker.move(initialPosition);
     
-        unlisten(SLIDE_EVENTS.MOUSEDOWN, self._make);
+        unlisten(SLIDE_EVENTS.MOUSEDOWN, make);
         listen(SLIDE_EVENTS.MOUSEMOVE, update);
         listen(SLIDE_EVENTS.MOUSEUP, complete);
     
@@ -33,24 +22,20 @@ class RectangleTool {
     
             // TODO: Incorporate shift, alt, ctrl, and snapping into position calculation
             // TODO: Handle ctrl case (symmetric around center)
-            const position = resolvePosition(baseEvent, slideRenderer, self._store);
+            const position = resolvePosition(baseEvent, slideRenderer, store);
             maker.setDimensions(initialPosition.towards(position));
         }
     
         function complete(): void {
-            listen(SLIDE_EVENTS.MOUSEDOWN, self._make);
+            listen(SLIDE_EVENTS.MOUSEDOWN, make);
             unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
             unlisten(SLIDE_EVENTS.MOUSEUP, complete);
         }
     }
 
-    public mount(): void {
-        listen(SLIDE_EVENTS.MOUSEDOWN, this._make);
-    }
-
-    public unmount(): void {
-        unlisten(SLIDE_EVENTS.MOUSEDOWN, this._make);
-    }
+    return {
+        name: TOOL_NAMES.RECTANGLE,
+        mount: () => listen(SLIDE_EVENTS.MOUSEDOWN, make),
+        unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, make)
+    };
 }
-
-export default RectangleTool;

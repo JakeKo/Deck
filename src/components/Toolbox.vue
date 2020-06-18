@@ -25,21 +25,21 @@ export default class Toolbox extends Vue {
     private tools = [
         {
             key: Math.random(),
-            clickHandler: () => this.$store.commit('setActiveToolName', 'pointer'),
+            clickHandler: () => this.$store.commit('setActiveTool', 'pointer'),
             toolName: 'cursor',
             icon: 'fas fa-mouse-pointer',
             isActive: this.toolName === 'cursor'
         },
         {
             key: Math.random(),
-            clickHandler: () => this.$store.commit('setActiveToolName', 'rectangle'),
+            clickHandler: () => this.$store.commit('setActiveTool', 'rectangle'),
             toolName: 'rectangle',
             icon: 'fas fa-square',
             isActive: this.toolName === 'rectangle'
         },
         {
             key: Math.random(),
-            clickHandler: () => this.$store.commit('setActiveToolName', 'curve'),
+            clickHandler: () => this.$store.commit('setActiveTool', 'curve'),
             toolName: 'curve',
             icon: 'fas fa-pen-nib',
             isActive: this.toolName === 'curve'

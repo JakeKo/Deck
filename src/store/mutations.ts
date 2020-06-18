@@ -1,4 +1,5 @@
-import { AppMutations, AppState, EditorTools } from "./types";
+import { AppMutations, AppState } from "./types";
+import { EditorTool } from "../tools/types";
 
 const mutations: AppMutations = {
     addSlide: (state: AppState, index: number): void => {
@@ -11,10 +12,10 @@ const mutations: AppMutations = {
     setActiveSlideId: (state: AppState, slideId: string): void => {
         state.activeSlideId = slideId;
     },
-    setActiveTool: (state: AppState, toolName: keyof EditorTools): void => {
-        state.tools[state.activeToolName].unmount();
-        state.activeToolName = toolName;
-        state.tools[state.activeToolName].mount();
+    setActiveTool: (state: AppState, tool: EditorTool): void => {
+        state.activeTool.unmount();
+        state.activeTool = tool;
+        state.activeTool.mount();
     }
 };
 

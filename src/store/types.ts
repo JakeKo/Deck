@@ -1,16 +1,18 @@
-import { GetterTree, MutationTree, ActionTree } from "vuex";
+import { GetterTree, MutationTree, ActionTree, Store } from "vuex";
+import { EditorTool } from "../tools/types";
 
 export type AppState = {
     activeSlideId: string;
     slides: any[];
-    activeToolName: keyof EditorTools;
-    tools: EditorTools;
+    activeTool: EditorTool;
     editorViewbox: {
         zoom: number;
         raw: Viewbox;
         cropped: Viewbox;
     };
 };
+
+export type AppStore = Store<AppState>;
 
 // TODO: Find out what the second type param should be
 export type AppGetters = GetterTree<AppState, any>;
@@ -24,10 +26,4 @@ export type Viewbox = {
     y: number;
     width: number;
     height: number;
-};
-
-export type EditorTools = {
-    pointer: any;
-    rectangle: any;
-    curve: any;
 };

@@ -4,17 +4,13 @@ import getters from './getters';
 import mutations from './mutations';
 import actions from './actions';
 import Vue from "vue";
+import NullTool from "../tools/NullTool";
 
 const store: StoreOptions<AppState> = {
     state: {
         activeSlideId: '',
         slides: [],
-        activeToolName: 'pointer',
-        tools: {
-            'pointer': {},
-            'rectangle': {},
-            'curve': {}
-        },
+        activeTool: NullTool,
         editorViewbox: {
             zoom: 1,
             raw: {

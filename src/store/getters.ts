@@ -23,7 +23,7 @@ const getters: AppGetters = {
         return state.activeSlideId === '' ? undefined : getters.slide(state.activeSlideId);
     },
     activeToolName: (state: AppState): string => {
-        return state.activeToolName;
+        return state.activeTool.name;
     },
     rawEditorViewbox: (state: AppState): Viewbox => {
         return state.editorViewbox.raw;
