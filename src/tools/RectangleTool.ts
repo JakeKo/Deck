@@ -6,26 +6,28 @@ import { EditorTool } from "./types";
 import { TOOL_NAMES } from "./constants";
 
 export default function rectangleTool(store: any): EditorTool {
+    console.log('Initialized Rectangle Tool');
+
     function make(event: SlideMouseEvent): void {
         const { slideRenderer, baseEvent } = event.detail;
 
         const initialPosition = resolvePosition(baseEvent, slideRenderer, store);
         const maker = slideRenderer.startMakingRectangle();
         maker.move(initialPosition);
-    
+
         unlisten(SLIDE_EVENTS.MOUSEDOWN, make);
         listen(SLIDE_EVENTS.MOUSEMOVE, update);
         listen(SLIDE_EVENTS.MOUSEUP, complete);
-    
+
         function update(event: SlideMouseEvent): void {
             const { baseEvent } = event.detail;
-    
+
             // TODO: Incorporate shift, alt, ctrl, and snapping into position calculation
             // TODO: Handle ctrl case (symmetric around center)
             const position = resolvePosition(baseEvent, slideRenderer, store);
             maker.setDimensions(initialPosition.towards(position));
         }
-    
+
         function complete(): void {
             listen(SLIDE_EVENTS.MOUSEDOWN, make);
             unlisten(SLIDE_EVENTS.MOUSEMOVE, update);

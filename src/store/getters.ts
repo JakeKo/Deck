@@ -30,6 +30,9 @@ const getters: AppGetters = {
     },
     croppedEditorViewbox: (state: AppState): Viewbox => {
         return state.editorViewbox.cropped;
+    },
+    editorZoomLevel: (state: AppState): number => {
+        return state.editorViewbox.zoom;
     }
 };
 

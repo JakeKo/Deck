@@ -52,6 +52,8 @@ class RectangleRenderer implements GraphicRenderer {
         this._strokeColor = args.strokeColor || DEFAULT_ARGS.strokeColor;
         this._strokeWidth = args.strokeWidth || DEFAULT_ARGS.strokeWidth;
         this._rotation = args.rotation || DEFAULT_ARGS.rotation;
+
+        console.log(this._origin.x, this._origin.y);
     }
 
     // TODO: Determine if slide events need to be propagated here
@@ -141,9 +143,17 @@ class RectangleRenderer implements GraphicRenderer {
 
     // TODO: Convert setters to functions
     // TODO: Create getter functions
+    public get origin(): Vector {
+        return this._origin;
+    }
+
     public set origin(origin: Vector) {
         this._origin = origin;
         this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
+    }
+
+    public get width(): number {
+        return this._width;
     }
 
     public set width(width: number) {
@@ -151,9 +161,17 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg && this._svg.width(this._width);
     }
 
+    public get height(): number {
+        return this._height;
+    }
+
     public set height(height: number) {
         this._height = height;
         this._svg && this._svg.height(this._height);
+    }
+
+    public get fillColor(): string {
+        return this._fillColor;
     }
 
     public set fillColor(fillColor: string) {
@@ -161,14 +179,26 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg && this._svg.fill(this._fillColor);
     }
 
+    public get strokeColor(): string {
+        return this._strokeColor;
+    }
+
     public set strokeColor(strokeColor: string) {
         this._strokeColor = strokeColor;
         this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
+    public get strokeWidth(): number {
+        return this._strokeWidth;
+    }
+
     public set strokeWidth(strokeWidth: number) {
         this._strokeWidth = strokeWidth;
         this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+    }
+
+    public get rotation(): number {
+        return this._rotation;
     }
 
     public set rotation(rotation: number) {

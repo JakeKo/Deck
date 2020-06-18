@@ -13,6 +13,9 @@
 <script lang='ts'>
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import Tool from './Tool.vue';
+import pointerTool from '../tools/PointerTool';
+import rectangleTool from '../tools/RectangleTool';
+import curveTool from '../tools/CurveTool';
 
 @Component({
     components: {
@@ -25,21 +28,21 @@ export default class Toolbox extends Vue {
     private tools = [
         {
             key: Math.random(),
-            clickHandler: () => this.$store.commit('setActiveTool', 'pointer'),
+            clickHandler: () => this.$store.commit('setActiveTool', pointerTool(this.$store)),
             toolName: 'cursor',
             icon: 'fas fa-mouse-pointer',
             isActive: this.toolName === 'cursor'
         },
         {
             key: Math.random(),
-            clickHandler: () => this.$store.commit('setActiveTool', 'rectangle'),
+            clickHandler: () => this.$store.commit('setActiveTool', rectangleTool(this.$store)),
             toolName: 'rectangle',
             icon: 'fas fa-square',
             isActive: this.toolName === 'rectangle'
         },
         {
             key: Math.random(),
-            clickHandler: () => this.$store.commit('setActiveTool', 'curve'),
+            clickHandler: () => this.$store.commit('setActiveTool', curveTool(this.$store)),
             toolName: 'curve',
             icon: 'fas fa-pen-nib',
             isActive: this.toolName === 'curve'

@@ -1,13 +1,13 @@
 import Vector from "../models/Vector";
 import SlideRenderer from "../rendering/SlideRenderer";
-import { AppState } from "../store/types";
-import { Store } from "vuex";
 
 // TODO: Investigate ways for SlideRenderer to provide all necessary data
-export function resolvePosition(event: MouseEvent, slideRenderer: SlideRenderer, store: Store<AppState>): Vector {
+export function resolvePosition(event: MouseEvent, slideRenderer: SlideRenderer, store: any): Vector {
+    const { editorZoomLevel, rawEditorViewbox } = store.getters;
+
     return new Vector(event.pageX, event.pageY)
-        .scale(1 / store.getters.canvasZoom)
+        .scale(1 / editorZoomLevel)
         .add(slideRenderer.bounds.origin.scale(-1))
-        .add(store.getters.viewbox.origin)
+        .add(new Vector(rawEditorViewbox.x, rawEditorViewbox.y))
         .transform(Math.round);
 }

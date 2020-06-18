@@ -5,5 +5,3 @@ export type EditorTool = {
     mount: () => void;
     unmount: () => void;
 };
-
-export type EditorToolInitializer = (store: any) => EditorTool;
