@@ -16,6 +16,9 @@ const mutations: AppMutations = {
         state.activeTool.unmount();
         state.activeTool = tool;
         state.activeTool.mount();
+    },
+    editorZoomLevel: (state: AppState, zoomLevel: number): void => {
+        state.editorViewbox.zoom = zoomLevel;
     }
 };
 

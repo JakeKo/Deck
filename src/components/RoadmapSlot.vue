@@ -42,6 +42,7 @@ export default class RoadmapSlot extends Vue {
     height: 45px;
     width: 80px;
     border: 2px solid $color-tertiary;
+    box-sizing: border-box;
 }
 
 .active-slide-preview {

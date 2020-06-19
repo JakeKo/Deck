@@ -37,7 +37,7 @@ export default class Roadmap extends Vue {
 #roadmap {
     box-sizing: border-box;
     border-top: 1px solid $color-tertiary;
-    height: 84px;
+    height: 80px;
     display: flex;
     flex-shrink: 0;
 }
@@ -61,11 +61,11 @@ export default class Roadmap extends Vue {
 #add-slide-button {
     height: 45px;
     width: 80px;
-    border: 2px solid $color-tertiary;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: $color-tertiary;
+    color: white;
+    background: $color-information;
 }
 
 ::-webkit-scrollbar {

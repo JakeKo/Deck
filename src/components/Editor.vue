@@ -1,5 +1,5 @@
 <template>
-<div id='editor'>
+<div id='editor' ref='editor'>
     <slide v-for='slide in $store.getters.slides' 
         :key='slide.id'
         :id='slide.id'
@@ -17,7 +17,23 @@ import Slide from './Slide.vue';
         Slide
     }
 })
-export default class Editor extends Vue {}
+export default class Editor extends Vue {
+    @Watch('$store.getters.editorZoomLevel')
+    private onZoomLevelUpdate(): void {
+        (this.$refs['editor'] as HTMLDivElement).style.zoom = this.$store.getters.editorZoomLevel.toString();
+    }
+
+    private mounted(): void {
+        const editorWidth = (this.$el as HTMLElement).offsetWidth;
+        const editorHeight = (this.$el as HTMLElement).offsetHeight;
+        const slideWidth = this.$store.getters.croppedEditorViewbox.width + 100;
+        const slideHeight = this.$store.getters.croppedEditorViewbox.height + 100;
+
+        const scale = Math.min(editorWidth / slideWidth, editorHeight / slideHeight);
+        (this.$refs['editor'] as HTMLDivElement).style.zoom = scale.toString();
+        this.$store.commit('editorZoomLevel', scale);
+    }
+}
 </script>
 
 <style lang='scss' scoped>
