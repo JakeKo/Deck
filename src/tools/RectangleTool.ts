@@ -4,8 +4,6 @@ import { resolvePosition } from "./utilities";
 import { EditorTool, TOOL_NAMES } from "./types";
 
 export default function rectangleTool(store: any): EditorTool {
-    console.log('Initialized Rectangle Tool');
-
     function make(event: SlideMouseEvent): void {
         const { slideRenderer, baseEvent } = event.detail;
 
