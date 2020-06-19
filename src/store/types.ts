@@ -5,6 +5,7 @@ export type AppState = {
     activeSlideId: string;
     slides: Slide[];
     activeTool: EditorTool;
+    deckTitle: string | undefined;
     editorViewbox: {
         zoom: number;
         raw: Viewbox;

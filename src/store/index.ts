@@ -11,6 +11,7 @@ const store: StoreOptions<AppState> = {
         activeSlideId: '',
         slides: [],
         activeTool: NullTool,
+        deckTitle: undefined,
         editorViewbox: {
             zoom: 1,
             raw: {

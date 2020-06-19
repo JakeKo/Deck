@@ -15,7 +15,7 @@ export default class Slide extends Vue {
     get slideStyle(): { minWidth: string; minHeight: string; } {
         return {
             minWidth: `${this.$store.getters.rawEditorViewbox.width}px`,
-            minHeight: `${this.$store.getters.rawEditorViewbox.height}px`,
+            minHeight: `${this.$store.getters.rawEditorViewbox.height}px`
         };
     }
 

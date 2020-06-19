@@ -19,6 +19,9 @@ const mutations: AppMutations = {
     },
     editorZoomLevel: (state: AppState, zoomLevel: number): void => {
         state.editorViewbox.zoom = zoomLevel;
+    },
+    deckTitle: (state: AppState, deckTitle: string): void => {
+        state.deckTitle = deckTitle === '' ? undefined : deckTitle;
     }
 };
 

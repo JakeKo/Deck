@@ -36,6 +36,9 @@ const getters: AppGetters = {
     },
     editorZoomLevel: (state: AppState): number => {
         return state.editorViewbox.zoom;
+    },
+    deckTitle: (state: AppState): string | undefined => {
+        return state.deckTitle;
     }
 };
 

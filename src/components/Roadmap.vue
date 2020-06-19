@@ -40,6 +40,7 @@ export default class Roadmap extends Vue {
     height: 80px;
     display: flex;
     flex-shrink: 0;
+    overflow-x: scroll;
 }
 
 #add-slide-slot {

@@ -1,6 +1,6 @@
 <template>
 <div id='app'>
-    <!-- <menu-bar></menu-bar> -->
+    <menu-bar />
     <div id='interface'>
         <toolbox />
         <div id='workspace'>
@@ -14,7 +14,7 @@
 
 <script lang='ts'>
 import { Vue, Component } from 'vue-property-decorator';
-// import MenuBar from './components/MenuBar.vue';
+import MenuBar from './components/MenuBar.vue';
 import Toolbox from './components/Toolbox.vue';
 import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
@@ -25,7 +25,7 @@ import pointerTool from './tools/PointerTool';
 
 @Component({
     components: {
-        // MenuBar,
+        MenuBar,
         Toolbox,
         Editor,
         Roadmap,
