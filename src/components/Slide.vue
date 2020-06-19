@@ -1,7 +1,5 @@
 <template>
-<div :id='`slide_${Math.random()}`' :class='{ "slide": true, "active-slide": isActive }' :style='slideStyle'>
-    <div class='slide-box'></div>
-</div>
+<div :id='`slide_${id}`' :class='{ "slide": true, "active-slide": isActive }' :style='slideStyle'></div>
 </template>
 
 <script lang='ts'>
@@ -11,6 +9,7 @@ import SlideRenderer from '../rendering/SlideRenderer';
 
 @Component
 export default class Slide extends Vue {
+    @Prop({ type: String, required: true }) private id!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
 
     get slideStyle(): { minWidth: string; minHeight: string; } {
@@ -20,10 +19,19 @@ export default class Slide extends Vue {
         };
     }
 
+    // TODO: Make the slide box an SVG
+    get slideBoxStyle(): { width: string; height: string } {
+        return {
+            width: `${this.$store.getters.croppedEditorViewbox.width}px`,
+            height: `${this.$store.getters.croppedEditorViewbox.height}px`
+        };
+    }
+
     private mounted(): void {
         const viewbox = this.$store.getters.rawEditorViewbox;
         const canvas = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
         const renderer = new SlideRenderer({ canvas });
+        renderer.renderBackdrop(this.$store.getters.croppedEditorViewbox.width, this.$store.getters.croppedEditorViewbox.height);
     }
 }
 </script>
@@ -39,13 +47,6 @@ export default class Slide extends Vue {
     justify-content: center;
     align-items: center;
     position: relative;
-}
-
-.slide-box {
-    box-shadow: 0 0 4px 0 $color-tertiary;
-    background: $color-primary;
-    height: calc(100% / 3);
-    width: calc(100% / 3);
 }
 
 .active-slide {

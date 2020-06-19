@@ -8,6 +8,7 @@ import CurveRenderer from './graphics/CurveRenderer';
 import CurveMutator from './mutators/CurveMutator';
 import { SlideMouseEventPayload, SlideKeyboardEventPayload, SLIDE_EVENTS } from '../events/types';
 import Vector from '../models/Vector';
+import CanvasRenderer from './helpers/CanvasRenderer';
 
 type SlideRendererArgs = {
     canvas: SVG.Doc;
@@ -125,6 +126,15 @@ class SlideRenderer {
 
     public startMutatingCurve(id: string): CurveMutator {
         return new CurveMutator({ curve: this._graphics[id] as CurveRenderer, slide: this });
+    }
+
+    public renderBackdrop(width: number, height: number): void {
+        new CanvasRenderer({
+            canvas: this._canvas,
+            origin: Vector.zero,
+            width,
+            height
+        }).render();
     }
 }
 
