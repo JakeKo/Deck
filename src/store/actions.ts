@@ -1,7 +1,6 @@
-import { ActionTree } from "vuex";
-import { AppState } from "./types";
+import { AppActions } from "./types";
 
-const actions: ActionTree<AppState, any> = {
+const actions: AppActions = {
 
 };
 

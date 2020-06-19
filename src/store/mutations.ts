@@ -1,26 +1,26 @@
-import { AppMutations, AppState } from "./types";
+import { AppMutations, AppState, MUTATIONS } from "./types";
 import { EditorTool } from "../tools/types";
 
 const mutations: AppMutations = {
-    addSlide: (state: AppState, index: number): void => {
+    [MUTATIONS.ADD_SLIDE]: (state: AppState, index: number): void => {
         state.slides = [
             ...state.slides.slice(0, index),
             { id: Math.random().toString() },
             ...state.slides.slice(index)
         ];
     },
-    setActiveSlideId: (state: AppState, slideId: string): void => {
+    [MUTATIONS.ACTIVE_SLIDE_ID]: (state: AppState, slideId: string): void => {
         state.activeSlideId = slideId;
     },
-    setActiveTool: (state: AppState, tool: EditorTool): void => {
+    [MUTATIONS.ACTIVE_TOOL]: (state: AppState, tool: EditorTool): void => {
         state.activeTool.unmount();
         state.activeTool = tool;
         state.activeTool.mount();
     },
-    editorZoomLevel: (state: AppState, zoomLevel: number): void => {
+    [MUTATIONS.EDITOR_ZOOM_LEVEL]: (state: AppState, zoomLevel: number): void => {
         state.editorViewbox.zoom = zoomLevel;
     },
-    deckTitle: (state: AppState, deckTitle: string): void => {
+    [MUTATIONS.DECK_TITLE]: (state: AppState, deckTitle: string): void => {
         state.deckTitle = deckTitle === '' ? undefined : deckTitle;
     }
 };

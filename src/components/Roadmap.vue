@@ -1,9 +1,9 @@
 <template>
 <div id='roadmap'>
-    <roadmap-slot v-for='slide in $store.getters.roadmapSlides'
+    <roadmap-slot v-for='slide in slides'
         :key='slide.id'
         :id='slide.id'
-        :isActive='slide.id === $store.getters.activeSlide.id'
+        :isActive='slide.isActive'
     />
     <div id='add-slide-slot' @click='addSlide'>
         <div id='add-slide-label'>Add Slide</div>
@@ -17,6 +17,7 @@
 <script lang='ts'>
 import { Vue, Component } from 'vue-property-decorator';
 import RoadmapSlot from './RoadmapSlot.vue';
+import { MUTATIONS, GETTERS } from '../store/types';
 
 @Component({
     components: {
@@ -24,9 +25,16 @@ import RoadmapSlot from './RoadmapSlot.vue';
     }
 })
 export default class Roadmap extends Vue {
+    private get slides(): any[] {
+        return this.$store.getters[GETTERS.ROADMAP_SLIDES].map((s: any) => ({
+            id: s.id,
+            isActive: s.id === this.$store.getters[GETTERS.ACTIVE_SLIDE].id
+        }));
+    }
+
     private addSlide(): void {
-        this.$store.commit('addSlide', this.$store.getters.slides.length);
-        this.$store.commit('setActiveSlideId', this.$store.getters.lastSlide.id);
+        this.$store.commit(MUTATIONS.ADD_SLIDE, this.$store.getters[GETTERS.SLIDES].length);
+        this.$store.commit(MUTATIONS.ACTIVE_SLIDE_ID, this.$store.getters[GETTERS.LAST_SLIDE].id);
     }
 }
 </script>

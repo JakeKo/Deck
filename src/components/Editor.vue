@@ -1,12 +1,12 @@
 <template>
 <div id='editor'>
-    <div v-if='$store.getters.slides.length === 0' id='empty-slide-container' :style='emptySlideContainerStyle'>
+    <div v-if='slides.length === 0' id='empty-slide-container' :style='emptySlideContainerStyle'>
         <div id='empty-slide' :style='emptySlideStyle' />
     </div>
-    <slide v-for='slide in $store.getters.slides' 
+    <slide v-for='slide in slides' 
         :key='slide.id'
         :id='slide.id'
-        :isActive='slide.id === $store.getters.activeSlide.id'
+        :isActive='slide.isActive'
     />
 </div>
 </template>
@@ -14,6 +14,7 @@
 <script lang='ts'>
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import Slide from './Slide.vue';
+import { MUTATIONS, GETTERS } from '../store/types';
 
 @Component({
     components: {
@@ -23,7 +24,7 @@ import Slide from './Slide.vue';
 export default class Editor extends Vue {
     @Watch('$store.getters.editorZoomLevel')
     private onZoomLevelUpdate(): void {
-       (this.$el as HTMLElement).style.zoom = this.$store.getters.editorZoomLevel.toString();
+       (this.$el as HTMLElement).style.zoom = this.$store.getters[GETTERS.EDITOR_ZOOM_LEVEL].toString();
     }
 
     // Recenter the editor view when the active slide changes
@@ -34,17 +35,25 @@ export default class Editor extends Vue {
         editor.scrollLeft = (editor.scrollWidth - editor.clientWidth) / 2;
     }
 
+    // TODO: Incorporate Slide type
+    private get slides(): any[] {
+        return this.$store.getters[GETTERS.SLIDES].map((s: any) => ({
+            id: s.id,
+            isActive: s.id === this.$store.getters[GETTERS.ACTIVE_SLIDE].id
+        }));
+    }
+
     private get emptySlideContainerStyle(): { minWidth: string; minHeight: string; } {
         return {
-            minWidth: `${this.$store.getters.rawEditorViewbox.width}px`,
-            minHeight: `${this.$store.getters.rawEditorViewbox.height}px`
+            minWidth: `${this.$store.getters[GETTERS.RAW_VIEWBOX].width}px`,
+            minHeight: `${this.$store.getters[GETTERS.RAW_VIEWBOX].height}px`
         };
     }
 
     private get emptySlideStyle(): { width: string; height: string; } {
         return {
-            width: `${this.$store.getters.croppedEditorViewbox.width}px`,
-            height: `${this.$store.getters.croppedEditorViewbox.height}px`
+            width: `${this.$store.getters[GETTERS.CROPPED_VIEWBOX].width}px`,
+            height: `${this.$store.getters[GETTERS.CROPPED_VIEWBOX].height}px`
         };
     }
 
@@ -52,13 +61,13 @@ export default class Editor extends Vue {
         const editor = this.$el as HTMLElement;
         const editorWidth = editor.offsetWidth;
         const editorHeight = editor.offsetHeight;
-        const slideWidth = this.$store.getters.croppedEditorViewbox.width + 100;
-        const slideHeight = this.$store.getters.croppedEditorViewbox.height + 100;
+        const slideWidth = this.$store.getters[GETTERS.CROPPED_VIEWBOX].width + 100;
+        const slideHeight = this.$store.getters[GETTERS.CROPPED_VIEWBOX].height + 100;
         const scale = Math.min(editorWidth / slideWidth, editorHeight / slideHeight);
 
         // Set the scale based on screen size and slide size
         // Then center the view on the slide
-        this.$store.commit('editorZoomLevel', scale);
+        this.$store.commit(MUTATIONS.EDITOR_ZOOM_LEVEL, scale);
         editor.style.zoom = scale.toString();
         editor.scrollTop = (editor.scrollHeight - editor.offsetHeight) / 2;
         editor.scrollLeft = (editor.scrollWidth - editor.offsetWidth) / 2;

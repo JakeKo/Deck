@@ -7,6 +7,7 @@
 
 <script lang='ts'>
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { MUTATIONS } from '../store/types';
 
 @Component
 export default class RoadmapSlot extends Vue {
@@ -14,7 +15,7 @@ export default class RoadmapSlot extends Vue {
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
 
     private activateSlide(): void {
-        this.$store.commit('setActiveSlideId', this.id);
+        this.$store.commit(MUTATIONS.ACTIVE_SLIDE_ID, this.id);
     }
 }
 </script>

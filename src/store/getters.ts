@@ -1,16 +1,16 @@
-import { AppState, Viewbox, AppGetters, Slide, RoadmapSlide } from "./types";
+import { AppState, Viewbox, AppGetters, Slide, RoadmapSlide, GETTERS } from "./types";
 
 const getters: AppGetters = {
-    slides: (state: AppState): Slide[] => {
+    [GETTERS.SLIDES]: (state: AppState): Slide[] => {
         return state.slides;
     },
-    roadmapSlides: (state: AppState): RoadmapSlide[] => {
+    [GETTERS.ROADMAP_SLIDES]: (state: AppState): RoadmapSlide[] => {
         return state.slides.map<RoadmapSlide>(s => ({ id: s.id }));
     },
-    lastSlide: (state: AppState): Slide => {
+    [GETTERS.LAST_SLIDE]: (state: AppState): Slide => {
         return state.slides[state.slides.length - 1];
     },
-    slide: (state: AppState): (slideId: string) => Slide => {
+    [GETTERS.SLIDE]: (state: AppState): (slideId: string) => Slide => {
         return slideId => {
             const slide = state.slides.find(s => s.id === slideId);
 
@@ -22,22 +22,22 @@ const getters: AppGetters = {
         };
     },
     // TODO: Figure out what is the type of getters
-    activeSlide: (state: AppState, getters: any): Slide => {
+    [GETTERS.ACTIVE_SLIDE]: (state: AppState, getters: any): Slide => {
         return state.activeSlideId === '' ? undefined : getters.slide(state.activeSlideId);
     },
-    activeToolName: (state: AppState): string => {
+    [GETTERS.ACTIVE_TOOL_NAME]: (state: AppState): string => {
         return state.activeTool.name;
     },
-    rawEditorViewbox: (state: AppState): Viewbox => {
+    [GETTERS.RAW_VIEWBOX]: (state: AppState): Viewbox => {
         return state.editorViewbox.raw;
     },
-    croppedEditorViewbox: (state: AppState): Viewbox => {
+    [GETTERS.CROPPED_VIEWBOX]: (state: AppState): Viewbox => {
         return state.editorViewbox.cropped;
     },
-    editorZoomLevel: (state: AppState): number => {
+    [GETTERS.EDITOR_ZOOM_LEVEL]: (state: AppState): number => {
         return state.editorViewbox.zoom;
     },
-    deckTitle: (state: AppState): string | undefined => {
+    [GETTERS.DECK_TITLE]: (state: AppState): string | undefined => {
         return state.deckTitle;
     }
 };

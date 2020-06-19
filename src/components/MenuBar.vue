@@ -6,15 +6,16 @@
 
 <script lang='ts'>
 import { Vue, Component } from 'vue-property-decorator';
+import { MUTATIONS, GETTERS } from '../store/types';
 
 @Component
 export default class MenuBar extends Vue {
-    get deckTitle(): string {
-        return this.$store.getters.deckTitle;
+    private get deckTitle(): string {
+        return this.$store.getters[GETTERS.DECK_TITLE];
     }
 
-    set deckTitle(deckTitle: string) {
-        this.$store.commit('deckTitle', deckTitle);
+    private set deckTitle(deckTitle: string) {
+        this.$store.commit(MUTATIONS.DECK_TITLE, deckTitle);
     }
 
     private handleKeydown(event: KeyboardEvent): void {

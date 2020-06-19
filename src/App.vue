@@ -19,6 +19,7 @@ import Toolbox from './components/Toolbox.vue';
 import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
 import pointerTool from './tools/PointerTool';
+import { MUTATIONS } from './store/types';
 // import GraphicEditor from './components/GraphicEditor.vue';
 // import Utilities from './utilities';
 // import { IGraphic } from './types';
@@ -35,7 +36,7 @@ import pointerTool from './tools/PointerTool';
 export default class App extends Vue {
     // Initialize application settings
     private mounted(): void {
-        this.$store.commit('setActiveTool', pointerTool(this.$store));
+        this.$store.commit(MUTATIONS.ACTIVE_TOOL, pointerTool(this.$store));
     }
 }
 </script>

@@ -6,24 +6,25 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as SVG from 'svg.js';
 import SlideRenderer from '../rendering/SlideRenderer';
+import { GETTERS } from '../store/types';
 
 @Component
 export default class Slide extends Vue {
     @Prop({ type: String, required: true }) private id!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
 
-    get slideStyle(): { minWidth: string; minHeight: string; } {
+    private get slideStyle(): { minWidth: string; minHeight: string; } {
         return {
-            minWidth: `${this.$store.getters.rawEditorViewbox.width}px`,
-            minHeight: `${this.$store.getters.rawEditorViewbox.height}px`
+            minWidth: `${this.$store.getters[GETTERS.RAW_VIEWBOX].width}px`,
+            minHeight: `${this.$store.getters[GETTERS.RAW_VIEWBOX].height}px`
         };
     }
 
     private mounted(): void {
-        const viewbox = this.$store.getters.rawEditorViewbox;
+        const viewbox = this.$store.getters[GETTERS.RAW_VIEWBOX];
         const canvas = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
         const renderer = new SlideRenderer({ canvas });
-        renderer.renderBackdrop(this.$store.getters.croppedEditorViewbox.width, this.$store.getters.croppedEditorViewbox.height);
+        renderer.renderBackdrop(this.$store.getters[GETTERS.CROPPED_VIEWBOX].width, this.$store.getters[GETTERS.CROPPED_VIEWBOX].height);
     }
 }
 </script>
