@@ -2,7 +2,7 @@
 <div id='app'>
     <!-- <menu-bar></menu-bar> -->
     <div id='interface'>
-        <toolbox :toolName='$store.getters.activeToolName'></toolbox>
+        <toolbox />
         <div id='workspace'>
             <editor></editor>
             <roadmap></roadmap>
@@ -18,6 +18,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import Toolbox from './components/Toolbox.vue';
 import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
+import pointerTool from './tools/PointerTool';
 // import GraphicEditor from './components/GraphicEditor.vue';
 // import Utilities from './utilities';
 // import { IGraphic } from './types';
@@ -31,7 +32,12 @@ import Roadmap from './components/Roadmap.vue';
         // GraphicEditor
     }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+    // Initialize application settings
+    private mounted(): void {
+        this.$store.commit('setActiveTool', pointerTool(this.$store));
+    }
+}
 </script>
 
 <style lang='scss'>

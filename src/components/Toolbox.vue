@@ -1,12 +1,8 @@
 <template>
 <div id='toolbox'>
-    <tool v-for='t in tools'
-        :key='t.key'
-        @tool-click='t.clickHandler'
-        :toolName='t.toolName'
-        :icon='t.icon'
-        :isActive='t.isActive'
-    />
+    <tool :name='"pointer"' :icon='"fas fa-mouse-pointer"' :isActive='$store.getters.activeToolName === "pointer"' @tool-click='activatePointerTool' />
+    <tool :name='"rectangle"' :icon='"fas fa-square"' :isActive='$store.getters.activeToolName === "rectangle"' @tool-click='activateRectangleTool' />
+    <tool :name='"curve"' :icon='"fas fa-pen-nib"' :isActive='$store.getters.activeToolName === "curve"' @tool-click='activateCurveTool' />
 </div>
 </template>
 
@@ -16,7 +12,6 @@ import Tool from './Tool.vue';
 import pointerTool from '../tools/PointerTool';
 import rectangleTool from '../tools/RectangleTool';
 import curveTool from '../tools/CurveTool';
-import { TOOL_NAMES } from '../tools/types';
 
 @Component({
     components: {
@@ -24,31 +19,17 @@ import { TOOL_NAMES } from '../tools/types';
     }
 })
 export default class Toolbox extends Vue {
-    @Prop({ type: String, required: true }) private toolName!: string;
+    private activatePointerTool(): void {
+        this.$store.commit('setActiveTool', pointerTool(this.$store));
+    }
 
-    private tools = [
-        {
-            key: Math.random(),
-            clickHandler: () => this.$store.commit('setActiveTool', pointerTool(this.$store)),
-            toolName: TOOL_NAMES.POINTER,
-            icon: 'fas fa-mouse-pointer',
-            isActive: this.toolName === TOOL_NAMES.POINTER
-        },
-        {
-            key: Math.random(),
-            clickHandler: () => this.$store.commit('setActiveTool', rectangleTool(this.$store)),
-            toolName: TOOL_NAMES.RECTANGLE,
-            icon: 'fas fa-square',
-            isActive: this.toolName === TOOL_NAMES.RECTANGLE
-        },
-        {
-            key: Math.random(),
-            clickHandler: () => this.$store.commit('setActiveTool', curveTool(this.$store)),
-            toolName: TOOL_NAMES.CURVE,
-            icon: 'fas fa-pen-nib',
-            isActive: this.toolName === TOOL_NAMES.CURVE
-        }
-    ];
+    private activateRectangleTool(): void {
+        this.$store.commit('setActiveTool', rectangleTool(this.$store));
+    }
+
+    private activateCurveTool(): void {
+        this.$store.commit('setActiveTool', curveTool(this.$store));
+    }
 }
 </script>
 

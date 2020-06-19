@@ -19,14 +19,6 @@ export default class Slide extends Vue {
         };
     }
 
-    // TODO: Make the slide box an SVG
-    get slideBoxStyle(): { width: string; height: string } {
-        return {
-            width: `${this.$store.getters.croppedEditorViewbox.width}px`,
-            height: `${this.$store.getters.croppedEditorViewbox.height}px`
-        };
-    }
-
     private mounted(): void {
         const viewbox = this.$store.getters.rawEditorViewbox;
         const canvas = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
