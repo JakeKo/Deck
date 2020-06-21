@@ -22,17 +22,14 @@ import { MUTATIONS, GETTERS } from '../store/types';
     }
 })
 export default class Editor extends Vue {
-    @Watch('$store.getters.editorZoomLevel')
-    private onZoomLevelUpdate(): void {
-       (this.$el as HTMLElement).style.zoom = this.$store.getters[GETTERS.EDITOR_ZOOM_LEVEL].toString();
+    private get activeSlideId(): string | undefined {
+        return this.$store.getters[GETTERS.ACTIVE_SLIDE] === undefined
+            ? undefined
+            : this.$store.getters[GETTERS.ACTIVE_SLIDE].id;
     }
 
-    // Recenter the editor view when the active slide changes
-    @Watch('$store.getters.activeSlide.id')
-    private onActiveSlideIdUpdate(): void {
-        const editor = this.$el as HTMLElement;
-        editor.scrollTop = (editor.scrollHeight - editor.clientHeight) / 2;
-        editor.scrollLeft = (editor.scrollWidth - editor.clientWidth) / 2;
+    private get zoomLevel(): number {
+        return this.$store.getters[GETTERS.EDITOR_ZOOM_LEVEL];
     }
 
     // TODO: Incorporate Slide type
@@ -55,6 +52,19 @@ export default class Editor extends Vue {
             width: `${this.$store.getters[GETTERS.CROPPED_VIEWBOX].width}px`,
             height: `${this.$store.getters[GETTERS.CROPPED_VIEWBOX].height}px`
         };
+    }
+
+    // Recenter the editor view when the active slide changes
+    @Watch('activeSlideId')
+    private onActiveSlideIdUpdate(): void {
+        const editor = this.$el as HTMLElement;
+        editor.scrollTop = (editor.scrollHeight - editor.clientHeight) / 2;
+        editor.scrollLeft = (editor.scrollWidth - editor.clientWidth) / 2;
+    }
+
+    @Watch('zoomLevel')
+    private onZoomLevelUpdate(zoomLevel: number): void {
+       (this.$el as HTMLElement).style.zoom = zoomLevel.toString();
     }
 
     private mounted(): void {
