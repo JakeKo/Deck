@@ -1,4 +1,4 @@
-import Vector from "../../models/Vector";
+import Vector from "../../utilities/Vector";
 import * as SVG from 'svg.js';
 
 type CanvasRendererArgs = {

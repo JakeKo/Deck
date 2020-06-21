@@ -1,7 +1,7 @@
 import CurveRenderer from "../graphics/CurveRenderer";
 import SlideRenderer from "../SlideRenderer";
 import CurveAnchorRenderer from "../helpers/CurveAnchorRenderer";
-import Vector from "../../models/Vector";
+import Vector from "../../utilities/Vector";
 import { CurveAnchor } from "../types";
 
 type CurveMakerArgs = {

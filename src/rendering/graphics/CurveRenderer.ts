@@ -1,6 +1,6 @@
 import * as SVG from 'svg.js';
 import { GraphicRenderer, CurveAnchor, GRAPHIC_TYPES } from "../types";
-import Vector from '../../models/Vector';
+import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GraphicMouseEventPayload, GraphicKeyboardEventPayload, GRAPHIC_EVENTS } from '../../events/types';
 

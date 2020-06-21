@@ -1,4 +1,4 @@
-import Vector from '../models/Vector';
+import Vector from '../utilities/Vector';
 
 export type GraphicRenderer = {
     id: string;

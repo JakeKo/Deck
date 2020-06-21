@@ -7,7 +7,7 @@ import CurveMaker from './makers/CurveMaker';
 import CurveRenderer from './graphics/CurveRenderer';
 import CurveMutator from './mutators/CurveMutator';
 import { SlideMouseEventPayload, SlideKeyboardEventPayload, SLIDE_EVENTS } from '../events/types';
-import Vector from '../models/Vector';
+import Vector from '../utilities/Vector';
 import CanvasRenderer from './helpers/CanvasRenderer';
 
 type SlideRendererArgs = {

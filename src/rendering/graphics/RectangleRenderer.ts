@@ -1,5 +1,5 @@
 import * as SVG from 'svg.js';
-import Vector from '../../models/Vector';
+import Vector from '../../utilities/Vector';
 import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 import SlideRenderer from '../SlideRenderer';
 import { GraphicMouseEventPayload, GraphicKeyboardEventPayload, GRAPHIC_EVENTS } from '../../events/types';

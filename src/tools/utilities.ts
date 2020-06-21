@@ -1,4 +1,4 @@
-import Vector from "../models/Vector";
+import Vector from "../utilities/Vector";
 import SlideRenderer from "../rendering/SlideRenderer";
 
 // TODO: Investigate ways for SlideRenderer to provide all necessary data

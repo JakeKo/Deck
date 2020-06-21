@@ -7,7 +7,6 @@
             <editor></editor>
             <roadmap></roadmap>
         </div>
-        <!-- <graphic-editor></graphic-editor> -->
     </div>
 </div>
 </template>
@@ -20,17 +19,13 @@ import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
 import pointerTool from './tools/PointerTool';
 import { MUTATIONS } from './store/types';
-// import GraphicEditor from './components/GraphicEditor.vue';
-// import Utilities from './utilities';
-// import { IGraphic } from './types';
 
 @Component({
     components: {
         MenuBar,
         Toolbox,
         Editor,
-        Roadmap,
-        // GraphicEditor
+        Roadmap
     }
 })
 export default class App extends Vue {
