@@ -1,7 +1,7 @@
 import SlideRenderer from "../SlideRenderer";
-import RectangleRenderer from "../graphics/RectangleRenderer";
 import Vector from "../../utilities/Vector";
-import VertexRenderer from "../helpers/VertexRenderer";
+import { RectangleRenderer } from "../graphics";
+import { VertexRenderer } from "../helpers";
 
 type RectangleMakerArgs = {
     rectangle: RectangleRenderer;

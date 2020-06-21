@@ -1,7 +1,7 @@
-import RectangleRenderer from "../graphics/RectangleRenderer";
 import SlideRenderer from "../SlideRenderer";
-import VertexRenderer from '../helpers/VertexRenderer';
 import Vector from "../../utilities/Vector";
+import { RectangleRenderer } from "../graphics";
+import { VertexRenderer } from "../helpers";
 
 type RectangleMutatorArgs = {
     rectangle: RectangleRenderer;
