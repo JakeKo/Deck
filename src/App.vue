@@ -19,6 +19,8 @@ import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
 import { PointerTool } from './tools';
 import { MUTATIONS } from './store/types';
+import { mapMutations } from 'vuex';
+import { EditorTool } from './tools/types';
 
 @Component({
     components: {
@@ -26,12 +28,15 @@ import { MUTATIONS } from './store/types';
         Toolbox,
         Editor,
         Roadmap
-    }
+    },
+    methods: mapMutations([MUTATIONS.ACTIVE_TOOL])
 })
 export default class App extends Vue {
+    private [MUTATIONS.ACTIVE_TOOL]: (tool: EditorTool) => void;
+
     // Initialize application settings
     private mounted(): void {
-        this.$store.commit(MUTATIONS.ACTIVE_TOOL, PointerTool(this.$store));
+        this[MUTATIONS.ACTIVE_TOOL](PointerTool(this.$store));
     }
 }
 </script>

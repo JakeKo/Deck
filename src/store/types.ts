@@ -30,10 +30,12 @@ export type Viewbox = {
 
 export type Slide = {
     id: string;
+    isActive: boolean;
 };
 
 export type RoadmapSlide = {
     id: string;
+    isActive: boolean;
 };
 
 export enum GETTERS {

@@ -1,6 +1,6 @@
 <template>
 <div id='roadmap'>
-    <roadmap-slot v-for='slide in roadmapSlideViews'
+    <roadmap-slot v-for='slide in getRoadmapSlides'
         :key='slide.id'
         :id='slide.id'
         :isActive='slide.isActive'
@@ -17,7 +17,7 @@
 <script lang='ts'>
 import { Vue, Component } from 'vue-property-decorator';
 import RoadmapSlot from './RoadmapSlot.vue';
-import { MUTATIONS, GETTERS } from '../store/types';
+import { MUTATIONS, GETTERS, RoadmapSlide, Slide } from '../store/types';
 import { mapMutations, mapGetters } from 'vuex';
 
 @Component({
@@ -28,19 +28,12 @@ import { mapMutations, mapGetters } from 'vuex';
     methods: mapMutations([MUTATIONS.ADD_SLIDE, MUTATIONS.ACTIVE_SLIDE_ID])
 })
 export default class Roadmap extends Vue {
-    private [GETTERS.ROADMAP_SLIDES]: any[];
-    private [GETTERS.ACTIVE_SLIDE]: any;
-    private [GETTERS.SLIDES]: any[];
-    private [GETTERS.LAST_SLIDE]: any;
+    private [GETTERS.ROADMAP_SLIDES]: RoadmapSlide[];
+    private [GETTERS.ACTIVE_SLIDE]: Slide;
+    private [GETTERS.SLIDES]: Slide[];
+    private [GETTERS.LAST_SLIDE]: Slide;
     private [MUTATIONS.ADD_SLIDE]: (index: number) => void;
     private [MUTATIONS.ACTIVE_SLIDE_ID]: (id: string) => void;
-
-    private get roadmapSlideViews(): any[] {
-        return this[GETTERS.ROADMAP_SLIDES].map((s: any) => ({
-            id: s.id,
-            isActive: s.id === this[GETTERS.ACTIVE_SLIDE].id
-        }));
-    }
 
     private createNewSlide(): void {
         this[MUTATIONS.ADD_SLIDE](this[GETTERS.SLIDES].length);

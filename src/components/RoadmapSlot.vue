@@ -1,5 +1,5 @@
 <template>
-    <div class='roadmap-slot' @click='activateSlide'>
+    <div class='roadmap-slot' @click='() => setActiveSlideId(id)'>
         <div class='slide-topic'>Topic</div>
         <canvas :class='{ "slide-preview": true, "active-slide-preview": isActive }' />
     </div>
@@ -17,10 +17,6 @@ export default class RoadmapSlot extends Vue {
     @Prop({ type: String, required: true }) private id!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
     private [MUTATIONS.ACTIVE_SLIDE_ID]: (id: string) => void;
-
-    private activateSlide(): void {
-        this[MUTATIONS.ACTIVE_SLIDE_ID](this.id);
-    }
 }
 </script>
 

@@ -1,9 +1,9 @@
 <template>
 <div id='editor' :style='{ zoom: getEditorZoomLevel }'>
-    <div v-if='slides.length === 0' id='empty-slide-container' :style='emptySlideContainerStyle'>
+    <div v-if='getSlides.length === 0' id='empty-slide-container' :style='emptySlideContainerStyle'>
         <div id='empty-slide' :style='emptySlideStyle' />
     </div>
-    <slide v-for='slide in slides' 
+    <slide v-for='slide in getSlides' 
         :key='slide.id'
         :id='slide.id'
         :isActive='slide.isActive'
@@ -14,32 +14,23 @@
 <script lang='ts'>
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import Slide from './Slide.vue';
-import { MUTATIONS, GETTERS, Viewbox } from '../store/types';
+import { MUTATIONS, GETTERS, Viewbox, Slide as SlideModel } from '../store/types';
 import { mapGetters, mapMutations } from 'vuex';
 
 @Component({
     components: {
         Slide
     },
-    computed: mapGetters([GETTERS.ACTIVE_SLIDE, GETTERS.EDITOR_ZOOM_LEVEL, GETTERS.SLIDES, GETTERS.ROADMAP_SLIDES, GETTERS.RAW_VIEWBOX, GETTERS.CROPPED_VIEWBOX]),
+    computed: mapGetters([GETTERS.ACTIVE_SLIDE, GETTERS.EDITOR_ZOOM_LEVEL, GETTERS.SLIDES, GETTERS.RAW_VIEWBOX, GETTERS.CROPPED_VIEWBOX]),
     methods: mapMutations([MUTATIONS.EDITOR_ZOOM_LEVEL])
 })
 export default class Editor extends Vue {
-    private [GETTERS.ACTIVE_SLIDE]: any;
+    private [GETTERS.ACTIVE_SLIDE]: SlideModel;
     private [GETTERS.EDITOR_ZOOM_LEVEL]: number;
-    private [GETTERS.SLIDES]: any[];
-    private [GETTERS.ROADMAP_SLIDES]: any[];
+    private [GETTERS.SLIDES]: SlideModel[];
     private [GETTERS.RAW_VIEWBOX]: Viewbox;
     private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
     private [MUTATIONS.EDITOR_ZOOM_LEVEL]: (zoomLevel: number) => void;
-
-    // TODO: Incorporate Slide type
-    private get slides(): any[] {
-        return this[GETTERS.SLIDES].map((s: any) => ({
-            id: s.id,
-            isActive: s.id === this[GETTERS.ACTIVE_SLIDE].id
-        }));
-    }
 
     private get emptySlideContainerStyle(): { minWidth: string; minHeight: string; } {
         return {
