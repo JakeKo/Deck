@@ -3,7 +3,7 @@ import { listen, unlisten } from "../events/utilities";
 import { resolvePosition } from "./utilities";
 import { EditorTool, TOOL_NAMES } from "./types";
 
-export default function rectangleTool(store: any): EditorTool {
+export default (store: any): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slideRenderer, baseEvent } = event.detail;
 
@@ -35,4 +35,4 @@ export default function rectangleTool(store: any): EditorTool {
         mount: () => listen(SLIDE_EVENTS.MOUSEDOWN, make),
         unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, make)
     };
-}
+};

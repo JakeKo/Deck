@@ -17,7 +17,7 @@ import MenuBar from './components/MenuBar.vue';
 import Toolbox from './components/Toolbox.vue';
 import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
-import pointerTool from './tools/PointerTool';
+import { PointerTool } from './tools';
 import { MUTATIONS } from './store/types';
 
 @Component({
@@ -31,7 +31,7 @@ import { MUTATIONS } from './store/types';
 export default class App extends Vue {
     // Initialize application settings
     private mounted(): void {
-        this.$store.commit(MUTATIONS.ACTIVE_TOOL, pointerTool(this.$store));
+        this.$store.commit(MUTATIONS.ACTIVE_TOOL, PointerTool(this.$store));
     }
 }
 </script>

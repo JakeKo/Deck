@@ -8,5 +8,9 @@ export enum TOOL_NAMES {
     NULL = 'null',
     POINTER = 'pointer',
     RECTANGLE = 'rectangle',
-    CURVE = 'curve'
+    ELLIPSE = 'ellipse',
+    CURVE = 'curve',
+    IMAGE = 'image',
+    TEXTBOX = 'textbox',
+    VIDEO = 'video'
 }

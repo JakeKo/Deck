@@ -15,7 +15,6 @@ export type AppState = {
 
 export type AppStore = Store<AppState>;
 
-// TODO: Find out what the second type param should be
 export type AppGetters = GetterTree<AppState, AppState>;
 
 export type AppMutations = MutationTree<AppState>;

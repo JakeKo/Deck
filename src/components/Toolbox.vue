@@ -9,9 +9,7 @@
 <script lang='ts'>
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import Tool from './Tool.vue';
-import pointerTool from '../tools/PointerTool';
-import rectangleTool from '../tools/RectangleTool';
-import curveTool from '../tools/CurveTool';
+import { PointerTool, RectangleTool, CurveTool } from '../tools';
 import { MUTATIONS, GETTERS } from '../store/types';
 import { TOOL_NAMES, EditorTool } from '../tools/types';
 import { mapGetters, mapMutations } from 'vuex';
@@ -40,15 +38,15 @@ export default class Toolbox extends Vue {
     }
 
     private activatePointerTool(): void {
-        this[MUTATIONS.ACTIVE_TOOL](pointerTool(this.$store));
+        this[MUTATIONS.ACTIVE_TOOL](PointerTool(this.$store));
     }
 
     private activateRectangleTool(): void {
-        this[MUTATIONS.ACTIVE_TOOL](rectangleTool(this.$store));
+        this[MUTATIONS.ACTIVE_TOOL](RectangleTool(this.$store));
     }
 
     private activateCurveTool(): void {
-        this[MUTATIONS.ACTIVE_TOOL](curveTool(this.$store));
+        this[MUTATIONS.ACTIVE_TOOL](CurveTool(this.$store));
     }
 }
 </script>
