@@ -1,11 +1,11 @@
 <template>
 <div id='roadmap'>
-    <roadmap-slot v-for='slide in slides'
+    <roadmap-slot v-for='slide in roadmapSlideViews'
         :key='slide.id'
         :id='slide.id'
         :isActive='slide.isActive'
     />
-    <div id='add-slide-slot' @click='addSlide'>
+    <div id='add-slide-slot' @click='createNewSlide'>
         <div id='add-slide-label'>Add Slide</div>
         <div id='add-slide-button'>
             <i class='fas fa-plus' />
@@ -18,23 +18,33 @@
 import { Vue, Component } from 'vue-property-decorator';
 import RoadmapSlot from './RoadmapSlot.vue';
 import { MUTATIONS, GETTERS } from '../store/types';
+import { mapMutations, mapGetters } from 'vuex';
 
 @Component({
     components: {
         RoadmapSlot
-    }
+    },
+    computed: mapGetters([GETTERS.ROADMAP_SLIDES, GETTERS.ACTIVE_SLIDE, GETTERS.SLIDES, GETTERS.LAST_SLIDE]),
+    methods: mapMutations([MUTATIONS.ADD_SLIDE, MUTATIONS.ACTIVE_SLIDE_ID])
 })
 export default class Roadmap extends Vue {
-    private get slides(): any[] {
-        return this.$store.getters[GETTERS.ROADMAP_SLIDES].map((s: any) => ({
+    private [GETTERS.ROADMAP_SLIDES]: any[];
+    private [GETTERS.ACTIVE_SLIDE]: any;
+    private [GETTERS.SLIDES]: any[];
+    private [GETTERS.LAST_SLIDE]: any;
+    private [MUTATIONS.ADD_SLIDE]: (index: number) => void;
+    private [MUTATIONS.ACTIVE_SLIDE_ID]: (id: string) => void;
+
+    private get roadmapSlideViews(): any[] {
+        return this[GETTERS.ROADMAP_SLIDES].map((s: any) => ({
             id: s.id,
-            isActive: s.id === this.$store.getters[GETTERS.ACTIVE_SLIDE].id
+            isActive: s.id === this[GETTERS.ACTIVE_SLIDE].id
         }));
     }
 
-    private addSlide(): void {
-        this.$store.commit(MUTATIONS.ADD_SLIDE, this.$store.getters[GETTERS.SLIDES].length);
-        this.$store.commit(MUTATIONS.ACTIVE_SLIDE_ID, this.$store.getters[GETTERS.LAST_SLIDE].id);
+    private createNewSlide(): void {
+        this[MUTATIONS.ADD_SLIDE](this[GETTERS.SLIDES].length);
+        this[MUTATIONS.ACTIVE_SLIDE_ID](this[GETTERS.LAST_SLIDE].id);
     }
 }
 </script>

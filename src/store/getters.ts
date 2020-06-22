@@ -23,7 +23,7 @@ const getters: AppGetters = {
     },
     // TODO: Figure out what is the type of getters
     [GETTERS.ACTIVE_SLIDE]: (state: AppState, getters: any): Slide => {
-        return state.activeSlideId === '' ? undefined : getters.slide(state.activeSlideId);
+        return state.activeSlideId === '' ? undefined : getters[GETTERS.SLIDE](state.activeSlideId);
     },
     [GETTERS.ACTIVE_TOOL_NAME]: (state: AppState): string => {
         return state.activeTool.name;

@@ -13,36 +13,42 @@ import pointerTool from '../tools/PointerTool';
 import rectangleTool from '../tools/RectangleTool';
 import curveTool from '../tools/CurveTool';
 import { MUTATIONS, GETTERS } from '../store/types';
-import { TOOL_NAMES } from '../tools/types';
+import { TOOL_NAMES, EditorTool } from '../tools/types';
+import { mapGetters, mapMutations } from 'vuex';
 
 @Component({
     components: {
         Tool
-    }
+    },
+    computed: mapGetters([GETTERS.ACTIVE_TOOL_NAME]),
+    methods: mapMutations([MUTATIONS.ACTIVE_TOOL])
 })
 export default class Toolbox extends Vue {
+    private [GETTERS.ACTIVE_TOOL_NAME]: TOOL_NAMES;
+    private [MUTATIONS.ACTIVE_TOOL]: (tool: EditorTool) => void;
+
     private get isPointerToolActive(): boolean {
-        return this.$store.getters[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.POINTER;
+        return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.POINTER;
     }
 
     private get isRectangleToolActive(): boolean {
-        return this.$store.getters[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.RECTANGLE;
+        return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.RECTANGLE;
     }
 
     private get isCurveToolActive(): boolean {
-        return this.$store.getters[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.CURVE;
+        return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.CURVE;
     }
 
     private activatePointerTool(): void {
-        this.$store.commit(MUTATIONS.ACTIVE_TOOL, pointerTool(this.$store));
+        this[MUTATIONS.ACTIVE_TOOL](pointerTool(this.$store));
     }
 
     private activateRectangleTool(): void {
-        this.$store.commit(MUTATIONS.ACTIVE_TOOL, rectangleTool(this.$store));
+        this[MUTATIONS.ACTIVE_TOOL](rectangleTool(this.$store));
     }
 
     private activateCurveTool(): void {
-        this.$store.commit(MUTATIONS.ACTIVE_TOOL, curveTool(this.$store));
+        this[MUTATIONS.ACTIVE_TOOL](curveTool(this.$store));
     }
 }
 </script>

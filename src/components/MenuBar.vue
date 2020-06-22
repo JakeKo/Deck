@@ -7,24 +7,26 @@
 <script lang='ts'>
 import { Vue, Component } from 'vue-property-decorator';
 import { MUTATIONS, GETTERS } from '../store/types';
+import { mapGetters, mapMutations } from 'vuex';
 
-@Component
+@Component({
+    computed: mapGetters([GETTERS.DECK_TITLE]),
+    methods: mapMutations([MUTATIONS.DECK_TITLE])
+})
 export default class MenuBar extends Vue {
+    private [GETTERS.DECK_TITLE]: string;
+    private [MUTATIONS.DECK_TITLE]: (deckTitle: string) => void;
+
     private get deckTitle(): string {
-        return this.$store.getters[GETTERS.DECK_TITLE];
+        return this[GETTERS.DECK_TITLE];
     }
 
     private set deckTitle(deckTitle: string) {
-        this.$store.commit(MUTATIONS.DECK_TITLE, deckTitle);
+        this[MUTATIONS.DECK_TITLE](deckTitle);
     }
 
     private handleKeydown(event: KeyboardEvent): void {
-        // Prevent propagation so pressing 'Delete' or 'Backspace' won't remove graphics from the active slide
-        // TODO: Devise better way to handle removing graphics such that graphics are only removed if a delete-ish key is pressed while the editor is 'focused'
-        event.stopPropagation();
-
-        // Submit the input field if 'Enter' is pressed
-        if (['Tab', 'Enter'].indexOf(event.key) !== -1) {
+        if (['Tab', 'Enter', 'Escape'].indexOf(event.key) !== -1) {
             (event.target as HTMLInputElement).blur();
         }
     }

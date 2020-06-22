@@ -38,24 +38,24 @@ export type RoadmapSlide = {
 };
 
 export enum GETTERS {
-    SLIDES = 'slides',
-    ROADMAP_SLIDES = 'roadmapSlides',
-    LAST_SLIDE = 'lastSlide',
-    SLIDE = 'slide',
-    ACTIVE_SLIDE = 'activeSlide',
-    ACTIVE_TOOL_NAME = 'activeToolName',
-    RAW_VIEWBOX = 'rawEditorViewbox',
-    CROPPED_VIEWBOX = 'croppedEditorViewbox',
-    EDITOR_ZOOM_LEVEL = 'editorZoomLevel',
-    DECK_TITLE = 'deckTitle'
+    SLIDES = 'getSlides',
+    ROADMAP_SLIDES = 'getRoadmapSlides',
+    LAST_SLIDE = 'getLastSlide',
+    SLIDE = 'getSlide',
+    ACTIVE_SLIDE = 'getActiveSlide',
+    ACTIVE_TOOL_NAME = 'getActiveToolName',
+    RAW_VIEWBOX = 'getRawViewbox',
+    CROPPED_VIEWBOX = 'getCroppedViewbox',
+    EDITOR_ZOOM_LEVEL = 'getEditorZoomLevel',
+    DECK_TITLE = 'getDeckTitle'
 }
 
 export enum MUTATIONS {
     ADD_SLIDE = 'addSlide',
-    ACTIVE_SLIDE_ID = 'activeSlideId',
+    ACTIVE_SLIDE_ID = 'setActiveSlideId',
     ACTIVE_TOOL = 'setActiveTool',
-    EDITOR_ZOOM_LEVEL = 'editorZoomLevel',
-    DECK_TITLE = 'deckTitle'
+    EDITOR_ZOOM_LEVEL = 'setEditorZoomLevel',
+    DECK_TITLE = 'setDeckTitle'
 }
 
 export enum ACTIONS { }
