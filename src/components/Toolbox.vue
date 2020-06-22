@@ -12,18 +12,16 @@ import Tool from './Tool.vue';
 import { PointerTool, RectangleTool, CurveTool } from '../tools';
 import { MUTATIONS, GETTERS } from '../store/types';
 import { TOOL_NAMES, EditorTool } from '../tools/types';
-import { mapGetters, mapMutations } from 'vuex';
+import { Getter, Mutation } from 'vuex-class';
 
 @Component({
     components: {
         Tool
-    },
-    computed: mapGetters([GETTERS.ACTIVE_TOOL_NAME]),
-    methods: mapMutations([MUTATIONS.ACTIVE_TOOL])
+    }
 })
 export default class Toolbox extends Vue {
-    private [GETTERS.ACTIVE_TOOL_NAME]: TOOL_NAMES;
-    private [MUTATIONS.ACTIVE_TOOL]: (tool: EditorTool) => void;
+    @Getter private [GETTERS.ACTIVE_TOOL_NAME]: TOOL_NAMES;
+    @Mutation private [MUTATIONS.ACTIVE_TOOL]: (tool: EditorTool) => void;
 
     private get isPointerToolActive(): boolean {
         return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.POINTER;

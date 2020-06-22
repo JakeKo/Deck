@@ -7,15 +7,12 @@
 <script lang='ts'>
 import { Vue, Component } from 'vue-property-decorator';
 import { MUTATIONS, GETTERS } from '../store/types';
-import { mapGetters, mapMutations } from 'vuex';
+import { Getter, Mutation } from 'vuex-class';
 
-@Component({
-    computed: mapGetters([GETTERS.DECK_TITLE]),
-    methods: mapMutations([MUTATIONS.DECK_TITLE])
-})
+@Component
 export default class MenuBar extends Vue {
-    private [GETTERS.DECK_TITLE]: string;
-    private [MUTATIONS.DECK_TITLE]: (deckTitle: string) => void;
+    @Getter private [GETTERS.DECK_TITLE]: string;
+    @Mutation private [MUTATIONS.DECK_TITLE]: (deckTitle: string) => void;
 
     private get deckTitle(): string {
         return this[GETTERS.DECK_TITLE];

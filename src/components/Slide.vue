@@ -7,16 +7,14 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as SVG from 'svg.js';
 import SlideRenderer from '../rendering/SlideRenderer';
 import { GETTERS, Viewbox } from '../store/types';
-import { mapGetters } from 'vuex';
+import { Getter } from 'vuex-class';
 
-@Component({
-    computed: mapGetters([GETTERS.RAW_VIEWBOX, GETTERS.CROPPED_VIEWBOX])
-})
+@Component
 export default class Slide extends Vue {
     @Prop({ type: String, required: true }) private id!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
-    private [GETTERS.RAW_VIEWBOX]: Viewbox;
-    private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
+    @Getter private [GETTERS.RAW_VIEWBOX]: Viewbox;
+    @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
 
     private get slideStyle(): { minWidth: string; minHeight: string; } {
         return {

@@ -18,22 +18,20 @@
 import { Vue, Component } from 'vue-property-decorator';
 import RoadmapSlot from './RoadmapSlot.vue';
 import { MUTATIONS, GETTERS, RoadmapSlide, Slide } from '../store/types';
-import { mapMutations, mapGetters } from 'vuex';
+import { Getter, Mutation } from 'vuex-class';
 
 @Component({
     components: {
         RoadmapSlot
-    },
-    computed: mapGetters([GETTERS.ROADMAP_SLIDES, GETTERS.ACTIVE_SLIDE, GETTERS.SLIDES, GETTERS.LAST_SLIDE]),
-    methods: mapMutations([MUTATIONS.ADD_SLIDE, MUTATIONS.ACTIVE_SLIDE_ID])
+    }
 })
 export default class Roadmap extends Vue {
-    private [GETTERS.ROADMAP_SLIDES]: RoadmapSlide[];
-    private [GETTERS.ACTIVE_SLIDE]: Slide;
-    private [GETTERS.SLIDES]: Slide[];
-    private [GETTERS.LAST_SLIDE]: Slide;
-    private [MUTATIONS.ADD_SLIDE]: (index: number) => void;
-    private [MUTATIONS.ACTIVE_SLIDE_ID]: (id: string) => void;
+    @Getter private [GETTERS.ROADMAP_SLIDES]: RoadmapSlide[];
+    @Getter private [GETTERS.ACTIVE_SLIDE]: Slide;
+    @Getter private [GETTERS.SLIDES]: Slide[];
+    @Getter private [GETTERS.LAST_SLIDE]: Slide;
+    @Mutation private [MUTATIONS.ADD_SLIDE]: (index: number) => void;
+    @Mutation private [MUTATIONS.ACTIVE_SLIDE_ID]: (id: string) => void;
 
     private createNewSlide(): void {
         this[MUTATIONS.ADD_SLIDE](this[GETTERS.SLIDES].length);

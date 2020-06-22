@@ -15,22 +15,20 @@
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import Slide from './Slide.vue';
 import { MUTATIONS, GETTERS, Viewbox, Slide as SlideModel } from '../store/types';
-import { mapGetters, mapMutations } from 'vuex';
+import { Getter, Mutation } from 'vuex-class';
 
 @Component({
     components: {
         Slide
-    },
-    computed: mapGetters([GETTERS.ACTIVE_SLIDE, GETTERS.EDITOR_ZOOM_LEVEL, GETTERS.SLIDES, GETTERS.RAW_VIEWBOX, GETTERS.CROPPED_VIEWBOX]),
-    methods: mapMutations([MUTATIONS.EDITOR_ZOOM_LEVEL])
+    }
 })
 export default class Editor extends Vue {
-    private [GETTERS.ACTIVE_SLIDE]: SlideModel;
-    private [GETTERS.EDITOR_ZOOM_LEVEL]: number;
-    private [GETTERS.SLIDES]: SlideModel[];
-    private [GETTERS.RAW_VIEWBOX]: Viewbox;
-    private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
-    private [MUTATIONS.EDITOR_ZOOM_LEVEL]: (zoomLevel: number) => void;
+    @Getter private [GETTERS.ACTIVE_SLIDE]: SlideModel;
+    @Getter private [GETTERS.EDITOR_ZOOM_LEVEL]: number;
+    @Getter private [GETTERS.SLIDES]: SlideModel[];
+    @Getter private [GETTERS.RAW_VIEWBOX]: Viewbox;
+    @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
+    @Mutation private [MUTATIONS.EDITOR_ZOOM_LEVEL]: (zoomLevel: number) => void;
 
     private get emptySlideContainerStyle(): { minWidth: string; minHeight: string; } {
         return {

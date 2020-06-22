@@ -8,15 +8,13 @@
 <script lang='ts'>
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { MUTATIONS } from '../store/types';
-import { mapMutations } from 'vuex';
+import { Mutation } from 'vuex-class';
 
-@Component({
-    methods: mapMutations([MUTATIONS.ACTIVE_SLIDE_ID])
-})
+@Component
 export default class RoadmapSlot extends Vue {
     @Prop({ type: String, required: true }) private id!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
-    private [MUTATIONS.ACTIVE_SLIDE_ID]: (id: string) => void;
+    @Mutation private [MUTATIONS.ACTIVE_SLIDE_ID]: (id: string) => void;
 }
 </script>
 
