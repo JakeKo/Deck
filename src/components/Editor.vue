@@ -1,5 +1,5 @@
 <template>
-<div id='editor' :style='{ zoom: getEditorZoomLevel }'>
+<div id='editor' @mousewheel='handleMouseWheel'>
     <div v-if='getSlides.length === 0' id='empty-slide-container' :style='emptySlideContainerStyle'>
         <div id='empty-slide' :style='emptySlideStyle' />
     </div>
@@ -16,6 +16,7 @@ import { Vue, Component, Watch } from 'vue-property-decorator';
 import Slide from './Slide.vue';
 import { MUTATIONS, GETTERS, Viewbox, Slide as SlideModel } from '../store/types';
 import { Getter, Mutation } from 'vuex-class';
+import Vector from '../utilities/Vector';
 
 @Component({
     components: {
@@ -44,28 +45,55 @@ export default class Editor extends Vue {
         };
     }
 
-    // Recenter the editor view when the active slide changes
-    @Watch(GETTERS.ACTIVE_SLIDE)
-    private onActiveSlideIdUpdate(): void {
-        const editor = this.$el as HTMLElement;
-        editor.scrollTop = (editor.scrollHeight - editor.clientHeight) / 2;
-        editor.scrollLeft = (editor.scrollWidth - editor.clientWidth) / 2;
-    }
-
-    private mounted(): void {
+    // Set the default zoom based on screen size and slide size
+    private get defaultZoom(): number {
         const editor = this.$el as HTMLElement;
         const editorWidth = editor.offsetWidth;
         const editorHeight = editor.offsetHeight;
         const slideWidth = this[GETTERS.CROPPED_VIEWBOX].width + 100;
         const slideHeight = this[GETTERS.CROPPED_VIEWBOX].height + 100;
-        const scale = Math.min(editorWidth / slideWidth, editorHeight / slideHeight);
+        return Math.min(editorWidth / slideWidth, editorHeight / slideHeight);
+    }
 
-        // Set the scale based on screen size and slide size
-        // Then center the view on the slide
-        this[MUTATIONS.EDITOR_ZOOM_LEVEL](scale);
-        editor.style.zoom = scale.toString();
-        editor.scrollTop = (editor.scrollHeight - editor.offsetHeight) / 2;
-        editor.scrollLeft = (editor.scrollWidth - editor.offsetWidth) / 2;
+    // Reorient the editor view when the active slide changes
+    @Watch(GETTERS.ACTIVE_SLIDE)
+    private onActiveSlideIdUpdate(): void {
+        this.reorientSlide();
+    }
+
+    private mounted(): void {
+        this.reorientSlide();
+    }
+
+    // Set the zoom level, then center the view on the slide
+    // Note: Editor zoom must be set manually to avoid scrolling before zooming
+    private reorientSlide(): void {
+        const editor = this.$el as HTMLElement;
+        this[MUTATIONS.EDITOR_ZOOM_LEVEL](this.defaultZoom);
+        editor.style.zoom = this.defaultZoom.toString();
+        editor.scrollTop = (editor.scrollHeight - editor.clientHeight) / 2;
+        editor.scrollLeft = (editor.scrollWidth - editor.clientWidth) / 2;
+    }
+
+    private handleMouseWheel(event: WheelEvent): void {
+        if (event.ctrlKey) {
+            event.preventDefault();
+
+            const editor = this.$el as HTMLElement;
+            const deltaZoom = event.deltaY < 0 ? 1.1 : 0.9;
+            const oldZoom = this[GETTERS.EDITOR_ZOOM_LEVEL];
+            const newZoom = this[GETTERS.EDITOR_ZOOM_LEVEL] * deltaZoom;
+            this[MUTATIONS.EDITOR_ZOOM_LEVEL](newZoom);
+            editor.style.zoom = newZoom.toString();
+
+            // TODO: Fetch absolute mouse position without hardcoded values
+            // TODO: Fix the math here (which is incorrect but not by much)
+            const absolutePosition = new Vector(event.clientX - 64, event.clientY - 28);
+            const absoluteDestination = absolutePosition.scale(1 / deltaZoom);
+            const scrollCorrection = absoluteDestination.towards(absolutePosition);
+            editor.scrollLeft = editor.scrollLeft + scrollCorrection.x;
+            editor.scrollTop = editor.scrollTop + scrollCorrection.y;
+        }
     }
 }
 </script>

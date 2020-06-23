@@ -24,6 +24,7 @@ export default (store: any): EditorTool => {
         }
 
         function complete(): void {
+            maker.complete();
             listen(SLIDE_EVENTS.MOUSEDOWN, make);
             unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
             unlisten(SLIDE_EVENTS.MOUSEUP, complete);
