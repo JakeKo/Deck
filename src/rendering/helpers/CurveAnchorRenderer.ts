@@ -3,9 +3,9 @@ import Vector from '../../utilities/Vector';
 
 type CurveAnchorRendererArgs = {
     canvas: SVG.Doc;
-    inHandle: Vector | undefined;
+    inHandle?: Vector;
     point: Vector;
-    outHandle: Vector | undefined;
+    outHandle?: Vector;
 };
 
 class CurveAnchorRenderer {
