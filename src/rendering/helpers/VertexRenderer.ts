@@ -17,12 +17,18 @@ class VertexRenderer {
     private _width: number;
     private _height: number;
     private _center: Vector;
+    private _fillColor: string;
+    private _strokeColor: string;
+    private _strokeWidth: number;
 
     constructor(args: VertexRendererArgs) {
         this._canvas = args.canvas;
         this._center = args.center || DEFAULT_ARGS.center;
-        this._width = 4;
-        this._height = 4;
+        this._width = 8;
+        this._height = 8;
+        this._fillColor = '#888888';
+        this._strokeColor = 'none';
+        this._strokeWidth = 0;
     }
 
     public get isRendered(): boolean {
@@ -42,8 +48,8 @@ class VertexRenderer {
 
         this._svg = this._canvas.ellipse(this._width, this._height)
             .translate(this._center.x - this._width / 2, this._center.y - this._height / 2)
-            .fill('#FFFFFF')
-            .stroke({ color: '#888888', width: 1 });
+            .fill(this._fillColor)
+            .stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
     public unrender(): void {

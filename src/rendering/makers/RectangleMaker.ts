@@ -62,7 +62,7 @@ class RectangleMaker {
         this._helpers.bottomRight.center = this._rectangle.origin.add(new Vector(this._rectangle.width, this._rectangle.height));
     }
 
-    public setDimensions(dimensions: Vector): void {
+    public resize(dimensions: Vector): void {
         // Update rendering
         this._rectangle.width = dimensions.x;
         this._rectangle.height = dimensions.y;

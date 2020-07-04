@@ -1,8 +1,8 @@
 import * as SVG from 'svg.js';
-import { GraphicRenderer, CurveAnchor, GRAPHIC_TYPES } from "../types";
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicMouseEventPayload, GraphicKeyboardEventPayload, GRAPHIC_EVENTS } from '../../events/types';
+import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from "../types";
+import { decorateGraphicEvents } from '../utilities';
 
 type CurveRendererArgs = {
     id: string;
@@ -42,78 +42,6 @@ class CurveRenderer implements GraphicRenderer {
         this._strokeColor = args.strokeColor || DEFAULT_ARGS.strokeColor;
         this._strokeWidth = args.strokeWidth || DEFAULT_ARGS.strokeWidth;
         this._rotation = args.rotation || DEFAULT_ARGS.rotation;
-    }
-
-    private _decorateGraphicEvents(): void {
-        this._svg && this._svg.node.addEventListener('mouseup', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEUP, {
-                detail: {
-                    slideRenderer: this._slideRenderer,
-                    graphicId: this._id,
-                    baseEvent
-                }
-            }));
-        });
-
-        this._svg && this._svg.node.addEventListener('mousedown', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEDOWN, {
-                detail: {
-                    slideRenderer: this._slideRenderer,
-                    graphicId: this._id,
-                    baseEvent
-                }
-            }));
-        });
-
-        this._svg && this._svg.node.addEventListener('mouseover', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOVER, {
-                detail: {
-                    slideRenderer: this._slideRenderer,
-                    graphicId: this._id,
-                    baseEvent
-                }
-            }));
-        });
-
-        this._svg && this._svg.node.addEventListener('mouseout', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOUT, {
-                detail: {
-                    slideRenderer: this._slideRenderer,
-                    graphicId: this._id,
-                    baseEvent
-                }
-            }));
-        });
-
-        this._svg && this._svg.node.addEventListener('mousemove', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEMOVE, {
-                detail: {
-                    slideRenderer: this._slideRenderer,
-                    graphicId: this._id,
-                    baseEvent
-                }
-            }));
-        });
-
-        this._svg && this._svg.node.addEventListener('keyup', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYUP, {
-                detail: {
-                    slideRenderer: this._slideRenderer,
-                    graphicId: this._id,
-                    baseEvent
-                }
-            }));
-        });
-
-        this._svg && this._svg.node.addEventListener('keydown', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYDOWN, {
-                detail: {
-                    slideRenderer: this._slideRenderer,
-                    graphicId: this._id,
-                    baseEvent
-                }
-            }));
-        });
     }
 
     public get id(): string {
@@ -185,7 +113,7 @@ class CurveRenderer implements GraphicRenderer {
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
-        this._decorateGraphicEvents();
+        decorateGraphicEvents(this._svg, this._slideRenderer, this._id);
     }
 
     public unrender(): void {

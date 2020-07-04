@@ -1,7 +1,7 @@
 import { SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
 import { listen, unlisten } from "../events/utilities";
-import { resolvePosition } from "./utilities";
 import { EditorTool, TOOL_NAMES } from "./types";
+import { resolvePosition } from "./utilities";
 
 export default (store: any): EditorTool => {
     function make(event: SlideMouseEvent): void {
@@ -18,9 +18,16 @@ export default (store: any): EditorTool => {
         function update(event: SlideMouseEvent): void {
             const { baseEvent } = event.detail;
 
+            // TODO: Determine if snapping, shift, etc. should be handled here
             // TODO: Handle ctrl case (symmetric around center)
+            // TODO: Figure out how to reflect rectangle as it is being drawn
             const position = resolvePosition(baseEvent, slideRenderer, store);
-            maker.setDimensions(initialPosition.towards(position));
+            const rawDimensions = initialPosition.towards(position);
+            const trueDimensions = rawDimensions.transform(Math.abs);
+            const relativeOrigin = rawDimensions.scale(0.5).add(trueDimensions.scale(-0.5));
+
+            maker.move(initialPosition.add(relativeOrigin));
+            maker.resize(trueDimensions);
         }
 
         function complete(): void {
