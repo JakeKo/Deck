@@ -1,5 +1,6 @@
-import { AppMutations, AppState, MUTATIONS } from "./types";
 import { EditorTool } from "../tools/types";
+import { provideId } from "../utilities/IdProvider";
+import { AppMutations, AppState, MUTATIONS } from "./types";
 import { getSlide } from "./utilities";
 
 const mutations: AppMutations = {
@@ -7,7 +8,7 @@ const mutations: AppMutations = {
         state.slides = [
             ...state.slides.slice(0, index),
             {
-                id: Math.random().toString(),
+                id: provideId(),
                 isActive: false
             },
             ...state.slides.slice(index)

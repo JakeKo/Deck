@@ -1,7 +1,8 @@
-import SlideRenderer from "../SlideRenderer";
+import { provideId } from "../../utilities/IdProvider";
 import Vector from "../../utilities/Vector";
 import { RectangleRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
+import SlideRenderer from "../SlideRenderer";
 
 type RectangleMakerArgs = {
     slide: SlideRenderer;
@@ -26,10 +27,9 @@ class RectangleMaker {
         this._initialPosition = args.initialPosition;
 
         // TODO: Aggregate snap vectors here
-        // TODO: Implement ID provider
         // Initialize primary graphic
         this._rectangle = new RectangleRenderer({
-            id: Math.random().toString(),
+            id: provideId(),
             slideRenderer: this._slide,
             origin: this._initialPosition
         });

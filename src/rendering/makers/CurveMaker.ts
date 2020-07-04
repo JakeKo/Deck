@@ -1,3 +1,4 @@
+import { provideId } from "../../utilities/IdProvider";
 import { CurveRenderer } from "../graphics";
 import { CurveAnchorRenderer } from '../helpers';
 import SlideRenderer from "../SlideRenderer";
@@ -19,7 +20,7 @@ class CurveMaker {
 
         // Inititalize primary graphic
         this._curve = new CurveRenderer({
-            id: Math.random().toString(),
+            id: provideId(),
             slideRenderer: this._slide
         });
 
