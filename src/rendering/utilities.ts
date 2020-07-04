@@ -1,6 +1,6 @@
-import SlideRenderer from "./SlideRenderer";
 import * as SVG from 'svg.js';
-import { GraphicMouseEventPayload, GRAPHIC_EVENTS, GraphicKeyboardEventPayload } from "../events/types";
+import { GraphicKeyboardEventPayload, GraphicMouseEventPayload, GRAPHIC_EVENTS, SlideKeyboardEventPayload, SlideMouseEventPayload, SLIDE_EVENTS } from "../events/types";
+import SlideRenderer from "./SlideRenderer";
 
 // TODO: Determine if slide events need to be decorated here
 export function decorateGraphicEvents(svg: SVG.Element, slideRenderer: SlideRenderer, graphicId: string) {
@@ -43,6 +43,50 @@ export function decorateGraphicEvents(svg: SVG.Element, slideRenderer: SlideRend
     svg.node.addEventListener('keydown', baseEvent => {
         document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYDOWN, {
             detail: { slideRenderer, graphicId, baseEvent }
+        }));
+    });
+}
+
+export function decorateSlideEvents(slideRenderer: SlideRenderer): void {
+    slideRenderer.canvas.node.addEventListener('mouseup', baseEvent => {
+        document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEUP, {
+            detail: { slideRenderer, baseEvent }
+        }));
+    });
+
+    slideRenderer.canvas.node.addEventListener('mousedown', baseEvent => {
+        document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEDOWN, {
+            detail: { slideRenderer, baseEvent }
+        }));
+    });
+
+    slideRenderer.canvas.node.addEventListener('mouseover', baseEvent => {
+        document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOVER, {
+            detail: { slideRenderer, baseEvent }
+        }));
+    });
+
+    slideRenderer.canvas.node.addEventListener('mouseout', baseEvent => {
+        document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOUT, {
+            detail: { slideRenderer, baseEvent }
+        }));
+    });
+
+    slideRenderer.canvas.node.addEventListener('mousemove', baseEvent => {
+        document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, {
+            detail: { slideRenderer, baseEvent }
+        }));
+    });
+
+    slideRenderer.canvas.node.addEventListener('keyup', baseEvent => {
+        document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYUP, {
+            detail: { slideRenderer, baseEvent }
+        }));
+    });
+
+    slideRenderer.canvas.node.addEventListener('keydown', baseEvent => {
+        document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYDOWN, {
+            detail: { slideRenderer, baseEvent }
         }));
     });
 }
