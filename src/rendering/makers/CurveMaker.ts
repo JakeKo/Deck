@@ -1,11 +1,9 @@
-import Vector from "../../utilities/Vector";
-import { CurveAnchor } from "../types";
 import { CurveRenderer } from "../graphics";
 import { CurveAnchorRenderer } from '../helpers';
 import SlideRenderer from "../SlideRenderer";
+import { CurveAnchor } from "../types";
 
 type CurveMakerArgs = {
-    curve: CurveRenderer;
     slide: SlideRenderer;
 };
 
@@ -16,22 +14,17 @@ class CurveMaker {
     private _helpers: CurveAnchorRenderer[];
 
     constructor(args: CurveMakerArgs) {
-        this._curve = args.curve;
         this._slide = args.slide;
         this._helpers = [];
-    }
 
-    public move(origin: Vector): void {
-        // Update rendering
-        this._curve.move(origin);
-
-        // Update helper graphics
-        const anchors = this._curve.getAnchors();
-        this._helpers.forEach((helper, index) => {
-            helper.setInHandle(anchors[index].inHandle);
-            helper.setPoint(anchors[index].point);
-            helper.setOutHandle(anchors[index].outHandle);
+        // Inititalize primary graphic
+        this._curve = new CurveRenderer({
+            id: Math.random().toString(),
+            slideRenderer: this._slide
         });
+
+        // Render primary graphic
+        this._curve.render();
     }
 
     public addAnchor(anchor: CurveAnchor): number {
@@ -56,6 +49,9 @@ class CurveMaker {
     }
 
     public complete(): void {
+        this._slide.persistGraphic(this._curve);
+
+        // Remove helper graphics
         this._helpers.forEach(helper => helper.unrender());
     }
 }

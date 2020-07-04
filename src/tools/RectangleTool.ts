@@ -1,17 +1,16 @@
 import { SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
 import { listen, unlisten } from "../events/utilities";
+import { RectangleMaker } from "../rendering/makers";
+import { AppStore } from "../store/types";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
-import { RectangleMaker } from "../rendering/makers";
 
-export default (store: any): EditorTool => {
+export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slideRenderer, baseEvent } = event.detail;
-
-        const initialPosition = resolvePosition(baseEvent, slideRenderer, store);
         const maker = new RectangleMaker({
             slide: slideRenderer,
-            initialPosition
+            initialPosition: resolvePosition(baseEvent, slideRenderer, store)
         });
 
         unlisten(SLIDE_EVENTS.MOUSEDOWN, make);

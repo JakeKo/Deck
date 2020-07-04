@@ -1,9 +1,9 @@
-import Vector from "../utilities/Vector";
 import SlideRenderer from "../rendering/SlideRenderer";
-import { GETTERS } from "../store/types";
+import { AppStore, GETTERS } from "../store/types";
+import Vector from "../utilities/Vector";
 
 // TODO: Investigate ways for SlideRenderer to provide all necessary data
-export function resolvePosition(event: MouseEvent, slideRenderer: SlideRenderer, store: any): Vector {
+export function resolvePosition(event: MouseEvent, slideRenderer: SlideRenderer, store: AppStore): Vector {
     const zoomLevel = store.getters[GETTERS.EDITOR_ZOOM_LEVEL];
     const rawViewbox = store.getters[GETTERS.RAW_VIEWBOX];
 
