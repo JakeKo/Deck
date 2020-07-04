@@ -100,15 +100,6 @@ class SlideRenderer {
         return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
     }
 
-    // TODO: Implement ID provider
-    public startMakingRectangle(): RectangleMaker {
-        const id = Math.random().toString();
-        this._graphics[id] = new RectangleRenderer({ id, slideRenderer: this });
-        this._graphics[id].render();
-
-        return new RectangleMaker({ rectangle: this._graphics[id] as RectangleRenderer, slide: this });
-    }
-
     public startMutatingRectangle(id: string): RectangleMutator {
         return new RectangleMutator({ rectangle: this._graphics[id] as RectangleRenderer, slide: this });
     }
@@ -132,6 +123,10 @@ class SlideRenderer {
             width,
             height
         }).render();
+    }
+
+    public persistGraphic(graphic: GraphicRenderer): void {
+        this._graphics[graphic.id] = graphic;
     }
 }
 

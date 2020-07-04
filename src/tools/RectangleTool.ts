@@ -2,14 +2,17 @@ import { SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
 import { listen, unlisten } from "../events/utilities";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
+import { RectangleMaker } from "../rendering/makers";
 
 export default (store: any): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slideRenderer, baseEvent } = event.detail;
 
         const initialPosition = resolvePosition(baseEvent, slideRenderer, store);
-        const maker = slideRenderer.startMakingRectangle();
-        maker.move(initialPosition);
+        const maker = new RectangleMaker({
+            slide: slideRenderer,
+            initialPosition
+        });
 
         unlisten(SLIDE_EVENTS.MOUSEDOWN, make);
         listen(SLIDE_EVENTS.MOUSEMOVE, update);
@@ -17,17 +20,8 @@ export default (store: any): EditorTool => {
 
         function update(event: SlideMouseEvent): void {
             const { baseEvent } = event.detail;
-
-            // TODO: Determine if snapping, shift, etc. should be handled here
-            // TODO: Handle ctrl case (symmetric around center)
-            // TODO: Figure out how to reflect rectangle as it is being drawn
             const position = resolvePosition(baseEvent, slideRenderer, store);
-            const rawDimensions = initialPosition.towards(position);
-            const trueDimensions = rawDimensions.transform(Math.abs);
-            const relativeOrigin = rawDimensions.scale(0.5).add(trueDimensions.scale(-0.5));
-
-            maker.move(initialPosition.add(relativeOrigin));
-            maker.resize(trueDimensions);
+            maker.resize(position, baseEvent.shiftKey, baseEvent.ctrlKey, baseEvent.altKey);
         }
 
         function complete(): void {
