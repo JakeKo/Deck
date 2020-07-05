@@ -15,7 +15,9 @@ class SlideRenderer {
     constructor(args: SlideRendererArgs) {
         this._canvas = args.canvas;
         this._graphics = {};
+
         decorateSlideEvents(this);
+        this._canvas.node.tabIndex = 0;
     }
 
     public get canvas(): SVG.Doc {

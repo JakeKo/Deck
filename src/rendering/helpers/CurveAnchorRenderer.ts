@@ -3,64 +3,72 @@ import Vector from '../../utilities/Vector';
 
 type CurveAnchorRendererArgs = {
     canvas: SVG.Doc;
-    inHandle?: Vector;
+    inHandle: Vector;
     point: Vector;
-    outHandle?: Vector;
+    outHandle: Vector;
 };
 
 class CurveAnchorRenderer {
     private _canvas: SVG.Doc;
-    private _inHandle: Vector | undefined;
+    private _inHandle: Vector;
     private _point: Vector;
-    private _outHandle: Vector | undefined;
+    private _outHandle: Vector;
     private _inHandleSvg: SVG.Rect | undefined;
     private _inHandleSpanSvg: SVG.Line | undefined;
     private _pointSvg: SVG.Ellipse | undefined;
     private _outHandleSpanSvg: SVG.Line | undefined;
     private _outHandleSvg: SVG.Rect | undefined;
+    private _handleWidth: number;
+    private _handleHeight: number;
+    private _handleFillColor: string;
+    private _handleStrokeWidth: number;
+    private _handleStrokeColor: string;
+    private _pointWidth: number;
+    private _pointHeight: number;
+    private _pointFillColor: string;
+    private _pointStrokeWidth: number;
+    private _pointStrokeColor: string;
+    private _spanStrokeWidth: number;
+    private _spanStrokeColor: string;
 
     constructor(args: CurveAnchorRendererArgs) {
         this._canvas = args.canvas;
         this._inHandle = args.inHandle;
         this._point = args.point;
         this._outHandle = args.outHandle;
+        this._handleWidth = 6;
+        this._handleHeight = 6;
+        this._handleFillColor = '#FFFFFF';
+        this._handleStrokeWidth = 1;
+        this._handleStrokeColor = '#888888';
+        this._pointWidth = 4;
+        this._pointHeight = 4;
+        this._pointFillColor = '#FFFFFF';
+        this._pointStrokeWidth = 1;
+        this._pointStrokeColor = '#888888';
+        this._spanStrokeWidth = 1;
+        this._spanStrokeColor = '#888888';
     }
 
     public get isRendered(): boolean {
         return this._pointSvg !== undefined;
     }
 
-    public setInHandle(inHandle: Vector | undefined) {
+    public setInHandle(inHandle: Vector) {
         this._inHandle = inHandle;
-
-        if (this._inHandle === undefined) {
-            this._inHandleSvg && this._inHandleSvg.remove();
-            this._inHandleSpanSvg && this._inHandleSpanSvg.remove();
-            this._inHandleSvg = undefined;
-            this._inHandleSpanSvg = undefined;
-        } else {
-            this._inHandleSvg && this._inHandleSvg.translate(this._inHandle.x - 2, this._inHandle.y - 2);
-            this._inHandleSpanSvg && this._inHandleSpanSvg.plot(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y);
-        }
+        this._inHandleSvg && this._inHandleSvg.translate(this._inHandle.x - this._handleWidth / 2, this._inHandle.y - this._handleHeight / 2);
+        this._inHandleSpanSvg && this._inHandleSpanSvg.plot(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y);
     }
 
     public setPoint(point: Vector) {
         this._point = point;
-        this._pointSvg && this._pointSvg.translate(this._point.x, this._point.y);
+        this._pointSvg && this._pointSvg.translate(this._point.x - this._pointWidth / 2, this._point.y - this._pointHeight / 2);
     }
 
-    public setOutHandle(outHandle: Vector | undefined) {
+    public setOutHandle(outHandle: Vector) {
         this._outHandle = outHandle;
-
-        if (this._outHandle === undefined) {
-            this._outHandleSvg && this._outHandleSvg.remove();
-            this._outHandleSpanSvg && this._outHandleSpanSvg.remove();
-            this._outHandleSvg = undefined;
-            this._outHandleSpanSvg = undefined;
-        } else {
-            this._outHandleSvg && this._outHandleSvg.translate(this._outHandle.x - 2, this._outHandle.y - 2);
-            this._outHandleSpanSvg && this._outHandleSpanSvg.plot(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y);
-        }
+        this._outHandleSvg && this._outHandleSvg.translate(this._outHandle.x - this._handleWidth / 2, this._outHandle.y - this._handleHeight / 2);
+        this._outHandleSpanSvg && this._outHandleSpanSvg.plot(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y);
     }
 
     public render(): void {
@@ -68,45 +76,26 @@ class CurveAnchorRenderer {
             return;
         }
 
-        if (this._inHandle !== undefined) {
-            this._inHandleSpanSvg = this._canvas.line(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y)
-                .stroke({
-                    color: '#888888',
-                    width: 1
-                });
+        this._inHandleSpanSvg = this._canvas.line(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y)
+            .stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth });
 
-            this._inHandleSvg = this._canvas.rect(4, 4)
-                .translate(this._inHandle.x - 2, this._inHandle.y - 2)
-                .fill('#FFFFFF')
-                .stroke({
-                    color: '#888888',
-                    width: 1
-                });
-        }
+        this._inHandleSvg = this._canvas.rect(this._handleWidth, this._handleHeight)
+            .translate(this._inHandle.x - this._handleWidth / 2, this._inHandle.y - this._handleHeight / 2)
+            .fill(this._handleFillColor)
+            .stroke({ color: this._handleStrokeColor, width: this._handleStrokeWidth });
 
-        this._pointSvg = this._canvas.ellipse(4, 4)
-            .translate(this._point.x, this._point.y)
-            .fill('#FFFFFF')
-            .stroke({
-                color: '#888888',
-                width: 1
-            });
+        this._outHandleSpanSvg = this._canvas.line(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y)
+            .stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth });
 
-        if (this._outHandle !== undefined) {
-            this._outHandleSpanSvg = this._canvas.line(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y)
-                .stroke({
-                    color: '#888888',
-                    width: 1
-                });
+        this._outHandleSvg = this._canvas.rect(this._handleWidth, this._handleHeight)
+            .translate(this._outHandle.x - this._handleWidth / 2, this._outHandle.y - this._handleHeight / 2)
+            .fill(this._handleFillColor)
+            .stroke({ color: this._handleStrokeColor, width: this._handleStrokeWidth });
 
-            this._outHandleSvg = this._canvas.rect(4, 4)
-                .translate(this._outHandle.x - 2, this._outHandle.y - 2)
-                .fill('#FFFFFF')
-                .stroke({
-                    color: '#888888',
-                    width: 1
-                });
-        }
+        this._pointSvg = this._canvas.ellipse(this._pointWidth, this._pointHeight)
+            .translate(this._point.x - this._pointWidth / 2, this._point.y - this._pointHeight / 2)
+            .fill(this._pointFillColor)
+            .stroke({ color: this._pointStrokeColor, width: this._pointStrokeWidth });
     }
 
     public unrender(): void {

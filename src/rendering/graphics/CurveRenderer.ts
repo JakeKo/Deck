@@ -16,7 +16,7 @@ type CurveRendererArgs = {
 
 const DEFAULT_ARGS = {
     anchors: [],
-    fillColor: '#FFFFFF',
+    fillColor: 'transparent',
     strokeColor: '#000000',
     strokeWidth: 1,
     rotation: 0
@@ -59,9 +59,9 @@ class CurveRenderer implements GraphicRenderer {
     public move(origin: Vector): void {
         const changeInPosition = this._anchors[0].point.towards(origin);
         this._anchors = this._anchors.map(anchor => ({
-            inHandle: anchor.inHandle === undefined ? undefined : anchor.inHandle.add(changeInPosition),
+            inHandle: anchor.inHandle.add(changeInPosition),
             point: anchor.point.add(changeInPosition),
-            outHandle: anchor.outHandle === undefined ? undefined : anchor.outHandle.add(changeInPosition)
+            outHandle: anchor.outHandle.add(changeInPosition)
         }));
         this._svg && this._svg.plot(this._formattedPoints);
     }
@@ -74,6 +74,11 @@ class CurveRenderer implements GraphicRenderer {
 
     public setAnchor(index: number, anchor: CurveAnchor): void {
         this._anchors[index] = anchor;
+        this._svg && this._svg.plot(this._formattedPoints);
+    }
+
+    public removeAnchor(index: number): void {
+        this._anchors.splice(index, 1);
         this._svg && this._svg.plot(this._formattedPoints);
     }
 
@@ -123,9 +128,10 @@ class CurveRenderer implements GraphicRenderer {
 
     // Reformat points from an array of objects to the bezier curve string
     private get _formattedPoints(): string {
-        const anchorPoints = this._anchors.map(s => [s.inHandle, s.point, s.outHandle].filter(p => p !== undefined) as Vector[]);
-        const [origin, ...points] = anchorPoints.reduce((points, anchor) => [...points, ...anchor]);
-        return `M ${origin.x},${origin.y} ${points.map(({ x, y }, i) => `${i % 3 === 0 ? ' C' : ''} ${x},${y}`)}`;
+        console.log(`${this._id} ${this._anchors.length}`);
+        const anchorPoints = this._anchors.reduce<Vector[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []);
+        const [origin, ...points] = anchorPoints.slice(1, -1);
+        return origin === undefined ? '' : `M ${origin.x},${origin.y} ${points.map(({ x, y }, i) => `${i % 3 === 0 ? ' C' : ''} ${x},${y}`)}`;
     }
 }
 

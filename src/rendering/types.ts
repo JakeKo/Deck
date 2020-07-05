@@ -9,9 +9,9 @@ export type GraphicRenderer = {
 };
 
 export type CurveAnchor = {
-    inHandle?: Vector;
+    inHandle: Vector;
     point: Vector;
-    outHandle?: Vector;
+    outHandle: Vector;
 };
 
 export enum GRAPHIC_TYPES {
