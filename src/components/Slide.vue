@@ -26,8 +26,7 @@ export default class Slide extends Vue {
     private mounted(): void {
         const viewbox = this[GETTERS.RAW_VIEWBOX];
         const canvas = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
-        const renderer = new SlideRenderer({ canvas });
-        renderer.renderBackdrop(this[GETTERS.CROPPED_VIEWBOX].width, this[GETTERS.CROPPED_VIEWBOX].height);
+        const renderer = new SlideRenderer({ canvas, rawViewbox: viewbox, croppedViewbox: this[GETTERS.CROPPED_VIEWBOX] });
     }
 }
 </script>

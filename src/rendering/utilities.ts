@@ -1,5 +1,7 @@
 import * as SVG from 'svg.js';
 import { GraphicKeyboardEventPayload, GraphicMouseEventPayload, GRAPHIC_EVENTS, SlideKeyboardEventPayload, SlideMouseEventPayload, SLIDE_EVENTS } from "../events/types";
+import Vector from '../utilities/Vector';
+import { CanvasRenderer } from './helpers';
 import SlideRenderer from "./SlideRenderer";
 
 // TODO: Determine if slide events need to be decorated here
@@ -89,4 +91,13 @@ export function decorateSlideEvents(slideRenderer: SlideRenderer): void {
             detail: { slideRenderer, baseEvent }
         }));
     });
+}
+
+export function renderBackdrop(slideRenderer: SlideRenderer, width: number, height: number): void {
+    new CanvasRenderer({
+        canvas: slideRenderer.canvas,
+        origin: Vector.zero,
+        width,
+        height
+    }).render();
 }

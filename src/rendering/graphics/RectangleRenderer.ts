@@ -38,7 +38,7 @@ class RectangleRenderer implements GraphicRenderer {
         this._height = args.height || 0;
         this._fillColor = args.fillColor || '#CCCCCC';
         this._strokeColor = args.strokeColor || 'none';
-        this._strokeWidth = args.strokeWidth || 1;
+        this._strokeWidth = args.strokeWidth || 0;
         this._rotation = args.rotation || 0;
     }
 

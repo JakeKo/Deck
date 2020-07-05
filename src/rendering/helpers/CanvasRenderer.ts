@@ -14,12 +14,14 @@ class CanvasRenderer {
     private _origin: Vector;
     private _width: number;
     private _height: number;
+    private _fillColor: string;
 
     constructor(args: CanvasRendererArgs) {
         this._canvas = args.canvas;
         this._origin = args.origin;
         this._width = args.width;
         this._height = args.height;
+        this._fillColor = '#FFFFFF';
     }
 
     public get isRendered(): boolean {
@@ -34,7 +36,7 @@ class CanvasRenderer {
 
         this._svg = this._canvas.rect(this._width, this._height)
             .translate(this._origin.x, this._origin.y)
-            .fill('#FFFFFF');
+            .fill(this._fillColor);
     }
 
     public unrender(): void {
