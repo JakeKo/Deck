@@ -30,6 +30,14 @@ export type GraphicKeyboardEventPayload = {
 
 export type GraphicKeyboardEvent = CustomEvent<GraphicKeyboardEventPayload>;
 
+export type VertexMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slideRenderer: SlideRenderer;
+    vertexLocation: string;
+};
+
+export type VertexMouseEvent = CustomEvent<VertexMouseEventPayload>;
+
 export enum SLIDE_EVENTS {
     MOUSEUP = 'deck-slide-mouseup',
     MOUSEDOWN = 'deck-slide-mousedown',
@@ -48,4 +56,12 @@ export enum GRAPHIC_EVENTS {
     MOUSEMOVE = 'deck-graphic-mousemove',
     KEYDOWN = 'deck-graphic-keydown',
     KEYUP = 'deck-graphic-keyup'
+}
+
+export enum VERTEX_EVENTS {
+    MOUSEUP = 'deck-vertex-mouseup',
+    MOUSEDOWN = 'deck-vertex-mousedown',
+    MOUSEOVER = 'deck-vertex-mouseover',
+    MOUSEOUT = 'deck-vertex-mouseout',
+    MOUSEMOVE = 'deck-vertex-mousemove',
 }

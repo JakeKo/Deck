@@ -2,7 +2,7 @@ import Vector from '../utilities/Vector';
 
 export type GraphicRenderer = {
     id: string;
-    type: string;
+    type: GRAPHIC_TYPES;
     isRendered: boolean;
     render: () => void;
     unrender: () => void;

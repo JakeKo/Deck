@@ -20,7 +20,7 @@ class RectangleRenderer implements GraphicRenderer {
     private _id: string;
     private _slideRenderer: SlideRenderer;
     private _svg: SVG.Rect | undefined;
-    private _type: string;
+    private _type: GRAPHIC_TYPES;
     private _origin: Vector;
     private _width: number;
     private _height: number;
@@ -46,7 +46,7 @@ class RectangleRenderer implements GraphicRenderer {
         return this._id;
     }
 
-    public get type(): string {
+    public get type(): GRAPHIC_TYPES {
         return this._type;
     }
 

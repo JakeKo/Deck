@@ -1,7 +1,7 @@
 import * as SVG from 'svg.js';
 import { Viewbox } from '../store/types';
 import Vector from '../utilities/Vector';
-import { GraphicRenderer } from './types';
+import { GraphicRenderer, GRAPHIC_TYPES } from './types';
 import { decorateSlideEvents, renderBackdrop } from './utilities';
 
 type SlideRendererArgs = {
@@ -44,6 +44,10 @@ class SlideRenderer {
 
     public persistGraphic(graphic: GraphicRenderer): void {
         this._graphics[graphic.id] = graphic;
+    }
+
+    public getGraphic(graphicId: string): GraphicRenderer {
+        return this._graphics[graphicId];
     }
 }
 

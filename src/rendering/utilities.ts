@@ -1,5 +1,14 @@
 import * as SVG from 'svg.js';
-import { GraphicKeyboardEventPayload, GraphicMouseEventPayload, GRAPHIC_EVENTS, SlideKeyboardEventPayload, SlideMouseEventPayload, SLIDE_EVENTS } from "../events/types";
+import {
+    GraphicKeyboardEventPayload,
+    GraphicMouseEventPayload,
+    GRAPHIC_EVENTS,
+    SlideKeyboardEventPayload,
+    SlideMouseEventPayload,
+    SLIDE_EVENTS,
+    VertexMouseEventPayload,
+    VERTEX_EVENTS
+} from "../events/types";
 import Vector from '../utilities/Vector';
 import { CanvasRenderer } from './helpers';
 import SlideRenderer from "./SlideRenderer";
@@ -89,6 +98,38 @@ export function decorateSlideEvents(slideRenderer: SlideRenderer): void {
     slideRenderer.canvas.node.addEventListener('keydown', baseEvent => {
         document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYDOWN, {
             detail: { slideRenderer, baseEvent }
+        }));
+    });
+}
+
+export function decorateVertexEvents(svg: SVG.Element, slideRenderer: SlideRenderer, vertexLocation: string): void {
+    svg.node.addEventListener('mouseup', baseEvent => {
+        document.dispatchEvent(new CustomEvent<VertexMouseEventPayload>(VERTEX_EVENTS.MOUSEUP, {
+            detail: { slideRenderer, vertexLocation, baseEvent }
+        }));
+    });
+
+    svg.node.addEventListener('mousedown', baseEvent => {
+        document.dispatchEvent(new CustomEvent<VertexMouseEventPayload>(VERTEX_EVENTS.MOUSEDOWN, {
+            detail: { slideRenderer, vertexLocation, baseEvent }
+        }));
+    });
+
+    svg.node.addEventListener('mouseover', baseEvent => {
+        document.dispatchEvent(new CustomEvent<VertexMouseEventPayload>(VERTEX_EVENTS.MOUSEOVER, {
+            detail: { slideRenderer, vertexLocation, baseEvent }
+        }));
+    });
+
+    svg.node.addEventListener('mouseout', baseEvent => {
+        document.dispatchEvent(new CustomEvent<VertexMouseEventPayload>(VERTEX_EVENTS.MOUSEOUT, {
+            detail: { slideRenderer, vertexLocation, baseEvent }
+        }));
+    });
+
+    svg.node.addEventListener('mousemove', baseEvent => {
+        document.dispatchEvent(new CustomEvent<VertexMouseEventPayload>(VERTEX_EVENTS.MOUSEMOVE, {
+            detail: { slideRenderer, vertexLocation, baseEvent }
         }));
     });
 }
