@@ -1,8 +1,10 @@
 import SlideRenderer from "../rendering/SlideRenderer";
 
+// TODO: Consider making isElementEvent more specific (containing element event?)
 export type SlideMouseEventPayload = {
     baseEvent: MouseEvent;
     slideRenderer: SlideRenderer;
+    isElementEvent: boolean;
 };
 
 export type SlideMouseEvent = CustomEvent<SlideMouseEventPayload>;
@@ -21,14 +23,6 @@ export type GraphicMouseEventPayload = {
 };
 
 export type GraphicMouseEvent = CustomEvent<GraphicMouseEventPayload>;
-
-export type GraphicKeyboardEventPayload = {
-    baseEvent: KeyboardEvent;
-    slideRenderer: SlideRenderer;
-    graphicId: string;
-};
-
-export type GraphicKeyboardEvent = CustomEvent<GraphicKeyboardEventPayload>;
 
 export type VertexMouseEventPayload = {
     baseEvent: MouseEvent;
@@ -53,9 +47,7 @@ export enum GRAPHIC_EVENTS {
     MOUSEDOWN = 'deck-graphic-mousedown',
     MOUSEOVER = 'deck-graphic-mouseover',
     MOUSEOUT = 'deck-graphic-mouseout',
-    MOUSEMOVE = 'deck-graphic-mousemove',
-    KEYDOWN = 'deck-graphic-keydown',
-    KEYUP = 'deck-graphic-keyup'
+    MOUSEMOVE = 'deck-graphic-mousemove'
 }
 
 export enum VERTEX_EVENTS {
