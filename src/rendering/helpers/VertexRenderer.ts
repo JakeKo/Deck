@@ -6,10 +6,6 @@ type VertexRendererArgs = {
     center?: Vector;
 };
 
-const DEFAULT_ARGS = {
-    center: Vector.zero
-};
-
 // TODO: Figure out how to make anchors zoom-insensitive
 class VertexRenderer {
     private _canvas: SVG.Doc;
@@ -23,7 +19,7 @@ class VertexRenderer {
 
     constructor(args: VertexRendererArgs) {
         this._canvas = args.canvas;
-        this._center = args.center || DEFAULT_ARGS.center;
+        this._center = args.center || Vector.zero;
         this._width = 8;
         this._height = 8;
         this._fillColor = '#888888';

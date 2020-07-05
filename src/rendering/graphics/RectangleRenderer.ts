@@ -16,16 +16,6 @@ type RectangleRendererArgs = {
     rotation?: number;
 };
 
-const DEFAULT_ARGS = {
-    origin: Vector.zero,
-    width: 0,
-    height: 0,
-    fillColor: '#CCCCCC',
-    strokeColor: 'none',
-    strokeWidth: 1,
-    rotation: 0
-};
-
 class RectangleRenderer implements GraphicRenderer {
     private _id: string;
     private _slideRenderer: SlideRenderer;
@@ -43,13 +33,13 @@ class RectangleRenderer implements GraphicRenderer {
         this._id = args.id;
         this._slideRenderer = args.slideRenderer;
         this._type = GRAPHIC_TYPES.RECTANGLE;
-        this._origin = args.origin || DEFAULT_ARGS.origin;
-        this._width = args.width || DEFAULT_ARGS.width;
-        this._height = args.height || DEFAULT_ARGS.height;
-        this._fillColor = args.fillColor || DEFAULT_ARGS.fillColor;
-        this._strokeColor = args.strokeColor || DEFAULT_ARGS.strokeColor;
-        this._strokeWidth = args.strokeWidth || DEFAULT_ARGS.strokeWidth;
-        this._rotation = args.rotation || DEFAULT_ARGS.rotation;
+        this._origin = args.origin || Vector.zero;
+        this._width = args.width || 0;
+        this._height = args.height || 0;
+        this._fillColor = args.fillColor || '#CCCCCC';
+        this._strokeColor = args.strokeColor || 'none';
+        this._strokeWidth = args.strokeWidth || 1;
+        this._rotation = args.rotation || 0;
     }
 
     public get id(): string {

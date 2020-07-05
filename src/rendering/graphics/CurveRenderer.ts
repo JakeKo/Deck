@@ -14,14 +14,6 @@ type CurveRendererArgs = {
     rotation?: number;
 };
 
-const DEFAULT_ARGS = {
-    anchors: [],
-    fillColor: 'transparent',
-    strokeColor: '#000000',
-    strokeWidth: 1,
-    rotation: 0
-};
-
 class CurveRenderer implements GraphicRenderer {
     private _id: string;
     private _slideRenderer: SlideRenderer;
@@ -37,11 +29,11 @@ class CurveRenderer implements GraphicRenderer {
         this._id = args.id;
         this._slideRenderer = args.slideRenderer;
         this._type = GRAPHIC_TYPES.CURVE;
-        this._anchors = args.anchors || DEFAULT_ARGS.anchors;
-        this._fillColor = args.fillColor || DEFAULT_ARGS.fillColor;
-        this._strokeColor = args.strokeColor || DEFAULT_ARGS.strokeColor;
-        this._strokeWidth = args.strokeWidth || DEFAULT_ARGS.strokeWidth;
-        this._rotation = args.rotation || DEFAULT_ARGS.rotation;
+        this._anchors = args.anchors || [];
+        this._fillColor = args.fillColor ||'transparent';
+        this._strokeColor = args.strokeColor || '#000000';
+        this._strokeWidth = args.strokeWidth || 1;
+        this._rotation = args.rotation || 0;
     }
 
     public get id(): string {
@@ -128,7 +120,6 @@ class CurveRenderer implements GraphicRenderer {
 
     // Reformat points from an array of objects to the bezier curve string
     private get _formattedPoints(): string {
-        console.log(`${this._id} ${this._anchors.length}`);
         const anchorPoints = this._anchors.reduce<Vector[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []);
         const [origin, ...points] = anchorPoints.slice(1, -1);
         return origin === undefined ? '' : `M ${origin.x},${origin.y} ${points.map(({ x, y }, i) => `${i % 3 === 0 ? ' C' : ''} ${x},${y}`)}`;
