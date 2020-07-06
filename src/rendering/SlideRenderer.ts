@@ -43,7 +43,7 @@ class SlideRenderer {
     }
 
     public persistGraphic(graphic: GraphicRenderer): void {
-        this._graphics[graphic.id] = graphic;
+        this._graphics[graphic.getId()] = graphic;
     }
 
     public getGraphic(graphicId: string): GraphicRenderer {

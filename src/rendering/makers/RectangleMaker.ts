@@ -38,19 +38,19 @@ class RectangleMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 canvas: this._slide.canvas,
-                center: this._rectangle.origin
+                center: this._rectangle.getOrigin()
             }),
             topRight: new VertexRenderer({
                 canvas: this._slide.canvas,
-                center: this._rectangle.origin.add(new Vector(this._rectangle.width, 0))
+                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0))
             }),
             bottomLeft: new VertexRenderer({
                 canvas: this._slide.canvas,
-                center: this._rectangle.origin.add(new Vector(0, this._rectangle.height))
+                center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight()))
             }),
             bottomRight: new VertexRenderer({
                 canvas: this._slide.canvas,
-                center: this._rectangle.origin.add(new Vector(this._rectangle.width, this._rectangle.height))
+                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()))
             })
         };
 
@@ -73,22 +73,22 @@ class RectangleMaker {
         if (ctrl) {
             const dimensions = postShiftOffset.transform(Math.abs).scale(2);
             const originOffset = postShiftOffset.transform(Math.abs).scale(-1);
-            this._rectangle.origin = this._initialPosition.add(originOffset);
-            this._rectangle.width = dimensions.x;
-            this._rectangle.height = dimensions.y;
+            this._rectangle.setOrigin(this._initialPosition.add(originOffset));
+            this._rectangle.setWidth(dimensions.x);
+            this._rectangle.setHeight(dimensions.y);
         } else {
             const dimensions = postShiftOffset.transform(Math.abs);
             const originOffset = postShiftOffset.scale(0.5).add(dimensions.scale(-0.5));
-            this._rectangle.origin = this._initialPosition.add(originOffset);
-            this._rectangle.width = dimensions.x;
-            this._rectangle.height = dimensions.y;
+            this._rectangle.setOrigin(this._initialPosition.add(originOffset));
+            this._rectangle.setWidth(dimensions.x);
+            this._rectangle.setHeight(dimensions.y);
         }
 
         // Update helper graphics
-        this._helpers.topLeft.center = this._rectangle.origin;
-        this._helpers.topRight.center = this._rectangle.origin.add(new Vector(this._rectangle.width, 0));
-        this._helpers.bottomLeft.center = this._rectangle.origin.add(new Vector(0, this._rectangle.height));
-        this._helpers.bottomRight.center = this._rectangle.origin.add(new Vector(this._rectangle.width, this._rectangle.height));
+        this._helpers.topLeft.setCenter(this._rectangle.getOrigin());
+        this._helpers.topRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)));
+        this._helpers.bottomLeft.setCenter(this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())));
+        this._helpers.bottomRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())));
     }
 
     public complete(): void {

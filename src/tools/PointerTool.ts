@@ -46,7 +46,7 @@ function initRectangleMutation(store: AppStore): MutationControls {
     function beginMove(event: RectangleMouseEvent): void {
         const { slide, baseEvent } = event.detail;
         const position = resolvePosition(baseEvent, slide, store);
-        originOffset = position.towards(rectangle!.origin);
+        originOffset = position.towards(rectangle!.getOrigin());
 
         unlisten(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
         listen(SLIDE_EVENTS.MOUSEMOVE, move);
@@ -67,7 +67,7 @@ function initRectangleMutation(store: AppStore): MutationControls {
 
     function complete(event: SlideMouseEvent): void {
         // Ignore event if the user clicked on the current graphic
-        if (event.detail.target && rectangle && event.detail.target.id === rectangle.id) {
+        if (event.detail.target && rectangle && event.detail.target.getId() === rectangle.getId()) {
             return;
         }
 

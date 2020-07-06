@@ -31,83 +31,31 @@ class CurveRenderer implements GraphicRenderer {
         this._slideRenderer = args.slideRenderer;
         this._type = GRAPHIC_TYPES.CURVE;
         this._anchors = args.anchors || [];
-        this._fillColor = args.fillColor ||'transparent';
+        this._fillColor = args.fillColor || 'transparent';
         this._strokeColor = args.strokeColor || '#000000';
         this._strokeWidth = args.strokeWidth || 1;
         this._rotation = args.rotation || 0;
     }
 
-    public get id(): string {
+    public getId(): string {
         return this._id;
     }
 
-    public get type(): GRAPHIC_TYPES {
+    public getType(): GRAPHIC_TYPES {
         return this._type;
     }
 
-    public get isRendered(): boolean {
+    public isRendered(): boolean {
         return this._svg !== undefined;
-    }
-
-    public move(origin: Vector): void {
-        const changeInPosition = this._anchors[0].point.towards(origin);
-        this._anchors = this._anchors.map(anchor => ({
-            inHandle: anchor.inHandle.add(changeInPosition),
-            point: anchor.point.add(changeInPosition),
-            outHandle: anchor.outHandle.add(changeInPosition)
-        }));
-        this._svg && this._svg.plot(this._formattedPoints);
-    }
-
-    public addAnchor(anchor: CurveAnchor): number {
-        this._anchors.push(anchor);
-        this._svg && this._svg.plot(this._formattedPoints);
-        return this._anchors.length - 1;
-    }
-
-    public setAnchor(index: number, anchor: CurveAnchor): void {
-        this._anchors[index] = anchor;
-        this._svg && this._svg.plot(this._formattedPoints);
-    }
-
-    public removeAnchor(index: number): void {
-        this._anchors.splice(index, 1);
-        this._svg && this._svg.plot(this._formattedPoints);
-    }
-
-    public getAnchors(): CurveAnchor[] {
-        return this._anchors;
-    }
-
-    // TODO: Convert setters to functions
-    // TODO: Create getter functions
-    public set fillColor(fillColor: string) {
-        this._fillColor = fillColor;
-        this._svg && this._svg.fill(this._fillColor);
-    }
-
-    public set strokeColor(strokeColor: string) {
-        this._strokeColor = strokeColor;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
-    }
-
-    public set strokeWidth(strokeWidth: number) {
-        this._strokeWidth = strokeWidth;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
-    }
-
-    public set rotation(rotation: number) {
-        this._rotation = rotation;
-        this._svg && this._svg.rotate(this._rotation);
     }
 
     public render(): void {
         // Silently fail if the SVG is already rendered
-        if (this.isRendered) {
+        if (this.isRendered()) {
             return;
         }
 
-        this._svg = this._slideRenderer.canvas.path(this._formattedPoints)
+        this._svg = this._slideRenderer.canvas.path(this._getFormattedPoints())
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
@@ -119,11 +67,87 @@ class CurveRenderer implements GraphicRenderer {
         this._svg = undefined;
     }
 
+    public getAnchors(): CurveAnchor[] {
+        return this._anchors;
+    }
+
+    public setAnchors(anchors: CurveAnchor[]): void {
+        this._anchors = anchors;
+        this._svg && this._svg.plot(this._getFormattedPoints());
+    }
+
+    public getAnchor(index: number): CurveAnchor {
+        return this._anchors[index];
+    }
+
+    public setAnchor(index: number, anchor: CurveAnchor): void {
+        this._anchors[index] = anchor;
+        this._svg && this._svg.plot(this._getFormattedPoints());
+    }
+
+    public addAnchor(anchor: CurveAnchor): number {
+        this._anchors.push(anchor);
+        this._svg && this._svg.plot(this._getFormattedPoints());
+        return this._anchors.length - 1;
+    }
+
+    public removeAnchor(index: number): void {
+        this._anchors.splice(index, 1);
+        this._svg && this._svg.plot(this._getFormattedPoints());
+    }
+
+    public getFillColor(): string {
+        return this._fillColor;
+    }
+
+    public setFillColor(fillColor: string): void {
+        this._fillColor = fillColor;
+        this._svg && this._svg.fill(this._fillColor);
+    }
+
+    public getStrokeColor(): string {
+        return this._strokeColor;
+    }
+
+    public setStrokeColor(strokeColor: string): void {
+        this._strokeColor = strokeColor;
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+    }
+
+    public getStrokeWidth(): number {
+        return this._strokeWidth;
+    }
+
+    public setStrokeWidth(strokeWidth: number): void {
+        this._strokeWidth = strokeWidth;
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+    }
+
+    public getRotation(): number {
+        return this._rotation;
+    }
+
+    public setRotation(rotation: number): void {
+        this._rotation = rotation;
+        this._svg && this._svg.rotate(this._rotation);
+    }
+
     // Reformat points from an array of objects to the bezier curve string
-    private get _formattedPoints(): string {
+    private _getFormattedPoints(): string {
         const anchorPoints = this._anchors.reduce<Vector[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []);
         const [origin, ...points] = anchorPoints.slice(1, -1);
         return origin === undefined ? '' : `M ${origin.x},${origin.y} ${points.map(({ x, y }, i) => `${i % 3 === 0 ? ' C' : ''} ${x},${y}`)}`;
+    }
+
+    // TODO: Consider removing
+    public move(origin: Vector): void {
+        const changeInPosition = this._anchors[0].point.towards(origin);
+        this._anchors = this._anchors.map(anchor => ({
+            inHandle: anchor.inHandle.add(changeInPosition),
+            point: anchor.point.add(changeInPosition),
+            outHandle: anchor.outHandle.add(changeInPosition)
+        }));
+        this._svg && this._svg.plot(this._getFormattedPoints());
     }
 }
 

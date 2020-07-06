@@ -30,21 +30,21 @@ class CanvasRenderer implements GraphicRenderer {
         this._fillColor = '#FFFFFF';
     }
 
-    public get id(): string {
+    public getId(): string {
         return this._id;
     }
 
-    public get type(): GRAPHIC_TYPES {
+    public getType(): GRAPHIC_TYPES {
         return this._type;
     }
 
-    public get isRendered(): boolean {
+    public isRendered(): boolean {
         return this._svg !== undefined;
     }
 
     public render(): void {
         // Silently fail if the SVG is already rendered
-        if (this.isRendered) {
+        if (this.isRendered()) {
             return;
         }
 

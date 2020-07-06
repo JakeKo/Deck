@@ -56,37 +56,20 @@ class CurveAnchorRenderer implements GraphicRenderer {
         this._spanStrokeColor = '#888888';
     }
 
-    public get id(): string {
+    public getId(): string {
         return this._id;
     }
 
-    public get type(): GRAPHIC_TYPES {
+    public getType(): GRAPHIC_TYPES {
         return this._type;
     }
 
-    public get isRendered(): boolean {
+    public isRendered(): boolean {
         return this._pointSvg !== undefined;
     }
 
-    public setInHandle(inHandle: Vector) {
-        this._inHandle = inHandle;
-        this._inHandleSvg && this._inHandleSvg.translate(this._inHandle.x - this._handleWidth / 2, this._inHandle.y - this._handleHeight / 2);
-        this._inHandleSpanSvg && this._inHandleSpanSvg.plot(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y);
-    }
-
-    public setPoint(point: Vector) {
-        this._point = point;
-        this._pointSvg && this._pointSvg.translate(this._point.x - this._pointWidth / 2, this._point.y - this._pointHeight / 2);
-    }
-
-    public setOutHandle(outHandle: Vector) {
-        this._outHandle = outHandle;
-        this._outHandleSvg && this._outHandleSvg.translate(this._outHandle.x - this._handleWidth / 2, this._outHandle.y - this._handleHeight / 2);
-        this._outHandleSpanSvg && this._outHandleSpanSvg.plot(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y);
-    }
-
     public render(): void {
-        if (this.isRendered) {
+        if (this.isRendered()) {
             return;
         }
 
@@ -124,6 +107,23 @@ class CurveAnchorRenderer implements GraphicRenderer {
         this._pointSvg = undefined;
         this._outHandleSvg = undefined;
         this._outHandleSpanSvg = undefined;
+    }
+
+    public setInHandle(inHandle: Vector) {
+        this._inHandle = inHandle;
+        this._inHandleSvg && this._inHandleSvg.translate(this._inHandle.x - this._handleWidth / 2, this._inHandle.y - this._handleHeight / 2);
+        this._inHandleSpanSvg && this._inHandleSpanSvg.plot(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y);
+    }
+
+    public setPoint(point: Vector) {
+        this._point = point;
+        this._pointSvg && this._pointSvg.translate(this._point.x - this._pointWidth / 2, this._point.y - this._pointHeight / 2);
+    }
+
+    public setOutHandle(outHandle: Vector) {
+        this._outHandle = outHandle;
+        this._outHandleSvg && this._outHandleSvg.translate(this._outHandle.x - this._handleWidth / 2, this._outHandle.y - this._handleHeight / 2);
+        this._outHandleSpanSvg && this._outHandleSpanSvg.plot(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y);
     }
 }
 

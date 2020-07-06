@@ -42,84 +42,21 @@ class RectangleRenderer implements GraphicRenderer {
         this._rotation = args.rotation || 0;
     }
 
-    public get id(): string {
+    public getId(): string {
         return this._id;
     }
 
-    public get type(): GRAPHIC_TYPES {
+    public getType(): GRAPHIC_TYPES {
         return this._type;
     }
 
-    public get isRendered(): boolean {
+    public isRendered(): boolean {
         return this._svg !== undefined;
-    }
-
-    public get origin(): Vector {
-        return this._origin;
-    }
-
-    public set origin(origin: Vector) {
-        this._origin = origin;
-        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
-    }
-
-    public get width(): number {
-        return this._width;
-    }
-
-    public set width(width: number) {
-        this._width = width;
-        this._svg && this._svg.width(this._width);
-    }
-
-    public get height(): number {
-        return this._height;
-    }
-
-    public set height(height: number) {
-        this._height = height;
-        this._svg && this._svg.height(this._height);
-    }
-
-    public get fillColor(): string {
-        return this._fillColor;
-    }
-
-    public set fillColor(fillColor: string) {
-        this._fillColor = fillColor;
-        this._svg && this._svg.fill(this._fillColor);
-    }
-
-    public get strokeColor(): string {
-        return this._strokeColor;
-    }
-
-    public set strokeColor(strokeColor: string) {
-        this._strokeColor = strokeColor;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
-    }
-
-    public get strokeWidth(): number {
-        return this._strokeWidth;
-    }
-
-    public set strokeWidth(strokeWidth: number) {
-        this._strokeWidth = strokeWidth;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
-    }
-
-    public get rotation(): number {
-        return this._rotation;
-    }
-
-    public set rotation(rotation: number) {
-        this._rotation = rotation;
-        this._svg && this._svg.rotate(this._rotation);
     }
 
     public render(): void {
         // Silently fail if the SVG is already rendered
-        if (this.isRendered) {
+        if (this.isRendered()) {
             return;
         }
 
@@ -134,6 +71,70 @@ class RectangleRenderer implements GraphicRenderer {
     public unrender(): void {
         this._svg && this._svg.remove();
         this._svg = undefined;
+    }
+
+    // TODO: Flatten origin to x and y
+    public getOrigin(): Vector {
+        return this._origin;
+    }
+
+    public setOrigin(origin: Vector): void {
+        this._origin = origin;
+        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
+    }
+
+    public getWidth(): number {
+        return this._width;
+    }
+
+    public setWidth(width: number): void {
+        this._width = width;
+        this._svg && this._svg.width(this._width);
+    }
+
+    public getHeight(): number {
+        return this._height;
+    }
+
+    public setHeight(height: number): void {
+        this._height = height;
+        this._svg && this._svg.height(this._height);
+    }
+
+    public getFillColor(): string {
+        return this._fillColor;
+    }
+
+    public setFillColor(fillColor: string): void {
+        this._fillColor = fillColor;
+        this._svg && this._svg.fill(this._fillColor);
+    }
+
+    public getStrokeColor(): string {
+        return this._strokeColor;
+    }
+
+    public setStrokeColor(strokeColor: string): void {
+        this._strokeColor = strokeColor;
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+    }
+
+    public getStrokeWidth(): number {
+        return this._strokeWidth;
+    }
+
+    public setStrokeWidth(strokeWidth: number): void {
+        this._strokeWidth = strokeWidth;
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+    }
+
+    public getRotation(): number {
+        return this._rotation;
+    }
+
+    public setRotation(rotation: number): void {
+        this._rotation = rotation;
+        this._svg && this._svg.rotate(this._rotation);
     }
 }
 

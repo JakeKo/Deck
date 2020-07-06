@@ -2,7 +2,6 @@ import * as SVG from 'svg.js';
 import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
 import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
-import { decorateVertexEvents } from '../utilities';
 
 type VertexRendererArgs = {
     canvas: SVG.Doc;
@@ -34,26 +33,21 @@ class VertexRenderer implements GraphicRenderer {
         this._strokeWidth = 0;
     }
 
-    public get id(): string {
+    public getId(): string {
         return this._id;
     }
 
-    public get type(): GRAPHIC_TYPES {
+    public getType(): GRAPHIC_TYPES {
         return this._type;
     }
 
-    public get isRendered(): boolean {
+    public isRendered(): boolean {
         return this._svg !== undefined;
-    }
-
-    public set center(center: Vector) {
-        this._center = center;
-        this._svg && this._svg.translate(this._center.x - this._width / 2, this._center.y - this._height / 2);
     }
 
     public render(): void {
         // Silently fail if the SVG is already rendered
-        if (this.isRendered) {
+        if (this.isRendered()) {
             return;
         }
 
@@ -66,6 +60,11 @@ class VertexRenderer implements GraphicRenderer {
     public unrender(): void {
         this._svg && this._svg.remove();
         this._svg = undefined;
+    }
+
+    public setCenter(center: Vector): void {
+        this._center = center;
+        this._svg && this._svg.translate(this._center.x - this._width / 2, this._center.y - this._height / 2);
     }
 }
 

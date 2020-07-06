@@ -28,19 +28,19 @@ class RectangleMutator {
         this._helpers = {
             topLeft: new VertexRenderer({
                 canvas: this._slide.canvas,
-                center: this._rectangle.origin
+                center: this._rectangle.getOrigin()
             }),
             topRight: new VertexRenderer({
                 canvas: this._slide.canvas,
-                center: this._rectangle.origin.add(new Vector(this._rectangle.width, 0))
+                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0))
             }),
             bottomLeft: new VertexRenderer({
                 canvas: this._slide.canvas,
-                center: this._rectangle.origin.add(new Vector(0, this._rectangle.height))
+                center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight()))
             }),
             bottomRight: new VertexRenderer({
                 canvas: this._slide.canvas,
-                center: this._rectangle.origin.add(new Vector(this._rectangle.width, this._rectangle.height))
+                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()))
             })
         };
 
@@ -53,24 +53,24 @@ class RectangleMutator {
 
     public move(origin: Vector): void {
         // Update rendering
-        this._rectangle.origin = origin;
+        this._rectangle.setOrigin(origin);
 
         // Update helper graphics
-        this._helpers.topLeft.center = this._rectangle.origin;
-        this._helpers.topRight.center = this._rectangle.origin.add(new Vector(this._rectangle.width, 0));
-        this._helpers.bottomLeft.center = this._rectangle.origin.add(new Vector(0, this._rectangle.height));
-        this._helpers.bottomRight.center = this._rectangle.origin.add(new Vector(this._rectangle.width, this._rectangle.height));
+        this._helpers.topLeft.setCenter(this._rectangle.getOrigin());
+        this._helpers.topRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)));
+        this._helpers.bottomLeft.setCenter(this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())));
+        this._helpers.bottomRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())));
     }
 
     public setDimensions(dimensions: Vector): void {
         // Update rendering
-        this._rectangle.width = dimensions.x;
-        this._rectangle.height = dimensions.y;
+        this._rectangle.setWidth(dimensions.x);
+        this._rectangle.setHeight(dimensions.y);
 
         // Update helper graphics
-        this._helpers.topRight.center = this._rectangle.origin.add(new Vector(this._rectangle.width, 0));
-        this._helpers.bottomLeft.center = this._rectangle.origin.add(new Vector(0, this._rectangle.height));
-        this._helpers.bottomRight.center = this._rectangle.origin.add(new Vector(this._rectangle.width, this._rectangle.height));
+        this._helpers.topRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)));
+        this._helpers.bottomLeft.setCenter(this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())));
+        this._helpers.bottomRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())));
     }
 
     // TODO: Include methods for other mutations
