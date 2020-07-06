@@ -9,18 +9,15 @@ import { resolvePosition } from "./utilities";
 
 export default (store: AppStore): EditorTool => {
     function mutate(event: GraphicMouseEvent): void {
-        const { slideRenderer, graphicId } = event.detail;
-        const graphic = slideRenderer.getGraphic(graphicId);
-
-        if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+        if (event.detail.graphic.type === GRAPHIC_TYPES.RECTANGLE) {
             mutateRectangle(store, event);
         }
     }
 
     // TODO: Consider the implications of RectangleMouseEvent, CurveMouseEvent, etc. instead of GraphicMouseEvent
     function mutateRectangle(store: AppStore, event: GraphicMouseEvent): void {
-        const { slideRenderer, graphicId } = event.detail;
-        const rectangle = slideRenderer.getGraphic(graphicId) as RectangleRenderer;
+        const { slideRenderer, graphic } = event.detail;
+        const rectangle = graphic as RectangleRenderer;
         const mutator = new RectangleMutator({ slide: slideRenderer, rectangle });
         beginMove(event);
 

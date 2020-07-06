@@ -1,4 +1,5 @@
 import SlideRenderer from "../rendering/SlideRenderer";
+import { GraphicRenderer } from "../rendering/types";
 
 export enum EVENT_CATEGORIES {
     SLIDE_MOUSE = 'deck-slide-mouse-event',
@@ -29,7 +30,7 @@ export type SlideKeyboardEvent = CustomEvent<SlideKeyboardEventPayload>;
 export type GraphicMouseEventPayload = {
     baseEvent: MouseEvent;
     slideRenderer: SlideRenderer;
-    graphicId: string;
+    graphic: GraphicRenderer;
     category: EVENT_CATEGORIES.GRAPHIC_MOUSE;
 };
 

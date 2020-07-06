@@ -128,7 +128,7 @@ class RectangleRenderer implements GraphicRenderer {
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
-        decorateGraphicEvents(this._svg, this._slideRenderer, this._id);
+        decorateGraphicEvents(this._svg, this._slideRenderer, this);
     }
 
     public unrender(): void {
