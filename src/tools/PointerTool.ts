@@ -1,86 +1,95 @@
-import { EVENT_CATEGORIES, GraphicMouseEvent, GRAPHIC_EVENTS, SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
+import { RectangleMouseEvent, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
 import { listen, unlisten } from "../events/utilities";
 import { RectangleRenderer } from "../rendering/graphics";
 import { RectangleMutator } from "../rendering/mutators";
-import { GRAPHIC_TYPES } from "../rendering/types";
 import { AppStore } from "../store/types";
+import Vector from "../utilities/Vector";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
 
+type MutationControls = {
+    begin: (event: CustomEvent) => void;
+    complete: (event: CustomEvent) => void;
+    stop: () => void;
+};
+
 export default (store: AppStore): EditorTool => {
-    function mutate(event: GraphicMouseEvent): void {
-        if (event.detail.graphic.type === GRAPHIC_TYPES.RECTANGLE) {
-            mutateRectangle(store, event);
-        }
-    }
-
-    // TODO: Consider the implications of RectangleMouseEvent, CurveMouseEvent, etc. instead of GraphicMouseEvent
-    function mutateRectangle(store: AppStore, event: GraphicMouseEvent): void {
-        const { slideRenderer, graphic } = event.detail;
-        const rectangle = graphic as RectangleRenderer;
-        const mutator = new RectangleMutator({ slide: slideRenderer, rectangle });
-        beginMove(event);
-
-        unlisten(GRAPHIC_EVENTS.MOUSEDOWN, mutate);
-        listen(SLIDE_EVENTS.MOUSEDOWN, complete);
-        listen(SLIDE_EVENTS.KEYDOWN, complete);
-
-        function beginMove(event: SlideMouseEvent | GraphicMouseEvent): void {
-            const position = resolvePosition(event.detail.baseEvent, slideRenderer, store);
-            const originOffset = position.towards(rectangle.origin);
-
-            unlisten(SLIDE_EVENTS.MOUSEDOWN, beginMove);
-            listen(SLIDE_EVENTS.MOUSEMOVE, move);
-            listen(SLIDE_EVENTS.MOUSEUP, endMove);
-            listen(SLIDE_EVENTS.KEYDOWN, endMove);
-
-            function move(event: SlideMouseEvent): void {
-                const position = resolvePosition(event.detail.baseEvent, slideRenderer, store);
-                mutator.move(position.add(originOffset));
-            }
-
-            function endMove(event: SlideMouseEvent | SlideKeyboardEvent): void {
-                // Ignore keyboard event if the user did not press any of the specified keys
-                if (event.detail.category === EVENT_CATEGORIES.SLIDE_KEYBOARD) {
-                    const keyboardEvent = event as SlideKeyboardEvent;
-                    if (['Tab', 'Enter', 'Escape'].indexOf(keyboardEvent.detail.baseEvent.key) === -1) {
-                        return;
-                    }
-                }
-
-                unlisten(SLIDE_EVENTS.MOUSEUP, endMove);
-                unlisten(SLIDE_EVENTS.KEYDOWN, endMove);
-                unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-                listen(SLIDE_EVENTS.MOUSEDOWN, beginMove);
-            }
-        }
-
-        function complete(event: SlideMouseEvent | SlideKeyboardEvent): void {
-            // Ignore keyboard event if the user did not press any of the specified keys
-            if (event.detail.category === EVENT_CATEGORIES.SLIDE_KEYBOARD) {
-                const keyboardEvent = event as SlideKeyboardEvent;
-                if (['Tab', 'Enter', 'Escape'].indexOf(keyboardEvent.detail.baseEvent.key) === -1) {
-                    return;
-                }
-            }
-
-            // TODO: Implement method for checking if another graphic was clicked
-            // Ignore mouse event if the user clicked on the current graphic or another graphic
-            if (event.detail.isElementEvent) {
-                return;
-            }
-
-            mutator.complete();
-            listen(GRAPHIC_EVENTS.MOUSEDOWN, mutate);
-            unlisten(SLIDE_EVENTS.MOUSEDOWN, beginMove);
-            unlisten(SLIDE_EVENTS.MOUSEUP, complete);
-            unlisten(SLIDE_EVENTS.KEYDOWN, complete);
-        }
-    }
+    const rectangleMutation = initRectangleMutation(store);
 
     return {
         name: TOOL_NAMES.POINTER,
-        mount: () => listen(GRAPHIC_EVENTS.MOUSEDOWN, mutate),
-        unmount: () => unlisten(GRAPHIC_EVENTS.MOUSEDOWN, mutate)
+        mount: () => {
+            listen(RECTANGLE_EVENTS.MOUSEDOWN, rectangleMutation.begin);
+        },
+        unmount: () => {
+            rectangleMutation.stop();
+            unlisten(RECTANGLE_EVENTS.MOUSEDOWN, rectangleMutation.begin);
+        }
     };
 };
+
+function initRectangleMutation(store: AppStore): MutationControls {
+    let mutator: RectangleMutator | undefined;
+    let originOffset: Vector | undefined;
+    let rectangle: RectangleRenderer | undefined;
+
+    function begin(event: RectangleMouseEvent): void {
+        const { slide, target } = event.detail;
+        rectangle = target;
+        mutator = new RectangleMutator({ slide, rectangle });
+        beginMove(event);
+
+        unlisten(RECTANGLE_EVENTS.MOUSEDOWN, begin);
+        listen(SLIDE_EVENTS.MOUSEDOWN, complete);
+    }
+
+    function beginMove(event: RectangleMouseEvent): void {
+        const { slide, baseEvent } = event.detail;
+        const position = resolvePosition(baseEvent, slide, store);
+        originOffset = position.towards(rectangle!.origin);
+
+        unlisten(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
+        listen(SLIDE_EVENTS.MOUSEMOVE, move);
+        listen(SLIDE_EVENTS.MOUSEUP, completeMove);
+    }
+
+    function move(event: SlideMouseEvent): void {
+        const { slide, baseEvent } = event.detail;
+        const position = resolvePosition(baseEvent, slide, store);
+        mutator!.move(position.add(originOffset!));
+    }
+
+    function completeMove(): void {
+        listen(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
+        unlisten(SLIDE_EVENTS.MOUSEUP, completeMove);
+    }
+
+    function complete(event: SlideMouseEvent): void {
+        // Ignore event if the user clicked on the current graphic
+        if (event.detail.target && rectangle && event.detail.target.id === rectangle.id) {
+            return;
+        }
+
+        // TODO: Implement method for switching to other graphic if clicked on
+
+        mutator && mutator.complete();
+        mutator = undefined;
+        listen(RECTANGLE_EVENTS.MOUSEDOWN, begin);
+        unlisten(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
+        unlisten(SLIDE_EVENTS.MOUSEUP, completeMove);
+        unlisten(SLIDE_EVENTS.MOUSEDOWN, complete);
+    }
+
+    function stop(): void {
+        mutator && mutator.complete();
+        unlisten(RECTANGLE_EVENTS.MOUSEDOWN, begin);
+        unlisten(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
+        unlisten(SLIDE_EVENTS.MOUSEUP, completeMove);
+        unlisten(SLIDE_EVENTS.MOUSEDOWN, complete);
+    }
+
+    return { begin, complete, stop };
+}

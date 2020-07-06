@@ -21,6 +21,7 @@ import { PointerTool } from './tools';
 import { MUTATIONS } from './store/types';
 import { mapMutations } from 'vuex';
 import { EditorTool } from './tools/types';
+import { Mutation } from 'vuex-class';
 
 @Component({
     components: {
@@ -28,11 +29,10 @@ import { EditorTool } from './tools/types';
         Toolbox,
         Editor,
         Roadmap
-    },
-    methods: mapMutations([MUTATIONS.ACTIVE_TOOL])
+    }
 })
 export default class App extends Vue {
-    private [MUTATIONS.ACTIVE_TOOL]: (tool: EditorTool) => void;
+    @Mutation private [MUTATIONS.ACTIVE_TOOL]: (tool: EditorTool) => void;
 
     // Initialize application settings
     private mounted(): void {

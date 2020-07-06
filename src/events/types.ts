@@ -1,50 +1,10 @@
+import { CurveRenderer, RectangleRenderer } from "../rendering/graphics";
 import SlideRenderer from "../rendering/SlideRenderer";
 import { GraphicRenderer } from "../rendering/types";
 
-export enum EVENT_CATEGORIES {
-    SLIDE_MOUSE = 'deck-slide-mouse-event',
-    SLIDE_KEYBOARD = 'deck-slide-keyboard-event',
-    GRAPHIC_MOUSE = 'deck-graphic-mouse-event',
-    VERTEX_MOUSE = 'deck-vertex-mouse-event',
-}
+export type DECK_EVENTS = SLIDE_EVENTS | RECTANGLE_EVENTS | CURVE_EVENTS | VERTEX_EVENTS;
 
-// TODO: Consider making isElementEvent more specific (containing element event?)
-export type SlideMouseEventPayload = {
-    baseEvent: MouseEvent;
-    slideRenderer: SlideRenderer;
-    isElementEvent: boolean;
-    category: EVENT_CATEGORIES.SLIDE_MOUSE;
-};
-
-export type SlideMouseEvent = CustomEvent<SlideMouseEventPayload>;
-
-export type SlideKeyboardEventPayload = {
-    baseEvent: KeyboardEvent;
-    slideRenderer: SlideRenderer;
-    isElementEvent: boolean;
-    category: EVENT_CATEGORIES.SLIDE_KEYBOARD;
-};
-
-export type SlideKeyboardEvent = CustomEvent<SlideKeyboardEventPayload>;
-
-export type GraphicMouseEventPayload = {
-    baseEvent: MouseEvent;
-    slideRenderer: SlideRenderer;
-    graphic: GraphicRenderer;
-    category: EVENT_CATEGORIES.GRAPHIC_MOUSE;
-};
-
-export type GraphicMouseEvent = CustomEvent<GraphicMouseEventPayload>;
-
-export type VertexMouseEventPayload = {
-    baseEvent: MouseEvent;
-    slideRenderer: SlideRenderer;
-    vertexLocation: string;
-    category: EVENT_CATEGORIES.VERTEX_MOUSE;
-};
-
-export type VertexMouseEvent = CustomEvent<VertexMouseEventPayload>;
-
+// SLIDE EVENTS
 export enum SLIDE_EVENTS {
     MOUSEUP = 'deck-slide-mouseup',
     MOUSEDOWN = 'deck-slide-mousedown',
@@ -55,18 +15,69 @@ export enum SLIDE_EVENTS {
     KEYUP = 'deck-slide-keyup'
 }
 
-export enum GRAPHIC_EVENTS {
-    MOUSEUP = 'deck-graphic-mouseup',
-    MOUSEDOWN = 'deck-graphic-mousedown',
-    MOUSEOVER = 'deck-graphic-mouseover',
-    MOUSEOUT = 'deck-graphic-mouseout',
-    MOUSEMOVE = 'deck-graphic-mousemove'
+export type SlideMouseEvent = CustomEvent<SlideMouseEventPayload>;
+export type SlideMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slide: SlideRenderer;
+    type: SLIDE_EVENTS;
+    target: GraphicRenderer | undefined;
+};
+
+export type SlideKeyboardEvent = CustomEvent<SlideKeyboardEventPayload>;
+export type SlideKeyboardEventPayload = {
+    baseEvent: KeyboardEvent;
+    slide: SlideRenderer;
+    type: SLIDE_EVENTS;
+    target: GraphicRenderer | undefined;
+};
+
+// RECTANGLE EVENTS
+export enum RECTANGLE_EVENTS {
+    MOUSEUP = 'deck-rectangle-mouseup',
+    MOUSEDOWN = 'deck-rectangle-mousedown',
+    MOUSEOVER = 'deck-rectangle-mouseover',
+    MOUSEOUT = 'deck-rectangle-mouseout',
+    MOUSEMOVE = 'deck-rectangle-mousemove'
 }
 
+export type RectangleMouseEvent = CustomEvent<RectangleMouseEventPayload>;
+export type RectangleMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slide: SlideRenderer;
+    type: RECTANGLE_EVENTS;
+    target: RectangleRenderer;
+};
+
+// CURVE EVENTS
+export enum CURVE_EVENTS {
+    MOUSEUP = 'deck-curve-mouseup',
+    MOUSEDOWN = 'deck-curve-mousedown',
+    MOUSEOVER = 'deck-curve-mouseover',
+    MOUSEOUT = 'deck-curve-mouseout',
+    MOUSEMOVE = 'deck-curve-mousemove'
+}
+
+export type CurveMouseEvent = CustomEvent<CurveMouseEventPayload>;
+export type CurveMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slide: SlideRenderer;
+    type: CURVE_EVENTS;
+    target: CurveRenderer;
+};
+
+// VERTEX EVENTS
 export enum VERTEX_EVENTS {
     MOUSEUP = 'deck-vertex-mouseup',
     MOUSEDOWN = 'deck-vertex-mousedown',
     MOUSEOVER = 'deck-vertex-mouseover',
     MOUSEOUT = 'deck-vertex-mouseout',
-    MOUSEMOVE = 'deck-vertex-mousemove',
+    MOUSEMOVE = 'deck-vertex-mousemove'
 }
+
+export type VertexMouseEvent = CustomEvent<VertexMouseEventPayload>;
+export type VertexMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slide: SlideRenderer;
+    type: VERTEX_EVENTS;
+    location: string;
+};

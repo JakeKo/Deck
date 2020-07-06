@@ -8,25 +8,23 @@ import { resolvePosition } from "./utilities";
 
 export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
-        const { slideRenderer, baseEvent } = event.detail;
+        const { slide, baseEvent } = event.detail;
         const maker = new RectangleMaker({
-            slide: slideRenderer,
-            initialPosition: resolvePosition(baseEvent, slideRenderer, store)
+            slide,
+            initialPosition: resolvePosition(baseEvent, slide, store)
         });
 
-        unlisten(SLIDE_EVENTS.MOUSEDOWN, make);
         listen(SLIDE_EVENTS.MOUSEMOVE, update);
         listen(SLIDE_EVENTS.MOUSEUP, complete);
 
         function update(event: SlideMouseEvent): void {
             const { baseEvent } = event.detail;
-            const position = resolvePosition(baseEvent, slideRenderer, store);
+            const position = resolvePosition(baseEvent, slide, store);
             maker.resize(position, baseEvent.shiftKey, baseEvent.ctrlKey, baseEvent.altKey);
         }
 
         function complete(): void {
             maker.complete();
-            listen(SLIDE_EVENTS.MOUSEDOWN, make);
             unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
             unlisten(SLIDE_EVENTS.MOUSEUP, complete);
 

@@ -2,7 +2,7 @@ import * as SVG from 'svg.js';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
-import { decorateGraphicEvents } from '../utilities';
+import { decorateRectangleEvents } from '../utilities';
 
 type RectangleRendererArgs = {
     id: string;
@@ -128,7 +128,7 @@ class RectangleRenderer implements GraphicRenderer {
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
-        decorateGraphicEvents(this._svg, this._slideRenderer, this);
+        decorateRectangleEvents(this._svg, this._slideRenderer, this);
     }
 
     public unrender(): void {

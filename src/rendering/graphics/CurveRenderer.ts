@@ -2,7 +2,7 @@ import * as SVG from 'svg.js';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from "../types";
-import { decorateGraphicEvents } from '../utilities';
+import { decorateCurveEvents } from '../utilities';
 
 type CurveRendererArgs = {
     id: string;
@@ -111,7 +111,7 @@ class CurveRenderer implements GraphicRenderer {
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
-        decorateGraphicEvents(this._svg, this._slideRenderer, this);
+        decorateCurveEvents(this._svg, this._slideRenderer, this);
     }
 
     public unrender(): void {

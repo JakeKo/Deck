@@ -2,6 +2,7 @@ import * as SVG from 'svg.js';
 import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
 import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { decorateVertexEvents } from '../utilities';
 
 type VertexRendererArgs = {
     canvas: SVG.Doc;
