@@ -14,6 +14,7 @@ type CurveRendererArgs = {
     rotation?: number;
 };
 
+// TODO: Change _slideRenderer to _slide
 class CurveRenderer implements GraphicRenderer {
     private _id: string;
     private _slideRenderer: SlideRenderer;

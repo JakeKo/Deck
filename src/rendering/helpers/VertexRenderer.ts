@@ -1,5 +1,7 @@
 import * as SVG from 'svg.js';
+import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
+import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
 type VertexRendererArgs = {
     canvas: SVG.Doc;
@@ -7,7 +9,9 @@ type VertexRendererArgs = {
 };
 
 // TODO: Figure out how to make anchors zoom-insensitive
-class VertexRenderer {
+class VertexRenderer implements GraphicRenderer {
+    private _id: string;
+    private _type: GRAPHIC_TYPES;
     private _canvas: SVG.Doc;
     private _svg: SVG.Ellipse | undefined;
     private _width: number;
@@ -18,6 +22,8 @@ class VertexRenderer {
     private _strokeWidth: number;
 
     constructor(args: VertexRendererArgs) {
+        this._id = provideId();
+        this._type = GRAPHIC_TYPES.VERTEX;
         this._canvas = args.canvas;
         this._center = args.center || Vector.zero;
         this._width = 8;
@@ -25,6 +31,14 @@ class VertexRenderer {
         this._fillColor = '#888888';
         this._strokeColor = 'none';
         this._strokeWidth = 0;
+    }
+
+    public get id(): string {
+        return this._id;
+    }
+
+    public get type(): GRAPHIC_TYPES {
+        return this._type;
     }
 
     public get isRendered(): boolean {

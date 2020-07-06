@@ -1,5 +1,7 @@
-import Vector from "../../utilities/Vector";
 import * as SVG from 'svg.js';
+import { provideId } from "../../utilities/IdProvider";
+import Vector from "../../utilities/Vector";
+import { GraphicRenderer, GRAPHIC_TYPES } from "../types";
 
 type CanvasRendererArgs = {
     canvas: SVG.Doc;
@@ -8,7 +10,9 @@ type CanvasRendererArgs = {
     height: number;
 };
 
-class CanvasRenderer {
+class CanvasRenderer implements GraphicRenderer {
+    private _id: string;
+    private _type: GRAPHIC_TYPES;
     private _canvas: SVG.Doc;
     private _svg: SVG.Rect | undefined;
     private _origin: Vector;
@@ -17,11 +21,21 @@ class CanvasRenderer {
     private _fillColor: string;
 
     constructor(args: CanvasRendererArgs) {
+        this._id = provideId();
+        this._type = GRAPHIC_TYPES.CANVAS;
         this._canvas = args.canvas;
         this._origin = args.origin;
         this._width = args.width;
         this._height = args.height;
         this._fillColor = '#FFFFFF';
+    }
+
+    public get id(): string {
+        return this._id;
+    }
+
+    public get type(): GRAPHIC_TYPES {
+        return this._type;
     }
 
     public get isRendered(): boolean {

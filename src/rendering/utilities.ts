@@ -43,7 +43,6 @@ function vertexMouseEvent(name: VERTEX_EVENTS, slideRenderer: SlideRenderer, ver
     });
 }
 
-// TODO: Consider including the rich graphic, not just the ID
 // Decorate custom events with more contextual information
 // Synthetically propagate events to the slide
 export function decorateGraphicEvents(svg: SVG.Element, slideRenderer: SlideRenderer, graphic: GraphicRenderer) {

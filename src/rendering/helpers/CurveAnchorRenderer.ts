@@ -1,5 +1,7 @@
 import * as SVG from 'svg.js';
+import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
+import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
 type CurveAnchorRendererArgs = {
     canvas: SVG.Doc;
@@ -8,7 +10,9 @@ type CurveAnchorRendererArgs = {
     outHandle: Vector;
 };
 
-class CurveAnchorRenderer {
+class CurveAnchorRenderer implements GraphicRenderer {
+    private _id: string;
+    private _type: GRAPHIC_TYPES;
     private _canvas: SVG.Doc;
     private _inHandle: Vector;
     private _point: Vector;
@@ -32,6 +36,8 @@ class CurveAnchorRenderer {
     private _spanStrokeColor: string;
 
     constructor(args: CurveAnchorRendererArgs) {
+        this._id = provideId();
+        this._type = GRAPHIC_TYPES.CURVE_ANCHOR;
         this._canvas = args.canvas;
         this._inHandle = args.inHandle;
         this._point = args.point;
@@ -48,6 +54,14 @@ class CurveAnchorRenderer {
         this._pointStrokeColor = '#888888';
         this._spanStrokeWidth = 1;
         this._spanStrokeColor = '#888888';
+    }
+
+    public get id(): string {
+        return this._id;
+    }
+
+    public get type(): GRAPHIC_TYPES {
+        return this._type;
     }
 
     public get isRendered(): boolean {
