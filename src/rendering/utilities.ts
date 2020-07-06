@@ -10,7 +10,8 @@ import {
     SlideMouseEvent,
     GraphicMouseEvent,
     SlideKeyboardEvent,
-    VertexMouseEvent
+    VertexMouseEvent,
+    EVENT_CATEGORIES
 } from '../events/types';
 import Vector from '../utilities/Vector';
 import { CanvasRenderer } from './helpers';
@@ -19,28 +20,31 @@ import { dispatch } from '../events/utilities';
 
 function graphicMouseEvent(name: GRAPHIC_EVENTS, slideRenderer: SlideRenderer, graphicId: string, baseEvent: MouseEvent): GraphicMouseEvent {
     return new CustomEvent<GraphicMouseEventPayload>(name, {
-        detail: { slideRenderer, graphicId, baseEvent }
+        detail: { slideRenderer, graphicId, baseEvent, category: EVENT_CATEGORIES.GRAPHIC_MOUSE }
     });
 }
 
 function slideMouseEvent(name: SLIDE_EVENTS, slideRenderer: SlideRenderer, isElementEvent: boolean, baseEvent: MouseEvent): SlideMouseEvent {
     return new CustomEvent<SlideMouseEventPayload>(name, {
-        detail: { slideRenderer, isElementEvent, baseEvent }
+        detail: { slideRenderer, isElementEvent, baseEvent, category: EVENT_CATEGORIES.SLIDE_MOUSE}
     });
 }
 
-function slideKeyboardEvent(name: SLIDE_EVENTS, slideRenderer: SlideRenderer, baseEvent: KeyboardEvent): SlideKeyboardEvent {
+function slideKeyboardEvent(name: SLIDE_EVENTS, slideRenderer: SlideRenderer, isElementEvent: boolean, baseEvent: KeyboardEvent): SlideKeyboardEvent {
     return new CustomEvent<SlideKeyboardEventPayload>(name, {
-        detail: { slideRenderer, baseEvent }
+        detail: { slideRenderer, isElementEvent, baseEvent, category: EVENT_CATEGORIES.SLIDE_KEYBOARD }
     });
 }
 
 function vertexMouseEvent(name: VERTEX_EVENTS, slideRenderer: SlideRenderer, vertexLocation: string, baseEvent: MouseEvent): VertexMouseEvent {
     return new CustomEvent<VertexMouseEventPayload>(name, {
-        detail: { slideRenderer, vertexLocation, baseEvent }
+        detail: { slideRenderer, vertexLocation, baseEvent, category: EVENT_CATEGORIES.VERTEX_MOUSE }
     });
 }
 
+// TODO: Consider including the rich graphic, not just the ID
+// Decorate custom events with more contextual information
+// Synthetically propagate events to the slide
 export function decorateGraphicEvents(svg: SVG.Element, slideRenderer: SlideRenderer, graphicId: string) {
     svg.node.addEventListener('mouseup', baseEvent => {
         baseEvent.stopPropagation();
@@ -101,12 +105,12 @@ export function decorateSlideEvents(slideRenderer: SlideRenderer): void {
 
     slideRenderer.canvas.node.addEventListener('keyup', baseEvent => {
         baseEvent.stopPropagation();
-        dispatch(slideKeyboardEvent(SLIDE_EVENTS.KEYUP, slideRenderer, baseEvent));
+        dispatch(slideKeyboardEvent(SLIDE_EVENTS.KEYUP, slideRenderer, false, baseEvent));
     });
 
     slideRenderer.canvas.node.addEventListener('keydown', baseEvent => {
         baseEvent.stopPropagation();
-        dispatch(slideKeyboardEvent(SLIDE_EVENTS.KEYDOWN, slideRenderer, baseEvent));
+        dispatch(slideKeyboardEvent(SLIDE_EVENTS.KEYDOWN, slideRenderer, false, baseEvent));
     });
 }
 
