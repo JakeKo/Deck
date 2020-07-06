@@ -1,10 +1,11 @@
 import * as SVG from 'svg.js';
 import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
+import SlideRenderer from '../SlideRenderer';
 import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
 type VertexRendererArgs = {
-    canvas: SVG.Doc;
+    slide: SlideRenderer;
     center?: Vector;
 };
 
@@ -12,7 +13,7 @@ type VertexRendererArgs = {
 class VertexRenderer implements GraphicRenderer {
     private _id: string;
     private _type: GRAPHIC_TYPES;
-    private _canvas: SVG.Doc;
+    private _slide: SlideRenderer;
     private _svg: SVG.Ellipse | undefined;
     private _width: number;
     private _height: number;
@@ -24,7 +25,7 @@ class VertexRenderer implements GraphicRenderer {
     constructor(args: VertexRendererArgs) {
         this._id = provideId();
         this._type = GRAPHIC_TYPES.VERTEX;
-        this._canvas = args.canvas;
+        this._slide = args.slide;
         this._center = args.center || Vector.zero;
         this._width = 8;
         this._height = 8;
@@ -51,7 +52,7 @@ class VertexRenderer implements GraphicRenderer {
             return;
         }
 
-        this._svg = this._canvas.ellipse(this._width, this._height)
+        this._svg = this._slide.canvas.ellipse(this._width, this._height)
             .translate(this._center.x - this._width / 2, this._center.y - this._height / 2)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth });

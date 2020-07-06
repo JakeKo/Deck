@@ -18,7 +18,7 @@ type RectangleRendererArgs = {
 
 class RectangleRenderer implements GraphicRenderer {
     private _id: string;
-    private _slideRenderer: SlideRenderer;
+    private _slide: SlideRenderer;
     private _svg: SVG.Rect | undefined;
     private _type: GRAPHIC_TYPES;
     private _origin: Vector;
@@ -31,7 +31,7 @@ class RectangleRenderer implements GraphicRenderer {
 
     constructor(args: RectangleRendererArgs) {
         this._id = args.id;
-        this._slideRenderer = args.slideRenderer;
+        this._slide = args.slideRenderer;
         this._type = GRAPHIC_TYPES.RECTANGLE;
         this._origin = args.origin || Vector.zero;
         this._width = args.width || 0;
@@ -60,12 +60,12 @@ class RectangleRenderer implements GraphicRenderer {
             return;
         }
 
-        this._svg = this._slideRenderer.canvas.rect(this._width, this._height)
+        this._svg = this._slide.canvas.rect(this._width, this._height)
             .translate(this._origin.x, this._origin.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
-        decorateRectangleEvents(this._svg, this._slideRenderer, this);
+        decorateRectangleEvents(this._svg, this._slide, this);
     }
 
     public unrender(): void {

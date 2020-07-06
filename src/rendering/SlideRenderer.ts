@@ -1,7 +1,7 @@
 import * as SVG from 'svg.js';
 import { Viewbox } from '../store/types';
 import Vector from '../utilities/Vector';
-import { GraphicRenderer, GRAPHIC_TYPES } from './types';
+import { GraphicRenderer } from './types';
 import { decorateSlideEvents, renderBackdrop } from './utilities';
 
 type SlideRendererArgs = {

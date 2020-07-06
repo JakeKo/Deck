@@ -14,10 +14,9 @@ type CurveRendererArgs = {
     rotation?: number;
 };
 
-// TODO: Change _slideRenderer to _slide
 class CurveRenderer implements GraphicRenderer {
     private _id: string;
-    private _slideRenderer: SlideRenderer;
+    private _slide: SlideRenderer;
     private _svg: SVG.Path | undefined;
     private _type: GRAPHIC_TYPES;
     private _anchors: CurveAnchor[];
@@ -28,7 +27,7 @@ class CurveRenderer implements GraphicRenderer {
 
     constructor(args: CurveRendererArgs) {
         this._id = args.id;
-        this._slideRenderer = args.slideRenderer;
+        this._slide = args.slideRenderer;
         this._type = GRAPHIC_TYPES.CURVE;
         this._anchors = args.anchors || [];
         this._fillColor = args.fillColor || 'transparent';
@@ -55,11 +54,11 @@ class CurveRenderer implements GraphicRenderer {
             return;
         }
 
-        this._svg = this._slideRenderer.canvas.path(this._getFormattedPoints())
+        this._svg = this._slide.canvas.path(this._getFormattedPoints())
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
-        decorateCurveEvents(this._svg, this._slideRenderer, this);
+        decorateCurveEvents(this._svg, this._slide, this);
     }
 
     public unrender(): void {

@@ -1,8 +1,8 @@
-import SlideRenderer from "../SlideRenderer";
 import Vector from "../../utilities/Vector";
-import { CurveAnchor } from "../types";
 import { CurveRenderer } from "../graphics";
 import { CurveAnchorRenderer } from "../helpers";
+import SlideRenderer from "../SlideRenderer";
+import { CurveAnchor } from "../types";
 
 type CurveMutatorArgs = {
     curve: CurveRenderer;
@@ -17,7 +17,7 @@ class CurveMutator {
     constructor(args: CurveMutatorArgs) {
         this._curve = args.curve;
         this._slide = args.slide;
-        this._helpers = this._curve.getAnchors().map(anchor => new CurveAnchorRenderer({ canvas: this._slide.canvas, ...anchor }));
+        this._helpers = this._curve.getAnchors().map(anchor => new CurveAnchorRenderer({ slide: this._slide, ...anchor }));
     }
 
     public move(origin: Vector): void {

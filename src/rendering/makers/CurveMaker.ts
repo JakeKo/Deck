@@ -26,7 +26,7 @@ class CurveMaker {
 
         // Initialize helper graphic
         this._helper = new CurveAnchorRenderer({
-            canvas: this._slide.canvas,
+            slide: this._slide,
             inHandle: args.initialPosition,
             point: args.initialPosition,
             outHandle: args.initialPosition

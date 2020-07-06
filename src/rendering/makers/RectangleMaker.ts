@@ -37,19 +37,19 @@ class RectangleMaker {
         // Initialize helper graphics
         this._helpers = {
             topLeft: new VertexRenderer({
-                canvas: this._slide.canvas,
+                slide: this._slide,
                 center: this._rectangle.getOrigin()
             }),
             topRight: new VertexRenderer({
-                canvas: this._slide.canvas,
+                slide: this._slide,
                 center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0))
             }),
             bottomLeft: new VertexRenderer({
-                canvas: this._slide.canvas,
+                slide: this._slide,
                 center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight()))
             }),
             bottomRight: new VertexRenderer({
-                canvas: this._slide.canvas,
+                slide: this._slide,
                 center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()))
             })
         };

@@ -179,7 +179,7 @@ export function decorateVertexEvents(svg: SVG.Element, slide: SlideRenderer, loc
 
 export function renderBackdrop(slideRenderer: SlideRenderer, width: number, height: number): void {
     new CanvasRenderer({
-        canvas: slideRenderer.canvas,
+        slide: slideRenderer,
         origin: Vector.zero,
         width,
         height

@@ -2,9 +2,10 @@ import * as SVG from 'svg.js';
 import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
 import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import SlideRenderer from '../SlideRenderer';
 
 type CurveAnchorRendererArgs = {
-    canvas: SVG.Doc;
+    slide: SlideRenderer;
     inHandle: Vector;
     point: Vector;
     outHandle: Vector;
@@ -13,7 +14,7 @@ type CurveAnchorRendererArgs = {
 class CurveAnchorRenderer implements GraphicRenderer {
     private _id: string;
     private _type: GRAPHIC_TYPES;
-    private _canvas: SVG.Doc;
+    private _slide: SlideRenderer;
     private _inHandle: Vector;
     private _point: Vector;
     private _outHandle: Vector;
@@ -38,7 +39,7 @@ class CurveAnchorRenderer implements GraphicRenderer {
     constructor(args: CurveAnchorRendererArgs) {
         this._id = provideId();
         this._type = GRAPHIC_TYPES.CURVE_ANCHOR;
-        this._canvas = args.canvas;
+        this._slide = args.slide;
         this._inHandle = args.inHandle;
         this._point = args.point;
         this._outHandle = args.outHandle;
@@ -73,23 +74,23 @@ class CurveAnchorRenderer implements GraphicRenderer {
             return;
         }
 
-        this._inHandleSpanSvg = this._canvas.line(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y)
+        this._inHandleSpanSvg = this._slide.canvas.line(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y)
             .stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth });
 
-        this._inHandleSvg = this._canvas.rect(this._handleWidth, this._handleHeight)
+        this._inHandleSvg = this._slide.canvas.rect(this._handleWidth, this._handleHeight)
             .translate(this._inHandle.x - this._handleWidth / 2, this._inHandle.y - this._handleHeight / 2)
             .fill(this._handleFillColor)
             .stroke({ color: this._handleStrokeColor, width: this._handleStrokeWidth });
 
-        this._outHandleSpanSvg = this._canvas.line(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y)
+        this._outHandleSpanSvg = this._slide.canvas.line(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y)
             .stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth });
 
-        this._outHandleSvg = this._canvas.rect(this._handleWidth, this._handleHeight)
+        this._outHandleSvg = this._slide.canvas.rect(this._handleWidth, this._handleHeight)
             .translate(this._outHandle.x - this._handleWidth / 2, this._outHandle.y - this._handleHeight / 2)
             .fill(this._handleFillColor)
             .stroke({ color: this._handleStrokeColor, width: this._handleStrokeWidth });
 
-        this._pointSvg = this._canvas.ellipse(this._pointWidth, this._pointHeight)
+        this._pointSvg = this._slide.canvas.ellipse(this._pointWidth, this._pointHeight)
             .translate(this._point.x - this._pointWidth / 2, this._point.y - this._pointHeight / 2)
             .fill(this._pointFillColor)
             .stroke({ color: this._pointStrokeColor, width: this._pointStrokeWidth });

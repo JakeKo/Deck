@@ -1,7 +1,7 @@
-import SlideRenderer from "../SlideRenderer";
 import Vector from "../../utilities/Vector";
 import { RectangleRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
+import SlideRenderer from "../SlideRenderer";
 
 type RectangleMutatorArgs = {
     rectangle: RectangleRenderer;
@@ -27,19 +27,19 @@ class RectangleMutator {
         // Initialize helper graphics
         this._helpers = {
             topLeft: new VertexRenderer({
-                canvas: this._slide.canvas,
+                slide: this._slide,
                 center: this._rectangle.getOrigin()
             }),
             topRight: new VertexRenderer({
-                canvas: this._slide.canvas,
+                slide: this._slide,
                 center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0))
             }),
             bottomLeft: new VertexRenderer({
-                canvas: this._slide.canvas,
+                slide: this._slide,
                 center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight()))
             }),
             bottomRight: new VertexRenderer({
-                canvas: this._slide.canvas,
+                slide: this._slide,
                 center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()))
             })
         };
