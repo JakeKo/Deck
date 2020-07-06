@@ -1,12 +1,11 @@
-import { GraphicMouseEvent, GRAPHIC_EVENTS, SlideMouseEvent, SLIDE_EVENTS, SlideKeyboardEvent, EVENT_CATEGORIES } from "../events/types";
+import { EVENT_CATEGORIES, GraphicMouseEvent, GRAPHIC_EVENTS, SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
 import { listen, unlisten } from "../events/utilities";
 import { RectangleRenderer } from "../rendering/graphics";
 import { RectangleMutator } from "../rendering/mutators";
 import { GRAPHIC_TYPES } from "../rendering/types";
+import { AppStore } from "../store/types";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
-import { AppStore, MUTATIONS } from "../store/types";
-import { PointerTool } from ".";
 
 export default (store: AppStore): EditorTool => {
     function mutate(event: GraphicMouseEvent): void {

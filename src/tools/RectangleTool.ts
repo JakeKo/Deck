@@ -1,7 +1,8 @@
+import { PointerTool } from ".";
 import { SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
 import { listen, unlisten } from "../events/utilities";
 import { RectangleMaker } from "../rendering/makers";
-import { AppStore } from "../store/types";
+import { AppStore, MUTATIONS } from "../store/types";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
 
@@ -28,6 +29,8 @@ export default (store: AppStore): EditorTool => {
             listen(SLIDE_EVENTS.MOUSEDOWN, make);
             unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
             unlisten(SLIDE_EVENTS.MOUSEUP, complete);
+
+            store.commit(MUTATIONS.ACTIVE_TOOL, PointerTool(store));
         }
     }
 
