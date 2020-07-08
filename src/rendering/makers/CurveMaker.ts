@@ -66,7 +66,7 @@ class CurveMaker {
     public complete(): void {
         // Trim the last anchor and persist
         this._curve.removeAnchor(this._curve.getAnchors().length - 1);
-        this._slide.persistGraphic(this._curve);
+        this._slide.addCurve(this._curve);
 
         // Remove helper graphics
         this._helper.unrender();

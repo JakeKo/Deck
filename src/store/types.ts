@@ -72,7 +72,7 @@ export type GraphicStoreModel = RectangleStoreModel;
 
 export type RectangleStoreModel = {
     id: string;
-    type: GRAPHIC_TYPES;
+    type: GRAPHIC_TYPES.RECTANGLE;
     origin: Vector;
     width: number;
     height: number;

@@ -49,7 +49,7 @@ const mutations: AppMutations = {
         const slide = getSlide(state, slideId);
         const index = getGraphicIndex(state, slideId, rectangle.id);
         if (slide !== undefined && index !== undefined) {
-            slide.graphics = [...slide.graphics.slice(0, index - 1), rectangle, ...slide.graphics.slice(index)];
+            slide.graphics[index] = rectangle;
         }
     },
     [MUTATIONS.REMOVE_GRAPHIC]: (state: AppState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {

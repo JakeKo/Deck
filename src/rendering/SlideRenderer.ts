@@ -3,6 +3,7 @@ import { Viewbox } from '../store/types';
 import Vector from '../utilities/Vector';
 import { GraphicRenderer } from './types';
 import { decorateSlideEvents, renderBackdrop } from './utilities';
+import { RectangleRenderer, CurveRenderer } from './graphics';
 
 type SlideRendererArgs = {
     canvas: SVG.Doc;
@@ -42,12 +43,31 @@ class SlideRenderer {
         return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
     }
 
-    public persistGraphic(graphic: GraphicRenderer): void {
-        this._graphics[graphic.getId()] = graphic;
+    // Rectangle Methods
+    public addRectangle(rectangle: RectangleRenderer): void {
+        this._graphics[rectangle.getId()] = rectangle;
     }
 
+    public updateRectangle(rectangle: RectangleRenderer): void {
+        this._graphics[rectangle.getId()] = rectangle;
+    }
+
+    // Curve Methods
+    public addCurve(curve: CurveRenderer): void {
+        this._graphics[curve.getId()] = curve;
+    }
+
+    public updateCurve(curve: CurveRenderer): void {
+        this._graphics[curve.getId()] = curve;
+    }
+
+    // Generic Graphic Methods
     public getGraphic(graphicId: string): GraphicRenderer {
         return this._graphics[graphicId];
+    }
+
+    public removeGraphic(graphicId: string): void {
+        delete this._graphics[graphicId];
     }
 }
 
