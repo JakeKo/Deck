@@ -2,6 +2,7 @@ import { GetterTree, MutationTree, ActionTree, Store } from "vuex";
 import { EditorTool } from "../tools/types";
 import Vector from "../utilities/Vector";
 import { GRAPHIC_TYPES } from "../rendering/types";
+import SlideStateManager from "../utilities/SlideStateManager";
 
 export type AppState = {
     activeSlideId: string;
@@ -35,6 +36,7 @@ export type Slide = {
     id: string;
     isActive: boolean;
     graphics: GraphicStoreModel[];
+    stateManager?: SlideStateManager;
 };
 
 export type RoadmapSlide = {
@@ -57,6 +59,7 @@ export enum GETTERS {
 
 export enum MUTATIONS {
     ADD_SLIDE = 'addSlide',
+    EQUIP_SLIDE_STATE_MANAGER = 'equipSlideStateManager',
     ACTIVE_SLIDE_ID = 'setActiveSlideId',
     ACTIVE_TOOL = 'setActiveTool',
     EDITOR_ZOOM_LEVEL = 'setEditorZoomLevel',

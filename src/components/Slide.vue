@@ -6,8 +6,9 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as SVG from 'svg.js';
 import SlideRenderer from '../rendering/SlideRenderer';
-import { GETTERS, Viewbox } from '../store/types';
-import { Getter } from 'vuex-class';
+import { GETTERS, Viewbox, MUTATIONS } from '../store/types';
+import { Getter, Mutation } from 'vuex-class';
+import SlideStateManager from '../utilities/SlideStateManager';
 
 @Component
 export default class Slide extends Vue {
@@ -15,6 +16,7 @@ export default class Slide extends Vue {
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
     @Getter private [GETTERS.RAW_VIEWBOX]: Viewbox;
     @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
+    @Mutation private [MUTATIONS.EQUIP_SLIDE_STATE_MANAGER]: (slideId: string, stateManager: SlideStateManager) => void;
 
     private get slideStyle(): { minWidth: string; minHeight: string; } {
         return {
@@ -27,6 +29,7 @@ export default class Slide extends Vue {
         const viewbox = this[GETTERS.RAW_VIEWBOX];
         const canvas = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
         const renderer = new SlideRenderer({ canvas, rawViewbox: viewbox, croppedViewbox: this[GETTERS.CROPPED_VIEWBOX] });
+        this[MUTATIONS.EQUIP_SLIDE_STATE_MANAGER](this.id, new SlideStateManager(this.id, this.$store, renderer));
     }
 }
 </script>

@@ -2,6 +2,7 @@ import { EditorTool } from "../tools/types";
 import { provideId } from "../utilities/IdProvider";
 import { AppMutations, AppState, MUTATIONS, RectangleStoreModel } from "./types";
 import { getSlide, getGraphicIndex } from "./utilities";
+import SlideStateManager from "../utilities/SlideStateManager";
 
 const mutations: AppMutations = {
     [MUTATIONS.ADD_SLIDE]: (state: AppState, index: number): void => {
@@ -14,6 +15,14 @@ const mutations: AppMutations = {
             },
             ...state.slides.slice(index)
         ];
+    },
+    [MUTATIONS.EQUIP_SLIDE_STATE_MANAGER]: (state: AppState, { slideId, stateManager }: { slideId: string, stateManager: SlideStateManager }): void => {
+        const slide = getSlide(state, slideId);
+        if (slide === undefined) {
+            return;
+        }
+
+        slide.stateManager = stateManager;
     },
     [MUTATIONS.ACTIVE_SLIDE_ID]: (state: AppState, slideId: string): void => {
         const oldActiveSlide = getSlide(state, state.activeSlideId);
