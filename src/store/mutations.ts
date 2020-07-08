@@ -1,7 +1,7 @@
 import { EditorTool } from "../tools/types";
 import { provideId } from "../utilities/IdProvider";
-import { AppMutations, AppState, MUTATIONS } from "./types";
-import { getSlide } from "./utilities";
+import { AppMutations, AppState, MUTATIONS, RectangleStoreModel } from "./types";
+import { getSlide, getGraphicIndex } from "./utilities";
 
 const mutations: AppMutations = {
     [MUTATIONS.ADD_SLIDE]: (state: AppState, index: number): void => {
@@ -9,7 +9,8 @@ const mutations: AppMutations = {
             ...state.slides.slice(0, index),
             {
                 id: provideId(),
-                isActive: false
+                isActive: false,
+                graphics: []
             },
             ...state.slides.slice(index)
         ];
@@ -37,6 +38,26 @@ const mutations: AppMutations = {
     },
     [MUTATIONS.DECK_TITLE]: (state: AppState, deckTitle: string): void => {
         state.deckTitle = deckTitle === '' ? undefined : deckTitle;
+    },
+    [MUTATIONS.ADD_RECTANGLE]: (state: AppState, { slideId, rectangle }: { slideId: string, rectangle: RectangleStoreModel }): void => {
+        const slide = getSlide(state, slideId);
+        if (slide !== undefined) {
+            slide.graphics = [...slide.graphics, rectangle];
+        }
+    },
+    [MUTATIONS.UPDATE_RECTANGLE]: (state: AppState, { slideId, rectangle }: { slideId: string, rectangle: RectangleStoreModel }): void => {
+        const slide = getSlide(state, slideId);
+        const index = getGraphicIndex(state, slideId, rectangle.id);
+        if (slide !== undefined && index !== undefined) {
+            slide.graphics = [...slide.graphics.slice(0, index - 1), rectangle, ...slide.graphics.slice(index)];
+        }
+    },
+    [MUTATIONS.REMOVE_GRAPHIC]: (state: AppState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
+        const slide = getSlide(state, slideId);
+        const index = getGraphicIndex(state, slideId, graphicId);
+        if (slide !== undefined && index !== undefined) {
+            slide.graphics = [...slide.graphics.slice(0, index - 1), ...slide.graphics.slice(index)];
+        }
     }
 };
 
