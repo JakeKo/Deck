@@ -1,8 +1,6 @@
 <template>
 <div id='editor' @mousewheel='handleMouseWheel'>
-    <div v-if='getSlides.length === 0' id='empty-slide-container' :style='emptySlideContainerStyle'>
-        <div id='empty-slide' :style='emptySlideStyle' />
-    </div>
+    <slide-placeholder v-if='getSlides.length === 0' />
     <slide v-for='slide in getSlides' 
         :key='slide.id'
         :id='slide.id'
@@ -17,33 +15,20 @@ import Slide from './Slide.vue';
 import { MUTATIONS, GETTERS, Viewbox, Slide as SlideModel } from '../store/types';
 import { Getter, Mutation } from 'vuex-class';
 import Vector from '../utilities/Vector';
+import SlidePlaceholder from './SlidePlaceholder.vue';
 
 @Component({
     components: {
-        Slide
+        Slide,
+        SlidePlaceholder
     }
 })
 export default class Editor extends Vue {
     @Getter private [GETTERS.ACTIVE_SLIDE]: SlideModel;
     @Getter private [GETTERS.EDITOR_ZOOM_LEVEL]: number;
     @Getter private [GETTERS.SLIDES]: SlideModel[];
-    @Getter private [GETTERS.RAW_VIEWBOX]: Viewbox;
     @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
     @Mutation private [MUTATIONS.EDITOR_ZOOM_LEVEL]: (zoomLevel: number) => void;
-
-    private get emptySlideContainerStyle(): { minWidth: string; minHeight: string; } {
-        return {
-            minWidth: `${this[GETTERS.RAW_VIEWBOX].width}px`,
-            minHeight: `${this[GETTERS.RAW_VIEWBOX].height}px`
-        };
-    }
-
-    private get emptySlideStyle(): { width: string; height: string; } {
-        return {
-            width: `${this[GETTERS.CROPPED_VIEWBOX].width}px`,
-            height: `${this[GETTERS.CROPPED_VIEWBOX].height}px`
-        };
-    }
 
     // Set the default zoom based on screen size and slide size
     private get defaultZoom(): number {
@@ -106,16 +91,6 @@ export default class Editor extends Vue {
     flex-grow: 1;
     overflow: scroll;
     background: $color-tertiary;
-}
-
-#empty-slide-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#empty-slide {
-    border: 4px dashed grey;
 }
 
 ::-webkit-scrollbar {
