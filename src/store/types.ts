@@ -35,8 +35,8 @@ export type Viewbox = {
 export type Slide = {
     id: string;
     isActive: boolean;
-    graphics: GraphicStoreModel[];
-    stateManager?: SlideStateManager;
+    graphics: { [index: string]: GraphicStoreModel };
+    stateManager: SlideStateManager;
 };
 
 export type RoadmapSlide = {
@@ -59,13 +59,11 @@ export enum GETTERS {
 
 export enum MUTATIONS {
     ADD_SLIDE = 'addSlide',
-    EQUIP_SLIDE_STATE_MANAGER = 'equipSlideStateManager',
     ACTIVE_SLIDE_ID = 'setActiveSlideId',
     ACTIVE_TOOL = 'setActiveTool',
     EDITOR_ZOOM_LEVEL = 'setEditorZoomLevel',
     DECK_TITLE = 'setDeckTitle',
-    ADD_RECTANGLE = 'addRectangle',
-    UPDATE_RECTANGLE = 'updateRectangle',
+    SET_GRAPHIC = 'setGraphic',
     REMOVE_GRAPHIC = 'removeGraphic'
 }
 

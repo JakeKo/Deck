@@ -92,7 +92,7 @@ class RectangleMaker {
     }
 
     public complete(): void {
-        this._slide.addRectangle(this._rectangle);
+        this._slide.setGraphic(this._rectangle);
 
         // Remove helper graphics
         this._helpers.topLeft.unrender();

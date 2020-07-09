@@ -1,23 +1,21 @@
-import { AppStore, RectangleStoreModel, MUTATIONS } from "../store/types";
-import SlideRenderer from "../rendering/SlideRenderer";
 import { RectangleRenderer } from "../rendering/graphics";
-import { GRAPHIC_TYPES } from "../rendering/types";
+import SlideRenderer from "../rendering/SlideRenderer";
+import { GraphicRenderer, GRAPHIC_TYPES } from "../rendering/types";
+import { AppStore, GraphicStoreModel, MUTATIONS, RectangleStoreModel } from "../store/types";
 
 export default class SlideStateManager {
     private _slideId: string;
-    private _store: AppStore;
-    private _renderer: SlideRenderer;
+    private _store: AppStore | undefined;
+    private _renderer: SlideRenderer | undefined;
 
-    constructor(slideId: string, store: AppStore, renderer: SlideRenderer) {
+    constructor(slideId: string) {
         this._slideId = slideId;
-        this._store = store;
-        this._renderer = renderer;
     }
 
     private _rectangleStoreModelToRenderer(rectangle: RectangleStoreModel): RectangleRenderer {
         return new RectangleRenderer({
             id: rectangle.id,
-            slideRenderer: this._renderer,
+            slideRenderer: this._renderer!,
             origin: rectangle.origin,
             width: rectangle.width,
             height: rectangle.height,
@@ -42,42 +40,39 @@ export default class SlideStateManager {
         };
     }
 
-    // Rectangle Methods
-    public addRectangleFromRenderer(rectangle: RectangleRenderer): void {
-        const storeModel = this._rectangleRendererToStoreModel(rectangle);
-        this._store.commit(MUTATIONS.ADD_RECTANGLE, {
-            slideId: this._slideId,
-            rectangle: storeModel
-        });
+    public setStore(store: AppStore): void {
+        this._store = store;
     }
 
-    public addRectangleFromStore(rectangle: RectangleStoreModel): void {
-        const renderer = this._rectangleStoreModelToRenderer(rectangle);
-        this._renderer.addRectangle(renderer);
+    public setRenderer(renderer: SlideRenderer): void {
+        this._renderer = renderer;
     }
 
-    public updateRectangleFromRenderer(rectangle: RectangleRenderer): void {
-        const storeModel = this._rectangleRendererToStoreModel(rectangle);
-        this._store.commit(MUTATIONS.UPDATE_RECTANGLE, {
-            slideId: this._slideId,
-            rectangle: storeModel
-        });
+    public setGraphicFromRenderer(graphic: GraphicRenderer): void {
+        if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
+            const storeModel = this._rectangleRendererToStoreModel(graphic as RectangleRenderer);
+            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, {
+                slide: this._slideId,
+                graphic: storeModel
+            });
+        }
     }
 
-    public updateRectangleFromStore(rectangle: RectangleStoreModel): void {
-        const renderer = this._rectangleStoreModelToRenderer(rectangle);
-        this._renderer.updateRectangle(renderer);
-    }
-
-    // Generic Graphic Methods
     public removeGraphicFromRenderer(graphicId: string): void {
-        this._store.commit(MUTATIONS.REMOVE_GRAPHIC, {
+        this._store && this._store.commit(MUTATIONS.REMOVE_GRAPHIC, {
             slideId: this._slideId,
             graphicId
         });
     }
 
+    public setGraphicFromStore(graphic: GraphicStoreModel): void {
+        if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+            const renderer = this._rectangleStoreModelToRenderer(graphic);
+            this._renderer && this._renderer.setGraphic(renderer);
+        }
+    }
+
     public removeGraphicFromStore(graphicId: string): void {
-        this._renderer.removeGraphic(graphicId);
+        this._renderer && this._renderer.removeGraphic(graphicId);
     }
 }

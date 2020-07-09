@@ -5,6 +5,7 @@
         :key='slide.id'
         :id='slide.id'
         :isActive='slide.isActive'
+        :stateManager='slide.stateManager'
     />
 </div>
 </template>

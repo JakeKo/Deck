@@ -1,22 +1,25 @@
 import * as SVG from 'svg.js';
 import { Viewbox } from '../store/types';
+import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
 import { GraphicRenderer } from './types';
 import { decorateSlideEvents, renderBackdrop } from './utilities';
-import { RectangleRenderer, CurveRenderer } from './graphics';
 
 type SlideRendererArgs = {
+    stateManager: SlideStateManager;
     canvas: SVG.Doc;
     rawViewbox: Viewbox;
     croppedViewbox: Viewbox;
 };
 
 class SlideRenderer {
+    private _stateManager: SlideStateManager;
     private _canvas: SVG.Doc;
     private _graphics: { [index: string]: GraphicRenderer };
     private _rawViewbox: Viewbox;
 
     constructor(args: SlideRendererArgs) {
+        this._stateManager = args.stateManager;
         this._canvas = args.canvas;
         this._graphics = {};
         this._rawViewbox = args.rawViewbox;
@@ -43,27 +46,12 @@ class SlideRenderer {
         return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
     }
 
-    // Rectangle Methods
-    public addRectangle(rectangle: RectangleRenderer): void {
-        this._graphics[rectangle.getId()] = rectangle;
-    }
-
-    public updateRectangle(rectangle: RectangleRenderer): void {
-        this._graphics[rectangle.getId()] = rectangle;
-    }
-
-    // Curve Methods
-    public addCurve(curve: CurveRenderer): void {
-        this._graphics[curve.getId()] = curve;
-    }
-
-    public updateCurve(curve: CurveRenderer): void {
-        this._graphics[curve.getId()] = curve;
-    }
-
-    // Generic Graphic Methods
     public getGraphic(graphicId: string): GraphicRenderer {
         return this._graphics[graphicId];
+    }
+
+    public setGraphic(graphic: GraphicRenderer): void {
+        this._graphics[graphic.getId()] = graphic;
     }
 
     public removeGraphic(graphicId: string): void {
