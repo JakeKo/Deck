@@ -13,6 +13,7 @@ export default (store: AppStore): EditorTool => {
             slide,
             initialPosition: resolvePosition(baseEvent, slide, store)
         });
+        slide.broadcastSetGraphic(maker.getTarget());
 
         listen(SLIDE_EVENTS.MOUSEMOVE, update);
         listen(SLIDE_EVENTS.MOUSEUP, complete);
@@ -21,6 +22,7 @@ export default (store: AppStore): EditorTool => {
             const { baseEvent } = event.detail;
             const position = resolvePosition(baseEvent, slide, store);
             maker.resize(position, baseEvent.shiftKey, baseEvent.ctrlKey, baseEvent.altKey);
+            slide.broadcastSetGraphic(maker.getTarget());
         }
 
         function complete(): void {

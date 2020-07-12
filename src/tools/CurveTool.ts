@@ -14,6 +14,7 @@ export default (store: AppStore): EditorTool => {
             slide: slide,
             initialPosition
         });
+        slide.broadcastSetGraphic(maker.getTarget());
 
         let currentAnchor = maker.addAnchor({ inHandle: initialPosition, point: initialPosition, outHandle: initialPosition });
         setPoint();
@@ -25,6 +26,7 @@ export default (store: AppStore): EditorTool => {
             const position = resolvePosition(event.detail.baseEvent, slide, store);
             currentAnchor.setPoint(position);
             currentAnchor.setHandles(position);
+            slide.broadcastSetGraphic(maker.getTarget());
         }
 
         function setPoint(): void {
@@ -37,11 +39,13 @@ export default (store: AppStore): EditorTool => {
         function moveHandles(event: SlideMouseEvent): void {
             const position = resolvePosition(event.detail.baseEvent, slide, store);
             currentAnchor.setHandles(position);
+            slide.broadcastSetGraphic(maker.getTarget());
         }
 
         function setHandles(): void {
             const position = resolvePosition(event.detail.baseEvent, slide, store);
             currentAnchor = maker.addAnchor({ inHandle: position, point: position, outHandle: position });
+            slide.broadcastSetGraphic(maker.getTarget());
 
             unlisten(SLIDE_EVENTS.MOUSEMOVE, moveHandles);
             unlisten(SLIDE_EVENTS.MOUSEUP, setHandles);

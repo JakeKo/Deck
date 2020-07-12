@@ -39,6 +39,10 @@ class CurveMaker {
         this._helper.render();
     }
 
+    public getTarget(): CurveRenderer {
+        return this._curve;
+    }
+
     public addAnchor(anchor: CurveAnchor): { setHandles: (position: Vector) => void, setPoint: (position: Vector) => void } {
         const anchorIndex = this._curve.addAnchor(anchor);
 

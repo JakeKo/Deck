@@ -64,6 +64,10 @@ class RectangleMaker {
         this._helpers.bottomRight.render();
     }
 
+    public getTarget(): RectangleRenderer {
+        return this._rectangle;
+    }
+
     public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
         const rawOffset = this._initialPosition.towards(position);
         const absOffset = rawOffset.transform(Math.abs);

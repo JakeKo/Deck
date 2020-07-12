@@ -51,6 +51,10 @@ class RectangleMutator {
         this._helpers.bottomRight.render();
     }
 
+    public getTarget(): RectangleRenderer {
+        return this._rectangle;
+    }
+
     public move(origin: Vector): void {
         // Update rendering
         this._rectangle.setOrigin(origin);

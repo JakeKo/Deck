@@ -20,6 +20,10 @@ class CurveMutator {
         this._helpers = this._curve.getAnchors().map(anchor => new CurveAnchorRenderer({ slide: this._slide, ...anchor }));
     }
 
+    public getTarget(): CurveRenderer {
+        return this._curve;
+    }
+
     public move(origin: Vector): void {
         // Update rendering
         this._curve.move(origin);

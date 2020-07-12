@@ -47,6 +47,7 @@ function initRectangleMutation(store: AppStore): MutationControls {
         const { slide, baseEvent } = event.detail;
         const position = resolvePosition(baseEvent, slide, store);
         originOffset = position.towards(rectangle!.getOrigin());
+        slide.broadcastSetGraphic(mutator!.getTarget());
 
         unlisten(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
         listen(SLIDE_EVENTS.MOUSEMOVE, move);
@@ -57,6 +58,7 @@ function initRectangleMutation(store: AppStore): MutationControls {
         const { slide, baseEvent } = event.detail;
         const position = resolvePosition(baseEvent, slide, store);
         mutator!.move(position.add(originOffset!));
+        slide.broadcastSetGraphic(mutator!.getTarget());
     }
 
     function completeMove(): void {
