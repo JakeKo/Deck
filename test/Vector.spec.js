@@ -1,4 +1,4 @@
-import Vector from '../src/models/Vector';
+import Vector from '../src/utilities/Vector';
 
 describe('Vector', () => {
     it('can calculate magnitude', () => {
@@ -85,7 +85,7 @@ describe('Vector', () => {
         expect(actualArray5).toEqual(expectedArray5);
     });
 
-    it('can calculate the sum vectors', () => {
+    it('can calculate the sum of two vectors', () => {
         // Arrange
         const vector1 = new Vector(-3, 4);
         const vector2 = new Vector(2, 3);

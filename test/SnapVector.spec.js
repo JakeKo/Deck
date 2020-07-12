@@ -1,8 +1,8 @@
-import SnapVector from '../src/models/SnapVector';
-import Vector from '../src/models/Vector';
+import SnapVector from '../src/utilities/SnapVector';
+import Vector from '../src/utilities/Vector';
 
 describe('SnapVector', () => {
-    it('can instantiate', () => {
+    it('can instantiate with reasonable defaults', () => {
         // Arrange
         const snapVector = new SnapVector('', new Vector(0, 0), new Vector(1, 1));
         
