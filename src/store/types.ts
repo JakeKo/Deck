@@ -64,7 +64,9 @@ export enum MUTATIONS {
     EDITOR_ZOOM_LEVEL = 'setEditorZoomLevel',
     DECK_TITLE = 'setDeckTitle',
     SET_GRAPHIC = 'setGraphic',
-    REMOVE_GRAPHIC = 'removeGraphic'
+    REMOVE_GRAPHIC = 'removeGraphic',
+    BROADCAST_SET_GRAPHIC = 'broadcastSetGraphic',
+    BROADCAST_REMOVE_GRAPHIC = 'broadcastRemoveGraphic'
 }
 
 export enum ACTIONS { }

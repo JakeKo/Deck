@@ -53,6 +53,18 @@ const mutations: AppMutations = {
         if (slide !== undefined) {
             delete slide.graphics[graphicId];
         }
+    },
+    [MUTATIONS.BROADCAST_SET_GRAPHIC]: (state: AppState, { slideId, graphic }: { slideId: string, graphic: GraphicStoreModel }): void => {
+        const slide = getSlide(state, slideId);
+        if (slide !== undefined) {
+            slide.stateManager.setGraphicFromStore(graphic);
+        }
+    },
+    [MUTATIONS.BROADCAST_REMOVE_GRAPHIC]: (state: AppState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
+        const slide = getSlide(state, slideId);
+        if (slide !== undefined) {
+            slide.stateManager.removeGraphicFromStore(graphicId);
+        }
     }
 };
 

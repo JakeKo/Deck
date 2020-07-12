@@ -57,6 +57,14 @@ class SlideRenderer {
     public removeGraphic(graphicId: string): void {
         delete this._graphics[graphicId];
     }
+
+    public broadcastSetGraphic(graphic: GraphicRenderer): void {
+        this._stateManager.setGraphicFromRenderer(graphic);
+    }
+
+    public broadcastRemoveGraphic(graphicId: string): void {
+        this._stateManager.removeGraphicFromRenderer(graphicId);
+    }
 }
 
 export default SlideRenderer;
