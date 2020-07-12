@@ -3,32 +3,29 @@ import { provideId } from "../utilities/IdProvider";
 import SlideStateManager from "../utilities/SlideStateManager";
 import { AppMutations, AppState, GraphicStoreModel, MUTATIONS } from "./types";
 import { getSlide } from "./utilities";
+import Vue from 'vue';
 
 const mutations: AppMutations = {
     [MUTATIONS.ADD_SLIDE]: (state: AppState, index: number): void => {
         const slideId = provideId();
-        state.slides = [
-            ...state.slides.slice(0, index),
-            {
-                id: slideId,
-                isActive: false,
-                graphics: {},
-                stateManager: new SlideStateManager(slideId)
-            },
-            ...state.slides.slice(index)
-        ];
+        state.slides.splice(index, 9, {
+            id: slideId,
+            isActive: false,
+            graphics: {},
+            stateManager: new SlideStateManager(slideId)
+        });
     },
     [MUTATIONS.ACTIVE_SLIDE_ID]: (state: AppState, slideId: string): void => {
         const oldActiveSlide = getSlide(state, state.activeSlideId);
         if (oldActiveSlide !== undefined) {
-            oldActiveSlide.isActive = false;
+            Vue.set(oldActiveSlide, 'isActive', false);
         }
 
         state.activeSlideId = slideId;
 
         const newActiveSlide = getSlide(state, state.activeSlideId);
         if (newActiveSlide !== undefined) {
-            newActiveSlide.isActive = true;
+            Vue.set(newActiveSlide, 'isActive', true);
         }
     },
     [MUTATIONS.ACTIVE_TOOL]: (state: AppState, tool: EditorTool): void => {
@@ -45,13 +42,13 @@ const mutations: AppMutations = {
     [MUTATIONS.SET_GRAPHIC]: (state: AppState, { slideId, graphic }: { slideId: string, graphic: GraphicStoreModel }): void => {
         const slide = getSlide(state, slideId);
         if (slide !== undefined) {
-            slide.graphics[graphic.id] = graphic;
+            Vue.set(slide.graphics, graphic.id, graphic);
         }
     },
     [MUTATIONS.REMOVE_GRAPHIC]: (state: AppState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
         const slide = getSlide(state, slideId);
         if (slide !== undefined) {
-            delete slide.graphics[graphicId];
+            Vue.delete(slide.graphics, graphicId);
         }
     },
     [MUTATIONS.BROADCAST_SET_GRAPHIC]: (state: AppState, { slideId, graphic }: { slideId: string, graphic: GraphicStoreModel }): void => {
