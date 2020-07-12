@@ -1,10 +1,8 @@
 import * as SVG from 'svg.js';
-import Vector from '../../models/Vector';
-import { GRAPHIC_TYPES } from '../constants';
-import { GraphicRenderer } from '../types';
+import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicMouseEventPayload, GraphicKeyboardEventPayload } from '../../events/types';
-import { GRAPHIC_EVENTS } from '../../events/constants';
+import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { decorateRectangleEvents } from '../utilities';
 
 type RectangleRendererArgs = {
     id: string;
@@ -18,21 +16,11 @@ type RectangleRendererArgs = {
     rotation?: number;
 };
 
-const DEFAULT_ARGS = {
-    origin: Vector.zero,
-    width: 0,
-    height: 0,
-    fillColor: '#FFFFFF',
-    strokeColor: '#000000',
-    strokeWidth: 1,
-    rotation: 0
-};
-
 class RectangleRenderer implements GraphicRenderer {
     private _id: string;
-    private _slideRenderer: SlideRenderer;
+    private _slide: SlideRenderer;
     private _svg: SVG.Rect | undefined;
-    private _type: string;
+    private _type: GRAPHIC_TYPES;
     private _origin: Vector;
     private _width: number;
     private _height: number;
@@ -43,142 +31,110 @@ class RectangleRenderer implements GraphicRenderer {
 
     constructor(args: RectangleRendererArgs) {
         this._id = args.id;
-        this._slideRenderer = args.slideRenderer;
+        this._slide = args.slideRenderer;
         this._type = GRAPHIC_TYPES.RECTANGLE;
-        this._origin = args.origin || DEFAULT_ARGS.origin;
-        this._width = args.width || DEFAULT_ARGS.width;
-        this._height = args.height || DEFAULT_ARGS.height;
-        this._fillColor = args.fillColor || DEFAULT_ARGS.fillColor;
-        this._strokeColor = args.strokeColor || DEFAULT_ARGS.strokeColor;
-        this._strokeWidth = args.strokeWidth || DEFAULT_ARGS.strokeWidth;
-        this._rotation = args.rotation || DEFAULT_ARGS.rotation;
+        this._origin = args.origin || Vector.zero;
+        this._width = args.width || 0;
+        this._height = args.height || 0;
+        this._fillColor = args.fillColor || '#CCCCCC';
+        this._strokeColor = args.strokeColor || 'none';
+        this._strokeWidth = args.strokeWidth || 0;
+        this._rotation = args.rotation || 0;
     }
 
-    // TODO: Determine if slide events need to be propagated here
-    private _decorateGraphicEvents(): void {
-        this._svg?.node.addEventListener('mouseup', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEUP, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
-        });
-        
-        this._svg?.node.addEventListener('mousedown', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEDOWN, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
-        });
-        
-        this._svg?.node.addEventListener('mouseover', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOVER, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
-        });
-        
-        this._svg?.node.addEventListener('mouseout', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEOUT, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
-        });
-        
-        this._svg?.node.addEventListener('mousemove', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicMouseEventPayload>(GRAPHIC_EVENTS.MOUSEMOVE, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
-        });
-        
-        this._svg?.node.addEventListener('keyup', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYUP, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
-        });
-        
-        this._svg?.node.addEventListener('keydown', baseEvent => {
-            document.dispatchEvent(new CustomEvent<GraphicKeyboardEventPayload>(GRAPHIC_EVENTS.KEYDOWN, { detail: {
-                slideRenderer: this._slideRenderer,
-                graphicId: this._id,
-                baseEvent
-            }}));
-        });
-    }
-
-    public get id(): string {
+    public getId(): string {
         return this._id;
     }
 
-    public get type(): string {
+    public getType(): GRAPHIC_TYPES {
         return this._type;
     }
 
-    public get isRendered(): boolean {
+    public isRendered(): boolean {
         return this._svg !== undefined;
-    }
-
-    // TODO: Convert setters to functions
-    // TODO: Create getter functions
-    public set origin(origin: Vector) {
-        this._origin = origin;
-        this._svg?.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
-    }
-
-    public set width(width: number) {
-        this._width = width;
-        this._svg?.width(this._width);
-    }
-
-    public set height(height: number) {
-        this._height = height;
-        this._svg?.height(this._height);
-    }
-
-    public set fillColor(fillColor: string) {
-        this._fillColor = fillColor;
-        this._svg?.fill(this._fillColor);
-    }
-
-    public set strokeColor(strokeColor: string) {
-        this._strokeColor = strokeColor;
-        this._svg?.stroke({ color: this._strokeColor, width: this._strokeWidth });
-    }
-
-    public set strokeWidth(strokeWidth: number) {
-        this._strokeWidth = strokeWidth;
-        this._svg?.stroke({ color: this._strokeColor, width: this._strokeWidth });
-    }
-
-    public set rotation(rotation: number) {
-        this._rotation = rotation;
-        this._svg?.rotate(this._rotation);
     }
 
     public render(): void {
         // Silently fail if the SVG is already rendered
-        if (this.isRendered) {
+        if (this.isRendered()) {
             return;
         }
 
-        this._svg = this._slideRenderer.canvas.rect(this._width, this._height)
+        this._svg = this._slide.canvas.rect(this._width, this._height)
             .translate(this._origin.x, this._origin.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
-        this._decorateGraphicEvents();
+        decorateRectangleEvents(this._svg, this._slide, this);
     }
 
     public unrender(): void {
-        this._svg?.remove();
+        this._svg && this._svg.remove();
         this._svg = undefined;
+    }
+
+    // TODO: Flatten origin to x and y
+    public getOrigin(): Vector {
+        return this._origin;
+    }
+
+    public setOrigin(origin: Vector): void {
+        this._origin = origin;
+        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
+    }
+
+    public getWidth(): number {
+        return this._width;
+    }
+
+    public setWidth(width: number): void {
+        this._width = width;
+        this._svg && this._svg.width(this._width);
+    }
+
+    public getHeight(): number {
+        return this._height;
+    }
+
+    public setHeight(height: number): void {
+        this._height = height;
+        this._svg && this._svg.height(this._height);
+    }
+
+    public getFillColor(): string {
+        return this._fillColor;
+    }
+
+    public setFillColor(fillColor: string): void {
+        this._fillColor = fillColor;
+        this._svg && this._svg.fill(this._fillColor);
+    }
+
+    public getStrokeColor(): string {
+        return this._strokeColor;
+    }
+
+    public setStrokeColor(strokeColor: string): void {
+        this._strokeColor = strokeColor;
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+    }
+
+    public getStrokeWidth(): number {
+        return this._strokeWidth;
+    }
+
+    public setStrokeWidth(strokeWidth: number): void {
+        this._strokeWidth = strokeWidth;
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+    }
+
+    public getRotation(): number {
+        return this._rotation;
+    }
+
+    public setRotation(rotation: number): void {
+        this._rotation = rotation;
+        this._svg && this._svg.rotate(this._rotation);
     }
 }
 

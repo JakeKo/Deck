@@ -1,56 +1,42 @@
-import { Store } from "vuex";
-import { ApplicationState } from "../store/types";
-import { SlideMouseEvent } from "../events/types";
-import { SLIDE_EVENTS } from "../events/constants";
+import { PointerTool } from ".";
+import { SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
 import { listen, unlisten } from "../events/utilities";
+import { RectangleMaker } from "../rendering/makers";
+import { AppStore, MUTATIONS } from "../store/types";
+import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
 
-type RectangleToolArgs = {
-    store: Store<ApplicationState>;
-};
+export default (store: AppStore): EditorTool => {
+    function make(event: SlideMouseEvent): void {
+        const { slide, baseEvent } = event.detail;
+        const maker = new RectangleMaker({
+            slide,
+            initialPosition: resolvePosition(baseEvent, slide, store)
+        });
+        slide.broadcastSetGraphic(maker.getTarget());
 
-class RectangleTool {
-    private _store: Store<ApplicationState>;
-
-    constructor(args: RectangleToolArgs) {
-        this._store = args.store;
-    }
-
-    private _make(event: SlideMouseEvent): void {
-        const self = this;
-        const { slideRenderer, baseEvent } = event.detail;
-
-        const initialPosition = resolvePosition(baseEvent, slideRenderer, self._store);
-        const maker = slideRenderer.startMakingRectangle();
-        maker.move(initialPosition);
-    
-        unlisten(SLIDE_EVENTS.MOUSEDOWN, self._make);
         listen(SLIDE_EVENTS.MOUSEMOVE, update);
         listen(SLIDE_EVENTS.MOUSEUP, complete);
-    
+
         function update(event: SlideMouseEvent): void {
             const { baseEvent } = event.detail;
-    
-            // TODO: Incorporate shift, alt, ctrl, and snapping into position calculation
-            // TODO: Handle ctrl case (symmetric around center)
-            const position = resolvePosition(baseEvent, slideRenderer, self._store);
-            maker.setDimensions(initialPosition.towards(position));
+            const position = resolvePosition(baseEvent, slide, store);
+            maker.resize(position, baseEvent.shiftKey, baseEvent.ctrlKey, baseEvent.altKey);
+            slide.broadcastSetGraphic(maker.getTarget());
         }
-    
+
         function complete(): void {
-            listen(SLIDE_EVENTS.MOUSEDOWN, self._make);
+            maker.complete();
             unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
             unlisten(SLIDE_EVENTS.MOUSEUP, complete);
+
+            store.commit(MUTATIONS.ACTIVE_TOOL, PointerTool(store));
         }
     }
 
-    public mount(): void {
-        listen(SLIDE_EVENTS.MOUSEDOWN, this._make);
-    }
-
-    public unmount(): void {
-        unlisten(SLIDE_EVENTS.MOUSEDOWN, this._make);
-    }
-}
-
-export default RectangleTool;
+    return {
+        name: TOOL_NAMES.RECTANGLE,
+        mount: () => listen(SLIDE_EVENTS.MOUSEDOWN, make),
+        unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, make)
+    };
+};

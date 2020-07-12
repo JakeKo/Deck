@@ -1,79 +1,32 @@
 import * as SVG from 'svg.js';
+import { Viewbox } from '../store/types';
+import SlideStateManager from '../utilities/SlideStateManager';
+import Vector from '../utilities/Vector';
 import { GraphicRenderer } from './types';
-import RectangleRenderer from './graphics/RectangleRenderer';
-import RectangleMaker from './makers/RectangleMaker';
-import RectangleMutator from './mutators/RectangleMutator';
-import CurveMaker from './makers/CurveMaker';
-import CurveRenderer from './graphics/CurveRenderer';
-import CurveMutator from './mutators/CurveMutator';
-import { SlideMouseEventPayload, SlideKeyboardEventPayload } from '../events/types';
-import { SLIDE_EVENTS } from '../events/constants';
-import Vector from '../models/Vector';
+import { decorateSlideEvents, renderBackdrop } from './utilities';
 
 type SlideRendererArgs = {
+    stateManager: SlideStateManager;
     canvas: SVG.Doc;
-}
+    rawViewbox: Viewbox;
+    croppedViewbox: Viewbox;
+};
 
 class SlideRenderer {
+    private _stateManager: SlideStateManager;
     private _canvas: SVG.Doc;
     private _graphics: { [index: string]: GraphicRenderer };
+    private _rawViewbox: Viewbox;
 
     constructor(args: SlideRendererArgs) {
+        this._stateManager = args.stateManager;
         this._canvas = args.canvas;
         this._graphics = {};
+        this._rawViewbox = args.rawViewbox;
 
-        this._decorateSlideEvents();
-    }
-
-    private _decorateSlideEvents(): void {
-        this._canvas.node.addEventListener('mouseup', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEUP, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
-        });
-        
-        this._canvas.node.addEventListener('mousedown', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEDOWN, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
-        });
-        
-        this._canvas.node.addEventListener('mouseover', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOVER, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
-        });
-        
-        this._canvas.node.addEventListener('mouseout', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOUT, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
-        });
-        
-        this._canvas.node.addEventListener('mousemove', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
-        });
-        
-        this._canvas.node.addEventListener('keyup', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYUP, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
-        });
-        
-        this._canvas.node.addEventListener('keydown', baseEvent => {
-            document.dispatchEvent(new CustomEvent<SlideKeyboardEventPayload>(SLIDE_EVENTS.KEYDOWN, { detail: {
-                slideRenderer: this,
-                baseEvent
-            }}));
-        });
+        renderBackdrop(this, args.croppedViewbox.width, args.croppedViewbox.height);
+        decorateSlideEvents(this);
+        this._canvas.node.tabIndex = 0;
     }
 
     public get canvas(): SVG.Doc {
@@ -84,34 +37,33 @@ class SlideRenderer {
         this._canvas = canvas;
     }
 
+    public get rawViewbox(): Viewbox {
+        return this._rawViewbox;
+    }
+
     public get bounds(): { origin: Vector, height: number, width: number } {
         const bounds = this._canvas.node.getBoundingClientRect() as DOMRect;
         return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
     }
 
-    // TODO: Implement ID provider
-    public startMakingRectangle(): RectangleMaker {
-        const id = Math.random().toString();
-        this._graphics[id] = new RectangleRenderer({ id, slideRenderer: this });
-        this._graphics[id].render();
-
-        return new RectangleMaker({ rectangle: this._graphics[id] as RectangleRenderer, slide: this });
+    public getGraphic(graphicId: string): GraphicRenderer {
+        return this._graphics[graphicId];
     }
 
-    public startMutatingRectangle(id: string): RectangleMutator {
-        return new RectangleMutator({ rectangle: this._graphics[id] as RectangleRenderer, slide: this });
+    public setGraphic(graphic: GraphicRenderer): void {
+        this._graphics[graphic.getId()] = graphic;
     }
 
-    public startMakingCurve(): CurveMaker {
-        const id = Math.random().toString();
-        this._graphics[id] = new CurveRenderer({ id, slideRenderer: this });
-        this._graphics[id].render();
-
-        return new CurveMaker({ curve: this._graphics[id] as CurveRenderer, slide: this });
+    public removeGraphic(graphicId: string): void {
+        delete this._graphics[graphicId];
     }
 
-    public startMutatingCurve(id: string): CurveMutator {
-        return new CurveMutator({ curve: this._graphics[id] as CurveRenderer, slide: this });
+    public broadcastSetGraphic(graphic: GraphicRenderer): void {
+        this._stateManager.setGraphicFromRenderer(graphic);
+    }
+
+    public broadcastRemoveGraphic(graphicId: string): void {
+        this._stateManager.removeGraphicFromRenderer(graphicId);
     }
 }
 

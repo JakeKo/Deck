@@ -1,62 +1,79 @@
-import CurveRenderer from "../graphics/CurveRenderer";
+import { provideId } from "../../utilities/IdProvider";
+import Vector from "../../utilities/Vector";
+import { CurveRenderer } from "../graphics";
+import { CurveAnchorRenderer } from '../helpers';
 import SlideRenderer from "../SlideRenderer";
-import CurveAnchorRenderer from "../helpers/CurveAnchorRenderer";
-import Vector from "../../models/Vector";
 import { CurveAnchor } from "../types";
 
 type CurveMakerArgs = {
-    curve: CurveRenderer;
     slide: SlideRenderer;
+    initialPosition: Vector;
 };
 
-// TODO: Reduce helpers to a single CurveAnchorRenderer
 class CurveMaker {
     private _curve: CurveRenderer;
     private _slide: SlideRenderer;
-    private _helpers: CurveAnchorRenderer[];
+    private _helper: CurveAnchorRenderer;
 
     constructor(args: CurveMakerArgs) {
-        this._curve = args.curve;
         this._slide = args.slide;
-        this._helpers = [];
-    }
 
-    public move(origin: Vector): void {
-        // Update rendering
-        this._curve.move(origin);
-
-        // Update helper graphics
-        const anchors = this._curve.getAnchors();
-        this._helpers.forEach((helper, index) => {
-            helper.setInHandle(anchors[index].inHandle);
-            helper.setPoint(anchors[index].point);
-            helper.setOutHandle(anchors[index].outHandle);
+        // Inititalize primary graphic
+        this._curve = new CurveRenderer({
+            id: provideId(),
+            slideRenderer: this._slide
         });
+
+        // Initialize helper graphic
+        this._helper = new CurveAnchorRenderer({
+            slide: this._slide,
+            inHandle: args.initialPosition,
+            point: args.initialPosition,
+            outHandle: args.initialPosition
+        });
+
+        // Render primary graphic
+        this._curve.render();
+
+        // Render helper graphic
+        this._helper.render();
     }
 
-    public addAnchor(anchor: CurveAnchor): number {
-        // Update rendering
+    public getTarget(): CurveRenderer {
+        return this._curve;
+    }
+
+    public addAnchor(anchor: CurveAnchor): { setHandles: (position: Vector) => void, setPoint: (position: Vector) => void } {
         const anchorIndex = this._curve.addAnchor(anchor);
 
-        // Update helper graphics
-        this._helpers.push(new CurveAnchorRenderer({ canvas: this._slide.canvas, ...anchor }));
-        this._helpers[anchorIndex].render();
+        // Update helper graphic
+        this._helper.setInHandle(anchor.inHandle);
+        this._helper.setPoint(anchor.point);
+        this._helper.setOutHandle(anchor.outHandle);
 
-        return anchorIndex;
-    }
-
-    public setAnchor(index: number, anchor: CurveAnchor): void {
-        // Update rendering
-        this.setAnchor(index, anchor);
-
-        // Update helper graphics
-        this._helpers[index].setInHandle(anchor.inHandle);
-        this._helpers[index].setPoint(anchor.point);
-        this._helpers[index].setOutHandle(anchor.outHandle);
+        return {
+            setHandles: position => {
+                anchor.inHandle = position.reflect(anchor.point);
+                anchor.outHandle = position;
+                this._curve.setAnchor(anchorIndex, anchor);
+                this._helper.setInHandle(anchor.inHandle);
+                this._helper.setOutHandle(anchor.outHandle);
+            },
+            setPoint: position => {
+                anchor.point = position;
+                this._curve.setAnchor(anchorIndex, anchor);
+                this._helper.setPoint(anchor.point);
+            }
+        };
     }
 
     public complete(): void {
-        this._helpers.forEach(helper => helper.unrender());
+        // Trim the last anchor and persist
+        this._curve.removeAnchor(this._curve.getAnchors().length - 1);
+        this._slide.setGraphic(this._curve);
+
+        // Remove helper graphics
+        this._helper.unrender();
     }
 }
 

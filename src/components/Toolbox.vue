@@ -1,29 +1,22 @@
 <template>
 <div id='toolbox'>
-    <tool @click='$store.commit("tool", "cursor")'      :toolName='"cursor"'    :icon='"fas fa-mouse-pointer"'      :isActive='toolName === "cursor"'></tool>
-    <tool @click='$store.commit("tool", "pencil")'      :toolName='"pencil"'    :icon='"fas fa-pen"'                :isActive='toolName === "pencil"'></tool>
-    <tool @click='$store.commit("tool", "pen")'         :toolName='"pen"'       :icon='"fas fa-pen-nib"'            :isActive='toolName === "pen"'></tool>
-    <tool @click='$store.commit("tool", "rectangle")'   :toolName='"rectangle"' :icon='"fas fa-square"'             :isActive='toolName === "rectangle"'></tool>
-    <tool @click='$store.commit("tool", "ellipse")'     :toolName='"ellipse"'   :icon='"fas fa-circle"'             :isActive='toolName === "ellipse"'></tool>
-    <tool @click='$store.commit("tool", "textbox")'     :toolName='"text"'      :icon='"fas fa-font"'               :isActive='toolName === "textbox"'></tool>
-    <tool @click='uploadImage'                          :toolName='"image"'     :icon='"fas fa-image"'              :isActive='false'></tool>
-    <tool @click='uploadVideo'                          :toolName='"video"'     :icon='"fas fa-video"'              :isActive='false'></tool>
-    <tool @click='$store.dispatch("save")'              :toolName='"save"'      :icon='"fas fa-cloud-download-alt"' :isActive='false'></tool>
-    <tool @click='uploadPresentation'                   :toolName='"load"'      :icon='"fas fa-file-upload"'        :isActive='false'></tool>
-
-    <a href='https://github.com/JakeKo/Deck/issues/new/choose' target='blank' style='text-decoration: none'>
-        <tool                                           :toolName='"feedback"'  :icon='"fas fa-info"'               :isActive='false'></tool>
-    </a>
+    <tool :name='"pointer"' :icon='"fas fa-mouse-pointer"' :isActive='isPointerToolActive' @tool-click='activatePointerTool' />
+    <tool :name='"rectangle"' :icon='"fas fa-square"' :isActive='isRectangleToolActive' @tool-click='activateRectangleTool' />
+    <tool :name='"ellipse"' :icon='"fas fa-circle"' :isActive='isEllipseToolActive' @tool-click='activateEllipseTool' />
+    <tool :name='"curve"' :icon='"fas fa-pen-nib"' :isActive='isCurveToolActive' @tool-click='activateCurveTool' />
+    <tool :name='"textbox"' :icon='"fas fa-font"' :isActive='isTextboxToolActive' @tool-click='activateTextboxTool' />
+    <tool :name='"image"' :icon='"fas fa-image"' :isActive='isImageToolActive' @tool-click='activateImageTool' />
+    <tool :name='"video"' :icon='"fas fa-video"' :isActive='isVideoToolActive' @tool-click='activateVideoTool' />
 </div>
 </template>
 
 <script lang='ts'>
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import Tool from './Tool.vue';
-import { Image, Video } from '../models/graphics/graphics';
-import Slide from '../models/Slide';
-import { IGraphic } from '../types';
-import Utilities from '../utilities';
+import { PointerTool, RectangleTool, CurveTool, EllipseTool, TextboxTool, ImageTool, VideoTool } from '../tools';
+import { MUTATIONS, GETTERS } from '../store/types';
+import { TOOL_NAMES, EditorTool } from '../tools/types';
+import { Getter, Mutation } from 'vuex-class';
 
 @Component({
     components: {
@@ -31,98 +24,63 @@ import Utilities from '../utilities';
     }
 })
 export default class Toolbox extends Vue {
-    @Prop({ type: String, required: true }) private toolName!: string;
+    @Getter private [GETTERS.ACTIVE_TOOL_NAME]: TOOL_NAMES;
+    @Mutation private [MUTATIONS.ACTIVE_TOOL]: (tool: EditorTool) => void;
 
-    private input!: HTMLInputElement;
-    private fileReader!: FileReader;
-
-    private mounted(): void {
-        this.fileReader = new FileReader();
-
-        this.input = document.createElement('input');
-        this.input.type = 'file';
-        this.input.style.display = 'none';
-        this.input.addEventListener('change', (event: Event): void => {
-            // Fetch the uploaded file and abort if no file was selected
-            const file: File = (event.target as HTMLInputElement).files![0];
-            if (file === undefined) {
-                return;
-            }
-
-            // Asynchronously read the uploaded file as a binary string
-            this.fileReader.readAsBinaryString(file);
-            (event.target as HTMLInputElement).value = '';
-        });
+    private get isPointerToolActive(): boolean {
+        return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.POINTER;
     }
 
-    private uploadImage(): void {
-        this.fileReader.onloadend = (): void => {
-            if (this.$store.getters.activeSlide === undefined) {
-                return;
-            }
-
-            // Create a promise that waits for the image width and height to be determined
-            const imageUrl: string = `data:image;base64,${btoa(this.fileReader.result as string)}`;
-            const promise = new Promise((resolve, reject): void => {
-                const image: HTMLImageElement = document.createElement<'img'>('img');
-                image.src = imageUrl;
-
-                image.addEventListener('load', (event: Event): void => {
-                    image.remove();
-                    const target: any = event.target;
-                    resolve({ width: target.width, height: target.height });
-                });
-            });
-
-            promise.then((value: any): void => {
-                const graphic: Image = new Image({ source: imageUrl, width: value.width, height: value.height });
-                this.$store.commit('addGraphic', { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
-            });
-        };
-
-        this.input.click();
+    private get isRectangleToolActive(): boolean {
+        return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.RECTANGLE;
     }
 
-    private uploadVideo(): void {
-        const videoUrl: string | null = window.prompt('Enter a link to the video you would like add:');
-        if (this.$store.getters.activeSlide === undefined || videoUrl === null || videoUrl === '') {
-            return;
-        }
-
-        const promise = new Promise((resolve, reject): void => {
-            const video: HTMLVideoElement = document.createElement('video');
-            video.src = videoUrl;
-
-            video.addEventListener('loadedmetadata', (event: Event): void => {
-                video.remove();
-                const target: any = event.target;
-                resolve({ width: target.videoWidth, height: target.videoHeight });
-            });
-        });
-
-        promise.then((value: any): void => {
-            const graphic: Video = new Video({ source: videoUrl, width: value.width, height: value.height });
-            this.$store.commit('addGraphic', { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
-        });
+    private get isEllipseToolActive(): boolean {
+        return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.ELLIPSE;
     }
 
-    private uploadPresentation(): void {
-        this.fileReader.onloadend = (): void => {
-            // TODO: Fix how flaky this is
-            const result: RegExpMatchArray | null = (this.fileReader.result as string).match(/\/\/ BEGIN SLIDE DATA (.*) END SLIDE DATA/);
-            const json: any = JSON.parse(result![1]);
-            const slides: Array<Slide> = json.map((slide: any): Slide => new Slide({
-                id: slide.id,
-                graphics: slide.graphics.map((graphic: any): IGraphic => Utilities.parseGraphic(graphic)),
-                topic: slide.topic,
-                width: slide.width,
-                height: slide.height
-            }));
+    private get isCurveToolActive(): boolean {
+        return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.CURVE;
+    }
 
-            this.$store.dispatch('resetPresentation', slides);
-        };
+    private get isTextboxToolActive(): boolean {
+        return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.TEXTBOX;
+    }
 
-        this.input.click();
+    private get isImageToolActive(): boolean {
+        return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.IMAGE;
+    }
+
+    private get isVideoToolActive(): boolean {
+        return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.VIDEO;
+    }
+
+    private activatePointerTool(): void {
+        this[MUTATIONS.ACTIVE_TOOL](PointerTool(this.$store));
+    }
+
+    private activateRectangleTool(): void {
+        this[MUTATIONS.ACTIVE_TOOL](RectangleTool(this.$store));
+    }
+
+    private activateEllipseTool(): void {
+        this[MUTATIONS.ACTIVE_TOOL](EllipseTool(this.$store));
+    }
+
+    private activateCurveTool(): void {
+        this[MUTATIONS.ACTIVE_TOOL](CurveTool(this.$store));
+    }
+
+    private activateTextboxTool(): void {
+        this[MUTATIONS.ACTIVE_TOOL](TextboxTool(this.$store));
+    }
+
+    private activateImageTool(): void {
+        this[MUTATIONS.ACTIVE_TOOL](ImageTool(this.$store));
+    }
+
+    private activateVideoTool(): void {
+        this[MUTATIONS.ACTIVE_TOOL](VideoTool(this.$store));
     }
 }
 </script>

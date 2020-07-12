@@ -1,9 +1,13 @@
-import { SLIDE_EVENTS, GRAPHIC_EVENTS } from "./constants";
+import { DECK_EVENTS } from "./types";
 
-export function listen(eventName: SLIDE_EVENTS | GRAPHIC_EVENTS, handler: (event: CustomEvent) => void): void {
+export function listen(eventName: DECK_EVENTS, handler: (event: CustomEvent) => void): void {
     document.addEventListener(eventName, handler as EventListener);
 }
 
-export function unlisten(eventName: SLIDE_EVENTS | GRAPHIC_EVENTS, handler: (event: CustomEvent) => void): void {
+export function unlisten(eventName: DECK_EVENTS, handler: (event: CustomEvent) => void): void {
     document.removeEventListener(eventName, handler as EventListener);
+}
+
+export function dispatch(event: CustomEvent): void {
+    document.dispatchEvent(event);
 }

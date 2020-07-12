@@ -3,7 +3,6 @@
 	"rules": {
 		"adjacent-overload-signatures": true,
         "align": true,
-		"arrow-parens": true,
 		"arrow-return-shorthand": true,
         "ban-comma-operator": true,
         "binary-expression-operand-order": true,

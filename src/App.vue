@@ -1,13 +1,12 @@
 <template>
 <div id='app'>
-    <menu-bar></menu-bar>
+    <menu-bar />
     <div id='interface'>
-        <toolbox :toolName='$store.getters.toolName'></toolbox>
+        <toolbox />
         <div id='workspace'>
             <editor></editor>
             <roadmap></roadmap>
         </div>
-        <graphic-editor></graphic-editor>
     </div>
 </div>
 </template>
@@ -18,52 +17,26 @@ import MenuBar from './components/MenuBar.vue';
 import Toolbox from './components/Toolbox.vue';
 import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
-import GraphicEditor from './components/GraphicEditor.vue';
-import Utilities from './utilities';
-import { IGraphic } from './types';
+import { PointerTool } from './tools';
+import { MUTATIONS } from './store/types';
+import { mapMutations } from 'vuex';
+import { EditorTool } from './tools/types';
+import { Mutation } from 'vuex-class';
 
 @Component({
     components: {
         MenuBar,
         Toolbox,
         Editor,
-        Roadmap,
-        GraphicEditor
+        Roadmap
     }
 })
 export default class App extends Vue {
-    private created(): void {
-        // Overrides the default behavior of copy to copy the graphic model of the focused graphic
-        document.addEventListener('copy', (event: Event): void => {
-            // Cast event as clipboard event and prevent from copying any user selection
-            const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
-            clipboardEvent.preventDefault();
+    @Mutation private [MUTATIONS.ACTIVE_TOOL]: (tool: EditorTool) => void;
 
-            const focusedGraphic: IGraphic | undefined = this.$store.getters.focusedGraphic;
-            if (focusedGraphic === undefined) {
-                return;
-            }
-
-            // Set the clipboard data to the graphic model associated with the current focused graphic
-            const graphic: IGraphic = this.$store.getters.activeSlide.graphics.find((graphic: IGraphic) => graphic.id === focusedGraphic.id)!;
-            clipboardEvent.clipboardData.setData('text/json', JSON.stringify(graphic));
-        });
-
-        document.addEventListener('paste', (event: Event): void => {
-            // Cast event as clipboard event
-            const clipboardEvent: ClipboardEvent = event as ClipboardEvent;
-            clipboardEvent.preventDefault();
-
-            const data: any = JSON.parse(clipboardEvent.clipboardData.getData('text/json'));
-            if (data === undefined) {
-                return;
-            }
-
-            const graphic: IGraphic = Utilities.parseGraphic({ ...data, id: Utilities.generateId() });
-            this.$store.commit('addGraphic', { slideId: this.$store.getters.activeSlide.id, graphic: graphic });
-            this.$store.commit('focusGraphic', { slideId: this.$store.getters.activeSlide.id, graphicId: graphic.id });
-            this.$store.commit('graphicEditorGraphicId', graphic.id);
-        });
+    // Initialize application settings
+    private mounted(): void {
+        this[MUTATIONS.ACTIVE_TOOL](PointerTool(this.$store));
     }
 }
 </script>
@@ -90,6 +63,7 @@ export default class App extends Vue {
     display: flex;
     flex-direction: column;
     height: 100%;
+    flex-grow: 1;
     min-width: 0; // Override min-width default for flex items
 }
 </style>

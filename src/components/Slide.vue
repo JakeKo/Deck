@@ -1,47 +1,42 @@
 <template>
-<div :id='`slide_${slideModel.id}`' :class='{ "slide": true, "active-slide": isActive }'>
-    <div class='slide-box'></div>
-</div>
+<div :id='`slide_${id}`' :class='{ "slide": true, "active-slide": isActive }' :style='slideStyle'></div>
 </template>
 
 <script lang='ts'>
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as SVG from 'svg.js';
-import SlideWrapper from '../models/SlideWrapper';
-import { IGraphic, CustomCanvasMouseEvent, ISlideWrapper, CanvasKeyboardEvent, CustomCanvasKeyboardEvent } from '../types';
-import { EVENT_TYPES } from '../constants';
-import SlideModel from '../models/Slide';
+import SlideRenderer from '../rendering/SlideRenderer';
+import { GETTERS, Viewbox, MUTATIONS } from '../store/types';
+import { Getter, Mutation } from 'vuex-class';
+import SlideStateManager from '../utilities/SlideStateManager';
 
 @Component
 export default class Slide extends Vue {
-    @Prop({ type: SlideModel, required: true }) private slideModel!: SlideModel;
+    @Prop({ type: String, required: true }) private id!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
+    @Prop({ type: SlideStateManager, required: true }) private stateManager!: SlideStateManager;
+    @Getter private [GETTERS.RAW_VIEWBOX]: Viewbox;
+    @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
+
+    private get slideStyle(): { minWidth: string; minHeight: string; } {
+        return {
+            minWidth: `${this[GETTERS.RAW_VIEWBOX].width}px`,
+            minHeight: `${this[GETTERS.RAW_VIEWBOX].height}px`
+        };
+    }
 
     private mounted(): void {
-        const viewbox: { x: number, y: number, width: number, height: number } = this.$store.getters.rawViewbox;
-        const canvas: SVG.Doc = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
-        this.slideModel.slideWrapper = new SlideWrapper(this.slideModel.id, canvas, this.$store, true);
-
-        this.slideModel.graphics.forEach((graphic: IGraphic): void => {
-            this.slideModel.slideWrapper!.addGraphic(graphic);
+        const viewbox = this[GETTERS.RAW_VIEWBOX];
+        const canvas = SVG(this.$el.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
+        const renderer = new SlideRenderer({
+            stateManager: this.stateManager,
+            canvas,
+            rawViewbox: viewbox,
+            croppedViewbox: this[GETTERS.CROPPED_VIEWBOX]
         });
 
-        this.slideModel.slideWrapper.addCanvasEventListener(EVENT_TYPES.CANVAS_KEY_DOWN, ((event: CustomCanvasKeyboardEvent): void => {
-            if (['Delete', 'Backspace'].indexOf(event.detail.baseEvent.key) !== -1) {
-                if (this.$store.getters.focusedGraphic === undefined) {
-                    return;
-                }
-
-                // Remove the focused graphic
-                const graphicId: string = this.$store.getters.focusedGraphic.id;
-                this.slideModel.slideWrapper!.focusGraphic(undefined);
-                this.$store.commit('focusGraphic', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: undefined });
-                this.$store.commit('removeGraphic', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: graphicId });
-                this.$store.commit('removeSnapVectors', { slideId: this.slideModel.slideWrapper!.slideId, graphicId: graphicId });
-                this.$store.commit('graphicEditorGraphicId', undefined);
-                this.slideModel.slideWrapper!.removeGraphic(graphicId);
-            }
-        }));
+        this.stateManager.setStore(this.$store);
+        this.stateManager.setRenderer(renderer);
     }
 }
 </script>
@@ -57,13 +52,6 @@ export default class Slide extends Vue {
     justify-content: center;
     align-items: center;
     position: relative;
-}
-
-.slide-box {
-    box-shadow: 0 0 4px 0 $color-tertiary;
-    background: $color-primary;
-    height: calc(100% / 3);
-    width: calc(100% / 3);
 }
 
 .active-slide {

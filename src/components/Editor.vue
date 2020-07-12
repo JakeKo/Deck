@@ -1,53 +1,85 @@
 <template>
-<div id='editor'>
-    <slide-settings></slide-settings>
-    <div id='canvas-container' ref='canvas-container'>
-        <div id='canvas' ref='canvas' :style='canvasStyle'>
-            <slide v-for='slide in $store.getters.slides' 
-                :key='slide.id'
-                :slideModel='slide'
-                :isActive='$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id'
-            ></slide>
-        </div>
-    </div>
+<div id='editor' @mousewheel='handleMouseWheel'>
+    <slide-placeholder v-if='getSlides.length === 0' />
+    <slide v-for='slide in getSlides' 
+        :key='slide.id'
+        :id='slide.id'
+        :isActive='slide.isActive'
+        :stateManager='slide.stateManager'
+    />
 </div>
 </template>
 
 <script lang='ts'>
 import { Vue, Component, Watch } from 'vue-property-decorator';
 import Slide from './Slide.vue';
-import SlideSettings from './SlideSettings.vue';
+import { MUTATIONS, GETTERS, Viewbox, Slide as SlideModel } from '../store/types';
+import { Getter, Mutation } from 'vuex-class';
+import Vector from '../utilities/Vector';
+import SlidePlaceholder from './SlidePlaceholder.vue';
 
 @Component({
     components: {
         Slide,
-        SlideSettings
+        SlidePlaceholder
     }
 })
 export default class Editor extends Vue {
-    @Watch('$store.getters.canvasZoom') private onCanvasZoomChanged(): void {
-        // Modify the zoom styling of the editor when the zoom is updated
-        const container: HTMLDivElement = this.$refs['canvas-container'] as HTMLDivElement;
-        const percentageDown = container.scrollTop / container.scrollHeight;
-        const percentageOver = container.scrollLeft / container.scrollWidth;
+    @Getter private [GETTERS.ACTIVE_SLIDE]: SlideModel;
+    @Getter private [GETTERS.EDITOR_ZOOM_LEVEL]: number;
+    @Getter private [GETTERS.SLIDES]: SlideModel[];
+    @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
+    @Mutation private [MUTATIONS.EDITOR_ZOOM_LEVEL]: (zoomLevel: number) => void;
 
-        (this.$refs['canvas'] as HTMLDivElement).style.zoom = this.$store.getters.canvasZoom;
-        container.scrollTop = container.scrollHeight * percentageDown;
-        container.scrollLeft = container.scrollWidth * percentageOver;
+    // Set the default zoom based on screen size and slide size
+    private get defaultZoom(): number {
+        const editor = this.$el as HTMLElement;
+        const editorWidth = editor.offsetWidth;
+        const editorHeight = editor.offsetHeight;
+        const slideWidth = this[GETTERS.CROPPED_VIEWBOX].width + 100;
+        const slideHeight = this[GETTERS.CROPPED_VIEWBOX].height + 100;
+        return Math.min(editorWidth / slideWidth, editorHeight / slideHeight);
     }
 
-    get canvasStyle(): any {
-        return {
-            width: `${this.$store.getters.canvasWidth}px`,
-            height: `${this.$store.getters.canvasHeight}px`
-        };
+    // Reorient the editor view when the active slide changes
+    @Watch(GETTERS.ACTIVE_SLIDE)
+    private onActiveSlideIdUpdate(): void {
+        this.reorientSlide();
     }
 
     private mounted(): void {
-        // Scroll to the middle of the editor
-        const container: HTMLDivElement = this.$refs['canvas-container'] as HTMLDivElement;
-        container.scrollTop = (this.$store.getters.canvasHeight - container.clientHeight) / 2;
-        container.scrollLeft = (this.$store.getters.canvasWidth - container.clientWidth) / 2;
+        this.reorientSlide();
+    }
+
+    // Set the zoom level, then center the view on the slide
+    // Note: Editor zoom must be set manually to avoid scrolling before zooming
+    private reorientSlide(): void {
+        const editor = this.$el as HTMLElement;
+        this[MUTATIONS.EDITOR_ZOOM_LEVEL](this.defaultZoom);
+        editor.style.zoom = this.defaultZoom.toString();
+        editor.scrollTop = (editor.scrollHeight - editor.clientHeight) / 2;
+        editor.scrollLeft = (editor.scrollWidth - editor.clientWidth) / 2;
+    }
+
+    private handleMouseWheel(event: WheelEvent): void {
+        if (event.ctrlKey) {
+            event.preventDefault();
+
+            const editor = this.$el as HTMLElement;
+            const deltaZoom = event.deltaY < 0 ? 1.1 : 0.9;
+            const oldZoom = this[GETTERS.EDITOR_ZOOM_LEVEL];
+            const newZoom = this[GETTERS.EDITOR_ZOOM_LEVEL] * deltaZoom;
+            this[MUTATIONS.EDITOR_ZOOM_LEVEL](newZoom);
+            editor.style.zoom = newZoom.toString();
+
+            // TODO: Fetch absolute mouse position without hardcoded values
+            // TODO: Fix the math here (which is incorrect but not by much)
+            const absolutePosition = new Vector(event.clientX - 64, event.clientY - 28);
+            const absoluteDestination = absolutePosition.scale(1 / deltaZoom);
+            const scrollCorrection = absoluteDestination.towards(absolutePosition);
+            editor.scrollLeft = editor.scrollLeft + scrollCorrection.x;
+            editor.scrollTop = editor.scrollTop + scrollCorrection.y;
+        }
     }
 }
 </script>
@@ -58,14 +90,11 @@ export default class Editor extends Vue {
 #editor {
     display: flex;
     flex-grow: 1;
-    min-height: 0;
-}
-
-#canvas-container {
     overflow: scroll;
+    background: $color-tertiary;
 }
 
-#canvas {
-    background: $color-secondary;
+::-webkit-scrollbar {
+    display: none;
 }
 </style>

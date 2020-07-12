@@ -1,20 +1,19 @@
-import Vue, { CreateElement } from 'vue';
+import Vue from 'vue';
 import App from './App.vue';
-import Store from './store';
+import Store from './store/index';
 
-const appContainer: HTMLDivElement = document.createElement<'div'>('div');
+const appContainer = document.createElement('div');
 appContainer.id = 'app-container';
 
-const exportFrame: HTMLDivElement = document.createElement<'div'>('div');
+const exportFrame = document.createElement('div');
 exportFrame.id = 'export-frame';
 exportFrame.style.display = 'none';
 
-const body: HTMLBodyElement = document.getElementsByTagName('body')[0];
-body.appendChild<HTMLDivElement>(appContainer);
-body.appendChild<HTMLDivElement>(exportFrame);
+document.body.appendChild(appContainer);
+document.body.appendChild(exportFrame);
 
 new Vue({
     el: '#app-container',
     store: Store,
-    render: (h: CreateElement) => h(App)
+    render: h => h(App)
 });

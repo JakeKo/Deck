@@ -1,75 +1,41 @@
 <template>
 <div id='roadmap'>
-    <div class='stretcher-vertical top' @mousedown='stretch'></div>
-    <div id='slide-previews'>
-        <slide-preview v-for='(slide, index) in $store.getters.slides'
-            :id='slide.id'
-            :index='index'
-            :slideId='slide.id'
-            :isActive='$store.getters.activeSlide !== undefined && slide.id === $store.getters.activeSlide.id'
-            :graphics='slide.graphics'
-            :isAddSlide='false'
-            :topic='slide.topic'
-            :key='slide.id'
-        ></slide-preview>
-        <slide-preview :id='"addSlide"' :index='-1' :slideId='"-"' :isActive='false' :graphics='[]' :isAddSlide='true' :topic='""' @add-slide='addSlide'></slide-preview>
+    <roadmap-slot v-for='slide in getRoadmapSlides'
+        :key='slide.id'
+        :id='slide.id'
+        :isActive='slide.isActive'
+    />
+    <div id='add-slide-slot' @click='createNewSlide'>
+        <div id='add-slide-label'>Add Slide</div>
+        <div id='add-slide-button'>
+            <i class='fas fa-plus' />
+        </div>
     </div>
 </div>
 </template>
 
 <script lang='ts'>
 import { Vue, Component } from 'vue-property-decorator';
-import SlidePreview from './SlidePreview.vue';
-import Slide from '../models/Slide';
+import RoadmapSlot from './RoadmapSlot.vue';
+import { MUTATIONS, GETTERS, RoadmapSlide, Slide } from '../store/types';
+import { Getter, Mutation } from 'vuex-class';
 
 @Component({
     components: {
-        SlidePreview
+        RoadmapSlot
     }
 })
 export default class Roadmap extends Vue {
-    private stretch(event: MouseEvent): void {
-        event.stopPropagation();
-        event.preventDefault();
-        document.addEventListener('mousemove', preview);
-        document.addEventListener('mouseup', end);
+    @Getter private [GETTERS.ROADMAP_SLIDES]: RoadmapSlide[];
+    @Getter private [GETTERS.ACTIVE_SLIDE]: Slide;
+    @Getter private [GETTERS.SLIDES]: Slide[];
+    @Getter private [GETTERS.LAST_SLIDE]: Slide;
+    @Mutation private [MUTATIONS.ADD_SLIDE]: (index: number) => void;
+    @Mutation private [MUTATIONS.ACTIVE_SLIDE_ID]: (id: string) => void;
 
-        const self: Roadmap = this;
-        function preview(event: MouseEvent): void {
-            // Update the height of the roadmap
-            const height: number = Math.max(Math.min(window.innerHeight - event.pageY, 192), 64);
-            (self.$el as HTMLElement).style.height = `${height}px`;
-
-            // Resize the slide previews based on the height of the roadmap
-            Array.from(document.querySelectorAll<HTMLElement>('.slide-preview-container'))
-                .forEach((slidePreviewContainer: HTMLElement): void => {
-                    const slidePreview: HTMLElement = slidePreviewContainer.querySelector<HTMLElement>('.slide-preview')!;
-                    const slidePreviewSlot: HTMLElement = slidePreviewContainer.querySelector<HTMLElement>('.slide-preview-slot')!;
-                    const topicLabel: HTMLElement = slidePreviewContainer.querySelector<HTMLElement>('.topic-label')!;
-                    slidePreview.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
-                    slidePreviewSlot.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
-
-                    if (topicLabel !== null) {
-                        topicLabel.style.width = `${slidePreview.clientHeight * 16 / 9}px`;
-                    }
-                });
-        }
-
-        function end(): void {
-            document.removeEventListener('mousemove', preview);
-            document.removeEventListener('mouseup', end);
-        }
-    }
-
-    private addSlide(): void {
-        // If there is an active slide, unfocus any graphic(s) that may be focused
-        if (this.$store.getters.activeSlide !== undefined) {
-            this.$store.commit('focusGraphic', { slideId: this.$store.getters.activeSlide.id, graphicId: undefined });
-        }
-
-        this.$store.commit('addSlide', this.$store.getters.slides.length);
-        this.$store.commit('activeSlide', this.$store.getters.slides[this.$store.getters.slides.length - 1].id);
-        this.$store.commit('graphicEditorGraphicId', undefined);
+    private createNewSlide(): void {
+        this[MUTATIONS.ADD_SLIDE](this[GETTERS.SLIDES].length);
+        this[MUTATIONS.ACTIVE_SLIDE_ID](this[GETTERS.LAST_SLIDE].id);
     }
 }
 </script>
@@ -78,23 +44,38 @@ export default class Roadmap extends Vue {
 @import '../styles/application';
 
 #roadmap {
-    position: relative;
     box-sizing: border-box;
     border-top: 1px solid $color-tertiary;
     height: 80px;
     display: flex;
-    align-items: center;
     flex-shrink: 0;
+    overflow-x: scroll;
 }
 
-#slide-previews {
-    height: calc(100% - 12px);
-    min-width: 100%;
-    overflow-x: auto;
-    display: flex;
-    align-items: center;
-    padding: 0 8px;
+#add-slide-slot {
+    height: 100%;
+    padding: 8px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+#add-slide-label {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+}
+
+#add-slide-button {
+    height: 45px;
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background: $color-information;
 }
 
 ::-webkit-scrollbar {
