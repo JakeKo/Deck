@@ -63,7 +63,7 @@ export function decorateRectangleEvents(svg: SVG.Element, slide: SlideRenderer, 
         dispatch(slideMouseEvent(SLIDE_EVENTS.MOUSEOVER, slide, graphic, baseEvent));
     });
 
-    svg.node.addEventListener('mouseout', baseEvent => {
+    svg.node.addEventListener('mouseleave', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(rectangleMouseEvent(RECTANGLE_EVENTS.MOUSEOUT, slide, graphic, baseEvent));
         dispatch(slideMouseEvent(SLIDE_EVENTS.MOUSEOUT, slide, graphic, baseEvent));
@@ -95,7 +95,7 @@ export function decorateCurveEvents(svg: SVG.Element, slide: SlideRenderer, grap
         dispatch(slideMouseEvent(SLIDE_EVENTS.MOUSEOVER, slide, graphic, baseEvent));
     });
 
-    svg.node.addEventListener('mouseout', baseEvent => {
+    svg.node.addEventListener('mouseleave', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(curveMouseEvent(CURVE_EVENTS.MOUSEOUT, slide, graphic, baseEvent));
         dispatch(slideMouseEvent(SLIDE_EVENTS.MOUSEOUT, slide, graphic, baseEvent));
@@ -124,7 +124,7 @@ export function decorateSlideEvents(slideRenderer: SlideRenderer): void {
         dispatch(slideMouseEvent(SLIDE_EVENTS.MOUSEOVER, slideRenderer, undefined, baseEvent));
     });
 
-    slideRenderer.canvas.node.addEventListener('mouseout', baseEvent => {
+    slideRenderer.canvas.node.addEventListener('mouseleave', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(slideMouseEvent(SLIDE_EVENTS.MOUSEOUT, slideRenderer, undefined, baseEvent));
     });
@@ -164,7 +164,7 @@ export function decorateVertexEvents(svg: SVG.Element, slide: SlideRenderer, loc
         dispatch(slideMouseEvent(SLIDE_EVENTS.MOUSEOVER, slide, undefined, baseEvent));
     });
 
-    svg.node.addEventListener('mouseout', baseEvent => {
+    svg.node.addEventListener('mouseleave', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(vertexMouseEvent(VERTEX_EVENTS.MOUSEOUT, slide, location, baseEvent));
         dispatch(slideMouseEvent(SLIDE_EVENTS.MOUSEOUT, slide, undefined, baseEvent));
