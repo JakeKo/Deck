@@ -34,10 +34,8 @@ const getters: AppGetters = {
     },
     [GETTERS.STYLE]: (state: AppState) => <T, U>(props: T, customStyles: StyleCreator<T, U>): BaseStyles & U => {
         const base = getBaseStyles(state.theme);
-        return {
-            ...base,
-            ...customStyles({ theme: state.theme, base, props })
-        };
+        const custom = customStyles({ theme: state.theme, base, props });
+        return { ...base, ...(custom as any) } as BaseStyles & U;
     }
 };
 

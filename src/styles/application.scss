@@ -41,26 +41,3 @@ html, body {
 .right {
     left: 100%;
 }
-
-.tool {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    padding: 8px 0;
-    font-family: 'Roboto', sans-serif;
-    color: $color-dark;
-    background: $color-light;
-    font-size: 12px;
-    transition: 0.25s;
-
-    i {
-        font-size: 16px;
-        padding: 4px 0;
-    }
-
-    &:hover {
-        background: $color-secondary;
-    }
-}
