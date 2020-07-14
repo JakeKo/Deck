@@ -1,10 +1,12 @@
+import Vue from "vue";
 import Vuex, { StoreOptions } from "vuex";
-import { AppState } from "./types";
+import { themes } from "../styling";
+import { THEMES } from "../styling/types";
+import NullTool from "../tools/NullTool";
+import actions from './actions';
 import getters from './getters';
 import mutations from './mutations';
-import actions from './actions';
-import Vue from "vue";
-import NullTool from "../tools/NullTool";
+import { AppState } from "./types";
 
 const store: StoreOptions<AppState> = {
     state: {
@@ -12,6 +14,7 @@ const store: StoreOptions<AppState> = {
         slides: [],
         activeTool: NullTool,
         deckTitle: undefined,
+        theme: themes[THEMES.LIGHT],
         editorViewbox: {
             zoom: 1,
             raw: {

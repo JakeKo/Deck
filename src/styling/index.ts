@@ -1,5 +1,5 @@
-import { BaseStyles, Theme } from "./types";
 import themes from './themes';
+import { BaseStyles, Theme } from "./types";
 
 const getBaseStyles = (theme: Theme): BaseStyles => ({
     flexRow: {
@@ -134,7 +134,7 @@ const getBaseStyles = (theme: Theme): BaseStyles => ({
     }
 });
 
-export default {
+export {
     getBaseStyles,
     themes
 };

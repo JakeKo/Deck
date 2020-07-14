@@ -1,5 +1,7 @@
-import { AppState, Viewbox, AppGetters, Slide, RoadmapSlide, GETTERS } from "./types";
+import { getBaseStyles } from "../styling";
+import { BaseStyles, StyleCreator } from "../styling/types";
 import { TOOL_NAMES } from "../tools/types";
+import { AppGetters, AppState, GETTERS, RoadmapSlide, Slide, Viewbox } from "./types";
 import { getSlide } from "./utilities";
 
 const getters: AppGetters = {
@@ -29,6 +31,13 @@ const getters: AppGetters = {
     },
     [GETTERS.DECK_TITLE]: (state: AppState): string | undefined => {
         return state.deckTitle;
+    },
+    [GETTERS.STYLE]: (state: AppState) => <T, U>(props: T, customStyles: StyleCreator<T, U>): BaseStyles & U => {
+        const base = getBaseStyles(state.theme);
+        return {
+            ...base,
+            ...customStyles({ theme: state.theme, base, props })
+        };
     }
 };
 

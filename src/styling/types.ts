@@ -161,3 +161,5 @@ export enum THEMES {
     LIGHT = 'light',
     DARK = 'dark'
 }
+
+export type StyleCreator<T, U> = ({ theme, base, props }: { theme: Theme, base: BaseStyles, props: T }) => U;

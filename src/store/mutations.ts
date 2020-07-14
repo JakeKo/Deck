@@ -1,9 +1,10 @@
+import Vue from 'vue';
+import { Theme } from "../styling/types";
 import { EditorTool } from "../tools/types";
 import { provideId } from "../utilities/IdProvider";
 import SlideStateManager from "../utilities/SlideStateManager";
 import { AppMutations, AppState, GraphicStoreModel, MUTATIONS } from "./types";
 import { getSlide } from "./utilities";
-import Vue from 'vue';
 
 const mutations: AppMutations = {
     [MUTATIONS.ADD_SLIDE]: (state: AppState, index: number): void => {
@@ -62,6 +63,9 @@ const mutations: AppMutations = {
         if (slide !== undefined) {
             slide.stateManager.removeGraphicFromStore(graphicId);
         }
+    },
+    [MUTATIONS.THEME]: (state: AppState, theme: Theme): void => {
+        state.theme = theme;
     }
 };
 

@@ -1,14 +1,16 @@
-import { GetterTree, MutationTree, ActionTree, Store } from "vuex";
-import { EditorTool } from "../tools/types";
-import Vector from "../utilities/Vector";
+import { ActionTree, GetterTree, MutationTree, Store } from "vuex";
 import { GRAPHIC_TYPES } from "../rendering/types";
+import { Theme } from "../styling/types";
+import { EditorTool } from "../tools/types";
 import SlideStateManager from "../utilities/SlideStateManager";
+import Vector from "../utilities/Vector";
 
 export type AppState = {
     activeSlideId: string;
     slides: Slide[];
     activeTool: EditorTool;
     deckTitle: string | undefined;
+    theme: Theme;
     editorViewbox: {
         zoom: number;
         raw: Viewbox;
@@ -54,7 +56,8 @@ export enum GETTERS {
     RAW_VIEWBOX = 'getRawViewbox',
     CROPPED_VIEWBOX = 'getCroppedViewbox',
     EDITOR_ZOOM_LEVEL = 'getEditorZoomLevel',
-    DECK_TITLE = 'getDeckTitle'
+    DECK_TITLE = 'getDeckTitle',
+    STYLE = 'style'
 }
 
 export enum MUTATIONS {
@@ -66,7 +69,8 @@ export enum MUTATIONS {
     SET_GRAPHIC = 'setGraphic',
     REMOVE_GRAPHIC = 'removeGraphic',
     BROADCAST_SET_GRAPHIC = 'broadcastSetGraphic',
-    BROADCAST_REMOVE_GRAPHIC = 'broadcastRemoveGraphic'
+    BROADCAST_REMOVE_GRAPHIC = 'broadcastRemoveGraphic',
+    THEME = 'setTheme'
 }
 
 export enum ACTIONS { }
