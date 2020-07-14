@@ -1,5 +1,5 @@
 <template>   
-<div :style='toolStyle' @click='$emit("tool-click")' @mouseover="onMouseOver" @mouseleave="onMouseLeave">
+<div :style='toolStyle' @click='$emit("tool-click")'>
     <i :style='toolIconStyle' :class='icon' />
     {{name}}
 </div>
@@ -10,9 +10,11 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { StyleCreator, BaseStyles } from '../styling/types';
 import { Getter } from 'vuex-class';
 import { GETTERS } from '../store/types';
+import DeckComponent from './DeckComponent';
 
-export type ToolStyleProps = {};
-export type ToolStyle = {
+// TODO: Consider implementing CSS type
+export type StyleProps = {};
+export type Style = {
     tool: any;
     toolIcon: any;
     toolHover: any;
@@ -20,7 +22,7 @@ export type ToolStyle = {
     activeToolHover: any;
     activeToolIcon: any;
 };
-const toolStyle: StyleCreator<ToolStyleProps, ToolStyle> = ({ theme, base, props }) => ({
+const toolStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
     tool: {
         ...base.flexColCC,
         ...base.fontLabel,
@@ -52,19 +54,13 @@ const toolStyle: StyleCreator<ToolStyleProps, ToolStyle> = ({ theme, base, props
 });
 
 @Component
-export default class Tool extends Vue {
+export default class Tool extends DeckComponent<StyleProps, Style> {
     @Prop({ type: String, required: true }) private name!: string;
     @Prop({ type: Boolean, required: true }) private isActive!: boolean;
     @Prop({ type: String, required: true }) private icon!: string;
-    @Getter private [GETTERS.STYLE]: <T, U>(props: T, customStyles: StyleCreator<T, U>) => BaseStyles & U;
-    private isHovered: boolean = false;
-
-    private get componentStyle(): BaseStyles & ToolStyle {
-        return this[GETTERS.STYLE]<ToolStyleProps, ToolStyle>({}, toolStyle);
-    }
 
     private get toolStyle(): any {
-        const style = this.componentStyle;
+        const style = this[GETTERS.STYLE]({}, toolStyle);
         return {
             ...style.tool,
             ...this.isHovered && style.toolHover,
@@ -74,19 +70,11 @@ export default class Tool extends Vue {
     }
 
     private get toolIconStyle(): any {
-        const style = this.componentStyle;
+        const style = this[GETTERS.STYLE]({}, toolStyle);
         return {
             ...style.toolIcon,
             ...this.isActive && style.activeToolIcon
         };
-    }
-
-    private onMouseOver(): void {
-        this.isHovered = true;
-    }
-
-    private onMouseLeave(): void {
-        this.isHovered = false;
     }
 }
 </script>
