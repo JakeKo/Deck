@@ -4,14 +4,14 @@ import { THEMES, Theme } from "./types";
 // TODO: Figure out how to encode font colors
 const lightTheme: Theme = {
     color: {
-        achro: {
+        base: {
             highest: '#ffffff', // 100% tint
             higher: '#ededed',  // 75% tint
             flush: '#dbdbdb',   // 50% tint
             lower: '#c8c8c8',   // 25% tint
             lowest: '#b6b6b6'   // base
         },
-        achrocomp: {
+        basecomp: {
             highest: '#494949', // base
             higher: '#373737',  // 25% tint
             flush: '#252525',   // 50% tint

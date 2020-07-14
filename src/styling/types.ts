@@ -14,8 +14,8 @@ type Typeface = {
 
 export type Theme = {
     color: {
-        achro: Palette;
-        achrocomp: Palette;
+        base: Palette;
+        basecomp: Palette;
         primary: Palette;
     };
     text: {

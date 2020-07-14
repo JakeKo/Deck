@@ -29,27 +29,27 @@ const toolStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => (
         width: '100%',
         cursor: 'pointer',
         padding: '8px 0',
-        color: theme.color.achrocomp.lowest,
-        background: theme.color.achro.highest,
+        color: theme.color.basecomp.lowest,
+        background: theme.color.base.highest,
         transition: '0.25s'
     },
     toolIcon: {
         fontSize: theme.text.body.size,
-        color: theme.color.achrocomp.lowest,
+        color: theme.color.basecomp.lowest,
         padding: '4px 0'
     },
     toolHover: {
-        background: theme.color.achro.flush
+        background: theme.color.base.flush
     },
     activeTool: {
-        color: theme.color.achro.highest,
+        color: theme.color.base.highest,
         background: theme.color.primary.flush
     },
     activeToolHover: {
         background: theme.color.primary.lowest
     },
     activeToolIcon: {
-        color: theme.color.achro.highest
+        color: theme.color.base.highest
     }
 });
 
