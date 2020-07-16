@@ -9,7 +9,7 @@ import { Component } from 'vue-property-decorator';
 import { MUTATIONS, GETTERS } from '../store/types';
 import { Getter, Mutation } from 'vuex-class';
 import { StyleCreator } from '../styling/types';
-import DeckComponent from './DeckComponent';
+import DeckComponent from './generic/DeckComponent';
 
 type StyleProps = {};
 type Style = {

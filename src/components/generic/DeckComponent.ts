@@ -1,7 +1,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { Getter } from 'vuex-class';
-import { GETTERS } from '../store/types';
-import { BaseStyles, StyleCreator } from '../styling/types';
+import { GETTERS } from '../../store/types';
+import { BaseStyles, StyleCreator } from '../../styling/types';
 
 @Component
 class DeckComponent<T, U> extends Vue {

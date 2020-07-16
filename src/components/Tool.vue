@@ -10,7 +10,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { StyleCreator, BaseStyles } from '../styling/types';
 import { Getter } from 'vuex-class';
 import { GETTERS } from '../store/types';
-import DeckComponent from './DeckComponent';
+import DeckComponent from './generic/DeckComponent';
 
 // TODO: Consider implementing CSS type
 export type StyleProps = {};
