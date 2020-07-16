@@ -1,5 +1,5 @@
 <template>
-<div id='editor' @mousewheel='handleMouseWheel'>
+<div :style="editorStyle" @mousewheel='handleMouseWheel'>
     <slide-placeholder v-if='getSlides.length === 0' />
     <slide v-for='slide in getSlides' 
         :key='slide.id'
@@ -17,6 +17,21 @@ import { MUTATIONS, GETTERS, Viewbox, Slide as SlideModel } from '../store/types
 import { Getter, Mutation } from 'vuex-class';
 import Vector from '../utilities/Vector';
 import SlidePlaceholder from './SlidePlaceholder.vue';
+import { StyleCreator } from '../styling/types';
+import DeckComponent from './generic/DeckComponent';
+
+type StyleProps = {};
+type Style = {
+    editor: any;
+};
+const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
+    editor: {
+        display: 'flex',
+        flexGrow: '1',
+        overflow: 'scroll',
+        background: theme.color.base.flush
+    }
+});
 
 @Component({
     components: {
@@ -24,12 +39,17 @@ import SlidePlaceholder from './SlidePlaceholder.vue';
         SlidePlaceholder
     }
 })
-export default class Editor extends Vue {
+export default class Editor extends DeckComponent<StyleProps, Style> {
     @Getter private [GETTERS.ACTIVE_SLIDE]: SlideModel;
     @Getter private [GETTERS.EDITOR_ZOOM_LEVEL]: number;
     @Getter private [GETTERS.SLIDES]: SlideModel[];
     @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
     @Mutation private [MUTATIONS.EDITOR_ZOOM_LEVEL]: (zoomLevel: number) => void;
+
+    private get editorStyle(): any {
+        const style = this[GETTERS.STYLE]({}, componentStyle);
+        return style.editor;
+    }
 
     // Set the default zoom based on screen size and slide size
     private get defaultZoom(): number {
@@ -47,7 +67,8 @@ export default class Editor extends Vue {
         this.reorientSlide();
     }
 
-    private mounted(): void {
+    public mounted(): void {
+        this.bindEvents();
         this.reorientSlide();
     }
 
@@ -83,18 +104,3 @@ export default class Editor extends Vue {
     }
 }
 </script>
-
-<style lang='scss' scoped>
-@import '../styles/colors';
-
-#editor {
-    display: flex;
-    flex-grow: 1;
-    overflow: scroll;
-    background: $color-tertiary;
-}
-
-::-webkit-scrollbar {
-    display: none;
-}
-</style>
