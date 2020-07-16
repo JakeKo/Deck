@@ -6,7 +6,7 @@
 </template>
 
 <script lang='ts'>
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { StyleCreator, BaseStyles } from '../styling/types';
 import { Getter } from 'vuex-class';
 import { GETTERS } from '../store/types';

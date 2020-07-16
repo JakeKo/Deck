@@ -1,5 +1,5 @@
 <template>
-<div id='toolbox'>
+<div :style="toolboxStyle">
     <tool :name='"pointer"' :icon='"fas fa-mouse-pointer"' :isActive='isPointerToolActive' @tool-click='activatePointerTool' />
     <tool :name='"rectangle"' :icon='"fas fa-square"' :isActive='isRectangleToolActive' @tool-click='activateRectangleTool' />
     <tool :name='"ellipse"' :icon='"fas fa-circle"' :isActive='isEllipseToolActive' @tool-click='activateEllipseTool' />
@@ -11,19 +11,34 @@
 </template>
 
 <script lang='ts'>
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import Tool from './Tool.vue';
 import { PointerTool, RectangleTool, CurveTool, EllipseTool, TextboxTool, ImageTool, VideoTool } from '../tools';
 import { MUTATIONS, GETTERS } from '../store/types';
 import { TOOL_NAMES, EditorTool } from '../tools/types';
 import { Getter, Mutation } from 'vuex-class';
+import { StyleCreator } from '../styling/types';
+import DeckComponent from './DeckComponent';
+
+type StyleProps = {};
+type Style = {
+    toolbox: any
+};
+const toolboxStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
+    toolbox: {
+        borderRight: `1px solid ${theme.color.base.flush}`,
+        ...base.flexCol,
+        flexShrink: 0,
+        width: '64px'
+    }
+});
 
 @Component({
     components: {
         Tool
     }
 })
-export default class Toolbox extends Vue {
+export default class Toolbox extends DeckComponent<StyleProps, Style> {
     @Getter private [GETTERS.ACTIVE_TOOL_NAME]: TOOL_NAMES;
     @Mutation private [MUTATIONS.ACTIVE_TOOL]: (tool: EditorTool) => void;
 
@@ -55,6 +70,11 @@ export default class Toolbox extends Vue {
         return this[GETTERS.ACTIVE_TOOL_NAME] === TOOL_NAMES.VIDEO;
     }
 
+    private get toolboxStyle(): any {
+        const style = this[GETTERS.STYLE]({}, toolboxStyle);
+        return style.toolbox;
+    }
+
     private activatePointerTool(): void {
         this[MUTATIONS.ACTIVE_TOOL](PointerTool(this.$store));
     }
@@ -84,14 +104,3 @@ export default class Toolbox extends Vue {
     }
 }
 </script>
-
-<style lang='scss' scoped>
-@import '../styles/colors';
-
-#toolbox {
-    border-right: 1px solid $color-tertiary;
-    flex-direction: column;
-    flex-shrink: 0;
-    width: 64px;
-}
-</style>
