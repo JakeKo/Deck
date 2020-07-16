@@ -1,6 +1,6 @@
 <template>
-    <div id='empty-slide-container' :style='emptySlideContainerStyle'>
-        <div id='empty-slide' :style='emptySlideStyle'>
+    <div :style="containerStyle">
+        <div :style="slideStyle">
             Click "Add Slide" to start your deck 😎😎
         </div>
     </div>
@@ -10,41 +10,49 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { GETTERS, Viewbox } from '../store/types';
 import { Getter } from 'vuex-class';
+import { StyleCreator } from '../styling/types';
+import DeckComponent from './generic/DeckComponent';
+
+type StyleProps = {
+    raw: Viewbox;
+    cropped: Viewbox;
+};
+type Style = {
+    container: any;
+    slide: any;
+};
+const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
+    container: {
+        ...base.flexRowCC,
+        minWidth: `${props.raw.width}px`,
+        minHeight: `${props.raw.height}px`
+    },
+    slide: {
+        ...base.flexRowCC,
+        ...base.fontBody,
+        border: `4px dashed ${theme.color.basecomp.flush}`,
+        width: `${props.cropped.width}px`,
+        height: `${props.cropped.height}px`
+    }
+});
 
 @Component
-export default class SlidePlaceholder extends Vue {
+export default class SlidePlaceholder extends DeckComponent<StyleProps, Style> {
     @Getter private [GETTERS.RAW_VIEWBOX]: Viewbox;
     @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
 
-    private get emptySlideContainerStyle(): { minWidth: string; minHeight: string; } {
-        return {
-            minWidth: `${this[GETTERS.RAW_VIEWBOX].width}px`,
-            minHeight: `${this[GETTERS.RAW_VIEWBOX].height}px`
-        };
+    private get containerStyle(): any {
+        return this[GETTERS.STYLE]({
+            raw: this[GETTERS.RAW_VIEWBOX],
+            cropped: this[GETTERS.CROPPED_VIEWBOX]
+        }, componentStyle).container;
     }
 
-    private get emptySlideStyle(): { width: string; height: string; } {
-        return {
-            width: `${this[GETTERS.CROPPED_VIEWBOX].width}px`,
-            height: `${this[GETTERS.CROPPED_VIEWBOX].height}px`
-        };
+    private get slideStyle(): any {
+        return this[GETTERS.STYLE]({
+            raw: this[GETTERS.RAW_VIEWBOX],
+            cropped: this[GETTERS.CROPPED_VIEWBOX]
+        }, componentStyle).slide;
     }
 }
 </script>
-
-<style lang="scss" scoped>
-#empty-slide-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#empty-slide {
-    border: 4px dashed grey;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    font-family: 'Roboto', sans-serif;
-}
-</style>
