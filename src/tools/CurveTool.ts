@@ -6,6 +6,7 @@ import PointerTool from "./PointerTool";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
 
+// TODO: Implement 'once' ability
 export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
