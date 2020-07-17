@@ -1,5 +1,5 @@
 import { RectangleMouseEvent, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
-import { listen, unlisten } from "../events/utilities";
+import { listen, unlisten, listenOnce } from "../events/utilities";
 import { RectangleRenderer } from "../rendering/graphics";
 import { RectangleMutator } from "../rendering/mutators";
 import { AppStore } from "../store/types";
@@ -19,7 +19,7 @@ export default (store: AppStore): EditorTool => {
     return {
         name: TOOL_NAMES.POINTER,
         mount: () => {
-            listen(RECTANGLE_EVENTS.MOUSEDOWN, rectangleMutation.begin);
+            listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, rectangleMutation.begin);
         },
         unmount: () => {
             rectangleMutation.stop();
@@ -39,7 +39,6 @@ function initRectangleMutation(store: AppStore): MutationControls {
         mutator = new RectangleMutator({ slide, rectangle });
         beginMove(event);
 
-        unlisten(RECTANGLE_EVENTS.MOUSEDOWN, begin);
         listen(SLIDE_EVENTS.MOUSEDOWN, complete);
     }
 
@@ -49,9 +48,8 @@ function initRectangleMutation(store: AppStore): MutationControls {
         originOffset = position.towards(rectangle!.getOrigin());
         slide.broadcastSetGraphic(mutator!.getTarget());
 
-        unlisten(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
         listen(SLIDE_EVENTS.MOUSEMOVE, move);
-        listen(SLIDE_EVENTS.MOUSEUP, completeMove);
+        listenOnce(SLIDE_EVENTS.MOUSEUP, completeMove);
     }
 
     function move(event: SlideMouseEvent): void {
@@ -62,9 +60,8 @@ function initRectangleMutation(store: AppStore): MutationControls {
     }
 
     function completeMove(): void {
-        listen(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
+        listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        unlisten(SLIDE_EVENTS.MOUSEUP, completeMove);
     }
 
     function complete(event: SlideMouseEvent): void {
@@ -77,7 +74,7 @@ function initRectangleMutation(store: AppStore): MutationControls {
 
         mutator && mutator.complete();
         mutator = undefined;
-        listen(RECTANGLE_EVENTS.MOUSEDOWN, begin);
+        listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, begin);
         unlisten(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         unlisten(SLIDE_EVENTS.MOUSEUP, completeMove);

@@ -1,12 +1,12 @@
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
-import { listen, unlisten } from "../events/utilities";
+import { listen, unlisten, listenOnce } from "../events/utilities";
 import { CurveMaker } from "../rendering/makers";
 import { AppStore, MUTATIONS } from "../store/types";
 import PointerTool from "./PointerTool";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
 
-// TODO: Implement 'once' ability
+// TODO: Investigate phantom line while making curves
 export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
@@ -20,7 +20,6 @@ export default (store: AppStore): EditorTool => {
         let currentAnchor = maker.addAnchor({ inHandle: initialPosition, point: initialPosition, outHandle: initialPosition });
         setPoint();
 
-        unlisten(SLIDE_EVENTS.MOUSEDOWN, make);
         listen(SLIDE_EVENTS.KEYDOWN, complete);
 
         function movePoint(event: SlideMouseEvent): void {
@@ -32,9 +31,8 @@ export default (store: AppStore): EditorTool => {
 
         function setPoint(): void {
             unlisten(SLIDE_EVENTS.MOUSEMOVE, movePoint);
-            unlisten(SLIDE_EVENTS.MOUSEDOWN, setPoint);
             listen(SLIDE_EVENTS.MOUSEMOVE, moveHandles);
-            listen(SLIDE_EVENTS.MOUSEUP, setHandles);
+            listenOnce(SLIDE_EVENTS.MOUSEUP, setHandles);
         }
 
         function moveHandles(event: SlideMouseEvent): void {
@@ -49,9 +47,8 @@ export default (store: AppStore): EditorTool => {
             slide.broadcastSetGraphic(maker.getTarget());
 
             unlisten(SLIDE_EVENTS.MOUSEMOVE, moveHandles);
-            unlisten(SLIDE_EVENTS.MOUSEUP, setHandles);
             listen(SLIDE_EVENTS.MOUSEMOVE, movePoint);
-            listen(SLIDE_EVENTS.MOUSEDOWN, setPoint);
+            listenOnce(SLIDE_EVENTS.MOUSEDOWN, setPoint);
         }
 
         function complete(event: SlideKeyboardEvent): void {
@@ -72,7 +69,7 @@ export default (store: AppStore): EditorTool => {
 
     return {
         name: TOOL_NAMES.CURVE,
-        mount: () => listen(SLIDE_EVENTS.MOUSEDOWN, make),
+        mount: () => listenOnce(SLIDE_EVENTS.MOUSEDOWN, make),
         unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, make)
     };
 };

@@ -33,7 +33,6 @@ export type Viewbox = {
     height: number;
 };
 
-// TODO: Consider implications of array of graphics vs. id-keyed object
 export type Slide = {
     id: string;
     isActive: boolean;

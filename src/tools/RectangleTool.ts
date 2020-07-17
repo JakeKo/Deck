@@ -1,6 +1,6 @@
 import { PointerTool } from ".";
 import { SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
-import { listen, unlisten } from "../events/utilities";
+import { listen, unlisten, listenOnce } from "../events/utilities";
 import { RectangleMaker } from "../rendering/makers";
 import { AppStore, MUTATIONS } from "../store/types";
 import { EditorTool, TOOL_NAMES } from "./types";
@@ -16,7 +16,7 @@ export default (store: AppStore): EditorTool => {
         slide.broadcastSetGraphic(maker.getTarget());
 
         listen(SLIDE_EVENTS.MOUSEMOVE, update);
-        listen(SLIDE_EVENTS.MOUSEUP, complete);
+        listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
 
         function update(event: SlideMouseEvent): void {
             const { baseEvent } = event.detail;
@@ -28,7 +28,6 @@ export default (store: AppStore): EditorTool => {
         function complete(): void {
             maker.complete();
             unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
-            unlisten(SLIDE_EVENTS.MOUSEUP, complete);
 
             store.commit(MUTATIONS.ACTIVE_TOOL, PointerTool(store));
         }
@@ -36,7 +35,7 @@ export default (store: AppStore): EditorTool => {
 
     return {
         name: TOOL_NAMES.RECTANGLE,
-        mount: () => listen(SLIDE_EVENTS.MOUSEDOWN, make),
+        mount: () => listenOnce(SLIDE_EVENTS.MOUSEDOWN, make),
         unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, make)
     };
 };
