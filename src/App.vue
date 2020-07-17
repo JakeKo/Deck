@@ -86,5 +86,5 @@ export default class App extends DeckComponent<StyleProps, Style> {
 </script>
 
 <style lang='scss'>
-@import './styles/application';
+@import './styling/application';
 </style>

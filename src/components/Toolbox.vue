@@ -24,7 +24,7 @@ type StyleProps = {};
 type Style = {
     toolbox: any
 };
-const toolboxStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
+const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
     toolbox: {
         borderRight: `1px solid ${theme.color.base.flush}`,
         ...base.flexCol,
@@ -71,7 +71,7 @@ export default class Toolbox extends DeckComponent<StyleProps, Style> {
     }
 
     private get toolboxStyle(): any {
-        const style = this[GETTERS.STYLE]({}, toolboxStyle);
+        const style = this[GETTERS.STYLE]({}, componentStyle);
         return style.toolbox;
     }
 

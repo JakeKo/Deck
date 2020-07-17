@@ -1,8 +1,8 @@
 <template>
-    <div :style='roadmapSlotStyle' @click='() => setActiveSlideId(id)'>
-        <div :style="slideTopicStyle">Topic</div>
-        <canvas :style="slidePreviewStyle" />
-    </div>
+<div :style='roadmapSlotStyle' @click='() => setActiveSlideId(id)'>
+    <div :style="slideTopicStyle">Topic</div>
+    <canvas :style="slidePreviewStyle" />
+</div>
 </template>
 
 <script lang='ts'>

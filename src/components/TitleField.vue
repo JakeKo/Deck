@@ -1,5 +1,5 @@
 <template>
-    <input :style="titleFieldStyle" v-model='deckTitle' @keydown='handleKeydown' autocomplete='off' placeholder='Untitled'>
+<input :style="titleFieldStyle" v-model='deckTitle' @keydown='handleKeydown' autocomplete='off' placeholder='Untitled'>
 </template>
 
 <script lang='ts'>
@@ -15,7 +15,7 @@ type Style = {
     titleFieldHover: any;
     titleFieldFocus: any;
 };
-const titleFieldStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
+const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
     titleField: {
         outline: 'none',
         border: 'none',
@@ -46,7 +46,7 @@ export default class TitleField extends DeckComponent<StyleProps, Style> {
     }
 
     private get titleFieldStyle(): any {
-        const style = this[GETTERS.STYLE]({}, titleFieldStyle);
+        const style = this[GETTERS.STYLE]({}, componentStyle);
         return {
             ...style.titleField,
             ...this.isHovered && style.titleFieldHover,

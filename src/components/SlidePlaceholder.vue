@@ -1,9 +1,9 @@
 <template>
-    <div :style="containerStyle">
-        <div :style="slideStyle">
-            Click "Add Slide" to start your deck 😎😎
-        </div>
+<div :style="containerStyle">
+    <div :style="slideStyle">
+        Click "Add Slide" to start your deck 😎😎
     </div>
+</div>
 </template>
 
 <script lang="ts">

@@ -22,7 +22,7 @@ export type Style = {
     activeToolHover: any;
     activeToolIcon: any;
 };
-const toolStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
+const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
     tool: {
         ...base.flexColCC,
         ...base.fontLabel,
@@ -60,7 +60,7 @@ export default class Tool extends DeckComponent<StyleProps, Style> {
     @Prop({ type: String, required: true }) private icon!: string;
 
     private get toolStyle(): any {
-        const style = this[GETTERS.STYLE]({}, toolStyle);
+        const style = this[GETTERS.STYLE]({}, componentStyle);
         return {
             ...style.tool,
             ...this.isHovered && style.toolHover,
@@ -70,7 +70,7 @@ export default class Tool extends DeckComponent<StyleProps, Style> {
     }
 
     private get toolIconStyle(): any {
-        const style = this[GETTERS.STYLE]({}, toolStyle);
+        const style = this[GETTERS.STYLE]({}, componentStyle);
         return {
             ...style.toolIcon,
             ...this.isActive && style.activeToolIcon
