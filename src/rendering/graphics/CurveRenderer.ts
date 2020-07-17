@@ -137,17 +137,6 @@ class CurveRenderer implements GraphicRenderer {
         const [origin, ...points] = anchorPoints.slice(1, -1);
         return origin === undefined ? '' : `M ${origin.x},${origin.y} ${points.map(({ x, y }, i) => `${i % 3 === 0 ? ' C' : ''} ${x},${y}`)}`;
     }
-
-    // TODO: Consider removing
-    public move(origin: Vector): void {
-        const changeInPosition = this._anchors[0].point.towards(origin);
-        this._anchors = this._anchors.map(anchor => ({
-            inHandle: anchor.inHandle.add(changeInPosition),
-            point: anchor.point.add(changeInPosition),
-            outHandle: anchor.outHandle.add(changeInPosition)
-        }));
-        this._svg && this._svg.plot(this._getFormattedPoints());
-    }
 }
 
 export default CurveRenderer;

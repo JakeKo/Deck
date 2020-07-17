@@ -26,7 +26,13 @@ class CurveMutator {
 
     public move(origin: Vector): void {
         // Update rendering
-        this._curve.move(origin);
+        const delta = this._curve.getAnchor(0).point.towards(origin);
+        const newAnchors = this._curve.getAnchors().map(anchor => ({
+            inHandle: anchor.inHandle.add(delta),
+            point: anchor.point.add(delta),
+            outHandle: anchor.outHandle.add(delta)
+        }));
+        this._curve.setAnchors(newAnchors);
 
         // Update helper graphics
         const anchors = this._curve.getAnchors();

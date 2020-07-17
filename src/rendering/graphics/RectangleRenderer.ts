@@ -73,7 +73,6 @@ class RectangleRenderer implements GraphicRenderer {
         this._svg = undefined;
     }
 
-    // TODO: Flatten origin to x and y
     public getOrigin(): Vector {
         return this._origin;
     }
