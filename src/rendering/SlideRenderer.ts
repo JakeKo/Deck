@@ -4,6 +4,7 @@ import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
 import { GraphicRenderer } from './types';
 import { decorateSlideEvents, renderBackdrop } from './utilities';
+import { RectangleMaker, CurveMaker } from './makers';
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;
@@ -44,6 +45,14 @@ class SlideRenderer {
     public get bounds(): { origin: Vector, height: number, width: number } {
         const bounds = this._canvas.node.getBoundingClientRect() as DOMRect;
         return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
+    }
+
+    public makeRectangleInteractive(initialPosition: Vector): RectangleMaker {
+        return new RectangleMaker({ slide: this, initialPosition });
+    }
+
+    public makeCurveInteractive(initialPosition: Vector): CurveMaker {
+        return new CurveMaker({ slide: this, initialPosition });
     }
 
     public getGraphic(graphicId: string): GraphicRenderer {

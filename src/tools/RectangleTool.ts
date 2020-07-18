@@ -1,7 +1,6 @@
 import { PointerTool } from ".";
 import { SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
-import { listen, unlisten, listenOnce } from "../events/utilities";
-import { RectangleMaker } from "../rendering/makers";
+import { listen, listenOnce, unlisten } from "../events/utilities";
 import { AppStore, MUTATIONS } from "../store/types";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
@@ -9,10 +8,7 @@ import { resolvePosition } from "./utilities";
 export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
-        const maker = new RectangleMaker({
-            slide,
-            initialPosition: resolvePosition(baseEvent, slide, store)
-        });
+        const maker = slide.makeRectangleInteractive(resolvePosition(baseEvent, slide, store));
         slide.broadcastSetGraphic(maker.getTarget());
 
         listen(SLIDE_EVENTS.MOUSEMOVE, update);

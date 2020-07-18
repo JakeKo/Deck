@@ -1,6 +1,5 @@
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
-import { listen, unlisten, listenOnce } from "../events/utilities";
-import { CurveMaker } from "../rendering/makers";
+import { listen, listenOnce, unlisten } from "../events/utilities";
 import { AppStore, MUTATIONS } from "../store/types";
 import PointerTool from "./PointerTool";
 import { EditorTool, TOOL_NAMES } from "./types";
@@ -10,10 +9,7 @@ export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
         const initialPosition = resolvePosition(baseEvent, slide, store);
-        const maker = new CurveMaker({
-            slide: slide,
-            initialPosition
-        });
+        const maker = slide.makeCurveInteractive(initialPosition);
         slide.broadcastSetGraphic(maker.getTarget());
 
         let currentAnchor = maker.addAnchor({ inHandle: initialPosition, point: initialPosition, outHandle: initialPosition });
