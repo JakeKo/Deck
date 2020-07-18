@@ -2,14 +2,14 @@ import Vector from "../../utilities/Vector";
 import { CurveRenderer } from "../graphics";
 import { CurveAnchorRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
-import { CurveAnchor } from "../types";
+import { CurveAnchor, GraphicMutator, GRAPHIC_TYPES } from "../types";
 
 type CurveMutatorArgs = {
     curve: CurveRenderer;
     slide: SlideRenderer;
 };
 
-class CurveMutator {
+class CurveMutator implements GraphicMutator {
     private _curve: CurveRenderer;
     private _slide: SlideRenderer;
     private _helpers: CurveAnchorRenderer[];
@@ -18,6 +18,10 @@ class CurveMutator {
         this._curve = args.curve;
         this._slide = args.slide;
         this._helpers = this._curve.getAnchors().map(anchor => new CurveAnchorRenderer({ slide: this._slide, ...anchor }));
+    }
+
+    public getType(): GRAPHIC_TYPES {
+        return GRAPHIC_TYPES.CURVE;
     }
 
     public getTarget(): CurveRenderer {

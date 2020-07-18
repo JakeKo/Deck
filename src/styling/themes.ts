@@ -1,7 +1,6 @@
 import { THEMES, Theme } from "./types";
 
 // Color Scheme Maker: https://noeldelgado.github.io/shadowlord
-// TODO: Figure out how to encode font colors
 const lightTheme: Theme = {
     color: {
         base: {

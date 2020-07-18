@@ -8,6 +8,11 @@ export type GraphicRenderer = {
     unrender: () => void;
 };
 
+export type GraphicMutator = {
+    getType: () => GRAPHIC_TYPES;
+    getTarget: () => GraphicRenderer;
+};
+
 export type CurveAnchor = {
     inHandle: Vector;
     point: Vector;

@@ -2,6 +2,7 @@ import Vector from "../../utilities/Vector";
 import { RectangleRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
+import { GraphicMutator, GRAPHIC_TYPES } from "../types";
 
 type RectangleMutatorArgs = {
     rectangle: RectangleRenderer;
@@ -15,7 +16,7 @@ type RectangleMutatorHelpers = {
     bottomRight: VertexRenderer
 };
 
-class RectangleMutator {
+class RectangleMutator implements GraphicMutator {
     private _rectangle: RectangleRenderer;
     private _slide: SlideRenderer;
     private _helpers: RectangleMutatorHelpers;
@@ -49,6 +50,10 @@ class RectangleMutator {
         this._helpers.topRight.render();
         this._helpers.bottomLeft.render();
         this._helpers.bottomRight.render();
+    }
+
+    public getType(): GRAPHIC_TYPES {
+        return GRAPHIC_TYPES.RECTANGLE;
     }
 
     public getTarget(): RectangleRenderer {
