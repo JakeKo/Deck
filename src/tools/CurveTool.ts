@@ -6,7 +6,6 @@ import PointerTool from "./PointerTool";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
 
-// TODO: Investigate phantom line while making curves
 export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
@@ -41,7 +40,7 @@ export default (store: AppStore): EditorTool => {
             slide.broadcastSetGraphic(maker.getTarget());
         }
 
-        function setHandles(): void {
+        function setHandles(event: SlideMouseEvent): void {
             const position = resolvePosition(event.detail.baseEvent, slide, store);
             currentAnchor = maker.addAnchor({ inHandle: position, point: position, outHandle: position });
             slide.broadcastSetGraphic(maker.getTarget());
