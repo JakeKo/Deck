@@ -1,17 +1,9 @@
 import { RectangleMouseEvent, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
-import { listen, unlisten, listenOnce } from "../events/utilities";
-import { RectangleRenderer } from "../rendering/graphics";
+import { listen, listenOnce, unlisten } from "../events/utilities";
 import { RectangleMutator } from "../rendering/mutators";
 import { AppStore } from "../store/types";
-import Vector from "../utilities/Vector";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
-
-type MutationControls = {
-    begin: (event: CustomEvent) => void;
-    complete: (event: CustomEvent) => void;
-    stop: () => void;
-};
 
 export default (store: AppStore): EditorTool => {
     const rectangleMutation = initRectangleMutation(store);
@@ -19,76 +11,44 @@ export default (store: AppStore): EditorTool => {
     return {
         name: TOOL_NAMES.POINTER,
         mount: () => {
-            listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, rectangleMutation.begin);
+            listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, rectangleMutation);
+            listen(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
         },
         unmount: () => {
-            rectangleMutation.stop();
-            unlisten(RECTANGLE_EVENTS.MOUSEDOWN, rectangleMutation.begin);
+            unlisten(RECTANGLE_EVENTS.MOUSEDOWN, rectangleMutation);
+            unlisten(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
         }
     };
 };
 
-function initRectangleMutation(store: AppStore): MutationControls {
-    let mutator: RectangleMutator | undefined;
-    let originOffset: Vector | undefined;
-    let rectangle: RectangleRenderer | undefined;
+function reevaluateFocusedGraphics(event: SlideMouseEvent): void {
+    const { slide, target } = event.detail;
 
-    function begin(event: RectangleMouseEvent): void {
-        const { slide, target } = event.detail;
-        rectangle = target;
-        mutator = new RectangleMutator({ slide, rectangle });
-        beginMove(event);
-
-        listen(SLIDE_EVENTS.MOUSEDOWN, complete);
+    if (target === undefined) {
+        slide.unfocusAllGraphics();
+    } else {
+        slide.focusGraphic(target.getId());
     }
+}
 
-    function beginMove(event: RectangleMouseEvent): void {
-        const { slide, baseEvent } = event.detail;
-        const position = resolvePosition(baseEvent, slide, store);
-        originOffset = position.towards(rectangle!.getOrigin());
-        slide.broadcastSetGraphic(mutator!.getTarget());
+function initRectangleMutation(store: AppStore): (event: RectangleMouseEvent) => void {
+    return function begin(event) {
+        const { slide, baseEvent, target } = event.detail;
+        const originOffset = resolvePosition(baseEvent, slide, store).towards(target.getOrigin());
+        const mutator = slide.focusGraphic(target.getId()) as RectangleMutator;
 
         listen(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(SLIDE_EVENTS.MOUSEUP, completeMove);
-    }
+        listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
 
-    function move(event: SlideMouseEvent): void {
-        const { slide, baseEvent } = event.detail;
-        const position = resolvePosition(baseEvent, slide, store);
-        mutator!.move(position.add(originOffset!));
-        slide.broadcastSetGraphic(mutator!.getTarget());
-    }
-
-    function completeMove(): void {
-        listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-    }
-
-    function complete(event: SlideMouseEvent): void {
-        // Ignore event if the user clicked on the current graphic
-        if (event.detail.target && rectangle && event.detail.target.getId() === rectangle.getId()) {
-            return;
+        function move(event: SlideMouseEvent): void {
+            const { slide, baseEvent } = event.detail;
+            mutator.move(resolvePosition(baseEvent, slide, store).add(originOffset));
+            slide.broadcastSetGraphic(mutator.getTarget());
         }
 
-        // TODO: Implement method for switching to other graphic if clicked on
-
-        mutator && mutator.complete();
-        mutator = undefined;
-        listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, begin);
-        unlisten(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        unlisten(SLIDE_EVENTS.MOUSEUP, completeMove);
-        unlisten(SLIDE_EVENTS.MOUSEDOWN, complete);
-    }
-
-    function stop(): void {
-        mutator && mutator.complete();
-        unlisten(RECTANGLE_EVENTS.MOUSEDOWN, begin);
-        unlisten(RECTANGLE_EVENTS.MOUSEDOWN, beginMove);
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        unlisten(SLIDE_EVENTS.MOUSEUP, completeMove);
-        unlisten(SLIDE_EVENTS.MOUSEDOWN, complete);
-    }
-
-    return { begin, complete, stop };
+        function complete(): void {
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
+            listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, begin);
+        }
+    };
 }

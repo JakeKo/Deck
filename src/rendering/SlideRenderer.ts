@@ -80,6 +80,10 @@ class SlideRenderer {
     }
 
     public focusGraphic(graphicId: string): GraphicMutator {
+        if (this._focusedGraphics[graphicId] !== undefined) {
+            return this._focusedGraphics[graphicId];
+        }
+
         const graphic = this.getGraphic(graphicId);
         let mutator;
 
@@ -101,7 +105,7 @@ class SlideRenderer {
     }
 
     public unfocusAllGraphics(): void {
-        Object.keys(this._focusedGraphics).forEach(this.unfocusGraphic);
+        Object.keys(this._focusedGraphics).forEach(graphicId => this.unfocusGraphic(graphicId));
     }
 }
 
