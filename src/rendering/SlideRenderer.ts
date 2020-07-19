@@ -2,9 +2,11 @@ import * as SVG from 'svg.js';
 import { Viewbox } from '../store/types';
 import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
-import { GraphicRenderer } from './types';
+import { GraphicRenderer, GraphicMutator, GRAPHIC_TYPES } from './types';
 import { decorateSlideEvents, renderBackdrop } from './utilities';
 import { RectangleMaker, CurveMaker } from './makers';
+import { RectangleMutator, CurveMutator } from './mutators';
+import { RectangleRenderer, CurveRenderer } from './graphics';
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;
@@ -18,12 +20,14 @@ class SlideRenderer {
     private _canvas: SVG.Doc;
     private _graphics: { [index: string]: GraphicRenderer };
     private _rawViewbox: Viewbox;
+    private _focusedGraphics: { [index: string]: GraphicMutator };
 
     constructor(args: SlideRendererArgs) {
         this._stateManager = args.stateManager;
         this._canvas = args.canvas;
         this._graphics = {};
         this._rawViewbox = args.rawViewbox;
+        this._focusedGraphics = {};
 
         renderBackdrop(this, args.croppedViewbox.width, args.croppedViewbox.height);
         decorateSlideEvents(this);
@@ -73,6 +77,31 @@ class SlideRenderer {
 
     public broadcastRemoveGraphic(graphicId: string): void {
         this._stateManager.removeGraphicFromRenderer(graphicId);
+    }
+
+    public focusGraphic(graphicId: string): GraphicMutator {
+        const graphic = this.getGraphic(graphicId);
+        let mutator;
+
+        if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
+            mutator = new RectangleMutator({ slide: this, rectangle: graphic as RectangleRenderer });
+        } else if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
+            mutator = new CurveMutator({ slide: this, curve: graphic as CurveRenderer });
+        } else {
+            throw new Error(`Did not recognize graphic type: ${graphic.getType()}`);
+        }
+
+        this._focusedGraphics[graphicId] = mutator;
+        return mutator;
+    }
+
+    public unfocusGraphic(graphicId: string): void {
+        this._focusedGraphics[graphicId].complete();
+        delete this._focusedGraphics[graphicId];
+    }
+
+    public unfocusAllGraphics(): void {
+        Object.keys(this._focusedGraphics).forEach(this.unfocusGraphic);
     }
 }
 
