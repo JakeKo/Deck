@@ -113,6 +113,10 @@ class SlideRenderer {
     public isFocused(graphicId: string): boolean {
         return this._focusedGraphics[graphicId] !== undefined;
     }
+
+    public setCursor(cursor: string): void {
+        this._canvas.node.style.cursor = cursor;
+    }
 }
 
 export default SlideRenderer;

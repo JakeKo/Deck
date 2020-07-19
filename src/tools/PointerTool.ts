@@ -13,10 +13,12 @@ export default (store: AppStore): EditorTool => {
         mount: () => {
             listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, rectangleMutation);
             listen(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
+            listen(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
         },
         unmount: () => {
             unlisten(RECTANGLE_EVENTS.MOUSEDOWN, rectangleMutation);
             unlisten(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
         }
     };
 };
@@ -27,6 +29,11 @@ function reevaluateFocusedGraphics(event: SlideMouseEvent): void {
     if (target === undefined) {
         slide.unfocusAllGraphics();
     }
+}
+
+function reevaluateCursor(event: SlideMouseEvent): void {
+    const { slide, target } = event.detail;
+    slide.setCursor(target === undefined ? 'default' : 'move');
 }
 
 function initRectangleMutation(store: AppStore): (event: RectangleMouseEvent) => void {
