@@ -80,7 +80,7 @@ class SlideRenderer {
     }
 
     public focusGraphic(graphicId: string): GraphicMutator {
-        if (this._focusedGraphics[graphicId] !== undefined) {
+        if (this.isFocused(graphicId)) {
             return this._focusedGraphics[graphicId];
         }
 
@@ -104,8 +104,14 @@ class SlideRenderer {
         delete this._focusedGraphics[graphicId];
     }
 
-    public unfocusAllGraphics(): void {
-        Object.keys(this._focusedGraphics).forEach(graphicId => this.unfocusGraphic(graphicId));
+    public unfocusAllGraphics(exclude: string[] = []): void {
+        Object.keys(this._focusedGraphics)
+            .filter(graphicId => exclude.indexOf(graphicId) === -1)
+            .forEach(graphicId => this.unfocusGraphic(graphicId));
+    }
+
+    public isFocused(graphicId: string): boolean {
+        return this._focusedGraphics[graphicId] !== undefined;
     }
 }
 

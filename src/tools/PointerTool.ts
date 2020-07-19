@@ -26,14 +26,16 @@ function reevaluateFocusedGraphics(event: SlideMouseEvent): void {
 
     if (target === undefined) {
         slide.unfocusAllGraphics();
-    } else {
-        slide.focusGraphic(target.getId());
     }
 }
 
 function initRectangleMutation(store: AppStore): (event: RectangleMouseEvent) => void {
     return function begin(event) {
         const { slide, baseEvent, target } = event.detail;
+        if (!baseEvent.ctrlKey && !slide.isFocused(target.getId())) {
+            slide.unfocusAllGraphics([target.getId()]);
+        }
+
         const originOffset = resolvePosition(baseEvent, slide, store).towards(target.getOrigin());
         const mutator = slide.focusGraphic(target.getId()) as RectangleMutator;
 
