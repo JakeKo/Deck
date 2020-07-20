@@ -2,6 +2,7 @@ import { CurveRenderer, RectangleRenderer } from "../rendering/graphics";
 import EllipseRenderer from "../rendering/graphics/EllipseRenderer";
 import SlideRenderer from "../rendering/SlideRenderer";
 import { GraphicRenderer } from "../rendering/types";
+import ImageRenderer from "../rendering/graphics/ImageRenderer";
 
 export type DECK_EVENTS = SLIDE_EVENTS | RECTANGLE_EVENTS | CURVE_EVENTS | VERTEX_EVENTS;
 
@@ -47,6 +48,23 @@ export type EllipseMouseEventPayload = {
     slide: SlideRenderer;
     type: ELLIPSE_EVENTS;
     target: EllipseRenderer;
+};
+
+// IMAGE EVENTS
+export enum IMAGE_EVENTS {
+    MOUSEUP = 'deck-image-mouseup',
+    MOUSEDOWN = 'deck-image-mousedown',
+    MOUSEOVER = 'deck-image-mouseover',
+    MOUSEOUT = 'deck-image-mouseout',
+    MOUSEMOVE = 'deck-image-mousemove'
+}
+
+export type ImageMouseEvent = CustomEvent<ImageMouseEventPayload>;
+export type ImageMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slide: SlideRenderer;
+    type: IMAGE_EVENTS;
+    target: ImageRenderer;
 };
 
 // RECTANGLE EVENTS
