@@ -1,7 +1,9 @@
 import CurveRenderer from './CurveRenderer';
+import EllipseRenderer from './EllipseRenderer';
 import RectangleRenderer from './RectangleRenderer';
 
 export {
-    RectangleRenderer,
-    CurveRenderer
+    CurveRenderer,
+    EllipseRenderer,
+    RectangleRenderer
 };

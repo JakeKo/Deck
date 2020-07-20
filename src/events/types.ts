@@ -1,4 +1,5 @@
 import { CurveRenderer, RectangleRenderer } from "../rendering/graphics";
+import EllipseRenderer from "../rendering/graphics/EllipseRenderer";
 import SlideRenderer from "../rendering/SlideRenderer";
 import { GraphicRenderer } from "../rendering/types";
 
@@ -29,6 +30,23 @@ export type SlideKeyboardEventPayload = {
     slide: SlideRenderer;
     type: SLIDE_EVENTS;
     target: GraphicRenderer | undefined;
+};
+
+// ELLIPSE EVENTS
+export enum ELLIPSE_EVENTS {
+    MOUSEUP = 'deck-ellipse-mouseup',
+    MOUSEDOWN = 'deck-ellipse-mousedown',
+    MOUSEOVER = 'deck-ellipse-mouseover',
+    MOUSEOUT = 'deck-ellipse-mouseout',
+    MOUSEMOVE = 'deck-ellipse-mousemove'
+}
+
+export type EllipseMouseEvent = CustomEvent<EllipseMouseEventPayload>;
+export type EllipseMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slide: SlideRenderer;
+    type: ELLIPSE_EVENTS;
+    target: EllipseRenderer;
 };
 
 // RECTANGLE EVENTS
