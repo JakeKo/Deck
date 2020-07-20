@@ -1,0 +1,114 @@
+import { provideId } from "../../utilities/IdProvider";
+import Vector from "../../utilities/Vector";
+import { ImageRenderer } from "../graphics";
+import { VertexRenderer } from "../helpers";
+import SlideRenderer from "../SlideRenderer";
+
+type ImageMakerArgs = {
+    slide: SlideRenderer;
+    initialPosition: Vector;
+    image: string;
+    width: number;
+    height: number;
+};
+
+type ImageMakerHelpers = {
+    topLeft: VertexRenderer,
+    topRight: VertexRenderer,
+    bottomLeft: VertexRenderer,
+    bottomRight: VertexRenderer
+};
+
+class ImageMaker {
+    private _graphic: ImageRenderer;
+    private _slide: SlideRenderer;
+    private _initialPosition: Vector;
+    private _helpers: ImageMakerHelpers;
+
+    constructor(args: ImageMakerArgs) {
+        this._slide = args.slide;
+        this._initialPosition = args.initialPosition;
+
+        // Initialize primary graphic
+        this._graphic = new ImageRenderer({
+            id: provideId(),
+            slideRenderer: this._slide,
+            origin: this._initialPosition,
+            image: args.image,
+            width: args.width,
+            height: args.height
+        });
+
+        // Initialize helper graphics
+        this._helpers = {
+            topLeft: new VertexRenderer({
+                slide: this._slide,
+                center: this._graphic.getOrigin()
+            }),
+            topRight: new VertexRenderer({
+                slide: this._slide,
+                center: this._graphic.getOrigin().add(new Vector(this._graphic.getWidth(), 0))
+            }),
+            bottomLeft: new VertexRenderer({
+                slide: this._slide,
+                center: this._graphic.getOrigin().add(new Vector(0, this._graphic.getHeight()))
+            }),
+            bottomRight: new VertexRenderer({
+                slide: this._slide,
+                center: this._graphic.getOrigin().add(new Vector(this._graphic.getWidth(), this._graphic.getHeight()))
+            })
+        };
+
+        // Render primary graphic
+        this._graphic.render();
+
+        // Render helper graphics
+        this._helpers.topLeft.render();
+        this._helpers.topRight.render();
+        this._helpers.bottomLeft.render();
+        this._helpers.bottomRight.render();
+    }
+
+    public getTarget(): ImageRenderer {
+        return this._graphic;
+    }
+
+    public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
+        const rawOffset = this._initialPosition.towards(position);
+        const absOffset = rawOffset.transform(Math.abs);
+        const minOffset = Math.min(absOffset.x, absOffset.y);
+        const postShiftOffset = shift ? new Vector(Math.sign(rawOffset.x) * minOffset, Math.sign(rawOffset.y) * minOffset) : rawOffset;
+
+        if (ctrl) {
+            const dimensions = postShiftOffset.transform(Math.abs).scale(2);
+            const originOffset = postShiftOffset.transform(Math.abs).scale(-1);
+            this._graphic.setOrigin(this._initialPosition.add(originOffset));
+            this._graphic.setWidth(dimensions.x);
+            this._graphic.setHeight(dimensions.y);
+        } else {
+            const dimensions = postShiftOffset.transform(Math.abs);
+            const originOffset = postShiftOffset.scale(0.5).add(dimensions.scale(-0.5));
+            this._graphic.setOrigin(this._initialPosition.add(originOffset));
+            this._graphic.setWidth(dimensions.x);
+            this._graphic.setHeight(dimensions.y);
+        }
+
+        // Update helper graphics
+        this._helpers.topLeft.setCenter(this._graphic.getOrigin());
+        this._helpers.topRight.setCenter(this._graphic.getOrigin().add(new Vector(this._graphic.getWidth(), 0)));
+        this._helpers.bottomLeft.setCenter(this._graphic.getOrigin().add(new Vector(0, this._graphic.getHeight())));
+        this._helpers.bottomRight.setCenter(this._graphic.getOrigin().add(new Vector(this._graphic.getWidth(), this._graphic.getHeight())));
+    }
+
+    public complete(): void {
+        this._slide.setGraphic(this._graphic);
+
+        // Remove helper graphics
+        this._helpers.topLeft.unrender();
+        this._helpers.topRight.unrender();
+        this._helpers.bottomLeft.unrender();
+        this._helpers.bottomRight.unrender();
+    }
+}
+
+export default ImageMaker;

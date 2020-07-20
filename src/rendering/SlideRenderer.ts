@@ -8,6 +8,7 @@ import { CurveMaker, RectangleMaker } from './makers';
 import { CurveMutator, RectangleMutator } from './mutators';
 import { GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
 import { renderBackdrop } from './utilities';
+import ImageMaker from './makers/ImageMaker';
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;
@@ -52,12 +53,16 @@ class SlideRenderer {
         return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
     }
 
-    public makeRectangleInteractive(initialPosition: Vector): RectangleMaker {
-        return new RectangleMaker({ slide: this, initialPosition });
-    }
-
     public makeCurveInteractive(initialPosition: Vector): CurveMaker {
         return new CurveMaker({ slide: this, initialPosition });
+    }
+
+    public makeImageInteractive(initialPosition: Vector, source: string, width: number, height: number) {
+        return new ImageMaker({ slide: this, initialPosition, image: source, width, height });
+    }
+
+    public makeRectangleInteractive(initialPosition: Vector): RectangleMaker {
+        return new RectangleMaker({ slide: this, initialPosition });
     }
 
     public getGraphic(graphicId: string): GraphicRenderer {

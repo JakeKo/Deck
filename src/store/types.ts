@@ -74,7 +74,19 @@ export enum MUTATIONS {
 
 export enum ACTIONS { }
 
-export type GraphicStoreModel = RectangleStoreModel;
+export type GraphicStoreModel = ImageStoreModel | RectangleStoreModel;
+
+export type ImageStoreModel = {
+    id: string;
+    type: GRAPHIC_TYPES.IMAGE;
+    source: string;
+    origin: Vector;
+    width: number;
+    height: number;
+    strokeColor: string;
+    strokeWidth: number;
+    rotation: number;
+};
 
 export type RectangleStoreModel = {
     id: string;

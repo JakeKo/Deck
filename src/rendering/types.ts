@@ -21,6 +21,7 @@ export type CurveAnchor = {
 };
 
 export enum GRAPHIC_TYPES {
+    IMAGE = 'image',
     RECTANGLE = 'rectangle',
     ELLIPSE = 'ellipse',
     CURVE = 'curve',

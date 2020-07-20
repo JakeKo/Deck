@@ -32,7 +32,7 @@ class ImageRenderer implements GraphicRenderer {
     constructor(args: ImageRendererArgs) {
         this._id = args.id;
         this._slide = args.slideRenderer;
-        this._type = GRAPHIC_TYPES.RECTANGLE;
+        this._type = GRAPHIC_TYPES.IMAGE;
         this._image = args.image;
         this._origin = args.origin || Vector.zero;
         this._width = args.width || 0;
@@ -70,6 +70,10 @@ class ImageRenderer implements GraphicRenderer {
     public unrender(): void {
         this._svg && this._svg.remove();
         this._svg = undefined;
+    }
+
+    public getImage(): string {
+        return this._image;
     }
 
     public getOrigin(): Vector {

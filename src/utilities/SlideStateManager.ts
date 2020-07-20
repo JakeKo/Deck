@@ -1,7 +1,7 @@
-import { RectangleRenderer } from "../rendering/graphics";
+import { ImageRenderer, RectangleRenderer } from "../rendering/graphics";
 import SlideRenderer from "../rendering/SlideRenderer";
 import { GraphicRenderer, GRAPHIC_TYPES } from "../rendering/types";
-import { AppStore, GraphicStoreModel, MUTATIONS, RectangleStoreModel } from "../store/types";
+import { AppStore, GraphicStoreModel, ImageStoreModel, MUTATIONS, RectangleStoreModel } from "../store/types";
 
 export default class SlideStateManager {
     private _slideId: string;
@@ -10,6 +10,34 @@ export default class SlideStateManager {
 
     constructor(slideId: string) {
         this._slideId = slideId;
+    }
+
+    private _imageStoreModelToRenderer(image: ImageStoreModel): ImageRenderer {
+        return new ImageRenderer({
+            id: image.id,
+            slideRenderer: this._renderer!,
+            origin: image.origin,
+            image: image.source,
+            width: image.width,
+            height: image.height,
+            strokeColor: image.strokeColor,
+            strokeWidth: image.strokeWidth,
+            rotation: image.rotation
+        });
+    }
+
+    private _imageRendererToStoreModel(image: ImageRenderer): ImageStoreModel {
+        return {
+            id: image.getId(),
+            type: GRAPHIC_TYPES.IMAGE,
+            source: image.getImage(),
+            origin: image.getOrigin(),
+            height: image.getHeight(),
+            width: image.getWidth(),
+            strokeColor: image.getStrokeColor(),
+            strokeWidth: image.getStrokeWidth(),
+            rotation: image.getRotation()
+        };
     }
 
     private _rectangleStoreModelToRenderer(rectangle: RectangleStoreModel): RectangleRenderer {
@@ -55,6 +83,12 @@ export default class SlideStateManager {
                 slide: this._slideId,
                 graphic: storeModel
             });
+        } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
+            const storeModel = this._imageRendererToStoreModel(graphic as ImageRenderer);
+            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, {
+                slide: this._slideId,
+                graphic: storeModel
+            });
         }
     }
 
@@ -68,6 +102,9 @@ export default class SlideStateManager {
     public setGraphicFromStore(graphic: GraphicStoreModel): void {
         if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
             const renderer = this._rectangleStoreModelToRenderer(graphic);
+            this._renderer && this._renderer.setGraphic(renderer);
+        } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
+            const renderer = this._imageStoreModelToRenderer(graphic);
             this._renderer && this._renderer.setGraphic(renderer);
         }
     }
