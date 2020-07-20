@@ -5,6 +5,7 @@ import { decorateRectangleEvents } from './rectangle';
 import { decorateSlideEvents } from './slide';
 import { decorateTextboxEvents } from './textbox';
 import { decorateVertexEvents } from './vertex';
+import { decorateVideoEvents } from './video';
 
 export {
     decorateCurveEvents,
@@ -13,5 +14,6 @@ export {
     decorateRectangleEvents,
     decorateSlideEvents,
     decorateTextboxEvents,
-    decorateVertexEvents
+    decorateVertexEvents,
+    decorateVideoEvents
 };

@@ -1,8 +1,8 @@
-import { CurveRenderer, RectangleRenderer, TextboxRenderer } from "../rendering/graphics";
+import { CurveRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from "../rendering/graphics";
 import EllipseRenderer from "../rendering/graphics/EllipseRenderer";
+import ImageRenderer from "../rendering/graphics/ImageRenderer";
 import SlideRenderer from "../rendering/SlideRenderer";
 import { GraphicRenderer } from "../rendering/types";
-import ImageRenderer from "../rendering/graphics/ImageRenderer";
 
 export type DECK_EVENTS = SLIDE_EVENTS | RECTANGLE_EVENTS | CURVE_EVENTS | VERTEX_EVENTS;
 
@@ -31,6 +31,23 @@ export type SlideKeyboardEventPayload = {
     slide: SlideRenderer;
     type: SLIDE_EVENTS;
     target: GraphicRenderer | undefined;
+};
+
+// CURVE EVENTS
+export enum CURVE_EVENTS {
+    MOUSEUP = 'deck-curve-mouseup',
+    MOUSEDOWN = 'deck-curve-mousedown',
+    MOUSEOVER = 'deck-curve-mouseover',
+    MOUSEOUT = 'deck-curve-mouseout',
+    MOUSEMOVE = 'deck-curve-mousemove'
+}
+
+export type CurveMouseEvent = CustomEvent<CurveMouseEventPayload>;
+export type CurveMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slide: SlideRenderer;
+    type: CURVE_EVENTS;
+    target: CurveRenderer;
 };
 
 // ELLIPSE EVENTS
@@ -101,21 +118,21 @@ export type TextboxMouseEventPayload = {
     target: TextboxRenderer;
 };
 
-// CURVE EVENTS
-export enum CURVE_EVENTS {
-    MOUSEUP = 'deck-curve-mouseup',
-    MOUSEDOWN = 'deck-curve-mousedown',
-    MOUSEOVER = 'deck-curve-mouseover',
-    MOUSEOUT = 'deck-curve-mouseout',
-    MOUSEMOVE = 'deck-curve-mousemove'
+// VIDEO EVENTS
+export enum VIDEO_EVENTS {
+    MOUSEUP = 'deck-video-mouseup',
+    MOUSEDOWN = 'deck-video-mousedown',
+    MOUSEOVER = 'deck-video-mouseover',
+    MOUSEOUT = 'deck-video-mouseout',
+    MOUSEMOVE = 'deck-video-mousemove'
 }
 
-export type CurveMouseEvent = CustomEvent<CurveMouseEventPayload>;
-export type CurveMouseEventPayload = {
+export type VideoMouseEvent = CustomEvent<VideoMouseEventPayload>;
+export type VideoMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
-    type: CURVE_EVENTS;
-    target: CurveRenderer;
+    type: VIDEO_EVENTS;
+    target: VideoRenderer;
 };
 
 // VERTEX EVENTS
