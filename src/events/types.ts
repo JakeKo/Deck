@@ -1,4 +1,4 @@
-import { CurveRenderer, RectangleRenderer } from "../rendering/graphics";
+import { CurveRenderer, RectangleRenderer, TextboxRenderer } from "../rendering/graphics";
 import EllipseRenderer from "../rendering/graphics/EllipseRenderer";
 import SlideRenderer from "../rendering/SlideRenderer";
 import { GraphicRenderer } from "../rendering/types";
@@ -82,6 +82,23 @@ export type RectangleMouseEventPayload = {
     slide: SlideRenderer;
     type: RECTANGLE_EVENTS;
     target: RectangleRenderer;
+};
+
+// TEXTBOX EVENTS
+export enum TEXTBOX_EVENTS {
+    MOUSEUP = 'deck-textbox-mouseup',
+    MOUSEDOWN = 'deck-textbox-mousedown',
+    MOUSEOVER = 'deck-textbox-mouseover',
+    MOUSEOUT = 'deck-textbox-mouseout',
+    MOUSEMOVE = 'deck-textbox-mousemove'
+}
+
+export type TextboxMouseEvent = CustomEvent<TextboxMouseEventPayload>;
+export type TextboxMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slide: SlideRenderer;
+    type: TEXTBOX_EVENTS;
+    target: TextboxRenderer;
 };
 
 // CURVE EVENTS
