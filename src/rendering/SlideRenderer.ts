@@ -1,12 +1,13 @@
 import * as SVG from 'svg.js';
+import { decorateSlideEvents } from '../events/decorators';
 import { Viewbox } from '../store/types';
 import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
-import { GraphicRenderer, GraphicMutator, GRAPHIC_TYPES } from './types';
-import { decorateSlideEvents, renderBackdrop } from './utilities';
-import { RectangleMaker, CurveMaker } from './makers';
-import { RectangleMutator, CurveMutator } from './mutators';
-import { RectangleRenderer, CurveRenderer } from './graphics';
+import { CurveRenderer, RectangleRenderer } from './graphics';
+import { CurveMaker, RectangleMaker } from './makers';
+import { CurveMutator, RectangleMutator } from './mutators';
+import { GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
+import { renderBackdrop } from './utilities';
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;

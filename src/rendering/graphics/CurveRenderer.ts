@@ -1,8 +1,8 @@
 import * as SVG from 'svg.js';
+import { decorateCurveEvents } from '../../events/decorators';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from "../types";
-import { decorateCurveEvents } from '../utilities';
 
 type CurveRendererArgs = {
     id: string;

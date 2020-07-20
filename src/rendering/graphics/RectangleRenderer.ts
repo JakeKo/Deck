@@ -1,8 +1,8 @@
 import * as SVG from 'svg.js';
+import { decorateRectangleEvents } from '../../events/decorators';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
-import { decorateRectangleEvents } from '../utilities';
 
 type RectangleRendererArgs = {
     id: string;
