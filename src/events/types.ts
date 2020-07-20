@@ -1,10 +1,10 @@
-import { CurveRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from "../rendering/graphics";
-import EllipseRenderer from "../rendering/graphics/EllipseRenderer";
-import ImageRenderer from "../rendering/graphics/ImageRenderer";
+import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from "../rendering/graphics";
 import SlideRenderer from "../rendering/SlideRenderer";
 import { GraphicRenderer } from "../rendering/types";
 
-export type DECK_EVENTS = SLIDE_EVENTS | RECTANGLE_EVENTS | CURVE_EVENTS | VERTEX_EVENTS;
+export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
+type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
+type HELPER_EVENTS = VERTEX_EVENTS;
 
 // SLIDE EVENTS
 export enum SLIDE_EVENTS {

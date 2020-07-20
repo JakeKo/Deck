@@ -11,7 +11,6 @@ type ImageRendererArgs = {
     origin?: Vector;
     width?: number;
     height?: number;
-    fillColor?: string;
     strokeColor?: string;
     strokeWidth?: number;
     rotation?: number;
@@ -26,7 +25,6 @@ class ImageRenderer implements GraphicRenderer {
     private _origin: Vector;
     private _width: number;
     private _height: number;
-    private _fillColor: string;
     private _strokeColor: string;
     private _strokeWidth: number;
     private _rotation: number;
@@ -39,7 +37,6 @@ class ImageRenderer implements GraphicRenderer {
         this._origin = args.origin || Vector.zero;
         this._width = args.width || 0;
         this._height = args.height || 0;
-        this._fillColor = args.fillColor || '#CCCCCC';
         this._strokeColor = args.strokeColor || 'none';
         this._strokeWidth = args.strokeWidth || 0;
         this._rotation = args.rotation || 0;
@@ -65,7 +62,6 @@ class ImageRenderer implements GraphicRenderer {
 
         this._svg = this._slide.canvas.image(this._image, this._width, this._height)
             .translate(this._origin.x, this._origin.y)
-            .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
         decorateImageEvents(this._svg, this._slide, this);
@@ -101,15 +97,6 @@ class ImageRenderer implements GraphicRenderer {
     public setHeight(height: number): void {
         this._height = height;
         this._svg && this._svg.height(this._height);
-    }
-
-    public getFillColor(): string {
-        return this._fillColor;
-    }
-
-    public setFillColor(fillColor: string): void {
-        this._fillColor = fillColor;
-        this._svg && this._svg.fill(this._fillColor);
     }
 
     public getStrokeColor(): string {

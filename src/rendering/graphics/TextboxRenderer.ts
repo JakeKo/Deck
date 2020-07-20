@@ -14,9 +14,6 @@ type TextboxRendererArgs = {
     text?: string;
     weight?: string;
     font?: string;
-    fillColor?: string;
-    strokeColor?: string;
-    strokeWidth?: number;
     rotation?: number;
 };
 
@@ -32,9 +29,6 @@ class TextboxRenderer implements GraphicRenderer {
     private _size: number;
     private _weight: string;
     private _font: string;
-    private _fillColor: string;
-    private _strokeColor: string;
-    private _strokeWidth: number;
     private _rotation: number;
 
     constructor(args: TextboxRendererArgs) {
@@ -48,9 +42,6 @@ class TextboxRenderer implements GraphicRenderer {
         this._size = args.size || 16;
         this._weight = args.weight || '400';
         this._font = args.font || 'Arial';
-        this._fillColor = args.fillColor || '#CCCCCC';
-        this._strokeColor = args.strokeColor || 'none';
-        this._strokeWidth = args.strokeWidth || 0;
         this._rotation = args.rotation || 0;
     }
 
@@ -77,8 +68,6 @@ class TextboxRenderer implements GraphicRenderer {
             .width(this._width)
             .font({ weight: this._weight, family: this._font, size: this._size })
             .translate(this._origin.x, this._origin.y)
-            .fill(this._fillColor)
-            .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
         decorateTextboxEvents(this._svg, this._slide, this);
     }
@@ -149,33 +138,6 @@ class TextboxRenderer implements GraphicRenderer {
     public setFont(font: string): void {
         this._font = font;
         this._svg && this._svg.font({ weight: this._weight, family: this._font, size: this._size });
-    }
-
-    public getFillColor(): string {
-        return this._fillColor;
-    }
-
-    public setFillColor(fillColor: string): void {
-        this._fillColor = fillColor;
-        this._svg && this._svg.fill(this._fillColor);
-    }
-
-    public getStrokeColor(): string {
-        return this._strokeColor;
-    }
-
-    public setStrokeColor(strokeColor: string): void {
-        this._strokeColor = strokeColor;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
-    }
-
-    public getStrokeWidth(): number {
-        return this._strokeWidth;
-    }
-
-    public setStrokeWidth(strokeWidth: number): void {
-        this._strokeWidth = strokeWidth;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
     public getRotation(): number {

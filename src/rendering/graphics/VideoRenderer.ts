@@ -7,7 +7,7 @@ import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 type VideoRendererArgs = {
     id: string;
     slideRenderer: SlideRenderer;
-    source: string;
+    source: HTMLVideoElement;
     origin?: Vector;
     width?: number;
     height?: number;
@@ -16,13 +16,12 @@ type VideoRendererArgs = {
     rotation?: number;
 };
 
-// TODO: Incorporate foreign object into rendering
 class VideoRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
-    private _svg: SVG.Image | undefined;
+    private _svg: SVG.Element | undefined;
     private _type: GRAPHIC_TYPES;
-    private _source: string;
+    private _source: HTMLVideoElement;
     private _origin: Vector;
     private _width: number;
     private _height: number;
@@ -61,10 +60,17 @@ class VideoRenderer implements GraphicRenderer {
             return;
         }
 
-        this._svg = this._slide.canvas.image(this._source, this._width, this._height)
+        const foreignObject = SVG.create('foreignObject') as HTMLElement;
+        foreignObject.append(this._source);
+
+        this._svg = (foreignObject as any as SVG.Element)
             .translate(this._origin.x, this._origin.y)
+            .width(this._width)
+            .height(this._height)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
+
+        this._slide.canvas.add(this._svg);
         decorateVideoEvents(this._svg, this._slide, this);
     }
 
