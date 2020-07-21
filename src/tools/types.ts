@@ -5,12 +5,12 @@ export type EditorTool = {
 };
 
 export enum TOOL_NAMES {
+    CURVE = 'curve',
+    ELLIPSE = 'ellipse',
+    IMAGE = 'image',
     NULL = 'null',
     POINTER = 'pointer',
     RECTANGLE = 'rectangle',
-    ELLIPSE = 'ellipse',
-    CURVE = 'curve',
-    IMAGE = 'image',
     TEXTBOX = 'textbox',
     VIDEO = 'video'
 }
