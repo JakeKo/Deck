@@ -20,7 +20,7 @@ type ImageMakerHelpers = {
 };
 
 class ImageMaker {
-    private _graphic: ImageRenderer;
+    private _image: ImageRenderer;
     private _slide: SlideRenderer;
     private _initialPosition: Vector;
     private _width: number;
@@ -34,7 +34,7 @@ class ImageMaker {
         this._height = args.height;
 
         // Initialize primary graphic
-        this._graphic = new ImageRenderer({
+        this._image = new ImageRenderer({
             id: provideId(),
             slide: this._slide,
             origin: this._initialPosition,
@@ -47,24 +47,24 @@ class ImageMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._graphic.getOrigin()
+                center: this._image.getOrigin()
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._graphic.getOrigin().add(new Vector(this._graphic.getWidth(), 0))
+                center: this._image.getOrigin().add(new Vector(this._image.getWidth(), 0))
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._graphic.getOrigin().add(new Vector(0, this._graphic.getHeight()))
+                center: this._image.getOrigin().add(new Vector(0, this._image.getHeight()))
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._graphic.getOrigin().add(new Vector(this._graphic.getWidth(), this._graphic.getHeight()))
+                center: this._image.getOrigin().add(new Vector(this._image.getWidth(), this._image.getHeight()))
             })
         };
 
         // Render primary graphic
-        this._graphic.render();
+        this._image.render();
 
         // Render helper graphics
         this._helpers.topLeft.render();
@@ -74,7 +74,7 @@ class ImageMaker {
     }
 
     public getTarget(): ImageRenderer {
-        return this._graphic;
+        return this._image;
     }
 
     // Some trig, for your enjoyment
@@ -89,26 +89,26 @@ class ImageMaker {
         if (ctrl) {
             const dimensions = dimensionOffset.abs.scale(2);
             const originOffset = dimensionOffset.abs.scale(-1);
-            this._graphic.setOrigin(this._initialPosition.add(originOffset));
-            this._graphic.setWidth(dimensions.x);
-            this._graphic.setHeight(dimensions.y);
+            this._image.setOrigin(this._initialPosition.add(originOffset));
+            this._image.setWidth(dimensions.x);
+            this._image.setHeight(dimensions.y);
         } else {
             const dimensions = dimensionOffset.abs;
             const originOffset = dimensionOffset.scale(0.5).add(dimensions.scale(-0.5));
-            this._graphic.setOrigin(this._initialPosition.add(originOffset));
-            this._graphic.setWidth(dimensions.x);
-            this._graphic.setHeight(dimensions.y);
+            this._image.setOrigin(this._initialPosition.add(originOffset));
+            this._image.setWidth(dimensions.x);
+            this._image.setHeight(dimensions.y);
         }
 
         // Update helper graphics
-        this._helpers.topLeft.setCenter(this._graphic.getOrigin());
-        this._helpers.topRight.setCenter(this._graphic.getOrigin().add(new Vector(this._graphic.getWidth(), 0)));
-        this._helpers.bottomLeft.setCenter(this._graphic.getOrigin().add(new Vector(0, this._graphic.getHeight())));
-        this._helpers.bottomRight.setCenter(this._graphic.getOrigin().add(new Vector(this._graphic.getWidth(), this._graphic.getHeight())));
+        this._helpers.topLeft.setCenter(this._image.getOrigin());
+        this._helpers.topRight.setCenter(this._image.getOrigin().add(new Vector(this._image.getWidth(), 0)));
+        this._helpers.bottomLeft.setCenter(this._image.getOrigin().add(new Vector(0, this._image.getHeight())));
+        this._helpers.bottomRight.setCenter(this._image.getOrigin().add(new Vector(this._image.getWidth(), this._image.getHeight())));
     }
 
     public complete(): void {
-        this._slide.setGraphic(this._graphic);
+        this._slide.setGraphic(this._image);
 
         // Remove helper graphics
         this._helpers.topLeft.unrender();
