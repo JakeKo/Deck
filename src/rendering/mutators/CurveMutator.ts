@@ -28,6 +28,7 @@ class CurveMutator implements GraphicMutator {
         return this._curve;
     }
 
+    // TODO: Account for shift, alt, and snapping
     public move(origin: Vector): void {
         // Update rendering
         const delta = this._curve.getAnchor(0).point.towards(origin);
@@ -47,6 +48,7 @@ class CurveMutator implements GraphicMutator {
         });
     }
 
+    // TODO: Account for shift, alt, and snapping
     public setAnchor(index: number, anchor: CurveAnchor): void {
         // Update rendering
         this.setAnchor(index, anchor);
@@ -56,6 +58,9 @@ class CurveMutator implements GraphicMutator {
         this._helpers[index].setPoint(anchor.point);
         this._helpers[index].setOutHandle(anchor.outHandle);
     }
+
+    // TODO: Implement rectangular scaling
+    // TODO: Assess how CurveAnchorMutator interfaces with SlideRenderer focuesed graphics
 
     public complete(): void {
         this._helpers.forEach(helper => helper.unrender());

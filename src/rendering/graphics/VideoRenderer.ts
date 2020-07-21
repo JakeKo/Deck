@@ -77,6 +77,10 @@ class VideoRenderer implements GraphicRenderer {
         this._svg = undefined;
     }
 
+    public getSource(): HTMLVideoElement {
+        return this._source;
+    }
+
     public getOrigin(): Vector {
         return this._origin;
     }

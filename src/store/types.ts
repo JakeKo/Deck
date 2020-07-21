@@ -74,7 +74,29 @@ export enum MUTATIONS {
 
 export enum ACTIONS { }
 
-export type GraphicStoreModel = ImageStoreModel | RectangleStoreModel;
+export type GraphicStoreModel = CurveStoreModel | EllipseStoreModel | ImageStoreModel | RectangleStoreModel | TextboxStoreModel | VideoStoreModel;
+
+export type CurveStoreModel = {
+    id: string;
+    type: GRAPHIC_TYPES.CURVE;
+    points: Vector[];
+    fillColor: string;
+    strokeColor: string;
+    strokeWidth: number;
+    rotation: number;
+};
+
+export type EllipseStoreModel = {
+    id: string;
+    type: GRAPHIC_TYPES.ELLIPSE;
+    origin: Vector;
+    width: number;
+    height: number;
+    fillColor: string;
+    strokeColor: string;
+    strokeWidth: number;
+    rotation: number;
+};
 
 export type ImageStoreModel = {
     id: string;
@@ -95,6 +117,31 @@ export type RectangleStoreModel = {
     width: number;
     height: number;
     fillColor: string;
+    strokeColor: string;
+    strokeWidth: number;
+    rotation: number;
+};
+
+export type TextboxStoreModel = {
+    id: string;
+    type: GRAPHIC_TYPES.TEXTBOX;
+    text: string;
+    origin: Vector;
+    width: number;
+    height: number;
+    size: number;
+    weight: string;
+    font: string;
+    rotation: number;
+};
+
+export type VideoStoreModel = {
+    id: string;
+    type: GRAPHIC_TYPES.VIDEO;
+    source: string;
+    origin: Vector;
+    width: number;
+    height: number;
     strokeColor: string;
     strokeWidth: number;
     rotation: number;

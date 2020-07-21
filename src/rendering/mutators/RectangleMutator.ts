@@ -60,6 +60,7 @@ class RectangleMutator implements GraphicMutator {
         return this._rectangle;
     }
 
+    // TODO: Account for shift, alt, and snapping
     public move(origin: Vector): void {
         // Update rendering
         this._rectangle.setOrigin(origin);
@@ -71,6 +72,7 @@ class RectangleMutator implements GraphicMutator {
         this._helpers.bottomRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())));
     }
 
+    // TODO: Account for shift, alt, ctrl, and snipping
     public setDimensions(dimensions: Vector): void {
         // Update rendering
         this._rectangle.setWidth(dimensions.x);
