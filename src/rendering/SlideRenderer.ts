@@ -4,7 +4,7 @@ import { Viewbox } from '../store/types';
 import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
 import { CurveRenderer, RectangleRenderer } from './graphics';
-import { CurveMaker, ImageMaker, RectangleMaker } from './makers';
+import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, VideoMaker } from './makers';
 import { CurveMutator, RectangleMutator } from './mutators';
 import { GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
 import { renderBackdrop } from './utilities';
@@ -56,12 +56,24 @@ class SlideRenderer {
         return new CurveMaker({ slide: this, initialPosition });
     }
 
+    public makeEllipseInteractive(initialPosition: Vector): EllipseMaker {
+        return new EllipseMaker({ slide: this, initialPosition });
+    }
+
     public makeImageInteractive(initialPosition: Vector, source: string, width: number, height: number) {
         return new ImageMaker({ slide: this, initialPosition, source: source, width, height });
     }
 
     public makeRectangleInteractive(initialPosition: Vector): RectangleMaker {
         return new RectangleMaker({ slide: this, initialPosition });
+    }
+
+    public makeTextboxInteractive(initialPosition: Vector): TextboxMaker {
+        return new TextboxMaker({ slide: this, initialPosition });
+    }
+
+    public makeVideoInteractive(initialPosition: Vector, source: HTMLVideoElement, width: number, height: number): VideoMaker {
+        return new VideoMaker({ slide: this, initialPosition, source, width, height });
     }
 
     public getGraphic(graphicId: string): GraphicRenderer {
