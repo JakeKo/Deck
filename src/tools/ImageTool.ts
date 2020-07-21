@@ -5,27 +5,6 @@ import { AppStore, MUTATIONS } from "../store/types";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
 
-const uploadImage = new Promise<{ source: string, width: number, height: number }>(resolve => {
-    const reader = new FileReader();
-    const input = document.createElement('input');
-    input.type = 'file';
-
-    input.addEventListener('input', (): void => reader.readAsBinaryString((input as HTMLInputElement).files![0]));
-    reader.addEventListener('loadend', (): void => {
-        // Wait for the image width and height to be determined
-        const imageUrl = `data:image;base64,${btoa(reader.result as string)}`;
-        const image = document.createElement('img');
-        image.src = imageUrl;
-        image.addEventListener('load', (): void => resolve({
-            source: imageUrl,
-            width: image.width,
-            height: image.height
-        }));
-    });
-
-    input.click();
-});
-
 export default (store: AppStore): EditorTool => {
     function seedImage(image: string, width: number, height: number): (event: SlideMouseEvent) => void {
         return function make(event) {
@@ -56,6 +35,27 @@ export default (store: AppStore): EditorTool => {
     return {
         name: TOOL_NAMES.IMAGE,
         mount: async () => {
+            const uploadImage = new Promise<{ source: string, width: number, height: number }>(resolve => {
+                const reader = new FileReader();
+                const input = document.createElement('input');
+                input.type = 'file';
+
+                input.addEventListener('input', (): void => reader.readAsBinaryString((input as HTMLInputElement).files![0]));
+                reader.addEventListener('loadend', (): void => {
+                    // Wait for the image width and height to be determined
+                    const imageUrl = `data:image;base64,${btoa(reader.result as string)}`;
+                    const image = document.createElement('img');
+                    image.src = imageUrl;
+                    image.addEventListener('load', (): void => resolve({
+                        source: imageUrl,
+                        width: image.width,
+                        height: image.height
+                    }));
+                });
+
+                input.click();
+            });
+
             const image = await uploadImage;
             make = seedImage(image.source, image.width, image.height);
             listenOnce(SLIDE_EVENTS.MOUSEDOWN, make);
