@@ -10,7 +10,7 @@ const uploadVideo = new Promise<{ source: HTMLVideoElement, width: number, heigh
     const input = document.createElement('input');
     input.type = 'file';
 
-    input.addEventListener('input', (): void => reader.readAsBinaryString((input as HTMLInputElement).files![0]));
+    input.addEventListener('input', (): void => reader.readAsDataURL((input as HTMLInputElement).files![0]));
     reader.addEventListener('loadend', (): void => {
         // Wait for the video width and height to be determined
         const video = document.createElement('video');

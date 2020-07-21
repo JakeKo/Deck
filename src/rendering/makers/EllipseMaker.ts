@@ -31,26 +31,26 @@ class EllipseMaker {
         this._ellipse = new EllipseRenderer({
             id: provideId(),
             slide: this._slide,
-            origin: this._initialPosition
+            center: this._initialPosition
         });
 
         // Initialize helper graphics
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._ellipse.getOrigin()
+                center: this._ellipse.getCenter()
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._ellipse.getOrigin().add(new Vector(this._ellipse.getWidth(), 0))
+                center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), 0))
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._ellipse.getOrigin().add(new Vector(0, this._ellipse.getHeight()))
+                center: this._ellipse.getCenter().add(new Vector(0, this._ellipse.getHeight()))
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._ellipse.getOrigin().add(new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()))
+                center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()))
             })
         };
 
@@ -76,23 +76,24 @@ class EllipseMaker {
 
         if (ctrl) {
             const dimensions = postShiftOffset.transform(Math.abs).scale(2);
-            const originOffset = postShiftOffset.transform(Math.abs).scale(-1);
-            this._ellipse.setOrigin(this._initialPosition.add(originOffset));
+            this._ellipse.setCenter(this._initialPosition);
             this._ellipse.setWidth(dimensions.x);
             this._ellipse.setHeight(dimensions.y);
         } else {
             const dimensions = postShiftOffset.transform(Math.abs);
-            const originOffset = postShiftOffset.scale(0.5).add(dimensions.scale(-0.5));
-            this._ellipse.setOrigin(this._initialPosition.add(originOffset));
+            const originOffset = postShiftOffset.scale(0.5);
+            this._ellipse.setCenter(this._initialPosition.add(originOffset));
             this._ellipse.setWidth(dimensions.x);
             this._ellipse.setHeight(dimensions.y);
         }
 
         // Update helper graphics
-        this._helpers.topLeft.setCenter(this._ellipse.getOrigin());
-        this._helpers.topRight.setCenter(this._ellipse.getOrigin().add(new Vector(this._ellipse.getWidth(), 0)));
-        this._helpers.bottomLeft.setCenter(this._ellipse.getOrigin().add(new Vector(0, this._ellipse.getHeight())));
-        this._helpers.bottomRight.setCenter(this._ellipse.getOrigin().add(new Vector(this._ellipse.getWidth(), this._ellipse.getHeight())));
+        const center = this._ellipse.getCenter();
+        const radius = new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()).scale(0.5);
+        this._helpers.topLeft.setCenter(center.add(radius.scale(-1)));
+        this._helpers.topRight.setCenter(center.add(radius.signAs(new Vector(1, -1))));
+        this._helpers.bottomLeft.setCenter(center.add(radius));
+        this._helpers.bottomRight.setCenter(center.add(radius.signAs(new Vector(-1, 1))));
     }
 
     public complete(): void {

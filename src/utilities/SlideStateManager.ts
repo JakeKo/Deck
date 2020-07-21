@@ -45,7 +45,7 @@ export default class SlideStateManager {
         return new EllipseRenderer({
             id: ellipse.id,
             slide: this._renderer!,
-            origin: ellipse.origin,
+            center: ellipse.center,
             width: ellipse.width,
             height: ellipse.height,
             fillColor: ellipse.fillColor,
@@ -59,7 +59,7 @@ export default class SlideStateManager {
         return {
             id: ellipse.getId(),
             type: GRAPHIC_TYPES.ELLIPSE,
-            origin: ellipse.getOrigin(),
+            center: ellipse.getCenter(),
             width: ellipse.getWidth(),
             height: ellipse.getHeight(),
             fillColor: ellipse.getFillColor(),

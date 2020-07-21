@@ -7,7 +7,7 @@ import { GraphicRenderer, GRAPHIC_TYPES } from "../types";
 type EllipseRendererArgs = {
     id: string;
     slide: SlideRenderer;
-    origin?: Vector;
+    center?: Vector;
     width?: number;
     height?: number;
     fillColor?: string;
@@ -20,7 +20,7 @@ class EllipseRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
     private _svg: SVG.Ellipse | undefined;
-    private _origin: Vector;
+    private _center: Vector;
     private _width: number;
     private _height: number;
     private _fillColor: string;
@@ -31,7 +31,7 @@ class EllipseRenderer implements GraphicRenderer {
     constructor(args: EllipseRendererArgs) {
         this._id = args.id;
         this._slide = args.slide;
-        this._origin = args.origin || Vector.zero;
+        this._center = args.center || Vector.zero;
         this._width = args.width || 0;
         this._height = args.height || 0;
         this._fillColor = args.fillColor || '#CCCCCC';
@@ -59,7 +59,7 @@ class EllipseRenderer implements GraphicRenderer {
         }
 
         this._svg = this._slide.canvas.ellipse(this._width, this._height)
-            .translate(this._origin.x, this._origin.y)
+            .translate(this._center.x, this._center.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
@@ -71,13 +71,13 @@ class EllipseRenderer implements GraphicRenderer {
         this._svg = undefined;
     }
 
-    public getOrigin(): Vector {
-        return this._origin;
+    public getCenter(): Vector {
+        return this._center;
     }
 
-    public setOrigin(origin: Vector): void {
-        this._origin = origin;
-        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
+    public setCenter(origin: Vector): void {
+        this._center = origin;
+        this._svg && this._svg.rotate(0).translate(this._center.x, this._center.y).rotate(this._rotation);
     }
 
     public getWidth(): number {

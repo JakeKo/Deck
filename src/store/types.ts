@@ -89,7 +89,7 @@ export type CurveStoreModel = {
 export type EllipseStoreModel = {
     id: string;
     type: GRAPHIC_TYPES.ELLIPSE;
-    origin: Vector;
+    center: Vector;
     width: number;
     height: number;
     fillColor: string;
