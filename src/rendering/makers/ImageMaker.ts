@@ -23,11 +23,15 @@ class ImageMaker {
     private _graphic: ImageRenderer;
     private _slide: SlideRenderer;
     private _initialPosition: Vector;
+    private _width: number;
+    private _height: number;
     private _helpers: ImageMakerHelpers;
 
     constructor(args: ImageMakerArgs) {
         this._slide = args.slide;
         this._initialPosition = args.initialPosition;
+        this._width = args.width;
+        this._height = args.height;
 
         // Initialize primary graphic
         this._graphic = new ImageRenderer({
@@ -73,21 +77,24 @@ class ImageMaker {
         return this._graphic;
     }
 
+    // Some trig, for your enjoyment
     public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
         const rawOffset = this._initialPosition.towards(position);
-        const absOffset = rawOffset.transform(Math.abs);
-        const minOffset = Math.min(absOffset.x, absOffset.y);
-        const postShiftOffset = shift ? new Vector(Math.sign(rawOffset.x) * minOffset, Math.sign(rawOffset.y) * minOffset) : rawOffset;
+        const absOffset = rawOffset.abs;
+        const absDimensionOffset = absOffset.theta(Vector.right) <= Math.atan2(this._height, this._width)
+            ? new Vector(absOffset.x, absOffset.x * this._height / this._width)
+            : new Vector(absOffset.y * this._width / this._height, absOffset.y);
+        const dimensionOffset = absDimensionOffset.signAs(rawOffset);
 
         if (ctrl) {
-            const dimensions = postShiftOffset.transform(Math.abs).scale(2);
-            const originOffset = postShiftOffset.transform(Math.abs).scale(-1);
+            const dimensions = dimensionOffset.abs.scale(2);
+            const originOffset = dimensionOffset.abs.scale(-1);
             this._graphic.setOrigin(this._initialPosition.add(originOffset));
             this._graphic.setWidth(dimensions.x);
             this._graphic.setHeight(dimensions.y);
         } else {
-            const dimensions = postShiftOffset.transform(Math.abs);
-            const originOffset = postShiftOffset.scale(0.5).add(dimensions.scale(-0.5));
+            const dimensions = dimensionOffset.abs;
+            const originOffset = dimensionOffset.scale(0.5).add(dimensions.scale(-0.5));
             this._graphic.setOrigin(this._initialPosition.add(originOffset));
             this._graphic.setWidth(dimensions.x);
             this._graphic.setHeight(dimensions.y);

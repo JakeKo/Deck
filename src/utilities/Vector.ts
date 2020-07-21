@@ -26,6 +26,10 @@ export default class Vector {
         return [this.x, this.y];
     }
 
+    get abs(): Vector {
+        return this.transform(Math.abs);
+    }
+
     public toArray(): Array<number> {
         return [this.x, this.y];
     }
@@ -64,5 +68,9 @@ export default class Vector {
 
     public equals(vector: Vector): boolean {
         return this.x === vector.x && this.y === vector.y;
+    }
+
+    public signAs(sign: Vector): Vector {
+        return new Vector(Math.sign(sign.x) * this.x, Math.sign(sign.y) * this.y);
     }
 }
