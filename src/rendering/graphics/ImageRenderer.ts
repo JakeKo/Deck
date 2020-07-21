@@ -6,8 +6,8 @@ import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
 type ImageRendererArgs = {
     id: string;
-    slideRenderer: SlideRenderer;
-    image: string;
+    slide: SlideRenderer;
+    source: string;
     origin?: Vector;
     width?: number;
     height?: number;
@@ -20,8 +20,7 @@ class ImageRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
     private _svg: SVG.Image | undefined;
-    private _type: GRAPHIC_TYPES;
-    private _image: string;
+    private _source: string;
     private _origin: Vector;
     private _width: number;
     private _height: number;
@@ -31,9 +30,8 @@ class ImageRenderer implements GraphicRenderer {
 
     constructor(args: ImageRendererArgs) {
         this._id = args.id;
-        this._slide = args.slideRenderer;
-        this._type = GRAPHIC_TYPES.IMAGE;
-        this._image = args.image;
+        this._slide = args.slide;
+        this._source = args.source;
         this._origin = args.origin || Vector.zero;
         this._width = args.width || 0;
         this._height = args.height || 0;
@@ -47,7 +45,7 @@ class ImageRenderer implements GraphicRenderer {
     }
 
     public getType(): GRAPHIC_TYPES {
-        return this._type;
+        return GRAPHIC_TYPES.IMAGE;
     }
 
     public isRendered(): boolean {
@@ -60,7 +58,7 @@ class ImageRenderer implements GraphicRenderer {
             return;
         }
 
-        this._svg = this._slide.canvas.image(this._image, this._width, this._height)
+        this._svg = this._slide.canvas.image(this._source, this._width, this._height)
             .translate(this._origin.x, this._origin.y)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(this._rotation);
@@ -72,8 +70,8 @@ class ImageRenderer implements GraphicRenderer {
         this._svg = undefined;
     }
 
-    public getImage(): string {
-        return this._image;
+    public getSource(): string {
+        return this._source;
     }
 
     public getOrigin(): Vector {

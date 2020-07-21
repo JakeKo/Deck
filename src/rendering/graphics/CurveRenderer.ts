@@ -6,7 +6,7 @@ import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from "../types";
 
 type CurveRendererArgs = {
     id: string;
-    slideRenderer: SlideRenderer;
+    slide: SlideRenderer;
     anchors?: CurveAnchor[];
     fillColor?: string;
     strokeColor?: string;
@@ -18,7 +18,6 @@ class CurveRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
     private _svg: SVG.Path | undefined;
-    private _type: GRAPHIC_TYPES;
     private _anchors: CurveAnchor[];
     private _fillColor: string;
     private _strokeColor: string;
@@ -27,8 +26,7 @@ class CurveRenderer implements GraphicRenderer {
 
     constructor(args: CurveRendererArgs) {
         this._id = args.id;
-        this._slide = args.slideRenderer;
-        this._type = GRAPHIC_TYPES.CURVE;
+        this._slide = args.slide;
         this._anchors = args.anchors || [];
         this._fillColor = args.fillColor || 'transparent';
         this._strokeColor = args.strokeColor || '#000000';
@@ -41,7 +39,7 @@ class CurveRenderer implements GraphicRenderer {
     }
 
     public getType(): GRAPHIC_TYPES {
-        return this._type;
+        return GRAPHIC_TYPES.CURVE;
     }
 
     public isRendered(): boolean {

@@ -15,9 +15,9 @@ export default class SlideStateManager {
     private _imageStoreModelToRenderer(image: ImageStoreModel): ImageRenderer {
         return new ImageRenderer({
             id: image.id,
-            slideRenderer: this._renderer!,
+            slide: this._renderer!,
             origin: image.origin,
-            image: image.source,
+            source: image.source,
             width: image.width,
             height: image.height,
             strokeColor: image.strokeColor,
@@ -30,7 +30,7 @@ export default class SlideStateManager {
         return {
             id: image.getId(),
             type: GRAPHIC_TYPES.IMAGE,
-            source: image.getImage(),
+            source: image.getSource(),
             origin: image.getOrigin(),
             height: image.getHeight(),
             width: image.getWidth(),
@@ -43,7 +43,7 @@ export default class SlideStateManager {
     private _rectangleStoreModelToRenderer(rectangle: RectangleStoreModel): RectangleRenderer {
         return new RectangleRenderer({
             id: rectangle.id,
-            slideRenderer: this._renderer!,
+            slide: this._renderer!,
             origin: rectangle.origin,
             width: rectangle.width,
             height: rectangle.height,

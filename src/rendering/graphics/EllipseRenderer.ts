@@ -20,7 +20,6 @@ class EllipseRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
     private _svg: SVG.Ellipse | undefined;
-    private _type: GRAPHIC_TYPES;
     private _origin: Vector;
     private _width: number;
     private _height: number;
@@ -32,7 +31,6 @@ class EllipseRenderer implements GraphicRenderer {
     constructor(args: EllipseRendererArgs) {
         this._id = args.id;
         this._slide = args.slide;
-        this._type = GRAPHIC_TYPES.ELLIPSE;
         this._origin = args.origin || Vector.zero;
         this._width = args.width || 0;
         this._height = args.height || 0;
@@ -47,7 +45,7 @@ class EllipseRenderer implements GraphicRenderer {
     }
 
     public getType(): GRAPHIC_TYPES {
-        return this._type;
+        return GRAPHIC_TYPES.ELLIPSE;
     }
 
     public isRendered(): boolean {

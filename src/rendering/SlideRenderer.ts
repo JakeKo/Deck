@@ -4,11 +4,10 @@ import { Viewbox } from '../store/types';
 import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
 import { CurveRenderer, RectangleRenderer } from './graphics';
-import { CurveMaker, RectangleMaker } from './makers';
+import { CurveMaker, ImageMaker, RectangleMaker } from './makers';
 import { CurveMutator, RectangleMutator } from './mutators';
 import { GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
 import { renderBackdrop } from './utilities';
-import ImageMaker from './makers/ImageMaker';
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;
@@ -58,7 +57,7 @@ class SlideRenderer {
     }
 
     public makeImageInteractive(initialPosition: Vector, source: string, width: number, height: number) {
-        return new ImageMaker({ slide: this, initialPosition, image: source, width, height });
+        return new ImageMaker({ slide: this, initialPosition, source: source, width, height });
     }
 
     public makeRectangleInteractive(initialPosition: Vector): RectangleMaker {

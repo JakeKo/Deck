@@ -21,11 +21,13 @@ export type CurveAnchor = {
 };
 
 export enum GRAPHIC_TYPES {
+    CANVAS = 'canvas',
+    CURVE = 'curve',
+    CURVE_ANCHOR = 'curve-anchor',
+    ELLIPSE = 'ellipse',
     IMAGE = 'image',
     RECTANGLE = 'rectangle',
-    ELLIPSE = 'ellipse',
-    CURVE = 'curve',
-    CANVAS = 'canvas',
-    CURVE_ANCHOR = 'curve-anchor',
-    VERTEX = 'vertex'
+    TEXTBOX = 'textbox',
+    VERTEX = 'vertex',
+    VIDEO = 'video'
 }

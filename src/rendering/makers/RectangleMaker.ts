@@ -30,7 +30,7 @@ class RectangleMaker {
         // Initialize primary graphic
         this._rectangle = new RectangleRenderer({
             id: provideId(),
-            slideRenderer: this._slide,
+            slide: this._slide,
             origin: this._initialPosition
         });
 

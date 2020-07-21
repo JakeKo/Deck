@@ -6,7 +6,7 @@ import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
 type VideoRendererArgs = {
     id: string;
-    slideRenderer: SlideRenderer;
+    slide: SlideRenderer;
     source: HTMLVideoElement;
     origin?: Vector;
     width?: number;
@@ -20,7 +20,6 @@ class VideoRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
     private _svg: SVG.Element | undefined;
-    private _type: GRAPHIC_TYPES;
     private _source: HTMLVideoElement;
     private _origin: Vector;
     private _width: number;
@@ -31,8 +30,7 @@ class VideoRenderer implements GraphicRenderer {
 
     constructor(args: VideoRendererArgs) {
         this._id = args.id;
-        this._slide = args.slideRenderer;
-        this._type = GRAPHIC_TYPES.RECTANGLE;
+        this._slide = args.slide;
         this._source = args.source;
         this._origin = args.origin || Vector.zero;
         this._width = args.width || 0;
@@ -47,7 +45,7 @@ class VideoRenderer implements GraphicRenderer {
     }
 
     public getType(): GRAPHIC_TYPES {
-        return this._type;
+        return GRAPHIC_TYPES.VIDEO;
     }
 
     public isRendered(): boolean {
@@ -61,7 +59,7 @@ class VideoRenderer implements GraphicRenderer {
         }
 
         const foreignObject = SVG.create('foreignObject') as HTMLElement;
-        foreignObject.append(this._source);
+        foreignObject.appendChild(this._source);
 
         this._svg = (foreignObject as any as SVG.Element)
             .translate(this._origin.x, this._origin.y)

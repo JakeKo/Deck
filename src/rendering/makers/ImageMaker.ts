@@ -7,7 +7,7 @@ import SlideRenderer from "../SlideRenderer";
 type ImageMakerArgs = {
     slide: SlideRenderer;
     initialPosition: Vector;
-    image: string;
+    source: string;
     width: number;
     height: number;
 };
@@ -36,9 +36,9 @@ class ImageMaker {
         // Initialize primary graphic
         this._graphic = new ImageRenderer({
             id: provideId(),
-            slideRenderer: this._slide,
+            slide: this._slide,
             origin: this._initialPosition,
-            image: args.image,
+            source: args.source,
             width: args.width,
             height: args.height
         });

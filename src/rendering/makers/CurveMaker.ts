@@ -21,7 +21,7 @@ class CurveMaker {
         // Inititalize primary graphic
         this._curve = new CurveRenderer({
             id: provideId(),
-            slideRenderer: this._slide
+            slide: this._slide
         });
 
         // Initialize helper graphic
