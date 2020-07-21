@@ -20,7 +20,8 @@ type TextboxRendererArgs = {
 class TextboxRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
-    private _svg: SVG.Text | undefined;
+    private _svg: SVGForeignObjectElement | undefined;
+    private _textbox: HTMLDivElement | undefined;
     private _origin: Vector;
     private _width: number;
     private _height: number;
@@ -37,7 +38,7 @@ class TextboxRenderer implements GraphicRenderer {
         this._width = args.width || 0;
         this._height = args.height || 0;
         this._text = args.text || 'Lorem ipsum';
-        this._size = args.size || 16;
+        this._size = args.size || 24;
         this._weight = args.weight || '400';
         this._font = args.font || 'Arial';
         this._rotation = args.rotation || 0;
@@ -61,18 +62,30 @@ class TextboxRenderer implements GraphicRenderer {
             return;
         }
 
-        this._svg = this._slide.canvas.text(this._text)
-            .height(this._height)
-            .width(this._width)
-            .font({ weight: this._weight, family: this._font, size: this._size })
-            .translate(this._origin.x, this._origin.y)
-            .rotate(this._rotation);
+        this._svg = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+        this._svg.setAttribute('x', `${this._origin.x}px`);
+        this._svg.setAttribute('y', `${this._origin.y}px`);
+        this._svg.setAttribute('width', `${this._width}px`);
+        this._svg.setAttribute('height', `${this._height}px`);
+        this._svg.style.transform = `rotate(${this._rotation}deg)`;
+        this._slide.canvas.node.appendChild(this._svg);
+
+        this._textbox = document.createElement('div');
+        this._textbox.innerHTML = this._text;
+        this._textbox.style.width = '100%';
+        this._textbox.style.height = '100%';
+        this._textbox.style.font = `${this._size}px ${this._font}`;
+        this._textbox.style.fontWeight = this._weight;
+        this._textbox.style.overflow = 'hidden';
+        this._svg.appendChild(this._textbox);
+
         decorateTextboxEvents(this._svg, this._slide, this);
     }
 
     public unrender(): void {
         this._svg && this._svg.remove();
         this._svg = undefined;
+        this._textbox = undefined;
     }
 
     public getOrigin(): Vector {
@@ -81,7 +94,7 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setOrigin(origin: Vector): void {
         this._origin = origin;
-        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
+        this._svg && this._svg.setAttribute('x', `${this._origin.x}px`);
     }
 
     public getWidth(): number {
@@ -90,7 +103,7 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setWidth(width: number): void {
         this._width = width;
-        this._svg && this._svg.width(this._width);
+        this._svg && this._svg.setAttribute('width', `${this._width}px`);
     }
 
     public getHeight(): number {
@@ -99,7 +112,7 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setHeight(height: number): void {
         this._height = height;
-        this._svg && this._svg.height(this._height);
+        this._svg && this._svg.setAttribute('height', `${this._height}px`);
     }
 
     public getText(): string {
@@ -108,7 +121,9 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setText(text: string): void {
         this._text = text;
-        this._svg && this._svg.text(this._text);
+        if (this._textbox) {
+            this._textbox.innerHTML = this._text;
+        }
     }
 
     public getSize(): number {
@@ -117,7 +132,10 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setSize(size: number): void {
         this._size = size;
-        this._svg && this._svg.font({ weight: this._weight, family: this._font, size: this._size });
+        if (this._textbox) {
+            this._textbox.style.font = `${this._size}px ${this._font}`;
+            this._textbox.style.fontWeight = this._weight;
+        }
     }
 
     public getWeight(): string {
@@ -126,7 +144,10 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setWeight(weight: string): void {
         this._weight = weight;
-        this._svg && this._svg.font({ weight: this._weight, family: this._font, size: this._size });
+        if (this._textbox) {
+            this._textbox.style.font = `${this._size}px ${this._font}`;
+            this._textbox.style.fontWeight = this._weight;
+        }
     }
 
     public getFont(): string {
@@ -135,7 +156,10 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setFont(font: string): void {
         this._font = font;
-        this._svg && this._svg.font({ weight: this._weight, family: this._font, size: this._size });
+        if (this._textbox) {
+            this._textbox.style.font = `${this._size}px ${this._font}`;
+            this._textbox.style.fontWeight = this._weight;
+        }
     }
 
     public getRotation(): number {
@@ -144,7 +168,9 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setRotation(rotation: number): void {
         this._rotation = rotation;
-        this._svg && this._svg.rotate(this._rotation);
+        if (this._svg) {
+            this._svg.style.transform = `rotate(${this._rotation}deg)`;
+        }
     }
 }
 
