@@ -10,7 +10,6 @@ type VertexRendererArgs = {
     center?: Vector;
 };
 
-// TODO: Figure out how to make anchors zoom-insensitive
 class VertexRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;

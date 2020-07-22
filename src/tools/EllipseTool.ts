@@ -8,7 +8,7 @@ import { resolvePosition } from "./utilities";
 export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
-        const maker = slide.makeEllipseInteractive(resolvePosition(baseEvent, slide, store));
+        const maker = slide.makeEllipseInteractive(resolvePosition(baseEvent, slide));
         slide.broadcastSetGraphic(maker.getTarget());
 
         listen(SLIDE_EVENTS.MOUSEMOVE, update);
@@ -16,7 +16,7 @@ export default (store: AppStore): EditorTool => {
 
         function update(event: SlideMouseEvent): void {
             const { baseEvent } = event.detail;
-            const position = resolvePosition(baseEvent, slide, store);
+            const position = resolvePosition(baseEvent, slide);
             maker.resize(position, baseEvent.shiftKey, baseEvent.ctrlKey, baseEvent.altKey);
             slide.broadcastSetGraphic(maker.getTarget());
         }

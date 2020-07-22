@@ -9,7 +9,7 @@ export default (store: AppStore): EditorTool => {
     function seedImage(image: string, width: number, height: number): (event: SlideMouseEvent) => void {
         return function make(event) {
             const { slide, baseEvent } = event.detail;
-            const maker = slide.makeImageInteractive(resolvePosition(baseEvent, slide, store), image, width, height);
+            const maker = slide.makeImageInteractive(resolvePosition(baseEvent, slide), image, width, height);
             slide.broadcastSetGraphic(maker.getTarget());
 
             listen(SLIDE_EVENTS.MOUSEMOVE, update);
@@ -17,7 +17,7 @@ export default (store: AppStore): EditorTool => {
 
             function update(event: SlideMouseEvent): void {
                 const { baseEvent } = event.detail;
-                const position = resolvePosition(baseEvent, slide, store);
+                const position = resolvePosition(baseEvent, slide);
                 maker.resize(position, baseEvent.shiftKey, baseEvent.ctrlKey, baseEvent.altKey);
                 slide.broadcastSetGraphic(maker.getTarget());
             }

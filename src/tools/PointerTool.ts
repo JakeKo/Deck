@@ -43,7 +43,7 @@ function initRectangleMutation(store: AppStore): (event: RectangleMouseEvent) =>
             slide.unfocusAllGraphics([target.getId()]);
         }
 
-        const originOffset = resolvePosition(baseEvent, slide, store).towards(target.getOrigin());
+        const originOffset = resolvePosition(baseEvent, slide).towards(target.getOrigin());
         const mutator = slide.focusGraphic(target.getId()) as RectangleMutator;
 
         listen(SLIDE_EVENTS.MOUSEMOVE, move);
@@ -51,7 +51,7 @@ function initRectangleMutation(store: AppStore): (event: RectangleMouseEvent) =>
 
         function move(event: SlideMouseEvent): void {
             const { slide, baseEvent } = event.detail;
-            mutator.move(resolvePosition(baseEvent, slide, store).add(originOffset));
+            mutator.move(resolvePosition(baseEvent, slide).add(originOffset));
             slide.broadcastSetGraphic(mutator.getTarget());
         }
 

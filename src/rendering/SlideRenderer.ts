@@ -57,6 +57,10 @@ class SlideRenderer {
         return this._rawViewbox;
     }
 
+    public get zoom(): number {
+        return this._zoom;
+    }
+
     public get bounds(): { origin: Vector, height: number, width: number } {
         const bounds = this._canvas.node.getBoundingClientRect() as DOMRect;
         return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
