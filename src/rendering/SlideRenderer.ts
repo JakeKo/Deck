@@ -1,15 +1,15 @@
 import * as SVG from 'svg.js';
 import { decorateSlideEvents } from '../events/decorators';
+import { SlideZoomEvent, SLIDE_EVENTS } from '../events/types';
+import { listen } from '../events/utilities';
 import { Viewbox } from '../store/types';
 import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
 import { CurveRenderer, RectangleRenderer } from './graphics';
 import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, VideoMaker } from './makers';
 import { CurveMutator, RectangleMutator } from './mutators';
-import { GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
+import { GraphicMaker, GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
 import { renderBackdrop } from './utilities';
-import { listen } from '../events/utilities';
-import { SLIDE_EVENTS, SlideZoomEvent } from '../events/types';
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;
@@ -25,6 +25,7 @@ class SlideRenderer {
     private _graphics: { [index: string]: GraphicRenderer };
     private _rawViewbox: Viewbox;
     private _focusedGraphics: { [index: string]: GraphicMutator };
+    private _activeMakers: { [index: string]: GraphicMaker };
     private _zoom: number;
 
     constructor(args: SlideRendererArgs) {
@@ -33,6 +34,7 @@ class SlideRenderer {
         this._graphics = {};
         this._rawViewbox = args.rawViewbox;
         this._focusedGraphics = {};
+        this._activeMakers = {};
         this._zoom = args.zoom;
 
         renderBackdrop(this, args.croppedViewbox.width, args.croppedViewbox.height);
@@ -41,7 +43,8 @@ class SlideRenderer {
 
         listen(SLIDE_EVENTS.ZOOM, (event: SlideZoomEvent): void => {
             this._zoom = event.detail.zoom;
-            Object.keys(this._focusedGraphics).forEach(graphicId => this._focusedGraphics[graphicId].setScale(1 / this._zoom));
+            Object.values(this._focusedGraphics).forEach(mutator => mutator.setScale(1 / this._zoom));
+            Object.values(this._activeMakers).forEach(maker => maker.setScale(1 / this._zoom));
         });
     }
 
@@ -66,28 +69,67 @@ class SlideRenderer {
         return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
     }
 
+    private activateMaker<T extends GraphicMaker>(maker: T): T {
+        this._activeMakers[maker.getTarget().getId()] = maker;
+        return maker;
+    }
+
+    public completeMaker(graphicId: string): void {
+        delete this._activeMakers[graphicId];
+    }
+
     public makeCurveInteractive(initialPosition: Vector): CurveMaker {
-        return new CurveMaker({ slide: this, initialPosition, scale: 1 / this._zoom });
+        return this.activateMaker(new CurveMaker({
+            slide: this,
+            initialPosition,
+            scale: 1 / this._zoom
+        }));
     }
 
     public makeEllipseInteractive(initialPosition: Vector): EllipseMaker {
-        return new EllipseMaker({ slide: this, initialPosition, scale: 1 / this._zoom });
+        return this.activateMaker(new EllipseMaker({
+            slide: this,
+            initialPosition,
+            scale: 1 / this._zoom
+        }));
     }
 
     public makeImageInteractive(initialPosition: Vector, source: string, width: number, height: number) {
-        return new ImageMaker({ slide: this, initialPosition, source: source, width, height, scale: 1 / this._zoom });
+        return this.activateMaker(new ImageMaker({
+            slide: this,
+            initialPosition,
+            source: source,
+            width,
+            height,
+            scale: 1 / this._zoom
+        }));
     }
 
     public makeRectangleInteractive(initialPosition: Vector): RectangleMaker {
-        return new RectangleMaker({ slide: this, initialPosition, scale: 1 / this._zoom });
+        return this.activateMaker(new RectangleMaker({
+            slide: this,
+            initialPosition,
+            scale: 1 / this._zoom
+        }));
     }
 
     public makeTextboxInteractive(initialPosition: Vector): TextboxMaker {
-        return new TextboxMaker({ slide: this, initialPosition, scale: 1 / this._zoom });
+        return this.activateMaker(new TextboxMaker({
+            slide: this,
+            initialPosition,
+            scale: 1 / this._zoom
+        }));
     }
 
     public makeVideoInteractive(initialPosition: Vector, source: HTMLVideoElement, width: number, height: number): VideoMaker {
-        return new VideoMaker({ slide: this, initialPosition, source, width, height, scale: 1 / this._zoom });
+        return this.activateMaker(new VideoMaker({
+            slide: this,
+            initialPosition,
+            source,
+            width,
+            height,
+            scale: 1 / this._zoom
+        }));
     }
 
     public getGraphic(graphicId: string): GraphicRenderer {
