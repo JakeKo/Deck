@@ -7,6 +7,7 @@ import SlideRenderer from "../SlideRenderer";
 type EllipseMakerArgs = {
     slide: SlideRenderer;
     initialPosition: Vector;
+    scale: number;
 };
 
 type EllipseMakerHelpers = {
@@ -38,19 +39,23 @@ class EllipseMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._ellipse.getCenter()
+                center: this._ellipse.getCenter(),
+                scale: args.scale
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), 0))
+                center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), 0)),
+                scale: args.scale
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._ellipse.getCenter().add(new Vector(0, this._ellipse.getHeight()))
+                center: this._ellipse.getCenter().add(new Vector(0, this._ellipse.getHeight())),
+                scale: args.scale
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()))
+                center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), this._ellipse.getHeight())),
+                scale: args.scale
             })
         };
 

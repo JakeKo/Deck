@@ -7,6 +7,7 @@ import { CurveAnchor, GraphicMutator, GRAPHIC_TYPES } from "../types";
 type CurveMutatorArgs = {
     curve: CurveRenderer;
     slide: SlideRenderer;
+    scale: number;
 };
 
 class CurveMutator implements GraphicMutator {
@@ -17,7 +18,11 @@ class CurveMutator implements GraphicMutator {
     constructor(args: CurveMutatorArgs) {
         this._curve = args.curve;
         this._slide = args.slide;
-        this._helpers = this._curve.getAnchors().map(anchor => new CurveAnchorRenderer({ slide: this._slide, ...anchor }));
+        this._helpers = this._curve.getAnchors().map(anchor => new CurveAnchorRenderer({
+            slide: this._slide,
+            scale: args.scale,
+            ...anchor
+        }));
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -64,6 +69,10 @@ class CurveMutator implements GraphicMutator {
 
     public complete(): void {
         this._helpers.forEach(helper => helper.unrender());
+    }
+
+    public setScale(scale: number): void {
+        this._helpers.forEach(helper => helper.setScale(scale));
     }
 }
 

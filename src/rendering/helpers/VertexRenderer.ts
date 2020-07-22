@@ -6,15 +6,16 @@ import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
 type VertexRendererArgs = {
     slide: SlideRenderer;
+    scale: number;
     center?: Vector;
 };
 
 // TODO: Figure out how to make anchors zoom-insensitive
 class VertexRenderer implements GraphicRenderer {
     private _id: string;
-    private _type: GRAPHIC_TYPES;
     private _slide: SlideRenderer;
     private _svg: SVG.Ellipse | undefined;
+    private _scale: number;
     private _width: number;
     private _height: number;
     private _center: Vector;
@@ -24,8 +25,8 @@ class VertexRenderer implements GraphicRenderer {
 
     constructor(args: VertexRendererArgs) {
         this._id = provideId();
-        this._type = GRAPHIC_TYPES.VERTEX;
         this._slide = args.slide;
+        this._scale = args.scale;
         this._center = args.center || Vector.zero;
         this._width = 8;
         this._height = 8;
@@ -39,7 +40,7 @@ class VertexRenderer implements GraphicRenderer {
     }
 
     public getType(): GRAPHIC_TYPES {
-        return this._type;
+        return GRAPHIC_TYPES.VERTEX;
     }
 
     public isRendered(): boolean {
@@ -52,8 +53,8 @@ class VertexRenderer implements GraphicRenderer {
             return;
         }
 
-        this._svg = this._slide.canvas.ellipse(this._width, this._height)
-            .translate(this._center.x - this._width / 2, this._center.y - this._height / 2)
+        this._svg = this._slide.canvas.ellipse(this._width * this._scale, this._height * this._scale)
+            .center(this._center.x, this._center.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
@@ -65,7 +66,12 @@ class VertexRenderer implements GraphicRenderer {
 
     public setCenter(center: Vector): void {
         this._center = center;
-        this._svg && this._svg.translate(this._center.x - this._width / 2, this._center.y - this._height / 2);
+        this._svg && this._svg.center(this._center.x, this._center.y);
+    }
+
+    public setScale(scale: number): void {
+        this._scale = scale;
+        this._svg && this._svg.size(this._width * this._scale, this._height * this._scale);
     }
 }
 

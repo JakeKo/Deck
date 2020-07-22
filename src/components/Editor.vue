@@ -19,6 +19,8 @@ import Vector from '../utilities/Vector';
 import SlidePlaceholder from './SlidePlaceholder.vue';
 import { StyleCreator } from '../styling/types';
 import DeckComponent from './generic/DeckComponent';
+import { dispatch } from '../events/utilities';
+import { SlideZoomEventPayload, SLIDE_EVENTS } from '../events/types';
 
 type StyleProps = {};
 type Style = {
@@ -80,6 +82,8 @@ export default class Editor extends DeckComponent<StyleProps, Style> {
         editor.style.zoom = this.defaultZoom.toString();
         editor.scrollTop = (editor.scrollHeight - editor.clientHeight) / 2;
         editor.scrollLeft = (editor.scrollWidth - editor.clientWidth) / 2;
+
+        dispatch(new CustomEvent<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { detail: { zoom: this.defaultZoom } }));
     }
 
     private handleMouseWheel(event: WheelEvent): void {
@@ -92,6 +96,8 @@ export default class Editor extends DeckComponent<StyleProps, Style> {
             const newZoom = this[GETTERS.EDITOR_ZOOM_LEVEL] * deltaZoom;
             this[MUTATIONS.EDITOR_ZOOM_LEVEL](newZoom);
             editor.style.zoom = newZoom.toString();
+
+            dispatch(new CustomEvent<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { detail: { zoom: newZoom } }));
 
             // TODO: Fetch absolute mouse position without hardcoded values
             // TODO: Fix the math here (which is incorrect but not by much)

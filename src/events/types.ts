@@ -14,7 +14,8 @@ export enum SLIDE_EVENTS {
     MOUSEOUT = 'deck-slide-mouseout',
     MOUSEMOVE = 'deck-slide-mousemove',
     KEYDOWN = 'deck-slide-keydown',
-    KEYUP = 'deck-slide-keyup'
+    KEYUP = 'deck-slide-keyup',
+    ZOOM = 'deck-slide-zoom'
 }
 
 export type SlideMouseEvent = CustomEvent<SlideMouseEventPayload>;
@@ -31,6 +32,11 @@ export type SlideKeyboardEventPayload = {
     slide: SlideRenderer;
     type: SLIDE_EVENTS;
     target: GraphicRenderer | undefined;
+};
+
+export type SlideZoomEvent = CustomEvent<SlideZoomEventPayload>;
+export type SlideZoomEventPayload = {
+    zoom: number;
 };
 
 // CURVE EVENTS

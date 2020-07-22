@@ -7,6 +7,7 @@ import SlideRenderer from "../SlideRenderer";
 type VideoMakerArgs = {
     slide: SlideRenderer;
     initialPosition: Vector;
+    scale: number;
     source: HTMLVideoElement;
     width: number;
     height: number;
@@ -47,19 +48,23 @@ class VideoMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._video.getOrigin()
+                center: this._video.getOrigin(),
+                scale: args.scale
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._video.getOrigin().add(new Vector(this._video.getWidth(), 0))
+                center: this._video.getOrigin().add(new Vector(this._video.getWidth(), 0)),
+                scale: args.scale
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._video.getOrigin().add(new Vector(0, this._video.getHeight()))
+                center: this._video.getOrigin().add(new Vector(0, this._video.getHeight())),
+                scale: args.scale
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._video.getOrigin().add(new Vector(this._video.getWidth(), this._video.getHeight()))
+                center: this._video.getOrigin().add(new Vector(this._video.getWidth(), this._video.getHeight())),
+                scale: args.scale
             })
         };
 

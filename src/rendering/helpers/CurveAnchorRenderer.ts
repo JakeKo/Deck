@@ -6,6 +6,7 @@ import SlideRenderer from '../SlideRenderer';
 
 type CurveAnchorRendererArgs = {
     slide: SlideRenderer;
+    scale: number;
     inHandle: Vector;
     point: Vector;
     outHandle: Vector;
@@ -13,8 +14,8 @@ type CurveAnchorRendererArgs = {
 
 class CurveAnchorRenderer implements GraphicRenderer {
     private _id: string;
-    private _type: GRAPHIC_TYPES;
     private _slide: SlideRenderer;
+    private _scale: number;
     private _inHandle: Vector;
     private _point: Vector;
     private _outHandle: Vector;
@@ -38,8 +39,8 @@ class CurveAnchorRenderer implements GraphicRenderer {
 
     constructor(args: CurveAnchorRendererArgs) {
         this._id = provideId();
-        this._type = GRAPHIC_TYPES.CURVE_ANCHOR;
         this._slide = args.slide;
+        this._scale = args.scale;
         this._inHandle = args.inHandle;
         this._point = args.point;
         this._outHandle = args.outHandle;
@@ -62,7 +63,7 @@ class CurveAnchorRenderer implements GraphicRenderer {
     }
 
     public getType(): GRAPHIC_TYPES {
-        return this._type;
+        return GRAPHIC_TYPES.CURVE_ANCHOR;
     }
 
     public isRendered(): boolean {
@@ -74,24 +75,26 @@ class CurveAnchorRenderer implements GraphicRenderer {
             return;
         }
 
+        const handleDimensions = this._handleDimensions();
+        const inHandlePosition = this._handlePosition(this._inHandle);
+        const outHandlePosition = this._handlePosition(this._outHandle);
+        const pointDimensions = this._pointDimensions();
+        const pointPosition = this._pointPosition();
+
         this._inHandleSpanSvg = this._slide.canvas.line(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y)
             .stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth });
-
-        this._inHandleSvg = this._slide.canvas.rect(this._handleWidth, this._handleHeight)
-            .translate(this._inHandle.x - this._handleWidth / 2, this._inHandle.y - this._handleHeight / 2)
-            .fill(this._handleFillColor)
-            .stroke({ color: this._handleStrokeColor, width: this._handleStrokeWidth });
-
         this._outHandleSpanSvg = this._slide.canvas.line(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y)
             .stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth });
-
-        this._outHandleSvg = this._slide.canvas.rect(this._handleWidth, this._handleHeight)
-            .translate(this._outHandle.x - this._handleWidth / 2, this._outHandle.y - this._handleHeight / 2)
+        this._inHandleSvg = this._slide.canvas.rect(handleDimensions.x, handleDimensions.y)
+            .translate(inHandlePosition.x, inHandlePosition.y)
             .fill(this._handleFillColor)
             .stroke({ color: this._handleStrokeColor, width: this._handleStrokeWidth });
-
-        this._pointSvg = this._slide.canvas.ellipse(this._pointWidth, this._pointHeight)
-            .translate(this._point.x - this._pointWidth / 2, this._point.y - this._pointHeight / 2)
+        this._outHandleSvg = this._slide.canvas.rect(handleDimensions.x, handleDimensions.y)
+            .translate(outHandlePosition.x, outHandlePosition.y)
+            .fill(this._handleFillColor)
+            .stroke({ color: this._handleStrokeColor, width: this._handleStrokeWidth });
+        this._pointSvg = this._slide.canvas.ellipse(pointDimensions.x, pointDimensions.y)
+            .translate(pointPosition.x, pointPosition.y)
             .fill(this._pointFillColor)
             .stroke({ color: this._pointStrokeColor, width: this._pointStrokeWidth });
     }
@@ -110,21 +113,59 @@ class CurveAnchorRenderer implements GraphicRenderer {
         this._outHandleSpanSvg = undefined;
     }
 
-    public setInHandle(inHandle: Vector) {
+    public setInHandle(inHandle: Vector): void {
         this._inHandle = inHandle;
-        this._inHandleSvg && this._inHandleSvg.translate(this._inHandle.x - this._handleWidth / 2, this._inHandle.y - this._handleHeight / 2);
+
+        const position = this._handlePosition(this._inHandle);
+        this._inHandleSvg && this._inHandleSvg.translate(position.x, position.y);
         this._inHandleSpanSvg && this._inHandleSpanSvg.plot(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y);
     }
 
-    public setPoint(point: Vector) {
+    public setPoint(point: Vector): void {
         this._point = point;
-        this._pointSvg && this._pointSvg.translate(this._point.x - this._pointWidth / 2, this._point.y - this._pointHeight / 2);
+
+        const position = this._pointPosition();
+        this._pointSvg && this._pointSvg.translate(position.x ,position.y);
     }
 
-    public setOutHandle(outHandle: Vector) {
+    public setOutHandle(outHandle: Vector): void {
         this._outHandle = outHandle;
-        this._outHandleSvg && this._outHandleSvg.translate(this._outHandle.x - this._handleWidth / 2, this._outHandle.y - this._handleHeight / 2);
+
+        const position = this._handlePosition(this._outHandle);
+        this._outHandleSvg && this._outHandleSvg.translate(position.x, position.y);
         this._outHandleSpanSvg && this._outHandleSpanSvg.plot(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y);
+    }
+
+    public setScale(scale: number): void {
+        this._scale = scale;
+
+        const handleDimensions = this._handleDimensions();
+        const inHandlePosition = this._handlePosition(this._inHandle);
+        const outHandlePosition = this._handlePosition(this._outHandle);
+        const pointDimensions = this._pointDimensions();
+        const pointPosition = this._pointPosition();
+
+        this._inHandleSvg && this._inHandleSvg.size(handleDimensions.x, handleDimensions.y).translate(inHandlePosition.x, inHandlePosition.y);
+        this._outHandleSvg && this._outHandleSvg.size(handleDimensions.x, handleDimensions.y).translate(outHandlePosition.x, outHandlePosition.y);
+        this._pointSvg && this._pointSvg.size(pointDimensions.x, pointDimensions.y).translate(pointPosition.x, pointPosition.y);
+    }
+
+    private _handleDimensions(): Vector {
+        return new Vector(this._handleWidth * this._scale, this._handleHeight * this._scale);
+    }
+
+    private _handlePosition(origin: Vector): Vector {
+        const dimensions = this._handleDimensions();
+        return new Vector(origin.x - dimensions.x / 2, origin.y - dimensions.y / 2);
+    }
+
+    private _pointDimensions(): Vector {
+        return new Vector(this._pointWidth * this._scale, this._pointHeight * this._scale);
+    }
+
+    private _pointPosition(): Vector {
+        const dimensions = this._pointDimensions();
+        return new Vector(this._point.x - dimensions.x / 2, this._point.y - dimensions.y / 2);
     }
 }
 

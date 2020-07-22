@@ -7,6 +7,7 @@ import SlideRenderer from "../SlideRenderer";
 type RectangleMakerArgs = {
     slide: SlideRenderer;
     initialPosition: Vector;
+    scale: number;
 };
 
 type RectangleMakerHelpers = {
@@ -38,19 +39,23 @@ class RectangleMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._rectangle.getOrigin()
+                center: this._rectangle.getOrigin(),
+                scale: args.scale
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0))
+                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)),
+                scale: args.scale
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight()))
+                center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())),
+                scale: args.scale
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()))
+                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())),
+                scale: args.scale
             })
         };
 

@@ -7,6 +7,7 @@ import { GraphicMutator, GRAPHIC_TYPES } from "../types";
 type RectangleMutatorArgs = {
     rectangle: RectangleRenderer;
     slide: SlideRenderer;
+    scale: number;
 };
 
 type RectangleMutatorHelpers = {
@@ -29,19 +30,23 @@ class RectangleMutator implements GraphicMutator {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._rectangle.getOrigin()
+                center: this._rectangle.getOrigin(),
+                scale: args.scale
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0))
+                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)),
+                scale: args.scale
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight()))
+                center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())),
+                scale: args.scale
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()))
+                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())),
+                scale: args.scale
             })
         };
 
@@ -92,6 +97,13 @@ class RectangleMutator implements GraphicMutator {
         this._helpers.topRight.unrender();
         this._helpers.bottomLeft.unrender();
         this._helpers.bottomRight.unrender();
+    }
+
+    public setScale(scale: number): void {
+        this._helpers.topLeft.setScale(scale);
+        this._helpers.topRight.setScale(scale);
+        this._helpers.bottomLeft.setScale(scale);
+        this._helpers.bottomRight.setScale(scale);
     }
 }
 

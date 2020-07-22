@@ -7,6 +7,7 @@ import SlideRenderer from "../SlideRenderer";
 type ImageMakerArgs = {
     slide: SlideRenderer;
     initialPosition: Vector;
+    scale: number;
     source: string;
     width: number;
     height: number;
@@ -47,19 +48,23 @@ class ImageMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._image.getOrigin()
+                center: this._image.getOrigin(),
+                scale: args.scale
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._image.getOrigin().add(new Vector(this._image.getWidth(), 0))
+                center: this._image.getOrigin().add(new Vector(this._image.getWidth(), 0)),
+                scale: args.scale
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._image.getOrigin().add(new Vector(0, this._image.getHeight()))
+                center: this._image.getOrigin().add(new Vector(0, this._image.getHeight())),
+                scale: args.scale
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._image.getOrigin().add(new Vector(this._image.getWidth(), this._image.getHeight()))
+                center: this._image.getOrigin().add(new Vector(this._image.getWidth(), this._image.getHeight())),
+                scale: args.scale
             })
         };
 

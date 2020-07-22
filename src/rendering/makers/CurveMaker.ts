@@ -8,8 +8,10 @@ import { CurveAnchor } from "../types";
 type CurveMakerArgs = {
     slide: SlideRenderer;
     initialPosition: Vector;
+    scale: number;
 };
 
+// TODO: Handle zoom while making graphics
 class CurveMaker {
     private _curve: CurveRenderer;
     private _slide: SlideRenderer;
@@ -27,6 +29,7 @@ class CurveMaker {
         // Initialize helper graphic
         this._helper = new CurveAnchorRenderer({
             slide: this._slide,
+            scale: args.scale,
             inHandle: args.initialPosition,
             point: args.initialPosition,
             outHandle: args.initialPosition

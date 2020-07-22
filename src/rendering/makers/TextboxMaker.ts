@@ -7,6 +7,7 @@ import SlideRenderer from "../SlideRenderer";
 type TextboxMakerArgs = {
     slide: SlideRenderer;
     initialPosition: Vector;
+    scale: number;
 };
 
 type TextboxMakerHelpers = {
@@ -38,19 +39,23 @@ class TextboxMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._textbox.getOrigin()
+                center: this._textbox.getOrigin(),
+                scale: args.scale
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), 0))
+                center: this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), 0)),
+                scale: args.scale
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
-                center: this._textbox.getOrigin().add(new Vector(0, this._textbox.getHeight()))
+                center: this._textbox.getOrigin().add(new Vector(0, this._textbox.getHeight())),
+                scale: args.scale
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
-                center: this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), this._textbox.getHeight()))
+                center: this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), this._textbox.getHeight())),
+                scale: args.scale
             })
         };
 

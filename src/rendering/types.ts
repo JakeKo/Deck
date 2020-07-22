@@ -12,6 +12,7 @@ export type GraphicMutator = {
     getType: () => GRAPHIC_TYPES;
     getTarget: () => GraphicRenderer;
     complete: () => void;
+    setScale: (scale: number) => void;
 };
 
 export type CurveAnchor = {

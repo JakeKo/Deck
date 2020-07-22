@@ -8,6 +8,8 @@ import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, Vid
 import { CurveMutator, RectangleMutator } from './mutators';
 import { GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
 import { renderBackdrop } from './utilities';
+import { listen } from '../events/utilities';
+import { SLIDE_EVENTS, SlideZoomEvent } from '../events/types';
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;
@@ -22,6 +24,7 @@ class SlideRenderer {
     private _graphics: { [index: string]: GraphicRenderer };
     private _rawViewbox: Viewbox;
     private _focusedGraphics: { [index: string]: GraphicMutator };
+    private _zoom: number;
 
     constructor(args: SlideRendererArgs) {
         this._stateManager = args.stateManager;
@@ -29,10 +32,16 @@ class SlideRenderer {
         this._graphics = {};
         this._rawViewbox = args.rawViewbox;
         this._focusedGraphics = {};
+        this._zoom = 1;
 
         renderBackdrop(this, args.croppedViewbox.width, args.croppedViewbox.height);
         decorateSlideEvents(this);
         this._canvas.node.tabIndex = 0;
+
+        listen(SLIDE_EVENTS.ZOOM, (event: SlideZoomEvent): void => {
+            this._zoom = event.detail.zoom;
+            Object.keys(this._focusedGraphics).forEach(graphicId => this._focusedGraphics[graphicId].setScale(1 / this._zoom));
+        });
     }
 
     public get canvas(): SVG.Doc {
@@ -53,27 +62,27 @@ class SlideRenderer {
     }
 
     public makeCurveInteractive(initialPosition: Vector): CurveMaker {
-        return new CurveMaker({ slide: this, initialPosition });
+        return new CurveMaker({ slide: this, initialPosition, scale: 1 / this._zoom });
     }
 
     public makeEllipseInteractive(initialPosition: Vector): EllipseMaker {
-        return new EllipseMaker({ slide: this, initialPosition });
+        return new EllipseMaker({ slide: this, initialPosition, scale: 1 / this._zoom });
     }
 
     public makeImageInteractive(initialPosition: Vector, source: string, width: number, height: number) {
-        return new ImageMaker({ slide: this, initialPosition, source: source, width, height });
+        return new ImageMaker({ slide: this, initialPosition, source: source, width, height, scale: 1 / this._zoom });
     }
 
     public makeRectangleInteractive(initialPosition: Vector): RectangleMaker {
-        return new RectangleMaker({ slide: this, initialPosition });
+        return new RectangleMaker({ slide: this, initialPosition, scale: 1 / this._zoom });
     }
 
     public makeTextboxInteractive(initialPosition: Vector): TextboxMaker {
-        return new TextboxMaker({ slide: this, initialPosition });
+        return new TextboxMaker({ slide: this, initialPosition, scale: 1 / this._zoom });
     }
 
     public makeVideoInteractive(initialPosition: Vector, source: HTMLVideoElement, width: number, height: number): VideoMaker {
-        return new VideoMaker({ slide: this, initialPosition, source, width, height });
+        return new VideoMaker({ slide: this, initialPosition, source, width, height, scale: 1 / this._zoom });
     }
 
     public getGraphic(graphicId: string): GraphicRenderer {
@@ -105,9 +114,9 @@ class SlideRenderer {
         let mutator;
 
         if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
-            mutator = new RectangleMutator({ slide: this, rectangle: graphic as RectangleRenderer });
+            mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, rectangle: graphic as RectangleRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
-            mutator = new CurveMutator({ slide: this, curve: graphic as CurveRenderer });
+            mutator = new CurveMutator({ slide: this, scale: 1 / this._zoom, curve: graphic as CurveRenderer });
         } else {
             throw new Error(`Did not recognize graphic type: ${graphic.getType()}`);
         }
