@@ -3,7 +3,7 @@ import Vector from "../../utilities/Vector";
 import { CurveRenderer } from "../graphics";
 import { CurveAnchorRenderer } from '../helpers';
 import SlideRenderer from "../SlideRenderer";
-import { CurveAnchor } from "../types";
+import { CurveAnchor, GraphicMaker } from "../types";
 
 type CurveMakerArgs = {
     slide: SlideRenderer;
@@ -12,7 +12,7 @@ type CurveMakerArgs = {
 };
 
 // TODO: Handle zoom while making graphics
-class CurveMaker {
+class CurveMaker implements GraphicMaker {
     private _curve: CurveRenderer;
     private _slide: SlideRenderer;
     private _helper: CurveAnchorRenderer;
@@ -46,6 +46,19 @@ class CurveMaker {
         return this._curve;
     }
 
+    public complete(): void {
+        // Trim the last anchor and persist
+        this._curve.removeAnchor(this._curve.getAnchors().length - 1);
+        this._slide.setGraphic(this._curve);
+
+        // Remove helper graphics
+        this._helper.unrender();
+    }
+
+    public setScale(scale: number): void {
+        this._helper.setScale(scale);
+    }
+
     public addAnchor(anchor: CurveAnchor): { setHandles: (position: Vector) => void, setPoint: (position: Vector) => void } {
         const anchorIndex = this._curve.addAnchor(anchor);
 
@@ -68,15 +81,6 @@ class CurveMaker {
                 this._helper.setPoint(anchor.point);
             }
         };
-    }
-
-    public complete(): void {
-        // Trim the last anchor and persist
-        this._curve.removeAnchor(this._curve.getAnchors().length - 1);
-        this._slide.setGraphic(this._curve);
-
-        // Remove helper graphics
-        this._helper.unrender();
     }
 }
 

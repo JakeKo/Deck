@@ -3,6 +3,7 @@ import Vector from "../../utilities/Vector";
 import { RectangleRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
+import { GraphicMaker } from "../types";
 
 type RectangleMakerArgs = {
     slide: SlideRenderer;
@@ -17,7 +18,7 @@ type RectangleMakerHelpers = {
     bottomRight: VertexRenderer
 };
 
-class RectangleMaker {
+class RectangleMaker implements GraphicMaker {
     private _rectangle: RectangleRenderer;
     private _slide: SlideRenderer;
     private _initialPosition: Vector;
@@ -73,6 +74,23 @@ class RectangleMaker {
         return this._rectangle;
     }
 
+    public setScale(scale: number): void {
+        this._helpers.topLeft.setScale(scale);
+        this._helpers.topRight.setScale(scale);
+        this._helpers.bottomLeft.setScale(scale);
+        this._helpers.bottomRight.setScale(scale);
+    }
+
+    public complete(): void {
+        this._slide.setGraphic(this._rectangle);
+
+        // Remove helper graphics
+        this._helpers.topLeft.unrender();
+        this._helpers.topRight.unrender();
+        this._helpers.bottomLeft.unrender();
+        this._helpers.bottomRight.unrender();
+    }
+
     public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
         const rawOffset = this._initialPosition.towards(position);
         const absOffset = rawOffset.transform(Math.abs);
@@ -98,16 +116,6 @@ class RectangleMaker {
         this._helpers.topRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)));
         this._helpers.bottomLeft.setCenter(this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())));
         this._helpers.bottomRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())));
-    }
-
-    public complete(): void {
-        this._slide.setGraphic(this._rectangle);
-
-        // Remove helper graphics
-        this._helpers.topLeft.unrender();
-        this._helpers.topRight.unrender();
-        this._helpers.bottomLeft.unrender();
-        this._helpers.bottomRight.unrender();
     }
 }
 

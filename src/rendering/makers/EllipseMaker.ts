@@ -3,6 +3,7 @@ import Vector from "../../utilities/Vector";
 import { EllipseRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
+import { GraphicMaker } from "../types";
 
 type EllipseMakerArgs = {
     slide: SlideRenderer;
@@ -17,7 +18,7 @@ type EllipseMakerHelpers = {
     bottomRight: VertexRenderer
 };
 
-class EllipseMaker {
+class EllipseMaker implements GraphicMaker {
     private _ellipse: EllipseRenderer;
     private _slide: SlideRenderer;
     private _initialPosition: Vector;
@@ -73,6 +74,23 @@ class EllipseMaker {
         return this._ellipse;
     }
 
+    public complete(): void {
+        this._slide.setGraphic(this._ellipse);
+
+        // Remove helper graphics
+        this._helpers.topLeft.unrender();
+        this._helpers.topRight.unrender();
+        this._helpers.bottomLeft.unrender();
+        this._helpers.bottomRight.unrender();
+    }
+
+    public setScale(scale: number): void {
+        this._helpers.topLeft.setScale(scale);
+        this._helpers.topRight.setScale(scale);
+        this._helpers.bottomLeft.setScale(scale);
+        this._helpers.bottomRight.setScale(scale);
+    }
+
     public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
         const rawOffset = this._initialPosition.towards(position);
         const absOffset = rawOffset.transform(Math.abs);
@@ -99,16 +117,6 @@ class EllipseMaker {
         this._helpers.topRight.setCenter(center.add(radius.signAs(new Vector(1, -1))));
         this._helpers.bottomLeft.setCenter(center.add(radius));
         this._helpers.bottomRight.setCenter(center.add(radius.signAs(new Vector(-1, 1))));
-    }
-
-    public complete(): void {
-        this._slide.setGraphic(this._ellipse);
-
-        // Remove helper graphics
-        this._helpers.topLeft.unrender();
-        this._helpers.topRight.unrender();
-        this._helpers.bottomLeft.unrender();
-        this._helpers.bottomRight.unrender();
     }
 }
 

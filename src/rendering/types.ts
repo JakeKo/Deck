@@ -8,6 +8,12 @@ export type GraphicRenderer = {
     unrender: () => void;
 };
 
+export type GraphicMaker = {
+    getTarget: () => GraphicRenderer;
+    complete: () => void;
+    setScale: (scale: number) => void;
+};
+
 export type GraphicMutator = {
     getType: () => GRAPHIC_TYPES;
     getTarget: () => GraphicRenderer;

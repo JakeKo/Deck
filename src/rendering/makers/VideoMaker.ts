@@ -3,6 +3,7 @@ import Vector from "../../utilities/Vector";
 import { VideoRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
+import { GraphicMaker } from "../types";
 
 type VideoMakerArgs = {
     slide: SlideRenderer;
@@ -20,7 +21,7 @@ type VideoMakerHelpers = {
     bottomRight: VertexRenderer
 };
 
-class VideoMaker {
+class VideoMaker implements GraphicMaker {
     private _video: VideoRenderer;
     private _slide: SlideRenderer;
     private _initialPosition: Vector;
@@ -82,6 +83,23 @@ class VideoMaker {
         return this._video;
     }
 
+    public setScale(scale: number): void {
+        this._helpers.topLeft.setScale(scale);
+        this._helpers.topRight.setScale(scale);
+        this._helpers.bottomLeft.setScale(scale);
+        this._helpers.bottomRight.setScale(scale);
+    }
+
+    public complete(): void {
+        this._slide.setGraphic(this._video);
+
+        // Remove helper graphics
+        this._helpers.topLeft.unrender();
+        this._helpers.topRight.unrender();
+        this._helpers.bottomLeft.unrender();
+        this._helpers.bottomRight.unrender();
+    }
+
     // Some trig, for your enjoyment
     public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
         const rawOffset = this._initialPosition.towards(position);
@@ -110,16 +128,6 @@ class VideoMaker {
         this._helpers.topRight.setCenter(this._video.getOrigin().add(new Vector(this._video.getWidth(), 0)));
         this._helpers.bottomLeft.setCenter(this._video.getOrigin().add(new Vector(0, this._video.getHeight())));
         this._helpers.bottomRight.setCenter(this._video.getOrigin().add(new Vector(this._video.getWidth(), this._video.getHeight())));
-    }
-
-    public complete(): void {
-        this._slide.setGraphic(this._video);
-
-        // Remove helper graphics
-        this._helpers.topLeft.unrender();
-        this._helpers.topRight.unrender();
-        this._helpers.bottomLeft.unrender();
-        this._helpers.bottomRight.unrender();
     }
 }
 
