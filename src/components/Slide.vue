@@ -42,6 +42,7 @@ export default class Slide extends DeckComponent<StyleProps, Style> {
     @Prop({ type: SlideStateManager, required: true }) private stateManager!: SlideStateManager;
     @Getter private [GETTERS.RAW_VIEWBOX]: Viewbox;
     @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
+    @Getter private [GETTERS.EDITOR_ZOOM_LEVEL]: number;
 
     private get slideStyle(): any {
         const style = this[GETTERS.STYLE]({ raw: this[GETTERS.RAW_VIEWBOX] }, componentStyle);
@@ -59,7 +60,8 @@ export default class Slide extends DeckComponent<StyleProps, Style> {
             stateManager: this.stateManager,
             canvas,
             rawViewbox: viewbox,
-            croppedViewbox: this[GETTERS.CROPPED_VIEWBOX]
+            croppedViewbox: this[GETTERS.CROPPED_VIEWBOX],
+            zoom: this[GETTERS.EDITOR_ZOOM_LEVEL]
         });
 
         this.stateManager.setStore(this.$store);

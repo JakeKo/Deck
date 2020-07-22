@@ -16,6 +16,7 @@ type SlideRendererArgs = {
     canvas: SVG.Doc;
     rawViewbox: Viewbox;
     croppedViewbox: Viewbox;
+    zoom: number;
 };
 
 class SlideRenderer {
@@ -32,7 +33,7 @@ class SlideRenderer {
         this._graphics = {};
         this._rawViewbox = args.rawViewbox;
         this._focusedGraphics = {};
-        this._zoom = 1;
+        this._zoom = args.zoom;
 
         renderBackdrop(this, args.croppedViewbox.width, args.croppedViewbox.height);
         decorateSlideEvents(this);
