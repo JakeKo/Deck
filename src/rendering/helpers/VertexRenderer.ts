@@ -53,6 +53,14 @@ class VertexRenderer implements GraphicRenderer {
         return this._svg !== undefined;
     }
 
+    public getLocation(): string {
+        return this._location;
+    }
+
+    public getParent(): GraphicRenderer {
+        return this._parent;
+    }
+
     public render(): void {
         // Silently fail if the SVG is already rendered
         if (this.isRendered()) {

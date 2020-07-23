@@ -32,7 +32,7 @@ function reevaluateFocusedGraphics(event: SlideMouseEvent): void {
     const { slide, target } = event.detail;
 
     if (target === undefined) {
-        // slide.unfocusAllGraphics();
+        slide.unfocusAllGraphics();
     }
 }
 
@@ -66,12 +66,11 @@ function beginRectangleMove(event: RectangleMouseEvent): void {
 }
 
 function beginVertexMove(event: VertexMouseEvent): void {
-    console.log(event.detail);
-    const { slide, parentId, location } = event.detail;
-    const mutator = slide.focusGraphic(parentId);
+    const { slide, graphic } = event.detail;
+    const mutator = slide.focusGraphic(graphic.getParent().getId());
 
     if (mutator.getType() === GRAPHIC_TYPES.RECTANGLE) {
-        if (location === 'topLeft') {
+        if (graphic.getLocation() === 'topLeft') {
             const handler = (mutator as RectangleMutator).moveTopLeft();
 
             listen(SLIDE_EVENTS.MOUSEMOVE, move);
