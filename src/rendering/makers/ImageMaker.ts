@@ -15,10 +15,10 @@ type ImageMakerArgs = {
 };
 
 type ImageMakerHelpers = {
-    topLeft: VertexRenderer,
-    topRight: VertexRenderer,
-    bottomLeft: VertexRenderer,
-    bottomRight: VertexRenderer
+    topLeft: VertexRenderer;
+    topRight: VertexRenderer;
+    bottomLeft: VertexRenderer;
+    bottomRight: VertexRenderer;
 };
 
 class ImageMaker implements GraphicMaker {

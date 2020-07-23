@@ -48,6 +48,11 @@ export default class Editor extends DeckComponent<StyleProps, Style> {
     @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
     @Mutation private [MUTATIONS.EDITOR_ZOOM_LEVEL]: (zoomLevel: number) => void;
 
+    public mounted(): void {
+        this.bindEvents();
+        this.reorientSlide();
+    }
+
     private get editorStyle(): any {
         const style = this[GETTERS.STYLE]({}, componentStyle);
         return style.editor;
@@ -66,11 +71,6 @@ export default class Editor extends DeckComponent<StyleProps, Style> {
     // Reorient the editor view when the active slide changes
     @Watch(GETTERS.ACTIVE_SLIDE)
     private onActiveSlideIdUpdate(): void {
-        this.reorientSlide();
-    }
-
-    public mounted(): void {
-        this.bindEvents();
         this.reorientSlide();
     }
 

@@ -1,13 +1,13 @@
 export default class Vector {
-    public x: number;
-    public y: number;
-
     public static undefined: Vector = new Vector(NaN, NaN);
     public static zero = new Vector(0, 0);
     public static up = new Vector(0, 1);
     public static right = new Vector(1, 0);
     public static down = new Vector(0, -1);
     public static left = new Vector(-1, 0);
+
+    public x: number;
+    public y: number;
 
     constructor(x: number, y: number) {
         this.x = x;

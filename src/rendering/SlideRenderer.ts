@@ -64,14 +64,9 @@ class SlideRenderer {
         return this._zoom;
     }
 
-    public get bounds(): { origin: Vector, height: number, width: number } {
+    public get bounds(): { origin: Vector; height: number; width: number } {
         const bounds = this._canvas.node.getBoundingClientRect() as DOMRect;
         return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
-    }
-
-    private activateMaker<T extends GraphicMaker>(maker: T): T {
-        this._activeMakers[maker.getTarget().getId()] = maker;
-        return maker;
     }
 
     public completeMaker(graphicId: string): void {
@@ -189,6 +184,11 @@ class SlideRenderer {
 
     public setCursor(cursor: string): void {
         this._canvas.node.style.cursor = cursor;
+    }
+
+    private activateMaker<T extends GraphicMaker>(maker: T): T {
+        this._activeMakers[maker.getTarget().getId()] = maker;
+        return maker;
     }
 }
 

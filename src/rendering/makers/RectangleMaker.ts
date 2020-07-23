@@ -12,10 +12,10 @@ type RectangleMakerArgs = {
 };
 
 type RectangleMakerHelpers = {
-    topLeft: VertexRenderer,
-    topRight: VertexRenderer,
-    bottomLeft: VertexRenderer,
-    bottomRight: VertexRenderer
+    topLeft: VertexRenderer;
+    topRight: VertexRenderer;
+    bottomLeft: VertexRenderer;
+    bottomRight: VertexRenderer;
 };
 
 class RectangleMaker implements GraphicMaker {

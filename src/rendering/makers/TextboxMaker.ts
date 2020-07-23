@@ -12,10 +12,10 @@ type TextboxMakerArgs = {
 };
 
 type TextboxMakerHelpers = {
-    topLeft: VertexRenderer,
-    topRight: VertexRenderer,
-    bottomLeft: VertexRenderer,
-    bottomRight: VertexRenderer
+    topLeft: VertexRenderer;
+    topRight: VertexRenderer;
+    bottomLeft: VertexRenderer;
+    bottomRight: VertexRenderer;
 };
 
 class TextboxMaker implements GraphicMaker {

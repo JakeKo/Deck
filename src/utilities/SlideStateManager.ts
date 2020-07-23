@@ -13,6 +13,69 @@ export default class SlideStateManager {
         this._slideId = slideId;
     }
 
+    public setStore(store: AppStore): void {
+        this._store = store;
+    }
+
+    public setRenderer(renderer: SlideRenderer): void {
+        this._renderer = renderer;
+    }
+
+    public setGraphicFromRenderer(graphic: GraphicRenderer): void {
+        if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
+            const storeModel = this._curveRendererToStoreModel(graphic as CurveRenderer);
+            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+        } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
+            const storeModel = this._ellipseRendererToStoreModel(graphic as EllipseRenderer);
+            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+        } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
+            const storeModel = this._imageRendererToStoreModel(graphic as ImageRenderer);
+            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+        } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
+            const storeModel = this._rectangleRendererToStoreModel(graphic as RectangleRenderer);
+            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+        } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
+            const storeModel = this._textboxRendererToStoreModel(graphic as TextboxRenderer);
+            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+        } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
+            const storeModel = this._videoRendererToStoreModel(graphic as VideoRenderer);
+            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+        }
+    }
+
+    public removeGraphicFromRenderer(graphicId: string): void {
+        this._store && this._store.commit(MUTATIONS.REMOVE_GRAPHIC, {
+            slideId: this._slideId,
+            graphicId
+        });
+    }
+
+    public setGraphicFromStore(graphic: GraphicStoreModel): void {
+        if (graphic.type === GRAPHIC_TYPES.CURVE) {
+            const renderer = this._curveStoreModelToRenderer(graphic);
+            this._renderer && this._renderer.setGraphic(renderer);
+        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+            const renderer = this._ellipseStoreModelToRenderer(graphic);
+            this._renderer && this._renderer.setGraphic(renderer);
+        } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
+            const renderer = this._imageStoreModelToRenderer(graphic);
+            this._renderer && this._renderer.setGraphic(renderer);
+        } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+            const renderer = this._rectangleStoreModelToRenderer(graphic);
+            this._renderer && this._renderer.setGraphic(renderer);
+        } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
+            const renderer = this._textboxStoreModelToRenderer(graphic);
+            this._renderer && this._renderer.setGraphic(renderer);
+        } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
+            const renderer = this._videoStoreModelToRenderer(graphic);
+            this._renderer && this._renderer.setGraphic(renderer);
+        }
+    }
+
+    public removeGraphicFromStore(graphicId: string): void {
+        this._renderer && this._renderer.removeGraphic(graphicId);
+    }
+
     private _curveStoreModelToRenderer(curve: CurveStoreModel): CurveRenderer {
         return new CurveRenderer({
             id: curve.id,
@@ -183,68 +246,5 @@ export default class SlideStateManager {
             strokeWidth: video.getStrokeWidth(),
             rotation: video.getRotation()
         };
-    }
-
-    public setStore(store: AppStore): void {
-        this._store = store;
-    }
-
-    public setRenderer(renderer: SlideRenderer): void {
-        this._renderer = renderer;
-    }
-
-    public setGraphicFromRenderer(graphic: GraphicRenderer): void {
-        if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
-            const storeModel = this._curveRendererToStoreModel(graphic as CurveRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
-        } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
-            const storeModel = this._ellipseRendererToStoreModel(graphic as EllipseRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
-        } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
-            const storeModel = this._imageRendererToStoreModel(graphic as ImageRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
-        } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
-            const storeModel = this._rectangleRendererToStoreModel(graphic as RectangleRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
-        } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
-            const storeModel = this._textboxRendererToStoreModel(graphic as TextboxRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
-        } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
-            const storeModel = this._videoRendererToStoreModel(graphic as VideoRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
-        }
-    }
-
-    public removeGraphicFromRenderer(graphicId: string): void {
-        this._store && this._store.commit(MUTATIONS.REMOVE_GRAPHIC, {
-            slideId: this._slideId,
-            graphicId
-        });
-    }
-
-    public setGraphicFromStore(graphic: GraphicStoreModel): void {
-        if (graphic.type === GRAPHIC_TYPES.CURVE) {
-            const renderer = this._curveStoreModelToRenderer(graphic);
-            this._renderer && this._renderer.setGraphic(renderer);
-        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
-            const renderer = this._ellipseStoreModelToRenderer(graphic);
-            this._renderer && this._renderer.setGraphic(renderer);
-        } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
-            const renderer = this._imageStoreModelToRenderer(graphic);
-            this._renderer && this._renderer.setGraphic(renderer);
-        } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
-            const renderer = this._rectangleStoreModelToRenderer(graphic);
-            this._renderer && this._renderer.setGraphic(renderer);
-        } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
-            const renderer = this._textboxStoreModelToRenderer(graphic);
-            this._renderer && this._renderer.setGraphic(renderer);
-        } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
-            const renderer = this._videoStoreModelToRenderer(graphic);
-            this._renderer && this._renderer.setGraphic(renderer);
-        }
-    }
-
-    public removeGraphicFromStore(graphicId: string): void {
-        this._renderer && this._renderer.removeGraphic(graphicId);
     }
 }

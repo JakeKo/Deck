@@ -12,10 +12,10 @@ type EllipseMakerArgs = {
 };
 
 type EllipseMakerHelpers = {
-    topLeft: VertexRenderer,
-    topRight: VertexRenderer,
-    bottomLeft: VertexRenderer,
-    bottomRight: VertexRenderer
+    topLeft: VertexRenderer;
+    topRight: VertexRenderer;
+    bottomLeft: VertexRenderer;
+    bottomRight: VertexRenderer;
 };
 
 class EllipseMaker implements GraphicMaker {

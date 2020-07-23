@@ -11,10 +11,10 @@ type RectangleMutatorArgs = {
 };
 
 type RectangleMutatorHelpers = {
-    topLeft: VertexRenderer,
-    topRight: VertexRenderer,
-    bottomLeft: VertexRenderer,
-    bottomRight: VertexRenderer
+    topLeft: VertexRenderer;
+    topRight: VertexRenderer;
+    bottomLeft: VertexRenderer;
+    bottomRight: VertexRenderer;
 };
 
 class RectangleMutator implements GraphicMutator {

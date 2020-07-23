@@ -22,7 +22,7 @@ import DeckComponent from './generic/DeckComponent';
 
 type StyleProps = {};
 type Style = {
-    toolbox: any
+    toolbox: any;
 };
 const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
     toolbox: {

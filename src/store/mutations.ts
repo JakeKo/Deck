@@ -40,25 +40,25 @@ const mutations: AppMutations = {
     [MUTATIONS.DECK_TITLE]: (state: AppState, deckTitle: string): void => {
         state.deckTitle = deckTitle === '' ? undefined : deckTitle;
     },
-    [MUTATIONS.SET_GRAPHIC]: (state: AppState, { slideId, graphic }: { slideId: string, graphic: GraphicStoreModel }): void => {
+    [MUTATIONS.SET_GRAPHIC]: (state: AppState, { slideId, graphic }: { slideId: string; graphic: GraphicStoreModel }): void => {
         const slide = getSlide(state, slideId);
         if (slide !== undefined) {
             Vue.set(slide.graphics, graphic.id, graphic);
         }
     },
-    [MUTATIONS.REMOVE_GRAPHIC]: (state: AppState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
+    [MUTATIONS.REMOVE_GRAPHIC]: (state: AppState, { slideId, graphicId }: { slideId: string; graphicId: string }): void => {
         const slide = getSlide(state, slideId);
         if (slide !== undefined) {
             Vue.delete(slide.graphics, graphicId);
         }
     },
-    [MUTATIONS.BROADCAST_SET_GRAPHIC]: (state: AppState, { slideId, graphic }: { slideId: string, graphic: GraphicStoreModel }): void => {
+    [MUTATIONS.BROADCAST_SET_GRAPHIC]: (state: AppState, { slideId, graphic }: { slideId: string; graphic: GraphicStoreModel }): void => {
         const slide = getSlide(state, slideId);
         if (slide !== undefined) {
             slide.stateManager.setGraphicFromStore(graphic);
         }
     },
-    [MUTATIONS.BROADCAST_REMOVE_GRAPHIC]: (state: AppState, { slideId, graphicId }: { slideId: string, graphicId: string }): void => {
+    [MUTATIONS.BROADCAST_REMOVE_GRAPHIC]: (state: AppState, { slideId, graphicId }: { slideId: string; graphicId: string }): void => {
         const slide = getSlide(state, slideId);
         if (slide !== undefined) {
             slide.stateManager.removeGraphicFromStore(graphicId);

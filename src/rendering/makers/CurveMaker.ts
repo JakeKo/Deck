@@ -59,7 +59,7 @@ class CurveMaker implements GraphicMaker {
         this._helper.setScale(scale);
     }
 
-    public addAnchor(anchor: CurveAnchor): { setHandles: (position: Vector) => void, setPoint: (position: Vector) => void } {
+    public addAnchor(anchor: CurveAnchor): { setHandles: (position: Vector) => void; setPoint: (position: Vector) => void } {
         const anchorIndex = this._curve.addAnchor(anchor);
 
         // Update helper graphic

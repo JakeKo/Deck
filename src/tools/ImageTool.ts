@@ -35,12 +35,12 @@ export default (store: AppStore): EditorTool => {
     return {
         name: TOOL_NAMES.IMAGE,
         mount: async () => {
-            const uploadImage = new Promise<{ source: string, width: number, height: number }>(resolve => {
+            const uploadImage = new Promise<{ source: string; width: number; height: number }>(resolve => {
                 const reader = new FileReader();
                 const input = document.createElement('input');
                 input.type = 'file';
 
-                input.addEventListener('input', (): void => reader.readAsBinaryString((input as HTMLInputElement).files![0]));
+                input.addEventListener('input', (): void => reader.readAsBinaryString(input.files![0]));
                 reader.addEventListener('loadend', (): void => {
                     // Wait for the image width and height to be determined
                     const imageUrl = `data:image;base64,${btoa(reader.result as string)}`;
