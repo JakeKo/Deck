@@ -1,7 +1,7 @@
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
 import { listen, listenOnce, unlisten } from "../events/utilities";
 import { AppStore, MUTATIONS } from "../store/types";
-import PointerTool from "./PointerTool";
+import { PointerTool } from ".";
 import { EditorTool, TOOL_NAMES } from "./types";
 import { resolvePosition } from "./utilities";
 

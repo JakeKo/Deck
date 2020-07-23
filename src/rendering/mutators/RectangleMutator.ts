@@ -98,24 +98,43 @@ class RectangleMutator implements GraphicMutator {
     }
 
     // TODO: Account for shift, alt, and snapping
-    public moveTopLeft(): (position: Vector) => void {
-        const oppositeCorner = this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()));
+    public getVertexHandlers(): { [index: string]: () => (position: Vector) => void } {
+        const makeHandler = (oppositeCorner: Vector): (position: Vector) => void => {
+            return position => {
+                const offset = oppositeCorner.towards(position);
+                const dimensions = offset.abs;
+                const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
 
-        return position => {
-            const offset = oppositeCorner.towards(position);
-            const dimensions = offset.abs;
-            const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
+                // Update rendering
+                this._rectangle.setOrigin(origin);
+                this._rectangle.setWidth(dimensions.x);
+                this._rectangle.setHeight(dimensions.y);
 
-            // Update rendering
-            this._rectangle.setOrigin(origin);
-            this._rectangle.setWidth(dimensions.x);
-            this._rectangle.setHeight(dimensions.y);
+                // Update helper graphics
+                this._helpers.topLeft.setCenter(origin);
+                this._helpers.topRight.setCenter(origin.add(new Vector(dimensions.x, 0)));
+                this._helpers.bottomLeft.setCenter(origin.add(new Vector(0, dimensions.y)));
+                this._helpers.bottomRight.setCenter(origin.add(dimensions));
+            };
+        };
 
-            // Update helper graphics
-            this._helpers.topLeft.setCenter(origin);
-            this._helpers.topRight.setCenter(origin.add(new Vector(dimensions.x, 0)));
-            this._helpers.bottomLeft.setCenter(origin.add(new Vector(0, dimensions.y)));
-            this._helpers.bottomRight.setCenter(origin.add(dimensions));
+        return {
+            'topLeft': () => {
+                const oppositeCorner = this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()));
+                return makeHandler(oppositeCorner);
+            },
+            'topRight': () => {
+                const oppositeCorner = this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight()));
+                return makeHandler(oppositeCorner);
+            },
+            'bottomLeft': () => {
+                const oppositeCorner = this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0));
+                return makeHandler(oppositeCorner);
+            },
+            'bottomRight': () => {
+                const oppositeCorner = this._rectangle.getOrigin();
+                return makeHandler(oppositeCorner);
+            }
         };
     }
 
