@@ -5,9 +5,9 @@ import { listen } from '../events/utilities';
 import { Viewbox } from '../store/types';
 import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
-import { CurveRenderer, RectangleRenderer } from './graphics';
+import { CurveRenderer, RectangleRenderer, EllipseRenderer } from './graphics';
 import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, VideoMaker } from './makers';
-import { CurveMutator, RectangleMutator } from './mutators';
+import { CurveMutator, RectangleMutator, EllipseMutator } from './mutators';
 import { GraphicMaker, GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
 import { renderBackdrop } from './utilities';
 
@@ -155,12 +155,14 @@ class SlideRenderer {
         const graphic = this.getGraphic(graphicId);
         let mutator;
 
-        if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
-            mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, rectangle: graphic as RectangleRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
+        if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
             mutator = new CurveMutator({ slide: this, scale: 1 / this._zoom, curve: graphic as CurveRenderer });
+        } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
+            mutator = new EllipseMutator({ slide: this, scale: 1 / this._zoom, ellipse: graphic as EllipseRenderer });
+        } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
+            mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, rectangle: graphic as RectangleRenderer });
         } else {
-            throw new Error(`Did not recognize graphic type: ${graphic.getType()}`);
+            throw new Error(`Cannot focus unrecognized graphic type: ${graphic.getType()}`);
         }
 
         this._focusedGraphics[graphicId] = mutator;

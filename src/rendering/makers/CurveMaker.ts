@@ -11,7 +11,6 @@ type CurveMakerArgs = {
     scale: number;
 };
 
-// TODO: Handle zoom while making graphics
 class CurveMaker implements GraphicMaker {
     private _curve: CurveRenderer;
     private _slide: SlideRenderer;
