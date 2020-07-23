@@ -1,6 +1,7 @@
 import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from "../rendering/graphics";
 import SlideRenderer from "../rendering/SlideRenderer";
 import { GraphicRenderer } from "../rendering/types";
+import { VertexRenderer } from "../rendering/helpers";
 
 export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
 type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
@@ -155,6 +156,5 @@ export type VertexMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
     type: VERTEX_EVENTS;
-    location: string;
-    parentId: string;
+    graphic: VertexRenderer;
 };
