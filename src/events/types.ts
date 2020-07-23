@@ -156,4 +156,5 @@ export type VertexMouseEventPayload = {
     slide: SlideRenderer;
     type: VERTEX_EVENTS;
     location: string;
+    parentId: string;
 };

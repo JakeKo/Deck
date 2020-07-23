@@ -63,7 +63,7 @@ class VertexRenderer implements GraphicRenderer {
             .center(this._center.x, this._center.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth });
-        decorateVertexEvents(this._svg, this._slide, this._location);
+        decorateVertexEvents(this._svg, this._slide, this._parent.getId(), this._location);
     }
 
     public unrender(): void {

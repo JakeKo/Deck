@@ -98,13 +98,13 @@ class RectangleMutator implements GraphicMutator {
     }
 
     // TODO: Account for shift, alt, and snapping
-    public moveTopRight(): (position: Vector) => void {
+    public moveTopLeft(): (position: Vector) => void {
         const oppositeCorner = this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()));
 
         return position => {
             const offset = oppositeCorner.towards(position);
             const dimensions = offset.abs;
-            const origin = offset.scale(0.5).add(dimensions.scale(-0.5));
+            const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
 
             // Update rendering
             this._rectangle.setOrigin(origin);
@@ -115,6 +115,7 @@ class RectangleMutator implements GraphicMutator {
             this._helpers.topLeft.setCenter(origin);
             this._helpers.topRight.setCenter(origin.add(new Vector(dimensions.x, 0)));
             this._helpers.bottomLeft.setCenter(origin.add(new Vector(0, dimensions.y)));
+            this._helpers.bottomRight.setCenter(origin.add(dimensions));
         };
     }
 
