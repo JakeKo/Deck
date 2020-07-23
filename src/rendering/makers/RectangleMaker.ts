@@ -40,23 +40,31 @@ class RectangleMaker implements GraphicMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._rectangle.getOrigin(),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topLeft'
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topRight'
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomLeft'
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomRight'
             })
         };
 

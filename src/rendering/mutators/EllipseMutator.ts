@@ -32,23 +32,31 @@ class EllipseMutator implements GraphicMutator {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: center.add(radius.scale(-1)),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topLeft'
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: center.add(radius.signAs(new Vector(1, -1))),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topRight'
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: center.add(radius),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomLeft'
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: center.add(radius.signAs(new Vector(-1, 1))),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomRight'
             })
         };
 

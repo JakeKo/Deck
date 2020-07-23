@@ -49,23 +49,31 @@ class ImageMaker implements GraphicMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._image.getOrigin(),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topLeft'
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._image.getOrigin().add(new Vector(this._image.getWidth(), 0)),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topRight'
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._image.getOrigin().add(new Vector(0, this._image.getHeight())),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomLeft'
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._image.getOrigin().add(new Vector(this._image.getWidth(), this._image.getHeight())),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomRight'
             })
         };
 

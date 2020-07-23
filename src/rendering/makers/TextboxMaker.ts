@@ -40,23 +40,31 @@ class TextboxMaker implements GraphicMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._textbox.getOrigin(),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topLeft'
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), 0)),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topRight'
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._textbox.getOrigin().add(new Vector(0, this._textbox.getHeight())),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomLeft'
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), this._textbox.getHeight())),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomRight'
             })
         };
 

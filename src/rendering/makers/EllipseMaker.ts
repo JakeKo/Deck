@@ -40,23 +40,31 @@ class EllipseMaker implements GraphicMaker {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._ellipse.getCenter(),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topRight'
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), 0)),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topLeft'
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._ellipse.getCenter().add(new Vector(0, this._ellipse.getHeight())),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomLeft'
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), this._ellipse.getHeight())),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomRight'
             })
         };
 

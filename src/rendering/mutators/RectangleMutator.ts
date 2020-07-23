@@ -30,23 +30,31 @@ class RectangleMutator implements GraphicMutator {
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._rectangle.getOrigin(),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topLeft'
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)),
-                scale: args.scale
+                scale: args.scale,
+                location: 'topRight'
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomLeft'
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
+                parent: this.getTarget(),
                 center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())),
-                scale: args.scale
+                scale: args.scale,
+                location: 'bottomRight'
             })
         };
 
@@ -77,7 +85,7 @@ class RectangleMutator implements GraphicMutator {
         this._helpers.bottomRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())));
     }
 
-    // TODO: Account for shift, alt, ctrl, and snipping
+    // TODO: Account for shift, alt, ctrl, and snapping
     public setDimensions(dimensions: Vector): void {
         // Update rendering
         this._rectangle.setWidth(dimensions.x);
@@ -87,6 +95,27 @@ class RectangleMutator implements GraphicMutator {
         this._helpers.topRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)));
         this._helpers.bottomLeft.setCenter(this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())));
         this._helpers.bottomRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())));
+    }
+
+    // TODO: Account for shift, alt, and snapping
+    public moveTopRight(): (position: Vector) => void {
+        const oppositeCorner = this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()));
+
+        return position => {
+            const offset = oppositeCorner.towards(position);
+            const dimensions = offset.abs;
+            const origin = offset.scale(0.5).add(dimensions.scale(-0.5));
+
+            // Update rendering
+            this._rectangle.setOrigin(origin);
+            this._rectangle.setWidth(dimensions.x);
+            this._rectangle.setHeight(dimensions.y);
+
+            // Update helper graphics
+            this._helpers.topLeft.setCenter(origin);
+            this._helpers.topRight.setCenter(origin.add(new Vector(dimensions.x, 0)));
+            this._helpers.bottomLeft.setCenter(origin.add(new Vector(0, dimensions.y)));
+        };
     }
 
     // TODO: Include methods for other mutations

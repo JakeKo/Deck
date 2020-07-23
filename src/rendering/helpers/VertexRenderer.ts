@@ -3,17 +3,22 @@ import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { decorateVertexEvents } from '../../events/decorators';
 
 type VertexRendererArgs = {
     slide: SlideRenderer;
     scale: number;
-    center?: Vector;
+    location: string;
+    center: Vector;
+    parent: GraphicRenderer;
 };
 
 class VertexRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
     private _svg: SVG.Ellipse | undefined;
+    private _location: string;
+    private _parent: GraphicRenderer;
     private _scale: number;
     private _width: number;
     private _height: number;
@@ -25,8 +30,10 @@ class VertexRenderer implements GraphicRenderer {
     constructor(args: VertexRendererArgs) {
         this._id = provideId();
         this._slide = args.slide;
+        this._location = args.location;
+        this._parent = args.parent;
         this._scale = args.scale;
-        this._center = args.center || Vector.zero;
+        this._center = args.center;
         this._width = 8;
         this._height = 8;
         this._fillColor = '#888888';
@@ -56,6 +63,7 @@ class VertexRenderer implements GraphicRenderer {
             .center(this._center.x, this._center.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth });
+        decorateVertexEvents(this._svg, this._slide, this._location);
     }
 
     public unrender(): void {
