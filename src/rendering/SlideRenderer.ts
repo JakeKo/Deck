@@ -5,9 +5,9 @@ import { listen } from '../events/utilities';
 import { Viewbox } from '../store/types';
 import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
-import { CurveRenderer, RectangleRenderer, EllipseRenderer } from './graphics';
+import { CurveRenderer, RectangleRenderer, EllipseRenderer, ImageRenderer } from './graphics';
 import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, VideoMaker } from './makers';
-import { CurveMutator, RectangleMutator, EllipseMutator } from './mutators';
+import { CurveMutator, RectangleMutator, EllipseMutator, ImageMutator } from './mutators';
 import { GraphicMaker, GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
 import { renderBackdrop } from './utilities';
 
@@ -159,6 +159,8 @@ class SlideRenderer {
             mutator = new CurveMutator({ slide: this, scale: 1 / this._zoom, curve: graphic as CurveRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
             mutator = new EllipseMutator({ slide: this, scale: 1 / this._zoom, ellipse: graphic as EllipseRenderer });
+        } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
+            mutator = new ImageMutator({ slide: this, scale: 1 / this._zoom, image: graphic as ImageRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
             mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, rectangle: graphic as RectangleRenderer });
         } else {
