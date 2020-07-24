@@ -95,6 +95,7 @@ class TextboxRenderer implements GraphicRenderer {
     public setOrigin(origin: Vector): void {
         this._origin = origin;
         this._svg && this._svg.setAttribute('x', `${this._origin.x}px`);
+        this._svg && this._svg.setAttribute('y', `${this._origin.y}px`);
     }
 
     public getWidth(): number {
