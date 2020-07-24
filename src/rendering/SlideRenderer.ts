@@ -5,9 +5,9 @@ import { listen } from '../events/utilities';
 import { Viewbox } from '../store/types';
 import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
-import { CurveRenderer, RectangleRenderer, EllipseRenderer, ImageRenderer, TextboxRenderer } from './graphics';
+import { CurveRenderer, RectangleRenderer, EllipseRenderer, ImageRenderer, TextboxRenderer, VideoRenderer } from './graphics';
 import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, VideoMaker } from './makers';
-import { CurveMutator, RectangleMutator, EllipseMutator, ImageMutator, TextboxMutator } from './mutators';
+import { CurveMutator, RectangleMutator, EllipseMutator, ImageMutator, TextboxMutator, VideoMutator } from './mutators';
 import { GraphicMaker, GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
 import { renderBackdrop } from './utilities';
 
@@ -165,6 +165,8 @@ class SlideRenderer {
             mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, rectangle: graphic as RectangleRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
             mutator = new TextboxMutator({ slide: this, scale: 1 / this._zoom, textbox: graphic as TextboxRenderer});
+        } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
+            mutator = new VideoMutator({ slide: this, scale: 1 / this._zoom, video: graphic as VideoRenderer });
         } else {
             throw new Error(`Cannot focus unrecognized graphic type: ${graphic.getType()}`);
         }

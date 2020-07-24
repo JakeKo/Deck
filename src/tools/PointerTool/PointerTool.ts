@@ -1,6 +1,6 @@
-import { ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS } from "../../events/types";
+import { ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { ImageMutator, RectangleMutator, TextboxMutator } from "../../rendering/mutators";
+import { ImageMutator, RectangleMutator, TextboxMutator, VideoMutator } from "../../rendering/mutators";
 import { GRAPHIC_TYPES } from "../../rendering/types";
 import { AppStore } from "../../store/types";
 import { EditorTool, TOOL_NAMES } from "../types";
@@ -8,6 +8,7 @@ import { moveEllipse } from "./ellipse";
 import { moveImage, moveImageVertex } from "./image";
 import { moveRectangle, moveRectangleVertex } from "./rectangle";
 import { moveTextbox, moveTextboxVertex } from "./textbox";
+import { moveVideo, moveVideoVertex } from "./video";
 
 export default (store: AppStore): EditorTool => {
     return {
@@ -18,6 +19,7 @@ export default (store: AppStore): EditorTool => {
             listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
             listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, moveTextbox);
             listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
+            listenOnce(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
 
             listen(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
             listen(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
@@ -28,6 +30,7 @@ export default (store: AppStore): EditorTool => {
             unlisten(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
             unlisten(TEXTBOX_EVENTS.MOUSEDOWN, moveTextbox);
             unlisten(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
+            unlisten(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
 
             unlisten(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
             unlisten(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
@@ -58,5 +61,7 @@ function moveVertex(event: VertexMouseEvent): void {
         moveRectangleVertex(mutator as RectangleMutator, graphic, moveVertex);
     } else if (mutator.getType() === GRAPHIC_TYPES.TEXTBOX) {
         moveTextboxVertex(mutator as TextboxMutator, graphic, moveVertex);
+    } else if (mutator.getType() === GRAPHIC_TYPES.VIDEO) {
+        moveVideoVertex(mutator as VideoMutator, graphic, moveVertex);
     }
 }
