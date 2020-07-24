@@ -5,7 +5,7 @@ import SlideRenderer from "../SlideRenderer";
 import { GraphicMutator, GRAPHIC_TYPES } from "../types";
 
 type VideoMutatorArgs = {
-    video: VideoRenderer;
+    target: VideoRenderer;
     slide: SlideRenderer;
     scale: number;
 };
@@ -18,47 +18,48 @@ type VideoMutatorHelpers = {
 };
 
 class VideoMutator implements GraphicMutator {
-    private _video: VideoRenderer;
+    private _target: VideoRenderer;
     private _slide: SlideRenderer;
     private _helpers: VideoMutatorHelpers;
 
     constructor(args: VideoMutatorArgs) {
-        this._video = args.video;
+        this._target = args.target;
         this._slide = args.slide;
 
-        // Initialize helper graphics
+        // Initialize helper targets
+        const corners = this._getCorners();
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._video.getOrigin(),
+                center: corners.topLeft,
                 scale: args.scale,
                 location: 'topLeft'
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._video.getOrigin().add(new Vector(this._video.getWidth(), 0)),
+                center: corners.topRight,
                 scale: args.scale,
                 location: 'topRight'
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._video.getOrigin().add(new Vector(0, this._video.getHeight())),
+                center: corners.bottomLeft,
                 scale: args.scale,
                 location: 'bottomLeft'
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._video.getOrigin().add(new Vector(this._video.getWidth(), this._video.getHeight())),
+                center: corners.bottomRight,
                 scale: args.scale,
                 location: 'bottomRight'
             })
         };
 
-        // Render helper graphics
+        // Render helper targets
         this._helpers.topLeft.render();
         this._helpers.topRight.render();
         this._helpers.bottomLeft.render();
@@ -70,31 +71,14 @@ class VideoMutator implements GraphicMutator {
     }
 
     public getTarget(): VideoRenderer {
-        return this._video;
+        return this._target;
     }
 
     // TODO: Account for shift, alt, and snapping
     public move(origin: Vector): void {
         // Update rendering
-        this._video.setOrigin(origin);
-
-        // Update helper graphics
-        this._helpers.topLeft.setCenter(this._video.getOrigin());
-        this._helpers.topRight.setCenter(this._video.getOrigin().add(new Vector(this._video.getWidth(), 0)));
-        this._helpers.bottomLeft.setCenter(this._video.getOrigin().add(new Vector(0, this._video.getHeight())));
-        this._helpers.bottomRight.setCenter(this._video.getOrigin().add(new Vector(this._video.getWidth(), this._video.getHeight())));
-    }
-
-    // TODO: Account for shift, alt, ctrl, and snapping
-    public setDimensions(dimensions: Vector): void {
-        // Update rendering
-        this._video.setWidth(dimensions.x);
-        this._video.setHeight(dimensions.y);
-
-        // Update helper graphics
-        this._helpers.topRight.setCenter(this._video.getOrigin().add(new Vector(this._video.getWidth(), 0)));
-        this._helpers.bottomLeft.setCenter(this._video.getOrigin().add(new Vector(0, this._video.getHeight())));
-        this._helpers.bottomRight.setCenter(this._video.getOrigin().add(new Vector(this._video.getWidth(), this._video.getHeight())));
+        this._target.setOrigin(origin);
+        this._repositionVertices();
     }
 
     // TODO: Account for shift, alt, and snapping
@@ -106,42 +90,26 @@ class VideoMutator implements GraphicMutator {
                 const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
 
                 // Update rendering
-                this._video.setOrigin(origin);
-                this._video.setWidth(dimensions.x);
-                this._video.setHeight(dimensions.y);
-
-                // Update helper graphics
-                this._helpers.topLeft.setCenter(origin);
-                this._helpers.topRight.setCenter(origin.add(new Vector(dimensions.x, 0)));
-                this._helpers.bottomLeft.setCenter(origin.add(new Vector(0, dimensions.y)));
-                this._helpers.bottomRight.setCenter(origin.add(dimensions));
+                this._target.setOrigin(origin);
+                this._target.setWidth(dimensions.x);
+                this._target.setHeight(dimensions.y);
+                this._repositionVertices();
             };
         };
 
+        const corners = this._getCorners();
         return {
-            'topLeft': () => {
-                const oppositeCorner = this._video.getOrigin().add(new Vector(this._video.getWidth(), this._video.getHeight()));
-                return makeHandler(oppositeCorner);
-            },
-            'topRight': () => {
-                const oppositeCorner = this._video.getOrigin().add(new Vector(0, this._video.getHeight()));
-                return makeHandler(oppositeCorner);
-            },
-            'bottomLeft': () => {
-                const oppositeCorner = this._video.getOrigin().add(new Vector(this._video.getWidth(), 0));
-                return makeHandler(oppositeCorner);
-            },
-            'bottomRight': () => {
-                const oppositeCorner = this._video.getOrigin();
-                return makeHandler(oppositeCorner);
-            }
+            'topLeft': () => makeHandler(corners.bottomRight),
+            'topRight': () => makeHandler(corners.bottomLeft),
+            'bottomLeft': () => makeHandler(corners.topRight),
+            'bottomRight': () => makeHandler(corners.topLeft)
         };
     }
 
     // TODO: Include methods for other mutations
 
     public complete(): void {
-        // Remove helper graphics
+        // Remove helper targets
         this._helpers.topLeft.unrender();
         this._helpers.topRight.unrender();
         this._helpers.bottomLeft.unrender();
@@ -153,6 +121,26 @@ class VideoMutator implements GraphicMutator {
         this._helpers.topRight.setScale(scale);
         this._helpers.bottomLeft.setScale(scale);
         this._helpers.bottomRight.setScale(scale);
+    }
+
+    private _repositionVertices(): void {
+        const corners = this._getCorners();
+        this._helpers.topLeft.setCenter(corners.topLeft);
+        this._helpers.topRight.setCenter(corners.topRight);
+        this._helpers.bottomLeft.setCenter(corners.bottomLeft);
+        this._helpers.bottomRight.setCenter(corners.bottomRight);
+    }
+
+    private _getCorners(): { topLeft: Vector; topRight: Vector; bottomLeft: Vector; bottomRight: Vector } {
+        const origin = this._target.getOrigin();
+        const dimensions = new Vector(this._target.getWidth(), this._target.getHeight());
+
+        return {
+            topLeft: origin,
+            topRight: origin.add(new Vector(dimensions.x, 0)),
+            bottomLeft: origin.add(new Vector(0, dimensions.y)),
+            bottomRight: origin.add(dimensions)
+        };
     }
 }
 

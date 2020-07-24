@@ -5,7 +5,7 @@ import SlideRenderer from "../SlideRenderer";
 import { GraphicMutator, GRAPHIC_TYPES } from "../types";
 
 type RectangleMutatorArgs = {
-    rectangle: RectangleRenderer;
+    target: RectangleRenderer;
     slide: SlideRenderer;
     scale: number;
 };
@@ -18,41 +18,42 @@ type RectangleMutatorHelpers = {
 };
 
 class RectangleMutator implements GraphicMutator {
-    private _rectangle: RectangleRenderer;
+    private target: RectangleRenderer;
     private _slide: SlideRenderer;
     private _helpers: RectangleMutatorHelpers;
 
     constructor(args: RectangleMutatorArgs) {
-        this._rectangle = args.rectangle;
+        this.target = args.target;
         this._slide = args.slide;
 
         // Initialize helper graphics
+        const corners = this._getCorners();
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._rectangle.getOrigin(),
+                center: corners.topLeft,
                 scale: args.scale,
                 location: 'topLeft'
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)),
+                center: corners.topRight,
                 scale: args.scale,
                 location: 'topRight'
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())),
+                center: corners.bottomLeft,
                 scale: args.scale,
                 location: 'bottomLeft'
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())),
+                center: corners.bottomRight,
                 scale: args.scale,
                 location: 'bottomRight'
             })
@@ -70,31 +71,14 @@ class RectangleMutator implements GraphicMutator {
     }
 
     public getTarget(): RectangleRenderer {
-        return this._rectangle;
+        return this.target;
     }
 
     // TODO: Account for shift, alt, and snapping
     public move(origin: Vector): void {
         // Update rendering
-        this._rectangle.setOrigin(origin);
-
-        // Update helper graphics
-        this._helpers.topLeft.setCenter(this._rectangle.getOrigin());
-        this._helpers.topRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)));
-        this._helpers.bottomLeft.setCenter(this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())));
-        this._helpers.bottomRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())));
-    }
-
-    // TODO: Account for shift, alt, ctrl, and snapping
-    public setDimensions(dimensions: Vector): void {
-        // Update rendering
-        this._rectangle.setWidth(dimensions.x);
-        this._rectangle.setHeight(dimensions.y);
-
-        // Update helper graphics
-        this._helpers.topRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0)));
-        this._helpers.bottomLeft.setCenter(this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight())));
-        this._helpers.bottomRight.setCenter(this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight())));
+        this.target.setOrigin(origin);
+        this._repositionVertices();
     }
 
     // TODO: Account for shift, alt, and snapping
@@ -106,35 +90,19 @@ class RectangleMutator implements GraphicMutator {
                 const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
 
                 // Update rendering
-                this._rectangle.setOrigin(origin);
-                this._rectangle.setWidth(dimensions.x);
-                this._rectangle.setHeight(dimensions.y);
-
-                // Update helper graphics
-                this._helpers.topLeft.setCenter(origin);
-                this._helpers.topRight.setCenter(origin.add(new Vector(dimensions.x, 0)));
-                this._helpers.bottomLeft.setCenter(origin.add(new Vector(0, dimensions.y)));
-                this._helpers.bottomRight.setCenter(origin.add(dimensions));
+                this.target.setOrigin(origin);
+                this.target.setWidth(dimensions.x);
+                this.target.setHeight(dimensions.y);
+                this._repositionVertices();
             };
         };
 
+        const corners = this._getCorners();
         return {
-            'topLeft': () => {
-                const oppositeCorner = this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), this._rectangle.getHeight()));
-                return makeHandler(oppositeCorner);
-            },
-            'topRight': () => {
-                const oppositeCorner = this._rectangle.getOrigin().add(new Vector(0, this._rectangle.getHeight()));
-                return makeHandler(oppositeCorner);
-            },
-            'bottomLeft': () => {
-                const oppositeCorner = this._rectangle.getOrigin().add(new Vector(this._rectangle.getWidth(), 0));
-                return makeHandler(oppositeCorner);
-            },
-            'bottomRight': () => {
-                const oppositeCorner = this._rectangle.getOrigin();
-                return makeHandler(oppositeCorner);
-            }
+            'topLeft': () => makeHandler(corners.bottomRight),
+            'topRight': () => makeHandler(corners.bottomLeft),
+            'bottomLeft': () => makeHandler(corners.topRight),
+            'bottomRight': () => makeHandler(corners.topLeft)
         };
     }
 
@@ -153,6 +121,26 @@ class RectangleMutator implements GraphicMutator {
         this._helpers.topRight.setScale(scale);
         this._helpers.bottomLeft.setScale(scale);
         this._helpers.bottomRight.setScale(scale);
+    }
+
+    private _repositionVertices(): void {
+        const corners = this._getCorners();
+        this._helpers.topLeft.setCenter(corners.topLeft);
+        this._helpers.topRight.setCenter(corners.topRight);
+        this._helpers.bottomLeft.setCenter(corners.bottomLeft);
+        this._helpers.bottomRight.setCenter(corners.bottomRight);
+    }
+
+    private _getCorners(): { topLeft: Vector; topRight: Vector; bottomLeft: Vector; bottomRight: Vector } {
+        const origin = this.target.getOrigin();
+        const dimensions = new Vector(this.target.getWidth(), this.target.getHeight());
+
+        return {
+            topLeft: origin,
+            topRight: origin.add(new Vector(dimensions.x, 0)),
+            bottomLeft: origin.add(new Vector(0, dimensions.y)),
+            bottomRight: origin.add(dimensions)
+        };
     }
 }
 

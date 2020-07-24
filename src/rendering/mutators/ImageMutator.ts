@@ -5,7 +5,7 @@ import SlideRenderer from "../SlideRenderer";
 import { GraphicMutator, GRAPHIC_TYPES } from "../types";
 
 type ImageMutatorArgs = {
-    image: ImageRenderer;
+    target: ImageRenderer;
     slide: SlideRenderer;
     scale: number;
 };
@@ -18,41 +18,42 @@ type ImageMutatorHelpers = {
 };
 
 class ImageMutator implements GraphicMutator {
-    private _image: ImageRenderer;
+    private _target: ImageRenderer;
     private _slide: SlideRenderer;
     private _helpers: ImageMutatorHelpers;
 
     constructor(args: ImageMutatorArgs) {
-        this._image = args.image;
+        this._target = args.target;
         this._slide = args.slide;
 
         // Initialize helper graphics
+        const corners = this._getCorners();
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._image.getOrigin(),
+                center: corners.topLeft,
                 scale: args.scale,
                 location: 'topLeft'
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._image.getOrigin().add(new Vector(this._image.getWidth(), 0)),
+                center: corners.topRight,
                 scale: args.scale,
                 location: 'topRight'
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._image.getOrigin().add(new Vector(0, this._image.getHeight())),
+                center: corners.bottomLeft,
                 scale: args.scale,
                 location: 'bottomLeft'
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._image.getOrigin().add(new Vector(this._image.getWidth(), this._image.getHeight())),
+                center: corners.bottomRight,
                 scale: args.scale,
                 location: 'bottomRight'
             })
@@ -70,31 +71,14 @@ class ImageMutator implements GraphicMutator {
     }
 
     public getTarget(): ImageRenderer {
-        return this._image;
+        return this._target;
     }
 
     // TODO: Account for shift, alt, and snapping
     public move(origin: Vector): void {
         // Update rendering
-        this._image.setOrigin(origin);
-
-        // Update helper graphics
-        this._helpers.topLeft.setCenter(this._image.getOrigin());
-        this._helpers.topRight.setCenter(this._image.getOrigin().add(new Vector(this._image.getWidth(), 0)));
-        this._helpers.bottomLeft.setCenter(this._image.getOrigin().add(new Vector(0, this._image.getHeight())));
-        this._helpers.bottomRight.setCenter(this._image.getOrigin().add(new Vector(this._image.getWidth(), this._image.getHeight())));
-    }
-
-    // TODO: Account for shift, alt, ctrl, and snapping
-    public setDimensions(dimensions: Vector): void {
-        // Update rendering
-        this._image.setWidth(dimensions.x);
-        this._image.setHeight(dimensions.y);
-
-        // Update helper graphics
-        this._helpers.topRight.setCenter(this._image.getOrigin().add(new Vector(this._image.getWidth(), 0)));
-        this._helpers.bottomLeft.setCenter(this._image.getOrigin().add(new Vector(0, this._image.getHeight())));
-        this._helpers.bottomRight.setCenter(this._image.getOrigin().add(new Vector(this._image.getWidth(), this._image.getHeight())));
+        this._target.setOrigin(origin);
+        this._repositionVertices();
     }
 
     // TODO: Account for shift, alt, and snapping
@@ -106,35 +90,19 @@ class ImageMutator implements GraphicMutator {
                 const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
 
                 // Update rendering
-                this._image.setOrigin(origin);
-                this._image.setWidth(dimensions.x);
-                this._image.setHeight(dimensions.y);
-
-                // Update helper graphics
-                this._helpers.topLeft.setCenter(origin);
-                this._helpers.topRight.setCenter(origin.add(new Vector(dimensions.x, 0)));
-                this._helpers.bottomLeft.setCenter(origin.add(new Vector(0, dimensions.y)));
-                this._helpers.bottomRight.setCenter(origin.add(dimensions));
+                this._target.setOrigin(origin);
+                this._target.setWidth(dimensions.x);
+                this._target.setHeight(dimensions.y);
+                this._repositionVertices();
             };
         };
 
+        const corners = this._getCorners();
         return {
-            'topLeft': () => {
-                const oppositeCorner = this._image.getOrigin().add(new Vector(this._image.getWidth(), this._image.getHeight()));
-                return makeHandler(oppositeCorner);
-            },
-            'topRight': () => {
-                const oppositeCorner = this._image.getOrigin().add(new Vector(0, this._image.getHeight()));
-                return makeHandler(oppositeCorner);
-            },
-            'bottomLeft': () => {
-                const oppositeCorner = this._image.getOrigin().add(new Vector(this._image.getWidth(), 0));
-                return makeHandler(oppositeCorner);
-            },
-            'bottomRight': () => {
-                const oppositeCorner = this._image.getOrigin();
-                return makeHandler(oppositeCorner);
-            }
+            'topLeft': () => makeHandler(corners.bottomRight),
+            'topRight': () => makeHandler(corners.bottomLeft),
+            'bottomLeft': () => makeHandler(corners.topRight),
+            'bottomRight': () => makeHandler(corners.topLeft)
         };
     }
 
@@ -153,6 +121,26 @@ class ImageMutator implements GraphicMutator {
         this._helpers.topRight.setScale(scale);
         this._helpers.bottomLeft.setScale(scale);
         this._helpers.bottomRight.setScale(scale);
+    }
+
+    private _repositionVertices(): void {
+        const corners = this._getCorners();
+        this._helpers.topLeft.setCenter(corners.topLeft);
+        this._helpers.topRight.setCenter(corners.topRight);
+        this._helpers.bottomLeft.setCenter(corners.bottomLeft);
+        this._helpers.bottomRight.setCenter(corners.bottomRight);
+    }
+
+    private _getCorners(): { topLeft: Vector; topRight: Vector; bottomLeft: Vector; bottomRight: Vector } {
+        const origin = this._target.getOrigin();
+        const dimensions = new Vector(this._target.getWidth(), this._target.getHeight());
+
+        return {
+            topLeft: origin,
+            topRight: origin.add(new Vector(dimensions.x, 0)),
+            bottomLeft: origin.add(new Vector(0, dimensions.y)),
+            bottomRight: origin.add(dimensions)
+        };
     }
 }
 

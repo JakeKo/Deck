@@ -5,7 +5,7 @@ import SlideRenderer from "../SlideRenderer";
 import { GraphicMutator, GRAPHIC_TYPES } from "../types";
 
 type EllipseMutatorArgs = {
-    ellipse: EllipseRenderer;
+    target: EllipseRenderer;
     slide: SlideRenderer;
     scale: number;
 };
@@ -18,43 +18,42 @@ type EllipseMutatorHelpers = {
 };
 
 class EllipseMutator implements GraphicMutator {
-    private _ellipse: EllipseRenderer;
+    private _target: EllipseRenderer;
     private _slide: SlideRenderer;
     private _helpers: EllipseMutatorHelpers;
 
     constructor(args: EllipseMutatorArgs) {
-        this._ellipse = args.ellipse;
+        this._target = args.target;
         this._slide = args.slide;
 
         // Initialize helper graphics
-        const center = this._ellipse.getCenter();
-        const radius = new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()).scale(0.5);
+        const corners = this._getCorners();
         this._helpers = {
             topLeft: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: center.add(radius.scale(-1)),
+                center: corners.topLeft,
                 scale: args.scale,
                 location: 'topLeft'
             }),
             topRight: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: center.add(radius.signAs(new Vector(1, -1))),
+                center: corners.topRight,
                 scale: args.scale,
                 location: 'topRight'
             }),
             bottomLeft: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: center.add(radius),
+                center: corners.bottomLeft,
                 scale: args.scale,
                 location: 'bottomLeft'
             }),
             bottomRight: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: center.add(radius.signAs(new Vector(-1, 1))),
+                center: corners.bottomRight,
                 scale: args.scale,
                 location: 'bottomRight'
             })
@@ -72,34 +71,14 @@ class EllipseMutator implements GraphicMutator {
     }
 
     public getTarget(): EllipseRenderer {
-        return this._ellipse;
+        return this._target;
     }
 
     // TODO: Account for shift, alt, and snapping
     public move(center: Vector): void {
         // Update rendering
-        this._ellipse.setCenter(center);
-
-        // Update helper graphics
-        const radius = new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()).scale(0.5);
-        this._helpers.topLeft.setCenter(center.add(radius.scale(-1)));
-        this._helpers.topRight.setCenter(center.add(radius.signAs(new Vector(1, -1))));
-        this._helpers.bottomLeft.setCenter(center.add(radius));
-        this._helpers.bottomRight.setCenter(center.add(radius.signAs(new Vector(-1, 1))));
-    }
-
-    // TODO: Account for shift, alt, ctrl, and snipping
-    public setDimensions(dimensions: Vector): void {
-        // Update rendering
-        this._ellipse.setWidth(dimensions.x);
-        this._ellipse.setHeight(dimensions.y);
-
-        // Update helper graphics
-        const center = this._ellipse.getCenter();
-        const radius = new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()).scale(0.5);
-        this._helpers.topRight.setCenter(center.add(radius.signAs(new Vector(1, -1))));
-        this._helpers.bottomLeft.setCenter(center.add(radius));
-        this._helpers.bottomRight.setCenter(center.add(radius.signAs(new Vector(-1, 1))));
+        this._target.setCenter(center);
+        this._repositionVertices();
     }
 
     // TODO: Account for shift, alt, and snapping
@@ -111,38 +90,19 @@ class EllipseMutator implements GraphicMutator {
                 const center = oppositeCorner.add(offset.scale(0.5));
 
                 // Update rendering
-                this._ellipse.setCenter(center);
-                this._ellipse.setWidth(dimensions.x);
-                this._ellipse.setHeight(dimensions.y);
-
-                // Update helper graphics
-                const radius = dimensions.scale(0.5);
-                this._helpers.topLeft.setCenter(center.add(radius.scale(-1)));
-                this._helpers.topRight.setCenter(center.add(radius.signAs(new Vector(1, -1))));
-                this._helpers.bottomLeft.setCenter(center.add(radius.signAs(new Vector(-1, 1))));
-                this._helpers.bottomRight.setCenter(center.add(radius));
+                this._target.setCenter(center);
+                this._target.setWidth(dimensions.x);
+                this._target.setHeight(dimensions.y);
+                this._repositionVertices();
             };
         };
 
-        const center = this._ellipse.getCenter();
-        const radius = new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()).scale(0.5);
+        const corners = this._getCorners();
         return {
-            'topLeft': () => {
-                const oppositeCorner = center.add(radius);
-                return makeHandler(oppositeCorner);
-            },
-            'topRight': () => {
-                const oppositeCorner = center.add(radius.signAs(new Vector(-1, 1)));
-                return makeHandler(oppositeCorner);
-            },
-            'bottomLeft': () => {
-                const oppositeCorner = center.add(radius.signAs(new Vector(1, -1)));
-                return makeHandler(oppositeCorner);
-            },
-            'bottomRight': () => {
-                const oppositeCorner = center.add(radius.signAs(new Vector(-1, -1)));
-                return makeHandler(oppositeCorner);
-            }
+            'topLeft': () => makeHandler(corners.bottomRight),
+            'topRight': () => makeHandler(corners.bottomLeft),
+            'bottomLeft': () => makeHandler(corners.topRight),
+            'bottomRight': () => makeHandler(corners.topLeft)
         };
     }
 
@@ -161,6 +121,26 @@ class EllipseMutator implements GraphicMutator {
         this._helpers.topRight.setScale(scale);
         this._helpers.bottomLeft.setScale(scale);
         this._helpers.bottomRight.setScale(scale);
+    }
+
+    private _repositionVertices(): void {
+        const corners = this._getCorners();
+        this._helpers.topLeft.setCenter(corners.topLeft);
+        this._helpers.topRight.setCenter(corners.topRight);
+        this._helpers.bottomLeft.setCenter(corners.bottomLeft);
+        this._helpers.bottomRight.setCenter(corners.bottomRight);
+    }
+
+    private _getCorners(): { topLeft: Vector; topRight: Vector; bottomLeft: Vector; bottomRight: Vector } {
+        const center = this._target.getCenter();
+        const radius = new Vector(this._target.getWidth(), this._target.getHeight()).scale(0.5);
+
+        return {
+            topLeft: center.add(radius.signAs(new Vector(-1, -1))),
+            topRight: center.add(radius.signAs(new Vector(1, -1))),
+            bottomLeft: center.add(radius.signAs(new Vector(-1, 1))),
+            bottomRight: center.add(radius.signAs(new Vector(1, 1)))
+        };
     }
 }
 

@@ -158,15 +158,15 @@ class SlideRenderer {
         if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
             mutator = new CurveMutator({ slide: this, scale: 1 / this._zoom, curve: graphic as CurveRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
-            mutator = new EllipseMutator({ slide: this, scale: 1 / this._zoom, ellipse: graphic as EllipseRenderer });
+            mutator = new EllipseMutator({ slide: this, scale: 1 / this._zoom, target: graphic as EllipseRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
-            mutator = new ImageMutator({ slide: this, scale: 1 / this._zoom, image: graphic as ImageRenderer });
+            mutator = new ImageMutator({ slide: this, scale: 1 / this._zoom, target: graphic as ImageRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
-            mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, rectangle: graphic as RectangleRenderer });
+            mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, target: graphic as RectangleRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
-            mutator = new TextboxMutator({ slide: this, scale: 1 / this._zoom, textbox: graphic as TextboxRenderer});
+            mutator = new TextboxMutator({ slide: this, scale: 1 / this._zoom, target: graphic as TextboxRenderer});
         } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
-            mutator = new VideoMutator({ slide: this, scale: 1 / this._zoom, video: graphic as VideoRenderer });
+            mutator = new VideoMutator({ slide: this, scale: 1 / this._zoom, target: graphic as VideoRenderer });
         } else {
             throw new Error(`Cannot focus unrecognized graphic type: ${graphic.getType()}`);
         }
