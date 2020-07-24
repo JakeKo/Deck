@@ -1,10 +1,10 @@
 import { ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { ImageMutator, RectangleMutator, TextboxMutator, VideoMutator } from "../../rendering/mutators";
+import { ImageMutator, RectangleMutator, TextboxMutator, VideoMutator, EllipseMutator } from "../../rendering/mutators";
 import { GRAPHIC_TYPES } from "../../rendering/types";
 import { AppStore } from "../../store/types";
 import { EditorTool, TOOL_NAMES } from "../types";
-import { moveEllipse } from "./ellipse";
+import { moveEllipse, moveEllipseVertex } from "./ellipse";
 import { moveImage, moveImageVertex } from "./image";
 import { moveRectangle, moveRectangleVertex } from "./rectangle";
 import { moveTextbox, moveTextboxVertex } from "./textbox";
@@ -57,6 +57,8 @@ function moveVertex(event: VertexMouseEvent): void {
 
     if (mutator.getType() === GRAPHIC_TYPES.IMAGE) {
         moveImageVertex(mutator as ImageMutator, graphic, moveVertex);
+    } else if (mutator.getType() === GRAPHIC_TYPES.ELLIPSE) {
+        moveEllipseVertex(mutator as EllipseMutator, graphic, moveVertex);
     } else if (mutator.getType() === GRAPHIC_TYPES.RECTANGLE) {
         moveRectangleVertex(mutator as RectangleMutator, graphic, moveVertex);
     } else if (mutator.getType() === GRAPHIC_TYPES.TEXTBOX) {

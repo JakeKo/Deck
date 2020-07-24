@@ -102,6 +102,50 @@ class EllipseMutator implements GraphicMutator {
         this._helpers.bottomRight.setCenter(center.add(radius.signAs(new Vector(-1, 1))));
     }
 
+    // TODO: Account for shift, alt, and snapping
+    public getVertexHandlers(): { [index: string]: () => (position: Vector) => void } {
+        const makeHandler = (oppositeCorner: Vector): (position: Vector) => void => {
+            return position => {
+                const offset = oppositeCorner.towards(position);
+                const dimensions = offset.abs;
+                const center = oppositeCorner.add(offset.scale(0.5));
+
+                // Update rendering
+                this._ellipse.setCenter(center);
+                this._ellipse.setWidth(dimensions.x);
+                this._ellipse.setHeight(dimensions.y);
+
+                // Update helper graphics
+                const radius = dimensions.scale(0.5);
+                this._helpers.topLeft.setCenter(center.add(radius.scale(-1)));
+                this._helpers.topRight.setCenter(center.add(radius.signAs(new Vector(1, -1))));
+                this._helpers.bottomLeft.setCenter(center.add(radius.signAs(new Vector(-1, 1))));
+                this._helpers.bottomRight.setCenter(center.add(radius));
+            };
+        };
+
+        const center = this._ellipse.getCenter();
+        const radius = new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()).scale(0.5);
+        return {
+            'topLeft': () => {
+                const oppositeCorner = center.add(radius);
+                return makeHandler(oppositeCorner);
+            },
+            'topRight': () => {
+                const oppositeCorner = center.add(radius.signAs(new Vector(-1, 1)));
+                return makeHandler(oppositeCorner);
+            },
+            'bottomLeft': () => {
+                const oppositeCorner = center.add(radius.signAs(new Vector(1, -1)));
+                return makeHandler(oppositeCorner);
+            },
+            'bottomRight': () => {
+                const oppositeCorner = center.add(radius.signAs(new Vector(-1, -1)));
+                return makeHandler(oppositeCorner);
+            }
+        };
+    }
+
     // TODO: Include methods for other mutations
 
     public complete(): void {
