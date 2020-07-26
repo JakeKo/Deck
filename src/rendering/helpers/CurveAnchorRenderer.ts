@@ -3,6 +3,7 @@ import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
 import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 import SlideRenderer from '../SlideRenderer';
+import { decorateCurveAnchorEvents } from '../../events/decorators/curve_anchor';
 
 type CurveAnchorRendererArgs = {
     slide: SlideRenderer;
@@ -10,11 +11,15 @@ type CurveAnchorRendererArgs = {
     inHandle: Vector;
     point: Vector;
     outHandle: Vector;
+    parentId: string;
+    index: number;
 };
 
 class CurveAnchorRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
+    private _parentId: string;
+    private _index: number;
     private _scale: number;
     private _inHandle: Vector;
     private _point: Vector;
@@ -40,6 +45,8 @@ class CurveAnchorRenderer implements GraphicRenderer {
     constructor(args: CurveAnchorRendererArgs) {
         this._id = provideId();
         this._slide = args.slide;
+        this._parentId = args.parentId;
+        this._index = args.index;
         this._scale = args.scale;
         this._inHandle = args.inHandle;
         this._point = args.point;
@@ -97,6 +104,10 @@ class CurveAnchorRenderer implements GraphicRenderer {
             .translate(pointPosition.x, pointPosition.y)
             .fill(this._pointFillColor)
             .stroke({ color: this._pointStrokeColor, width: this._pointStrokeWidth });
+
+        decorateCurveAnchorEvents(this._inHandleSvg, this._slide, this, this._parentId, this._index, 'inHandle');
+        decorateCurveAnchorEvents(this._pointSvg, this._slide, this, this._parentId, this._index, 'point');
+        decorateCurveAnchorEvents(this._outHandleSvg, this._slide, this, this._parentId, this._index, 'outHandle');
     }
 
     public unrender(): void {

@@ -19,9 +19,11 @@ class CurveMutator implements GraphicMutator {
     constructor(args: CurveMutatorArgs) {
         this._target = args.target;
         this._slide = args.slide;
-        this._helpers = this._target.getAnchors().map(anchor => new CurveAnchorRenderer({
+        this._helpers = this._target.getAnchors().map((anchor, index) => new CurveAnchorRenderer({
             slide: this._slide,
             scale: args.scale,
+            parentId: this._target.getId(),
+            index,
             ...anchor
         }));
 
@@ -58,6 +60,30 @@ class CurveMutator implements GraphicMutator {
             }));
             this._target.setAnchors(newAnchors);
             this._repositionCurveAnchors();
+        };
+    }
+
+    // TODO: Account for shift, alt, and snapping
+    public anchorMoveHandler(index: number): { [index: string]: (position: Vector) => void } {
+        const anchor = this._target.getAnchor(index);
+        return {
+            'inHandle': (position: Vector): void => {
+                this._target.setAnchor(index, { ...anchor, inHandle: position });
+                this._repositionCurveAnchor(index);
+            },
+            'point': (position: Vector): void => {
+                const move = anchor.point.towards(position);
+                this._target.setAnchor(index, {
+                    inHandle: anchor.inHandle.add(move),
+                    point: anchor.point.add(move),
+                    outHandle: anchor.outHandle.add(move),
+                });
+                this._repositionCurveAnchor(index);
+            },
+            'outHandle': (position: Vector): void => {
+                this._target.setAnchor(index, { ...anchor, outHandle: position });
+                this._repositionCurveAnchor(index);
+            }
         };
     }
 

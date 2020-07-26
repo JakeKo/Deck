@@ -1,10 +1,10 @@
-import { CURVE_EVENTS, ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS } from "../../events/types";
+import { CurveAnchorMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { EllipseMutator, ImageMutator, RectangleMutator, TextboxMutator, VideoMutator } from "../../rendering/mutators";
+import { CurveMutator, EllipseMutator, ImageMutator, RectangleMutator, TextboxMutator, VideoMutator } from "../../rendering/mutators";
 import { GRAPHIC_TYPES } from "../../rendering/types";
 import { AppStore } from "../../store/types";
 import { EditorTool, TOOL_NAMES } from "../types";
-import { moveCurve } from "./curve";
+import { moveCurve, moveCurveAnchor } from "./curve";
 import { moveEllipse, moveEllipseVertex } from "./ellipse";
 import { moveImage, moveImageVertex } from "./image";
 import { moveRectangle, moveRectangleVertex } from "./rectangle";
@@ -16,6 +16,7 @@ export default (store: AppStore): EditorTool => {
         name: TOOL_NAMES.POINTER,
         mount: () => {
             listenOnce(CURVE_EVENTS.MOUSEDOWN, moveCurve);
+            listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, moveAnchor);
             listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);
             listenOnce(IMAGE_EVENTS.MOUSEDOWN, moveImage);
             listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
@@ -28,6 +29,7 @@ export default (store: AppStore): EditorTool => {
         },
         unmount: () => {
             unlisten(CURVE_EVENTS.MOUSEDOWN, moveCurve);
+            unlisten(CURVE_ANCHOR_EVENTS.MOUSEDOWN, moveAnchor);
             unlisten(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);
             unlisten(IMAGE_EVENTS.MOUSEDOWN, moveImage);
             unlisten(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
@@ -69,4 +71,10 @@ function moveVertex(event: VertexMouseEvent): void {
     } else if (mutator.getType() === GRAPHIC_TYPES.VIDEO) {
         moveVideoVertex(mutator as VideoMutator, graphic, moveVertex);
     }
+}
+
+function moveAnchor(event: CurveAnchorMouseEvent): void {
+    const { slide, parentId, position, index } = event.detail;
+    const mutator = slide.focusGraphic(parentId);
+    moveCurveAnchor(mutator as CurveMutator, position, index, moveAnchor);
 }

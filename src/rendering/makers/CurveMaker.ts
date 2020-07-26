@@ -31,7 +31,9 @@ class CurveMaker implements GraphicMaker {
             scale: args.scale,
             inHandle: args.initialPosition,
             point: args.initialPosition,
-            outHandle: args.initialPosition
+            outHandle: args.initialPosition,
+            parentId: this._curve.getId(),
+            index: -1
         });
 
         // Render primary graphic

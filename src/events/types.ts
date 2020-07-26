@@ -1,11 +1,11 @@
 import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from "../rendering/graphics";
+import { CurveAnchorRenderer, VertexRenderer } from "../rendering/helpers";
 import SlideRenderer from "../rendering/SlideRenderer";
 import { GraphicRenderer } from "../rendering/types";
-import { VertexRenderer } from "../rendering/helpers";
 
 export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
 type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
-type HELPER_EVENTS = VERTEX_EVENTS;
+type HELPER_EVENTS = CURVE_ANCHOR_EVENTS | VERTEX_EVENTS;
 
 // SLIDE EVENTS
 export enum SLIDE_EVENTS {
@@ -55,6 +55,25 @@ export type CurveMouseEventPayload = {
     slide: SlideRenderer;
     type: CURVE_EVENTS;
     target: CurveRenderer;
+};
+
+// CURVE ANCHOR EVENTS
+export enum CURVE_ANCHOR_EVENTS {
+    MOUSEUP = 'deck-curve-anchor-mouseup',
+    MOUSEDOWN = 'deck-curve-anchor-mousedown',
+    MOUSEOVER = 'deck-curve-anchor-mouseover',
+    MOUSEOUT = 'deck-curve-anchor-mouseout',
+    MOUSEMOVE = 'deck-curve-anchor-mousemove'
+}
+
+export type CurveAnchorMouseEvent = CustomEvent<CurveAnchorMouseEventPayload>;
+export type CurveAnchorMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slide: SlideRenderer;
+    type: CURVE_ANCHOR_EVENTS;
+    parentId: string;
+    index: number;
+    position: string;
 };
 
 // ELLIPSE EVENTS
