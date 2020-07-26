@@ -1,3 +1,4 @@
+import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { TextboxRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
@@ -74,11 +75,19 @@ class TextboxMutator implements GraphicMutator {
         return this._target;
     }
 
-    // TODO: Account for shift, alt, and snapping
-    public move(origin: Vector): void {
-        // Update rendering
-        this._target.setOrigin(origin);
-        this._repositionVertices();
+    // TODO: Account for snapping
+    public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
+        const initialOrigin = this._target.getOrigin();
+        const directions = [Vector.right, new Vector(1, 1), Vector.up, new Vector(-1, 1), Vector.left, new Vector(-1, -1), Vector.down, new Vector(1, -1)];
+
+        return (position, shift, alt) => {
+            const rawMove = initialOrigin.towards(position);
+            const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
+            const move = rawMove.projectOn(moveDirection);
+
+            this._target.setOrigin(initialOrigin.add(move));
+            this._repositionVertices();
+        };
     }
 
     // TODO: Account for shift, alt, and snapping

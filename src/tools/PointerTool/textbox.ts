@@ -12,13 +12,14 @@ export function moveTextbox(event: TextboxMouseEvent): void {
 
     const originOffset = resolvePosition(baseEvent, slide).towards(target.getOrigin());
     const mutator = slide.focusGraphic(target.getId()) as TextboxMutator;
+    const moveHandler = mutator.graphicMoveHandler();
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
 
     function move(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
-        mutator.move(resolvePosition(baseEvent, slide).add(originOffset));
+        moveHandler(resolvePosition(baseEvent, slide).add(originOffset), baseEvent.shiftKey, baseEvent.altKey);
         slide.broadcastSetGraphic(mutator.getTarget());
     }
 

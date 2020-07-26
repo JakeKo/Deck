@@ -1,3 +1,4 @@
+import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { EllipseRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
@@ -74,11 +75,19 @@ class EllipseMutator implements GraphicMutator {
         return this._target;
     }
 
-    // TODO: Account for shift, alt, and snapping
-    public move(center: Vector): void {
-        // Update rendering
-        this._target.setCenter(center);
-        this._repositionVertices();
+    // TODO: Account for snapping
+    public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
+        const initialCenter = this._target.getCenter();
+        const directions = [Vector.right, new Vector(1, 1), Vector.up, new Vector(-1, 1), Vector.left, new Vector(-1, -1), Vector.down, new Vector(1, -1)];
+
+        return (position, shift, alt) => {
+            const rawMove = initialCenter.towards(position);
+            const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
+            const move = rawMove.projectOn(moveDirection);
+
+            this._target.setCenter(initialCenter.add(move));
+            this._repositionVertices();
+        };
     }
 
     // TODO: Account for shift, alt, and snapping

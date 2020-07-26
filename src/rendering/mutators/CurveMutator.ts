@@ -3,6 +3,7 @@ import { CurveRenderer } from "../graphics";
 import { CurveAnchorRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
 import { CurveAnchor, GraphicMutator, GRAPHIC_TYPES } from "../types";
+import { closestVector } from "../../utilities/utilities";
 
 type CurveMutatorArgs = {
     target: CurveRenderer;
@@ -39,17 +40,25 @@ class CurveMutator implements GraphicMutator {
         return this._target.getAnchor(0).point;
     }
 
-    // TODO: Account for shift, alt, and snapping
-    public move(origin: Vector): void {
-        // Update rendering
-        const delta = this._target.getAnchor(0).point.towards(origin);
-        const newAnchors = this._target.getAnchors().map(anchor => ({
-            inHandle: anchor.inHandle.add(delta),
-            point: anchor.point.add(delta),
-            outHandle: anchor.outHandle.add(delta)
-        }));
-        this._target.setAnchors(newAnchors);
-        this._repositionCurveAnchors();
+    // TODO: Account for snapping
+    public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
+        const initialOrigin = this.getOrigin();
+        const initialAnchors = this._target.getAnchors();
+        const directions = [Vector.right, new Vector(1, 1), Vector.up, new Vector(-1, 1), Vector.left, new Vector(-1, -1), Vector.down, new Vector(1, -1)];
+
+        return (position, shift, alt) => {
+            const rawMove = initialOrigin.towards(position);
+            const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
+            const move = rawMove.projectOn(moveDirection);
+
+            const newAnchors = initialAnchors.map(anchor => ({
+                inHandle: anchor.inHandle.add(move),
+                point: anchor.point.add(move),
+                outHandle: anchor.outHandle.add(move)
+            }));
+            this._target.setAnchors(newAnchors);
+            this._repositionCurveAnchors();
+        };
     }
 
     // TODO: Account for shift, alt, and snapping
