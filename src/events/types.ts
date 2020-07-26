@@ -1,7 +1,7 @@
 import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from "../rendering/graphics";
 import { CurveAnchorRenderer, VertexRenderer } from "../rendering/helpers";
 import SlideRenderer from "../rendering/SlideRenderer";
-import { GraphicRenderer } from "../rendering/types";
+import { GraphicRenderer, CURVE_ANCHOR_ROLES } from "../rendering/types";
 
 export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
 type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
@@ -73,7 +73,7 @@ export type CurveAnchorMouseEventPayload = {
     type: CURVE_ANCHOR_EVENTS;
     parentId: string;
     index: number;
-    position: string;
+    role: CURVE_ANCHOR_ROLES;
 };
 
 // ELLIPSE EVENTS

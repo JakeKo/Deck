@@ -74,7 +74,7 @@ function moveVertex(event: VertexMouseEvent): void {
 }
 
 function moveAnchor(event: CurveAnchorMouseEvent): void {
-    const { slide, parentId, position, index } = event.detail;
+    const { slide, parentId, role, index } = event.detail;
     const mutator = slide.focusGraphic(parentId);
-    moveCurveAnchor(mutator as CurveMutator, position, index, moveAnchor);
+    moveCurveAnchor(mutator as CurveMutator, role, index, moveAnchor);
 }

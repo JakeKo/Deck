@@ -3,7 +3,7 @@ import Vector from "../../utilities/Vector";
 import { TextboxRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
-import { GraphicMaker } from "../types";
+import { GraphicMaker, VERTEX_ROLES } from "../types";
 
 type TextboxMakerArgs = {
     slide: SlideRenderer;
@@ -11,12 +11,7 @@ type TextboxMakerArgs = {
     scale: number;
 };
 
-type TextboxMakerHelpers = {
-    topLeft: VertexRenderer;
-    topRight: VertexRenderer;
-    bottomLeft: VertexRenderer;
-    bottomRight: VertexRenderer;
-};
+type TextboxMakerHelpers = { [key in VERTEX_ROLES]: VertexRenderer };
 
 class TextboxMaker implements GraphicMaker {
     private _textbox: TextboxRenderer;
@@ -38,33 +33,33 @@ class TextboxMaker implements GraphicMaker {
 
         // Initialize helper graphics
         this._helpers = {
-            topLeft: new VertexRenderer({
+            [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
                 center: this._textbox.getOrigin(),
                 scale: args.scale,
-                location: 'topLeft'
+                role: VERTEX_ROLES.TOP_LEFT
             }),
-            topRight: new VertexRenderer({
+            [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
                 center: this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), 0)),
                 scale: args.scale,
-                location: 'topRight'
+                role: VERTEX_ROLES.TOP_RIGHT
             }),
-            bottomLeft: new VertexRenderer({
+            [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
                 center: this._textbox.getOrigin().add(new Vector(0, this._textbox.getHeight())),
                 scale: args.scale,
-                location: 'bottomLeft'
+                role: VERTEX_ROLES.BOTTOM_LEFT
             }),
-            bottomRight: new VertexRenderer({
+            [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
                 center: this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), this._textbox.getHeight())),
                 scale: args.scale,
-                location: 'bottomRight'
+                role: VERTEX_ROLES.BOTTOM_RIGHT
             })
         };
 
@@ -72,10 +67,10 @@ class TextboxMaker implements GraphicMaker {
         this._textbox.render();
 
         // Render helper graphics
-        this._helpers.topLeft.render();
-        this._helpers.topRight.render();
-        this._helpers.bottomLeft.render();
-        this._helpers.bottomRight.render();
+        this._helpers[VERTEX_ROLES.TOP_LEFT].render();
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].render();
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].render();
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].render();
     }
 
     public getTarget(): TextboxRenderer {
@@ -83,20 +78,20 @@ class TextboxMaker implements GraphicMaker {
     }
 
     public setScale(scale: number): void {
-        this._helpers.topLeft.setScale(scale);
-        this._helpers.topRight.setScale(scale);
-        this._helpers.bottomLeft.setScale(scale);
-        this._helpers.bottomRight.setScale(scale);
+        this._helpers[VERTEX_ROLES.TOP_LEFT].setScale(scale);
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].setScale(scale);
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setScale(scale);
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setScale(scale);
     }
 
     public complete(): void {
         this._slide.setGraphic(this._textbox);
 
         // Remove helper graphics
-        this._helpers.topLeft.unrender();
-        this._helpers.topRight.unrender();
-        this._helpers.bottomLeft.unrender();
-        this._helpers.bottomRight.unrender();
+        this._helpers[VERTEX_ROLES.TOP_LEFT].unrender();
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].unrender();
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].unrender();
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].unrender();
     }
 
     public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
@@ -120,10 +115,10 @@ class TextboxMaker implements GraphicMaker {
         }
 
         // Update helper graphics
-        this._helpers.topLeft.setCenter(this._textbox.getOrigin());
-        this._helpers.topRight.setCenter(this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), 0)));
-        this._helpers.bottomLeft.setCenter(this._textbox.getOrigin().add(new Vector(0, this._textbox.getHeight())));
-        this._helpers.bottomRight.setCenter(this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), this._textbox.getHeight())));
+        this._helpers[VERTEX_ROLES.TOP_LEFT].setCenter(this._textbox.getOrigin());
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].setCenter(this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), 0)));
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setCenter(this._textbox.getOrigin().add(new Vector(0, this._textbox.getHeight())));
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(this._textbox.getOrigin().add(new Vector(this._textbox.getWidth(), this._textbox.getHeight())));
     }
 }
 

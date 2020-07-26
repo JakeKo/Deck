@@ -38,3 +38,16 @@ export enum GRAPHIC_TYPES {
     VERTEX = 'vertex',
     VIDEO = 'video'
 }
+
+export enum VERTEX_ROLES {
+    TOP_LEFT = 'top-left',
+    TOP_RIGHT = 'top-right',
+    BOTTOM_LEFT = 'bottom-left',
+    BOTTOM_RIGHT = 'bottom-right'
+}
+
+export enum CURVE_ANCHOR_ROLES {
+    IN_HANDLE = 'in-handle',
+    POINT = 'point',
+    OUT_HANDLE = 'out-handle'
+}

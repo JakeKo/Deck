@@ -3,7 +3,7 @@ import Vector from "../../utilities/Vector";
 import { CurveRenderer } from "../graphics";
 import { CurveAnchorRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
-import { GraphicMutator, GRAPHIC_TYPES } from "../types";
+import { GraphicMutator, GRAPHIC_TYPES, CURVE_ANCHOR_ROLES } from "../types";
 
 type CurveMutatorArgs = {
     target: CurveRenderer;
@@ -65,15 +65,14 @@ class CurveMutator implements GraphicMutator {
     }
 
     // TODO: Account for shift, alt, and snapping
-    // TODO: Create type for anchor roles
-    public getAnchorHandler(index: number, role: string): (position: Vector) => void {
+    public getAnchorHandler(index: number, role: CURVE_ANCHOR_ROLES): (position: Vector) => void {
         const anchor = this._target.getAnchor(index);
         return ({
-            'inHandle': (position: Vector): void => {
+            [CURVE_ANCHOR_ROLES.IN_HANDLE]: (position: Vector): void => {
                 this._target.setAnchor(index, { ...anchor, inHandle: position });
                 this._repositionCurveAnchor(index);
             },
-            'point': (position: Vector): void => {
+            [CURVE_ANCHOR_ROLES.POINT]: (position: Vector): void => {
                 const move = anchor.point.towards(position);
                 this._target.setAnchor(index, {
                     inHandle: anchor.inHandle.add(move),
@@ -82,11 +81,11 @@ class CurveMutator implements GraphicMutator {
                 });
                 this._repositionCurveAnchor(index);
             },
-            'outHandle': (position: Vector): void => {
+            [CURVE_ANCHOR_ROLES.OUT_HANDLE]: (position: Vector): void => {
                 this._target.setAnchor(index, { ...anchor, outHandle: position });
                 this._repositionCurveAnchor(index);
             }
-        } as { [index: string]: (position: Vector) => void })[role];
+        } as { [key in CURVE_ANCHOR_ROLES]: (position: Vector) => void })[role];
     }
 
     // TODO: Implement rectangular scaling

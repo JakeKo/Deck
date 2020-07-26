@@ -2,13 +2,13 @@ import * as SVG from 'svg.js';
 import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { GraphicRenderer, GRAPHIC_TYPES, VERTEX_ROLES } from '../types';
 import { decorateVertexEvents } from '../../events/decorators';
 
 type VertexRendererArgs = {
     slide: SlideRenderer;
     scale: number;
-    location: string;
+    role: VERTEX_ROLES;
     center: Vector;
     parent: GraphicRenderer;
 };
@@ -17,7 +17,7 @@ class VertexRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
     private _svg: SVG.Ellipse | undefined;
-    private _location: string;
+    private _role: VERTEX_ROLES;
     private _parent: GraphicRenderer;
     private _scale: number;
     private _width: number;
@@ -30,7 +30,7 @@ class VertexRenderer implements GraphicRenderer {
     constructor(args: VertexRendererArgs) {
         this._id = provideId();
         this._slide = args.slide;
-        this._location = args.location;
+        this._role = args.role;
         this._parent = args.parent;
         this._scale = args.scale;
         this._center = args.center;
@@ -53,8 +53,8 @@ class VertexRenderer implements GraphicRenderer {
         return this._svg !== undefined;
     }
 
-    public getLocation(): string {
-        return this._location;
+    public getRole(): VERTEX_ROLES {
+        return this._role;
     }
 
     public getParent(): GraphicRenderer {

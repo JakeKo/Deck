@@ -1,7 +1,7 @@
 import * as SVG from 'svg.js';
 import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
-import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { GraphicRenderer, GRAPHIC_TYPES, CURVE_ANCHOR_ROLES } from '../types';
 import SlideRenderer from '../SlideRenderer';
 import { decorateCurveAnchorEvents } from '../../events/decorators/curve_anchor';
 
@@ -105,9 +105,9 @@ class CurveAnchorRenderer implements GraphicRenderer {
             .fill(this._pointFillColor)
             .stroke({ color: this._pointStrokeColor, width: this._pointStrokeWidth });
 
-        decorateCurveAnchorEvents(this._inHandleSvg, this._slide, this, this._parentId, this._index, 'inHandle');
-        decorateCurveAnchorEvents(this._pointSvg, this._slide, this, this._parentId, this._index, 'point');
-        decorateCurveAnchorEvents(this._outHandleSvg, this._slide, this, this._parentId, this._index, 'outHandle');
+        decorateCurveAnchorEvents(this._inHandleSvg, this._slide, this, this._parentId, this._index, CURVE_ANCHOR_ROLES.IN_HANDLE);
+        decorateCurveAnchorEvents(this._pointSvg, this._slide, this, this._parentId, this._index, CURVE_ANCHOR_ROLES.POINT);
+        decorateCurveAnchorEvents(this._outHandleSvg, this._slide, this, this._parentId, this._index, CURVE_ANCHOR_ROLES.OUT_HANDLE);
     }
 
     public unrender(): void {

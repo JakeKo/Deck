@@ -30,7 +30,7 @@ export function moveImage(event: ImageMouseEvent): void {
 }
 
 export function moveImageVertex(mutator: ImageMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
-    const handler = mutator.getVertexHandler(vertex.getLocation());
+    const handler = mutator.getVertexHandler(vertex.getRole());
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);

@@ -3,7 +3,7 @@ import Vector from "../../utilities/Vector";
 import { TextboxRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
-import { GraphicMutator, GRAPHIC_TYPES } from "../types";
+import { GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
 
 type TextboxMutatorArgs = {
     target: TextboxRenderer;
@@ -11,12 +11,7 @@ type TextboxMutatorArgs = {
     scale: number;
 };
 
-type TextboxMutatorHelpers = {
-    topLeft: VertexRenderer;
-    topRight: VertexRenderer;
-    bottomLeft: VertexRenderer;
-    bottomRight: VertexRenderer;
-};
+type TextboxMutatorHelpers = { [key in VERTEX_ROLES]: VertexRenderer };
 
 class TextboxMutator implements GraphicMutator {
     private _target: TextboxRenderer;
@@ -30,41 +25,41 @@ class TextboxMutator implements GraphicMutator {
         // Initialize helper targets
         const corners = this._getCorners();
         this._helpers = {
-            topLeft: new VertexRenderer({
+            [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
                 center: corners.topLeft,
                 scale: args.scale,
-                location: 'topLeft'
+                role: VERTEX_ROLES.TOP_LEFT
             }),
-            topRight: new VertexRenderer({
+            [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
                 center: corners.topRight,
                 scale: args.scale,
-                location: 'topRight'
+                role: VERTEX_ROLES.TOP_RIGHT
             }),
-            bottomLeft: new VertexRenderer({
+            [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
                 center: corners.bottomLeft,
                 scale: args.scale,
-                location: 'bottomLeft'
+                role: VERTEX_ROLES.BOTTOM_LEFT
             }),
-            bottomRight: new VertexRenderer({
+            [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
                 center: corners.bottomRight,
                 scale: args.scale,
-                location: 'bottomRight'
+                role: VERTEX_ROLES.BOTTOM_RIGHT
             })
         };
 
         // Render helper targets
-        this._helpers.topLeft.render();
-        this._helpers.topRight.render();
-        this._helpers.bottomLeft.render();
-        this._helpers.bottomRight.render();
+        this._helpers[VERTEX_ROLES.TOP_LEFT].render();
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].render();
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].render();
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].render();
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -91,7 +86,7 @@ class TextboxMutator implements GraphicMutator {
     }
 
     // TODO: Account for shift, ctrl, alt, and snapping
-    public getVertexHandler(role: string): (position: Vector) => void {
+    public getVertexHandler(role: VERTEX_ROLES): (position: Vector) => void {
         const makeHandler = (oppositeCorner: Vector): (position: Vector) => void => {
             return position => {
                 const offset = oppositeCorner.towards(position);
@@ -108,36 +103,36 @@ class TextboxMutator implements GraphicMutator {
 
         const corners = this._getCorners();
         return ({
-            'topLeft': makeHandler(corners.bottomRight),
-            'topRight': makeHandler(corners.bottomLeft),
-            'bottomLeft': makeHandler(corners.topRight),
-            'bottomRight': makeHandler(corners.topLeft)
-        } as { [index: string]: (position: Vector) => void })[role];
+            [VERTEX_ROLES.TOP_LEFT]: makeHandler(corners.bottomRight),
+            [VERTEX_ROLES.TOP_RIGHT]: makeHandler(corners.bottomLeft),
+            [VERTEX_ROLES.BOTTOM_LEFT]: makeHandler(corners.topRight),
+            [VERTEX_ROLES.BOTTOM_RIGHT]: makeHandler(corners.topLeft)
+        } as { [key in VERTEX_ROLES]: (position: Vector) => void })[role];
     }
 
     // TODO: Include methods for other mutations
 
     public complete(): void {
         // Remove helper targets
-        this._helpers.topLeft.unrender();
-        this._helpers.topRight.unrender();
-        this._helpers.bottomLeft.unrender();
-        this._helpers.bottomRight.unrender();
+        this._helpers[VERTEX_ROLES.TOP_LEFT].unrender();
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].unrender();
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].unrender();
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].unrender();
     }
 
     public setScale(scale: number): void {
-        this._helpers.topLeft.setScale(scale);
-        this._helpers.topRight.setScale(scale);
-        this._helpers.bottomLeft.setScale(scale);
-        this._helpers.bottomRight.setScale(scale);
+        this._helpers[VERTEX_ROLES.TOP_LEFT].setScale(scale);
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].setScale(scale);
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setScale(scale);
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setScale(scale);
     }
 
     private _repositionVertices(): void {
         const corners = this._getCorners();
-        this._helpers.topLeft.setCenter(corners.topLeft);
-        this._helpers.topRight.setCenter(corners.topRight);
-        this._helpers.bottomLeft.setCenter(corners.bottomLeft);
-        this._helpers.bottomRight.setCenter(corners.bottomRight);
+        this._helpers[VERTEX_ROLES.TOP_LEFT].setCenter(corners.topLeft);
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].setCenter(corners.topRight);
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setCenter(corners.bottomLeft);
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(corners.bottomRight);
     }
 
     private _getCorners(): { topLeft: Vector; topRight: Vector; bottomLeft: Vector; bottomRight: Vector } {

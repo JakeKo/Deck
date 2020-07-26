@@ -1,6 +1,7 @@
-import { CurveMouseEvent, CURVE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, CurveAnchorMouseEvent, CURVE_ANCHOR_EVENTS } from "../../events/types";
+import { CurveAnchorMouseEvent, CurveMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
 import { CurveMutator } from "../../rendering/mutators";
+import { CURVE_ANCHOR_ROLES } from "../../rendering/types";
 import { resolvePosition } from "../utilities";
 
 export function moveCurve(event: CurveMouseEvent): void {
@@ -28,8 +29,8 @@ export function moveCurve(event: CurveMouseEvent): void {
     }
 }
 
-export function moveCurveAnchor(mutator: CurveMutator, position: string, index: number, moveAnchor: (event: CurveAnchorMouseEvent) => void): void {
-    const handler = mutator.getAnchorHandler(index, position);
+export function moveCurveAnchor(mutator: CurveMutator, role: CURVE_ANCHOR_ROLES, index: number, moveAnchor: (event: CurveAnchorMouseEvent) => void): void {
+    const handler = mutator.getAnchorHandler(index, role);
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
