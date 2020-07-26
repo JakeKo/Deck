@@ -75,7 +75,7 @@ class RectangleMutator implements GraphicMutator {
         return this._target;
     }
 
-    // TODO: Account for shift, alt, and snapping
+    // TODO: Account for snapping
     public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
         const initialOrigin = this._target.getOrigin();
         const directions = [Vector.right, new Vector(1, 1), Vector.up, new Vector(-1, 1), Vector.left, new Vector(-1, -1), Vector.down, new Vector(1, -1)];

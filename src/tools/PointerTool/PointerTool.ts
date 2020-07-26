@@ -1,9 +1,10 @@
-import { ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS } from "../../events/types";
+import { CURVE_EVENTS, ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { ImageMutator, RectangleMutator, TextboxMutator, VideoMutator, EllipseMutator } from "../../rendering/mutators";
+import { EllipseMutator, ImageMutator, RectangleMutator, TextboxMutator, VideoMutator } from "../../rendering/mutators";
 import { GRAPHIC_TYPES } from "../../rendering/types";
 import { AppStore } from "../../store/types";
 import { EditorTool, TOOL_NAMES } from "../types";
+import { moveCurve } from "./curve";
 import { moveEllipse, moveEllipseVertex } from "./ellipse";
 import { moveImage, moveImageVertex } from "./image";
 import { moveRectangle, moveRectangleVertex } from "./rectangle";
@@ -14,6 +15,7 @@ export default (store: AppStore): EditorTool => {
     return {
         name: TOOL_NAMES.POINTER,
         mount: () => {
+            listenOnce(CURVE_EVENTS.MOUSEDOWN, moveCurve);
             listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);
             listenOnce(IMAGE_EVENTS.MOUSEDOWN, moveImage);
             listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
@@ -25,6 +27,7 @@ export default (store: AppStore): EditorTool => {
             listen(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
         },
         unmount: () => {
+            unlisten(CURVE_EVENTS.MOUSEDOWN, moveCurve);
             unlisten(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);
             unlisten(IMAGE_EVENTS.MOUSEDOWN, moveImage);
             unlisten(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);

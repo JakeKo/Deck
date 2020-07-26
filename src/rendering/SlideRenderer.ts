@@ -156,7 +156,7 @@ class SlideRenderer {
         let mutator;
 
         if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
-            mutator = new CurveMutator({ slide: this, scale: 1 / this._zoom, curve: graphic as CurveRenderer });
+            mutator = new CurveMutator({ slide: this, scale: 1 / this._zoom, target: graphic as CurveRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
             mutator = new EllipseMutator({ slide: this, scale: 1 / this._zoom, target: graphic as EllipseRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
