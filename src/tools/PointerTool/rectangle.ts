@@ -30,7 +30,7 @@ export function moveRectangle(event: RectangleMouseEvent): void {
 }
 
 export function moveRectangleVertex(mutator: RectangleMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
-    const handler = mutator.vertexMoveHandlers()[vertex.getLocation()]();
+    const handler = mutator.getVertexHandler(vertex.getLocation());
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);

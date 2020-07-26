@@ -29,7 +29,7 @@ export function moveCurve(event: CurveMouseEvent): void {
 }
 
 export function moveCurveAnchor(mutator: CurveMutator, position: string, index: number, moveAnchor: (event: CurveAnchorMouseEvent) => void): void {
-    const handler = mutator.anchorMoveHandler(index)[position];
+    const handler = mutator.getAnchorHandler(index, position);
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);

@@ -75,7 +75,7 @@ class EllipseMutator implements GraphicMutator {
         return this._target;
     }
 
-    // TODO: Account for snapping
+    // TODO: Account for alt snapping
     public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
         const initialCenter = this._target.getCenter();
         const directions = [Vector.right, new Vector(1, 1), Vector.up, new Vector(-1, 1), Vector.left, new Vector(-1, -1), Vector.down, new Vector(1, -1)];
@@ -90,8 +90,9 @@ class EllipseMutator implements GraphicMutator {
         };
     }
 
-    // TODO: Account for shift, alt, and snapping
-    public getVertexHandlers(): { [index: string]: () => (position: Vector) => void } {
+    // TODO: Account for shift, ctrl, alt, and snapping
+    // TODO: Create type for vertex roles
+    public getVertexHandler(role: string): (position: Vector) => void {
         const makeHandler = (oppositeCorner: Vector): (position: Vector) => void => {
             return position => {
                 const offset = oppositeCorner.towards(position);
@@ -107,12 +108,12 @@ class EllipseMutator implements GraphicMutator {
         };
 
         const corners = this._getCorners();
-        return {
-            'topLeft': () => makeHandler(corners.bottomRight),
-            'topRight': () => makeHandler(corners.bottomLeft),
-            'bottomLeft': () => makeHandler(corners.topRight),
-            'bottomRight': () => makeHandler(corners.topLeft)
-        };
+        return ({
+            'topLeft': makeHandler(corners.bottomRight),
+            'topRight': makeHandler(corners.bottomLeft),
+            'bottomLeft': makeHandler(corners.topRight),
+            'bottomRight': makeHandler(corners.topLeft)
+        } as { [index: string]: (position: Vector) => void })[role];
     }
 
     // TODO: Include methods for other mutations

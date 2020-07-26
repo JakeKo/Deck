@@ -1,9 +1,9 @@
+import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { CurveRenderer } from "../graphics";
 import { CurveAnchorRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
-import { CurveAnchor, GraphicMutator, GRAPHIC_TYPES } from "../types";
-import { closestVector } from "../../utilities/utilities";
+import { GraphicMutator, GRAPHIC_TYPES } from "../types";
 
 type CurveMutatorArgs = {
     target: CurveRenderer;
@@ -42,7 +42,8 @@ class CurveMutator implements GraphicMutator {
         return this._target.getAnchor(0).point;
     }
 
-    // TODO: Account for snapping
+    // TODO: Account for alt and snapping
+    // TODO: Extract shift operations to utilities
     public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
         const initialOrigin = this.getOrigin();
         const initialAnchors = this._target.getAnchors();
@@ -64,9 +65,10 @@ class CurveMutator implements GraphicMutator {
     }
 
     // TODO: Account for shift, alt, and snapping
-    public anchorMoveHandler(index: number): { [index: string]: (position: Vector) => void } {
+    // TODO: Create type for anchor roles
+    public getAnchorHandler(index: number, role: string): (position: Vector) => void {
         const anchor = this._target.getAnchor(index);
-        return {
+        return ({
             'inHandle': (position: Vector): void => {
                 this._target.setAnchor(index, { ...anchor, inHandle: position });
                 this._repositionCurveAnchor(index);
@@ -84,18 +86,10 @@ class CurveMutator implements GraphicMutator {
                 this._target.setAnchor(index, { ...anchor, outHandle: position });
                 this._repositionCurveAnchor(index);
             }
-        };
-    }
-
-    // TODO: Account for shift, alt, and snapping
-    public setAnchor(index: number, anchor: CurveAnchor): void {
-        // Update rendering
-        this.setAnchor(index, anchor);
-        this._repositionCurveAnchor(index);
+        } as { [index: string]: (position: Vector) => void })[role];
     }
 
     // TODO: Implement rectangular scaling
-    // TODO: Assess how CurveAnchorMutator interfaces with SlideRenderer focuesed graphics
 
     public complete(): void {
         this._helpers.forEach(helper => helper.unrender());
