@@ -12,13 +12,14 @@ export function moveRectangle(event: RectangleMouseEvent): void {
 
     const originOffset = resolvePosition(baseEvent, slide).towards(target.getOrigin());
     const mutator = slide.focusGraphic(target.getId()) as RectangleMutator;
+    const moveHandler = mutator.graphicMoveHandler();
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
 
     function move(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
-        mutator.move(resolvePosition(baseEvent, slide).add(originOffset));
+        moveHandler(resolvePosition(baseEvent, slide).add(originOffset), baseEvent.shiftKey, baseEvent.altKey);
         slide.broadcastSetGraphic(mutator.getTarget());
     }
 
@@ -29,7 +30,7 @@ export function moveRectangle(event: RectangleMouseEvent): void {
 }
 
 export function moveRectangleVertex(mutator: RectangleMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
-    const handler = mutator.getVertexHandlers()[vertex.getLocation()]();
+    const handler = mutator.vertexMoveHandlers()[vertex.getLocation()]();
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);

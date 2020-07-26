@@ -3,6 +3,7 @@ import { RectangleRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
 import { GraphicMutator, GRAPHIC_TYPES } from "../types";
+import { closestVector } from "../../utilities/utilities";
 
 type RectangleMutatorArgs = {
     target: RectangleRenderer;
@@ -18,12 +19,12 @@ type RectangleMutatorHelpers = {
 };
 
 class RectangleMutator implements GraphicMutator {
-    private target: RectangleRenderer;
+    private _target: RectangleRenderer;
     private _slide: SlideRenderer;
     private _helpers: RectangleMutatorHelpers;
 
     constructor(args: RectangleMutatorArgs) {
-        this.target = args.target;
+        this._target = args.target;
         this._slide = args.slide;
 
         // Initialize helper graphics
@@ -71,18 +72,26 @@ class RectangleMutator implements GraphicMutator {
     }
 
     public getTarget(): RectangleRenderer {
-        return this.target;
+        return this._target;
     }
 
     // TODO: Account for shift, alt, and snapping
-    public move(origin: Vector): void {
-        // Update rendering
-        this.target.setOrigin(origin);
-        this._repositionVertices();
+    public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
+        const initialOrigin = this._target.getOrigin();
+        const directions = [Vector.right, new Vector(1, 1), Vector.up, new Vector(-1, 1), Vector.left, new Vector(-1, -1), Vector.down, new Vector(1, -1)];
+
+        return (position, shift, alt) => {
+            const rawMove = initialOrigin.towards(position);
+            const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
+            const move = rawMove.projectOn(moveDirection);
+
+            this._target.setOrigin(initialOrigin.add(move));
+            this._repositionVertices();
+        };
     }
 
     // TODO: Account for shift, alt, and snapping
-    public getVertexHandlers(): { [index: string]: () => (position: Vector) => void } {
+    public vertexMoveHandlers(): { [index: string]: () => (position: Vector) => void } {
         const makeHandler = (oppositeCorner: Vector): (position: Vector) => void => {
             return position => {
                 const offset = oppositeCorner.towards(position);
@@ -90,9 +99,9 @@ class RectangleMutator implements GraphicMutator {
                 const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
 
                 // Update rendering
-                this.target.setOrigin(origin);
-                this.target.setWidth(dimensions.x);
-                this.target.setHeight(dimensions.y);
+                this._target.setOrigin(origin);
+                this._target.setWidth(dimensions.x);
+                this._target.setHeight(dimensions.y);
                 this._repositionVertices();
             };
         };
@@ -132,8 +141,8 @@ class RectangleMutator implements GraphicMutator {
     }
 
     private _getCorners(): { topLeft: Vector; topRight: Vector; bottomLeft: Vector; bottomRight: Vector } {
-        const origin = this.target.getOrigin();
-        const dimensions = new Vector(this.target.getWidth(), this.target.getHeight());
+        const origin = this._target.getOrigin();
+        const dimensions = new Vector(this._target.getWidth(), this._target.getHeight());
 
         return {
             topLeft: origin,
