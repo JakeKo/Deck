@@ -1,6 +1,6 @@
 import * as SVG from 'svg.js';
 import { decorateSlideEvents } from '../events/decorators';
-import { SlideZoomEvent, SLIDE_EVENTS } from '../events/types';
+import { SlideZoomEvent, SLIDE_EVENTS, SlideKeyboardEvent } from '../events/types';
 import { listen } from '../events/utilities';
 import { Viewbox } from '../store/types';
 import SlideStateManager from '../utilities/SlideStateManager';
@@ -45,6 +45,12 @@ class SlideRenderer {
             this._zoom = event.detail.zoom;
             Object.values(this._focusedGraphics).forEach(mutator => mutator.setScale(1 / this._zoom));
             Object.values(this._activeMakers).forEach(maker => maker.setScale(1 / this._zoom));
+        });
+
+        listen(SLIDE_EVENTS.KEYDOWN, (event: SlideKeyboardEvent): void => {
+            if (['Backspace', 'Delete'].indexOf(event.detail.baseEvent.key) !== -1) {
+                Object.keys(this._focusedGraphics).forEach(graphicId => this.removeGraphic(graphicId));
+            }
         });
     }
 
@@ -136,6 +142,8 @@ class SlideRenderer {
     }
 
     public removeGraphic(graphicId: string): void {
+        this.unfocusGraphic(graphicId);
+        this._graphics[graphicId].unrender();
         delete this._graphics[graphicId];
     }
 
@@ -176,7 +184,7 @@ class SlideRenderer {
     }
 
     public unfocusGraphic(graphicId: string): void {
-        this._focusedGraphics[graphicId].complete();
+        this.isFocused(graphicId) && this._focusedGraphics[graphicId].complete();
         delete this._focusedGraphics[graphicId];
     }
 
