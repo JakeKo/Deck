@@ -85,11 +85,16 @@ class RectangleMutator implements GraphicMutator {
         };
     }
 
-    // TODO: Account for shift, ctrl, alt, and snapping
-    public getVertexHandler(role: VERTEX_ROLES): (position: Vector) => void {
-        const makeHandler = (oppositeCorner: Vector): (position: Vector) => void => {
-            return position => {
-                const offset = oppositeCorner.towards(position);
+    // TODO: Account for ctrl, alt, and snapping
+    public getVertexHandler(role: VERTEX_ROLES): (position: Vector, shift: boolean) => void {
+        const size = new Vector(this._target.getWidth(), this._target.getHeight());
+        const directions = [ size, size.signAs(new Vector(-1, 1)), size.signAs(new Vector(-1, -1)), size.signAs(new Vector(1, -1))];
+
+        const makeHandler = (oppositeCorner: Vector): (position: Vector, shift: boolean) => void => {
+            return (position, shift) => {
+                const rawOffset = oppositeCorner.towards(position);
+                const offset = shift ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+
                 const dimensions = offset.abs;
                 const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
 
@@ -107,7 +112,7 @@ class RectangleMutator implements GraphicMutator {
             [VERTEX_ROLES.TOP_RIGHT]: makeHandler(corners.bottomLeft),
             [VERTEX_ROLES.BOTTOM_LEFT]: makeHandler(corners.topRight),
             [VERTEX_ROLES.BOTTOM_RIGHT]: makeHandler(corners.topLeft)
-        } as { [key in VERTEX_ROLES]: (position: Vector) => void })[role];
+        } as { [key in VERTEX_ROLES]: (position: Vector, shift: boolean) => void })[role];
     }
 
     // TODO: Include methods for other mutations

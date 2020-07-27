@@ -87,9 +87,14 @@ class VideoMutator implements GraphicMutator {
 
     // TODO: Account for ctrl, alt, and snapping
     public getVertexHandler(role: VERTEX_ROLES): (position: Vector) => void {
+        const size = new Vector(this._target.getWidth(), this._target.getHeight());
+        const directions = [ size, size.signAs(new Vector(-1, 1)), size.signAs(new Vector(-1, -1)), size.signAs(new Vector(1, -1))];
+
         const makeHandler = (oppositeCorner: Vector): (position: Vector) => void => {
             return position => {
-                const offset = oppositeCorner.towards(position);
+                const rawOffset = oppositeCorner.towards(position);
+                const offset = rawOffset.projectOn(closestVector(rawOffset, directions));
+
                 const dimensions = offset.abs;
                 const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
 

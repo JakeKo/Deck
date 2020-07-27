@@ -37,7 +37,7 @@ export function moveTextboxVertex(mutator: TextboxMutator, vertex: VertexRendere
 
     function move(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
-        handler(resolvePosition(baseEvent, slide));
+        handler(resolvePosition(baseEvent, slide), baseEvent.shiftKey);
         slide.broadcastSetGraphic(mutator.getTarget());
     }
 
