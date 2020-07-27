@@ -51,18 +51,18 @@ class CurveAnchorRenderer implements GraphicRenderer {
         this._inHandle = args.inHandle;
         this._point = args.point;
         this._outHandle = args.outHandle;
-        this._handleWidth = 6;
-        this._handleHeight = 6;
-        this._handleFillColor = '#FFFFFF';
-        this._handleStrokeWidth = 1;
-        this._handleStrokeColor = '#888888';
-        this._pointWidth = 4;
-        this._pointHeight = 4;
-        this._pointFillColor = '#FFFFFF';
-        this._pointStrokeWidth = 1;
-        this._pointStrokeColor = '#888888';
+        this._handleWidth = 8;
+        this._handleHeight = 8;
+        this._handleFillColor = '#400c8b';
+        this._handleStrokeWidth = 0;
+        this._handleStrokeColor = 'none';
+        this._pointWidth = 8;
+        this._pointHeight = 8;
+        this._pointFillColor = '#400c8b';
+        this._pointStrokeWidth = 0;
+        this._pointStrokeColor = 'none';
         this._spanStrokeWidth = 1;
-        this._spanStrokeColor = '#888888';
+        this._spanStrokeColor = '#400c8b';
     }
 
     public getId(): string {
@@ -89,9 +89,9 @@ class CurveAnchorRenderer implements GraphicRenderer {
         const pointPosition = this._pointPosition();
 
         this._inHandleSpanSvg = this._slide.canvas.line(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y)
-            .stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth });
+            .stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth * this._scale });
         this._outHandleSpanSvg = this._slide.canvas.line(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y)
-            .stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth });
+            .stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth * this._scale });
         this._inHandleSvg = this._slide.canvas.rect(handleDimensions.x, handleDimensions.y)
             .translate(inHandlePosition.x, inHandlePosition.y)
             .fill(this._handleFillColor)
@@ -156,6 +156,8 @@ class CurveAnchorRenderer implements GraphicRenderer {
         const pointDimensions = this._pointDimensions();
         const pointPosition = this._pointPosition();
 
+        this._inHandleSpanSvg && this._inHandleSpanSvg.stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth * this._scale });
+        this._outHandleSpanSvg && this._outHandleSpanSvg.stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth * this._scale });
         this._inHandleSvg && this._inHandleSvg.size(handleDimensions.x, handleDimensions.y).translate(inHandlePosition.x, inHandlePosition.y);
         this._outHandleSvg && this._outHandleSvg.size(handleDimensions.x, handleDimensions.y).translate(outHandlePosition.x, outHandlePosition.y);
         this._pointSvg && this._pointSvg.size(pointDimensions.x, pointDimensions.y).translate(pointPosition.x, pointPosition.y);

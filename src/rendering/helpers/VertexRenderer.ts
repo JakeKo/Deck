@@ -36,7 +36,7 @@ class VertexRenderer implements GraphicRenderer {
         this._center = args.center;
         this._width = 8;
         this._height = 8;
-        this._fillColor = '#888888';
+        this._fillColor = '#400c8b';
         this._strokeColor = 'none';
         this._strokeWidth = 0;
     }
