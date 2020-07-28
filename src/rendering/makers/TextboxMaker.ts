@@ -1,4 +1,5 @@
 import { provideId } from "../../utilities/IdProvider";
+import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { TextboxRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
@@ -95,20 +96,20 @@ class TextboxMaker implements GraphicMaker {
     }
 
     public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
+        // If shift is pressed, constrain to square
+        const directions = [Vector.northeast, Vector.northwest, Vector.southeast, Vector.southwest];
         const rawOffset = this._initialPosition.towards(position);
-        const absOffset = rawOffset.transform(Math.abs);
-        const minOffset = Math.min(absOffset.x, absOffset.y);
-        const postShiftOffset = shift ? new Vector(Math.sign(rawOffset.x) * minOffset, Math.sign(rawOffset.y) * minOffset) : rawOffset;
+        const offset = shift ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
 
         if (ctrl) {
-            const dimensions = postShiftOffset.transform(Math.abs).scale(2);
-            const originOffset = postShiftOffset.transform(Math.abs).scale(-1);
+            const dimensions = offset.transform(Math.abs).scale(2);
+            const originOffset = offset.transform(Math.abs).scale(-1);
             this._textbox.setOrigin(this._initialPosition.add(originOffset));
             this._textbox.setWidth(dimensions.x);
             this._textbox.setHeight(dimensions.y);
         } else {
-            const dimensions = postShiftOffset.transform(Math.abs);
-            const originOffset = postShiftOffset.scale(0.5).add(dimensions.scale(-0.5));
+            const dimensions = offset.transform(Math.abs);
+            const originOffset = offset.scale(0.5).add(dimensions.scale(-0.5));
             this._textbox.setOrigin(this._initialPosition.add(originOffset));
             this._textbox.setWidth(dimensions.x);
             this._textbox.setHeight(dimensions.y);

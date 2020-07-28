@@ -4,6 +4,7 @@ import { VideoRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
 import { GraphicMaker, VERTEX_ROLES } from "../types";
+import { closestVector } from "../../utilities/utilities";
 
 type VideoMakerArgs = {
     slide: SlideRenderer;
@@ -105,22 +106,20 @@ class VideoMaker implements GraphicMaker {
 
     // Some trig, for your enjoyment
     public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
+        const size = new Vector(this._width, this._height).normalized;
+        const directions = [size, size.signAs(Vector.southeast), size.signAs(Vector.southwest), size.signAs(Vector.northwest)];
         const rawOffset = this._initialPosition.towards(position);
-        const absOffset = rawOffset.abs;
-        const absDimensionOffset = absOffset.theta(Vector.right) <= Math.atan2(this._height, this._width)
-            ? new Vector(absOffset.x, absOffset.x * this._height / this._width)
-            : new Vector(absOffset.y * this._width / this._height, absOffset.y);
-        const dimensionOffset = absDimensionOffset.signAs(rawOffset);
+        const offset = rawOffset.projectOn(closestVector(rawOffset, directions));
 
         if (ctrl) {
-            const dimensions = dimensionOffset.abs.scale(2);
-            const originOffset = dimensionOffset.abs.scale(-1);
+            const dimensions = offset.abs.scale(2);
+            const originOffset = offset.abs.scale(-1);
             this._video.setOrigin(this._initialPosition.add(originOffset));
             this._video.setWidth(dimensions.x);
             this._video.setHeight(dimensions.y);
         } else {
-            const dimensions = dimensionOffset.abs;
-            const originOffset = dimensionOffset.scale(0.5).add(dimensions.scale(-0.5));
+            const dimensions = offset.abs;
+            const originOffset = offset.scale(0.5).add(dimensions.scale(-0.5));
             this._video.setOrigin(this._initialPosition.add(originOffset));
             this._video.setWidth(dimensions.x);
             this._video.setHeight(dimensions.y);

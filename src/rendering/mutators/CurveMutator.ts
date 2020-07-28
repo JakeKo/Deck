@@ -47,7 +47,7 @@ class CurveMutator implements GraphicMutator {
     public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
         const initialOrigin = this.getOrigin();
         const initialAnchors = this._target.getAnchors();
-        const directions = [Vector.right, new Vector(1, 1), Vector.up, new Vector(-1, 1), Vector.left, new Vector(-1, -1), Vector.down, new Vector(1, -1)];
+        const directions = [Vector.east, Vector.northeast, Vector.north, Vector.northwest, Vector.west, Vector.southwest, Vector.south, Vector.southeast];
 
         return (position, shift, alt) => {
             const rawMove = initialOrigin.towards(position);

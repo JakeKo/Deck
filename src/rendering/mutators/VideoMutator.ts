@@ -73,7 +73,7 @@ class VideoMutator implements GraphicMutator {
     // TODO: Account for alt and snapping
     public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
         const initialOrigin = this._target.getOrigin();
-        const directions = [Vector.right, new Vector(1, 1), Vector.up, new Vector(-1, 1), Vector.left, new Vector(-1, -1), Vector.down, new Vector(1, -1)];
+        const directions = [Vector.east, Vector.northeast, Vector.north, Vector.northwest, Vector.west, Vector.southwest, Vector.south, Vector.southeast];
 
         return (position, shift, alt) => {
             const rawMove = initialOrigin.towards(position);
@@ -88,7 +88,7 @@ class VideoMutator implements GraphicMutator {
     // TODO: Account for ctrl, alt, and snapping
     public getVertexHandler(role: VERTEX_ROLES): (position: Vector) => void {
         const size = new Vector(this._target.getWidth(), this._target.getHeight());
-        const directions = [ size, size.signAs(new Vector(-1, 1)), size.signAs(new Vector(-1, -1)), size.signAs(new Vector(1, -1))];
+        const directions = [ size, size.signAs(Vector.northwest), size.signAs(Vector.southwest), size.signAs(Vector.southeast)];
 
         const makeHandler = (oppositeCorner: Vector): (position: Vector) => void => {
             return position => {

@@ -4,6 +4,7 @@ import { EllipseRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
 import { GraphicMaker, VERTEX_ROLES } from "../types";
+import { closestVector } from "../../utilities/utilities";
 
 type EllipseMakerArgs = {
     slide: SlideRenderer;
@@ -95,19 +96,19 @@ class EllipseMaker implements GraphicMaker {
     }
 
     public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
+        // If shift is pressed, constrain to circle
+        const directions = [Vector.northeast, Vector.northwest, Vector.southeast, Vector.southwest];
         const rawOffset = this._initialPosition.towards(position);
-        const absOffset = rawOffset.transform(Math.abs);
-        const minOffset = Math.min(absOffset.x, absOffset.y);
-        const postShiftOffset = shift ? new Vector(Math.sign(rawOffset.x) * minOffset, Math.sign(rawOffset.y) * minOffset) : rawOffset;
+        const offset = shift ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
 
         if (ctrl) {
-            const dimensions = postShiftOffset.transform(Math.abs).scale(2);
+            const dimensions = offset.transform(Math.abs).scale(2);
             this._ellipse.setCenter(this._initialPosition);
             this._ellipse.setWidth(dimensions.x);
             this._ellipse.setHeight(dimensions.y);
         } else {
-            const dimensions = postShiftOffset.transform(Math.abs);
-            const originOffset = postShiftOffset.scale(0.5);
+            const dimensions = offset.transform(Math.abs);
+            const originOffset = offset.scale(0.5);
             this._ellipse.setCenter(this._initialPosition.add(originOffset));
             this._ellipse.setWidth(dimensions.x);
             this._ellipse.setHeight(dimensions.y);
@@ -117,9 +118,9 @@ class EllipseMaker implements GraphicMaker {
         const center = this._ellipse.getCenter();
         const radius = new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()).scale(0.5);
         this._helpers[VERTEX_ROLES.TOP_LEFT].setCenter(center.add(radius.scale(-1)));
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].setCenter(center.add(radius.signAs(new Vector(1, -1))));
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].setCenter(center.add(radius.signAs(Vector.southeast)));
         this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setCenter(center.add(radius));
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(center.add(radius.signAs(new Vector(-1, 1))));
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(center.add(radius.signAs(Vector.northwest)));
     }
 }
 

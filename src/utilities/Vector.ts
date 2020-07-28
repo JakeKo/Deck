@@ -1,10 +1,14 @@
 export default class Vector {
     public static undefined: Vector = new Vector(NaN, NaN);
     public static zero = new Vector(0, 0);
-    public static up = new Vector(0, 1);
-    public static right = new Vector(1, 0);
-    public static down = new Vector(0, -1);
-    public static left = new Vector(-1, 0);
+    public static north = new Vector(0, 1);
+    public static northeast = new Vector(Math.SQRT2 / 2, Math.SQRT2 / 2);
+    public static east = new Vector(1, 0);
+    public static southeast = new Vector(Math.SQRT2 / 2, -Math.SQRT2 / 2);
+    public static south = new Vector(0, -1);
+    public static southwest = new Vector(-Math.SQRT2 / 2, -Math.SQRT2 / 2);
+    public static west = new Vector(-1, 0);
+    public static northwest = new Vector(-Math.SQRT2 / 2, Math.SQRT2 / 2);
 
     public x: number;
     public y: number;

@@ -29,7 +29,7 @@ describe('SnapVector', () => {
     it('can calculate the distance from a point with direction', () => {
         // Arrange
         const epsilon = 1E-5;
-        const snapVector = new SnapVector('', new Vector(3, 8), new Vector(1, -1));
+        const snapVector = new SnapVector('', new Vector(3, 8), Vector.southeast);
         const point = new Vector(9, 3);
         const expectedDistance = 1 / Math.sqrt(2);
 
@@ -43,7 +43,7 @@ describe('SnapVector', () => {
     it('can calculate the distance from a point on the direction vector', () => {
         // Arrange
         const epsilon = 1E-5;
-        const snapVector = new SnapVector('', new Vector(3, 8), new Vector(1, -1));
+        const snapVector = new SnapVector('', new Vector(3, 8), Vector.southeast);
         const point = new Vector(9, 2);
         const expectedDistance = 0;
 
@@ -97,7 +97,7 @@ describe('SnapVector', () => {
     it('can calculate the closest point from a point with direction', () => {
         // Arrange
         const epsilon = 1E-5;
-        const snapVector = new SnapVector('', new Vector(3, 8), new Vector(1, -1));
+        const snapVector = new SnapVector('', new Vector(3, 8), Vector.southeast);
         const point = new Vector(9, 3);
         const expectedClosestPoint = new Vector(8.5, 2.5);
 
@@ -111,7 +111,7 @@ describe('SnapVector', () => {
     it('can calculate the closest point from a point on the direction vector', () => {
         // Arrange
         const epsilon = 1E-5;
-        const snapVector = new SnapVector('', new Vector(3, 8), new Vector(1, -1));
+        const snapVector = new SnapVector('', new Vector(3, 8), Vector.southeast);
         const point = new Vector(9, 2);
         const expectedClosestPoint = new Vector(9, 2);
 
