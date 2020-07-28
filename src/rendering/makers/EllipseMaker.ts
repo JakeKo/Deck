@@ -1,10 +1,11 @@
 import { provideId } from "../../utilities/IdProvider";
+import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { EllipseRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
+import EllipseOutlineRenderer from "../helpers/EllipseOutlineRenderer";
 import SlideRenderer from "../SlideRenderer";
 import { GraphicMaker, VERTEX_ROLES } from "../types";
-import { closestVector } from "../../utilities/utilities";
 
 type EllipseMakerArgs = {
     slide: SlideRenderer;
@@ -12,7 +13,13 @@ type EllipseMakerArgs = {
     scale: number;
 };
 
-type EllipseMakerHelpers = { [key in VERTEX_ROLES]: VertexRenderer };
+type EllipseMakerHelpers = {
+    [VERTEX_ROLES.TOP_LEFT]: VertexRenderer;
+    [VERTEX_ROLES.TOP_RIGHT]: VertexRenderer;
+    [VERTEX_ROLES.BOTTOM_LEFT]: VertexRenderer;
+    [VERTEX_ROLES.BOTTOM_RIGHT]: VertexRenderer;
+    outline: EllipseOutlineRenderer;
+};
 
 class EllipseMaker implements GraphicMaker {
     private _ellipse: EllipseRenderer;
@@ -61,6 +68,13 @@ class EllipseMaker implements GraphicMaker {
                 center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), this._ellipse.getHeight())),
                 scale: args.scale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
+            }),
+            outline: new EllipseOutlineRenderer({
+                slide: this._slide,
+                center: this._ellipse.getCenter(),
+                width: this._ellipse.getWidth(),
+                height: this._ellipse.getHeight(),
+                scale: args.scale
             })
         };
 
@@ -72,6 +86,7 @@ class EllipseMaker implements GraphicMaker {
         this._helpers[VERTEX_ROLES.TOP_RIGHT].render();
         this._helpers[VERTEX_ROLES.BOTTOM_LEFT].render();
         this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].render();
+        this._helpers.outline.render();
     }
 
     public getTarget(): EllipseRenderer {
@@ -86,6 +101,7 @@ class EllipseMaker implements GraphicMaker {
         this._helpers[VERTEX_ROLES.TOP_RIGHT].unrender();
         this._helpers[VERTEX_ROLES.BOTTOM_LEFT].unrender();
         this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].unrender();
+        this._helpers.outline.unrender();
     }
 
     public setScale(scale: number): void {
@@ -93,6 +109,7 @@ class EllipseMaker implements GraphicMaker {
         this._helpers[VERTEX_ROLES.TOP_RIGHT].setScale(scale);
         this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setScale(scale);
         this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setScale(scale);
+        this._helpers.outline.setScale(scale);
     }
 
     public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
@@ -121,6 +138,9 @@ class EllipseMaker implements GraphicMaker {
         this._helpers[VERTEX_ROLES.TOP_RIGHT].setCenter(center.add(radius.signAs(Vector.southeast)));
         this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setCenter(center.add(radius));
         this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(center.add(radius.signAs(Vector.northwest)));
+        this._helpers.outline.setCenter(center);
+        this._helpers.outline.setWidth(this._ellipse.getWidth());
+        this._helpers.outline.setHeight(this._ellipse.getHeight());
     }
 }
 

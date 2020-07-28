@@ -32,6 +32,7 @@ export enum GRAPHIC_TYPES {
     CURVE = 'curve',
     CURVE_ANCHOR = 'curve-anchor',
     ELLIPSE = 'ellipse',
+    ELLIPSE_OUTLINE = 'ellipse-outline',
     IMAGE = 'image',
     RECTANGLE = 'rectangle',
     TEXTBOX = 'textbox',
