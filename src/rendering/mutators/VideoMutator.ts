@@ -2,6 +2,7 @@ import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { VideoRenderer } from "../graphics";
 import { VertexRenderer } from "../helpers";
+import RectangleOutlineRenderer from "../helpers/RectangleOutlineRenderer";
 import SlideRenderer from "../SlideRenderer";
 import { GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
 
@@ -11,7 +12,9 @@ type VideoMutatorArgs = {
     scale: number;
 };
 
-type VideoMutatorHelpers = { [key in VERTEX_ROLES]: VertexRenderer };
+type VideoMutatorHelpers = { [key in VERTEX_ROLES]: VertexRenderer } & {
+    outline: RectangleOutlineRenderer;
+};
 
 class VideoMutator implements GraphicMutator {
     private _target: VideoRenderer;
@@ -52,6 +55,13 @@ class VideoMutator implements GraphicMutator {
                 center: corners.bottomRight,
                 scale: args.scale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
+            }),
+            outline: new RectangleOutlineRenderer({
+                slide: this._slide,
+                scale: args.scale,
+                origin: this._target.getOrigin(),
+                width: this._target.getWidth(),
+                height: this._target.getHeight()
             })
         };
 
@@ -60,6 +70,7 @@ class VideoMutator implements GraphicMutator {
         this._helpers[VERTEX_ROLES.TOP_RIGHT].render();
         this._helpers[VERTEX_ROLES.BOTTOM_LEFT].render();
         this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].render();
+        this._helpers.outline.render();
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -81,7 +92,7 @@ class VideoMutator implements GraphicMutator {
             const move = rawMove.projectOn(moveDirection);
 
             this._target.setOrigin(initialOrigin.add(move));
-            this._repositionVertices();
+            this._refreshHelpers();
         };
     }
 
@@ -102,7 +113,7 @@ class VideoMutator implements GraphicMutator {
                 this._target.setOrigin(origin);
                 this._target.setWidth(dimensions.x);
                 this._target.setHeight(dimensions.y);
-                this._repositionVertices();
+                this._refreshHelpers();
             };
         };
 
@@ -123,6 +134,7 @@ class VideoMutator implements GraphicMutator {
         this._helpers[VERTEX_ROLES.TOP_RIGHT].unrender();
         this._helpers[VERTEX_ROLES.BOTTOM_LEFT].unrender();
         this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].unrender();
+        this._helpers.outline.unrender();
     }
 
     public setScale(scale: number): void {
@@ -130,14 +142,18 @@ class VideoMutator implements GraphicMutator {
         this._helpers[VERTEX_ROLES.TOP_RIGHT].setScale(scale);
         this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setScale(scale);
         this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setScale(scale);
+        this._helpers.outline.setScale(scale);
     }
 
-    private _repositionVertices(): void {
+    private _refreshHelpers(): void {
         const corners = this._getCorners();
         this._helpers[VERTEX_ROLES.TOP_LEFT].setCenter(corners.topLeft);
         this._helpers[VERTEX_ROLES.TOP_RIGHT].setCenter(corners.topRight);
         this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setCenter(corners.bottomLeft);
         this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(corners.bottomRight);
+        this._helpers.outline.setOrigin(this._target.getOrigin());
+        this._helpers.outline.setWidth(this._target.getWidth());
+        this._helpers.outline.setHeight(this._target.getHeight());
     }
 
     private _getCorners(): { topLeft: Vector; topRight: Vector; bottomLeft: Vector; bottomRight: Vector } {

@@ -4,31 +4,31 @@ import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
-type EllipseOutlineRendererArgs = {
+type RectangleOutlineRendererArgs = {
     slide: SlideRenderer;
     scale: number;
-    center: Vector;
+    origin: Vector;
     width: number;
     height: number;
 };
 
-class EllipseOutlineRenderer implements GraphicRenderer {
+class RectangleOutlineRenderer implements GraphicRenderer {
     private _id: string;
     private _slide: SlideRenderer;
-    private _svg: SVG.Ellipse | undefined;
+    private _svg: SVG.Rect | undefined;
     private _scale: number;
     private _width: number;
     private _height: number;
-    private _center: Vector;
+    private _origin: Vector;
     private _fillColor: string;
     private _strokeColor: string;
     private _strokeWidth: number;
 
-    constructor(args: EllipseOutlineRendererArgs) {
+    constructor(args: RectangleOutlineRendererArgs) {
         this._id = provideId();
         this._slide = args.slide;
         this._scale = args.scale;
-        this._center = args.center;
+        this._origin = args.origin;
         this._width = args.width;
         this._height = args.height;
         this._fillColor = 'none';
@@ -41,7 +41,7 @@ class EllipseOutlineRenderer implements GraphicRenderer {
     }
 
     public getType(): GRAPHIC_TYPES {
-        return GRAPHIC_TYPES.ELLIPSE_OUTLINE;
+        return GRAPHIC_TYPES.RECTANGLE_OUTLINE;
     }
 
     public isRendered(): boolean {
@@ -54,8 +54,8 @@ class EllipseOutlineRenderer implements GraphicRenderer {
             return;
         }
 
-        this._svg = this._slide.canvas.ellipse(this._width, this._height)
-            .center(this._center.x, this._center.y)
+        this._svg = this._slide.canvas.rect(this._width, this._height)
+            .translate(this._origin.x, this._origin.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale });
     }
@@ -65,9 +65,9 @@ class EllipseOutlineRenderer implements GraphicRenderer {
         this._svg = undefined;
     }
 
-    public setCenter(center: Vector): void {
-        this._center = center;
-        this._svg && this._svg.center(this._center.x, this._center.y);
+    public setOrigin(origin: Vector): void {
+        this._origin = origin;
+        this._svg && this._svg.translate(this._origin.x, this._origin.y);
     }
 
     public setWidth(width: number): void {
@@ -87,4 +87,4 @@ class EllipseOutlineRenderer implements GraphicRenderer {
     }
 }
 
-export default EllipseOutlineRenderer;
+export default RectangleOutlineRenderer;

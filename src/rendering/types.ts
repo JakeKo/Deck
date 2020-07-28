@@ -35,6 +35,7 @@ export enum GRAPHIC_TYPES {
     ELLIPSE_OUTLINE = 'ellipse-outline',
     IMAGE = 'image',
     RECTANGLE = 'rectangle',
+    RECTANGLE_OUTLINE = 'rectangle-outline',
     TEXTBOX = 'textbox',
     VERTEX = 'vertex',
     VIDEO = 'video'

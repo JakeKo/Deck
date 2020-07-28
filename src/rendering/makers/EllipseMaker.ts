@@ -13,16 +13,12 @@ type EllipseMakerArgs = {
     scale: number;
 };
 
-type EllipseMakerHelpers = {
-    [VERTEX_ROLES.TOP_LEFT]: VertexRenderer;
-    [VERTEX_ROLES.TOP_RIGHT]: VertexRenderer;
-    [VERTEX_ROLES.BOTTOM_LEFT]: VertexRenderer;
-    [VERTEX_ROLES.BOTTOM_RIGHT]: VertexRenderer;
+type EllipseMakerHelpers = { [key in VERTEX_ROLES]: VertexRenderer } & {
     outline: EllipseOutlineRenderer;
 };
 
 class EllipseMaker implements GraphicMaker {
-    private _ellipse: EllipseRenderer;
+    private _target: EllipseRenderer;
     private _slide: SlideRenderer;
     private _initialPosition: Vector;
     private _helpers: EllipseMakerHelpers;
@@ -33,7 +29,7 @@ class EllipseMaker implements GraphicMaker {
 
         // TODO: Aggregate snap vectors here
         // Initialize primary graphic
-        this._ellipse = new EllipseRenderer({
+        this._target = new EllipseRenderer({
             id: provideId(),
             slide: this._slide,
             center: this._initialPosition
@@ -44,42 +40,42 @@ class EllipseMaker implements GraphicMaker {
             [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._ellipse.getCenter(),
+                center: this._target.getCenter(),
                 scale: args.scale,
                 role: VERTEX_ROLES.TOP_LEFT
             }),
             [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), 0)),
+                center: this._target.getCenter().add(new Vector(this._target.getWidth(), 0)),
                 scale: args.scale,
                 role: VERTEX_ROLES.TOP_RIGHT
             }),
             [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._ellipse.getCenter().add(new Vector(0, this._ellipse.getHeight())),
+                center: this._target.getCenter().add(new Vector(0, this._target.getHeight())),
                 scale: args.scale,
                 role: VERTEX_ROLES.BOTTOM_LEFT
             }),
             [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.getTarget(),
-                center: this._ellipse.getCenter().add(new Vector(this._ellipse.getWidth(), this._ellipse.getHeight())),
+                center: this._target.getCenter().add(new Vector(this._target.getWidth(), this._target.getHeight())),
                 scale: args.scale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
             }),
             outline: new EllipseOutlineRenderer({
                 slide: this._slide,
-                center: this._ellipse.getCenter(),
-                width: this._ellipse.getWidth(),
-                height: this._ellipse.getHeight(),
+                center: this._target.getCenter(),
+                width: this._target.getWidth(),
+                height: this._target.getHeight(),
                 scale: args.scale
             })
         };
 
         // Render primary graphic
-        this._ellipse.render();
+        this._target.render();
 
         // Render helper graphics
         this._helpers[VERTEX_ROLES.TOP_LEFT].render();
@@ -90,11 +86,11 @@ class EllipseMaker implements GraphicMaker {
     }
 
     public getTarget(): EllipseRenderer {
-        return this._ellipse;
+        return this._target;
     }
 
     public complete(): void {
-        this._slide.setGraphic(this._ellipse);
+        this._slide.setGraphic(this._target);
 
         // Remove helper graphics
         this._helpers[VERTEX_ROLES.TOP_LEFT].unrender();
@@ -120,27 +116,27 @@ class EllipseMaker implements GraphicMaker {
 
         if (ctrl) {
             const dimensions = offset.transform(Math.abs).scale(2);
-            this._ellipse.setCenter(this._initialPosition);
-            this._ellipse.setWidth(dimensions.x);
-            this._ellipse.setHeight(dimensions.y);
+            this._target.setCenter(this._initialPosition);
+            this._target.setWidth(dimensions.x);
+            this._target.setHeight(dimensions.y);
         } else {
             const dimensions = offset.transform(Math.abs);
             const originOffset = offset.scale(0.5);
-            this._ellipse.setCenter(this._initialPosition.add(originOffset));
-            this._ellipse.setWidth(dimensions.x);
-            this._ellipse.setHeight(dimensions.y);
+            this._target.setCenter(this._initialPosition.add(originOffset));
+            this._target.setWidth(dimensions.x);
+            this._target.setHeight(dimensions.y);
         }
 
         // Update helper graphics
-        const center = this._ellipse.getCenter();
-        const radius = new Vector(this._ellipse.getWidth(), this._ellipse.getHeight()).scale(0.5);
+        const center = this._target.getCenter();
+        const radius = new Vector(this._target.getWidth(), this._target.getHeight()).scale(0.5);
         this._helpers[VERTEX_ROLES.TOP_LEFT].setCenter(center.add(radius.scale(-1)));
         this._helpers[VERTEX_ROLES.TOP_RIGHT].setCenter(center.add(radius.signAs(Vector.southeast)));
         this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setCenter(center.add(radius));
         this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(center.add(radius.signAs(Vector.northwest)));
         this._helpers.outline.setCenter(center);
-        this._helpers.outline.setWidth(this._ellipse.getWidth());
-        this._helpers.outline.setHeight(this._ellipse.getHeight());
+        this._helpers.outline.setWidth(this._target.getWidth());
+        this._helpers.outline.setHeight(this._target.getHeight());
     }
 }
 

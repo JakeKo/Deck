@@ -13,7 +13,7 @@ type CurveMakerArgs = {
 
 // TODO: Fix drifting anchor bug
 class CurveMaker implements GraphicMaker {
-    private _curve: CurveRenderer;
+    private _target: CurveRenderer;
     private _slide: SlideRenderer;
     private _helper: CurveAnchorRenderer;
 
@@ -21,7 +21,7 @@ class CurveMaker implements GraphicMaker {
         this._slide = args.slide;
 
         // Inititalize primary graphic
-        this._curve = new CurveRenderer({
+        this._target = new CurveRenderer({
             id: provideId(),
             slide: this._slide
         });
@@ -33,25 +33,25 @@ class CurveMaker implements GraphicMaker {
             inHandle: args.initialPosition,
             point: args.initialPosition,
             outHandle: args.initialPosition,
-            parentId: this._curve.getId(),
+            parentId: this._target.getId(),
             index: -1
         });
 
         // Render primary graphic
-        this._curve.render();
+        this._target.render();
 
         // Render helper graphic
         this._helper.render();
     }
 
     public getTarget(): CurveRenderer {
-        return this._curve;
+        return this._target;
     }
 
     public complete(): void {
         // Trim the last anchor and persist
-        this._curve.removeAnchor(this._curve.getAnchors().length - 1);
-        this._slide.setGraphic(this._curve);
+        this._target.removeAnchor(this._target.getAnchors().length - 1);
+        this._slide.setGraphic(this._target);
 
         // Remove helper graphics
         this._helper.unrender();
@@ -62,7 +62,7 @@ class CurveMaker implements GraphicMaker {
     }
 
     public addAnchor(anchor: CurveAnchor): { setHandles: (position: Vector) => void; setPoint: (position: Vector) => void } {
-        const anchorIndex = this._curve.addAnchor(anchor);
+        const anchorIndex = this._target.addAnchor(anchor);
 
         // Update helper graphic
         this._helper.setInHandle(anchor.inHandle);
@@ -73,13 +73,13 @@ class CurveMaker implements GraphicMaker {
             setHandles: position => {
                 anchor.inHandle = position.reflect(anchor.point);
                 anchor.outHandle = position;
-                this._curve.setAnchor(anchorIndex, anchor);
+                this._target.setAnchor(anchorIndex, anchor);
                 this._helper.setInHandle(anchor.inHandle);
                 this._helper.setOutHandle(anchor.outHandle);
             },
             setPoint: position => {
                 anchor.point = position;
-                this._curve.setAnchor(anchorIndex, anchor);
+                this._target.setAnchor(anchorIndex, anchor);
                 this._helper.setPoint(anchor.point);
             }
         };

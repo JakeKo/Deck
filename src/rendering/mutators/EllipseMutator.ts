@@ -12,11 +12,7 @@ type EllipseMutatorArgs = {
     scale: number;
 };
 
-type EllipseMutatorHelpers = {
-    [VERTEX_ROLES.TOP_LEFT]: VertexRenderer;
-    [VERTEX_ROLES.TOP_RIGHT]: VertexRenderer;
-    [VERTEX_ROLES.BOTTOM_LEFT]: VertexRenderer;
-    [VERTEX_ROLES.BOTTOM_RIGHT]: VertexRenderer;
+type EllipseMutatorHelpers = { [key in VERTEX_ROLES]: VertexRenderer } & {
     outline: EllipseOutlineRenderer;
 };
 
