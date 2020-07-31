@@ -166,6 +166,10 @@ class SlideRenderer {
             return this._focusedGraphics[graphicId];
         }
 
+        if (this.isMarked(graphicId)) {
+            this.unmarkGraphic(graphicId);
+        }
+
         const graphic = this.getGraphic(graphicId);
         let mutator;
 
@@ -204,9 +208,9 @@ class SlideRenderer {
         return this._focusedGraphics[graphicId] !== undefined;
     }
 
-    public markGraphic(graphicId: string): void {
+    public markGraphic(graphicId: string): GraphicMarker {
         if (this.isMarked(graphicId)) {
-            return;
+            return this._markedGraphics[graphicId];
         }
 
         const graphic = this.getGraphic(graphicId);
@@ -229,6 +233,7 @@ class SlideRenderer {
         }
 
         this._markedGraphics[graphicId] = marker;
+        return this._markedGraphics[graphicId];
     }
 
     public unmarkGraphic(graphicId: string): void {

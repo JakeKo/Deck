@@ -7,7 +7,7 @@ import { EditorTool, TOOL_NAMES } from "../types";
 import { moveCurve, moveCurveAnchor } from "./curve";
 import { moveEllipse, moveEllipseVertex } from "./ellipse";
 import { moveImage, moveImageVertex } from "./image";
-import { moveRectangle, moveRectangleVertex } from "./rectangle";
+import { moveRectangle, moveRectangleVertex, hoverRectangle } from "./rectangle";
 import { moveTextbox, moveTextboxVertex } from "./textbox";
 import { moveVideo, moveVideoVertex } from "./video";
 
@@ -24,6 +24,8 @@ export default (store: AppStore): EditorTool => {
             listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
             listenOnce(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
 
+            listen(RECTANGLE_EVENTS.MOUSEOVER, hoverRectangle);
+
             listen(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
             listen(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
         },
@@ -36,6 +38,8 @@ export default (store: AppStore): EditorTool => {
             unlisten(TEXTBOX_EVENTS.MOUSEDOWN, moveTextbox);
             unlisten(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
             unlisten(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
+
+            unlisten(RECTANGLE_EVENTS.MOUSEOVER, hoverRectangle);
 
             unlisten(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
             unlisten(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);

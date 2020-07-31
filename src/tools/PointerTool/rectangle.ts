@@ -46,3 +46,18 @@ export function moveRectangleVertex(mutator: RectangleMutator, vertex: VertexRen
         listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
     }
 }
+
+export function hoverRectangle(event: RectangleMouseEvent): void {
+    const { target, slide } = event.detail;
+
+    if (slide.isFocused(target.getId())) {
+        return;
+    }
+
+    slide.markGraphic(target.getId());
+
+    listenOnce(RECTANGLE_EVENTS.MOUSEOUT, unmark);
+    function unmark(): void {
+        slide.unmarkGraphic(target.getId());
+    }
+}
