@@ -16,6 +16,7 @@ export type GraphicMaker = {
 
 export type GraphicMarker = {
     unmark: () => void;
+    setScale: (scale: number) => void;
 };
 
 export type GraphicMutator = {

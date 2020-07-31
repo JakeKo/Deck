@@ -48,6 +48,7 @@ class SlideRenderer {
             this._zoom = event.detail.zoom;
             Object.values(this._focusedGraphics).forEach(mutator => mutator.setScale(1 / this._zoom));
             Object.values(this._activeMakers).forEach(maker => maker.setScale(1 / this._zoom));
+            Object.values(this._markedGraphics).forEach(marker => marker.setScale(1 / this._zoom));
         });
 
         listen(SLIDE_EVENTS.KEYDOWN, (event: SlideKeyboardEvent): void => {

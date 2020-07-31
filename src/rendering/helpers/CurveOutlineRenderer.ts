@@ -25,7 +25,7 @@ class CurveOutlineRenderer implements GraphicRenderer {
         this._id = provideId();
         this._slide = args.slide;
         this._anchors = args.anchors;
-        this._fillColor = 'transparent';
+        this._fillColor = 'none';
         this._strokeColor = '#400c8b';
         this._strokeWidth = 1;
         this._rotation = 0;
@@ -62,6 +62,7 @@ class CurveOutlineRenderer implements GraphicRenderer {
     }
 
     public setScale(scale: number): void {
+        this._scale = scale;
         this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale });
     }
 

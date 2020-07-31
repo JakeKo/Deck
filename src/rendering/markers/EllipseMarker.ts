@@ -34,6 +34,10 @@ class EllipseMarker implements GraphicMarker {
     public unmark(): void {
         this._helper.unrender();
     }
+
+    public setScale(scale: number): void {
+        this._helper.setScale(scale);
+    }
 }
 
 export default EllipseMarker;
