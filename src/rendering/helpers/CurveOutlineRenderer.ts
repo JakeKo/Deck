@@ -26,7 +26,7 @@ class CurveOutlineRenderer implements GraphicRenderer {
         this._slide = args.slide;
         this._anchors = args.anchors;
         this._fillColor = 'transparent';
-        this._strokeColor = 'pink';
+        this._strokeColor = '#400c8b';
         this._strokeWidth = 1;
         this._rotation = 0;
         this._scale = args.scale;

@@ -4,12 +4,12 @@ import { CurveMutator, EllipseMutator, ImageMutator, RectangleMutator, TextboxMu
 import { GRAPHIC_TYPES } from "../../rendering/types";
 import { AppStore } from "../../store/types";
 import { EditorTool, TOOL_NAMES } from "../types";
-import { moveCurve, moveCurveAnchor } from "./curve";
-import { moveEllipse, moveEllipseVertex } from "./ellipse";
-import { moveImage, moveImageVertex } from "./image";
+import { moveCurve, moveCurveAnchor, hoverCurve } from "./curve";
+import { moveEllipse, moveEllipseVertex, hoverEllipse } from "./ellipse";
+import { moveImage, moveImageVertex, hoverImage } from "./image";
 import { moveRectangle, moveRectangleVertex, hoverRectangle } from "./rectangle";
-import { moveTextbox, moveTextboxVertex } from "./textbox";
-import { moveVideo, moveVideoVertex } from "./video";
+import { moveTextbox, moveTextboxVertex, hoverTextbox } from "./textbox";
+import { moveVideo, moveVideoVertex, hoverVideo } from "./video";
 
 export default (store: AppStore): EditorTool => {
     return {
@@ -24,7 +24,12 @@ export default (store: AppStore): EditorTool => {
             listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
             listenOnce(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
 
+            listen(CURVE_EVENTS.MOUSEOVER, hoverCurve);
+            listen(ELLIPSE_EVENTS.MOUSEOVER, hoverEllipse);
+            listen(IMAGE_EVENTS.MOUSEOVER, hoverImage);
             listen(RECTANGLE_EVENTS.MOUSEOVER, hoverRectangle);
+            listen(TEXTBOX_EVENTS.MOUSEOVER, hoverTextbox);
+            listen(VIDEO_EVENTS.MOUSEOVER, hoverVideo);
 
             listen(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
             listen(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
@@ -39,7 +44,12 @@ export default (store: AppStore): EditorTool => {
             unlisten(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
             unlisten(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
 
+            unlisten(CURVE_EVENTS.MOUSEOVER, hoverCurve);
+            unlisten(ELLIPSE_EVENTS.MOUSEOVER, hoverEllipse);
+            unlisten(IMAGE_EVENTS.MOUSEOVER, hoverImage);
             unlisten(RECTANGLE_EVENTS.MOUSEOVER, hoverRectangle);
+            unlisten(TEXTBOX_EVENTS.MOUSEOVER, hoverTextbox);
+            unlisten(VIDEO_EVENTS.MOUSEOVER, hoverVideo);
 
             unlisten(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
             unlisten(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);

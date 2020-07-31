@@ -46,3 +46,18 @@ export function moveEllipseVertex(mutator: EllipseMutator, vertex: VertexRendere
         listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
     }
 }
+
+export function hoverEllipse(event: EllipseMouseEvent): void {
+    const { target, slide } = event.detail;
+
+    if (slide.isFocused(target.getId())) {
+        return;
+    }
+
+    slide.markGraphic(target.getId());
+
+    listenOnce(ELLIPSE_EVENTS.MOUSEOUT, unmark);
+    function unmark(): void {
+        slide.unmarkGraphic(target.getId());
+    }
+}

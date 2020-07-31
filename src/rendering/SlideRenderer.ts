@@ -145,8 +145,14 @@ class SlideRenderer {
     }
 
     public removeGraphic(graphicId: string): void {
+        // Technically, this should always happen since a graphic cannot be deleted without being focued
         if (this.isFocused(graphicId)) {
             this.unfocusGraphic(graphicId);
+        }
+
+        // Technically, this should never happen since a graphic cannot be deleted without being focused
+        if (this.isMarked(graphicId)) {
+            this.unmarkGraphic(graphicId);
         }
 
         this._graphics[graphicId].unrender();

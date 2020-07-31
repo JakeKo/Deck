@@ -46,3 +46,18 @@ export function moveImageVertex(mutator: ImageMutator, vertex: VertexRenderer, m
         listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
     }
 }
+
+export function hoverImage(event: ImageMouseEvent): void {
+    const { target, slide } = event.detail;
+
+    if (slide.isFocused(target.getId())) {
+        return;
+    }
+
+    slide.markGraphic(target.getId());
+
+    listenOnce(IMAGE_EVENTS.MOUSEOUT, unmark);
+    function unmark(): void {
+        slide.unmarkGraphic(target.getId());
+    }
+}

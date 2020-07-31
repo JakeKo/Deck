@@ -46,3 +46,18 @@ export function moveTextboxVertex(mutator: TextboxMutator, vertex: VertexRendere
         listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
     }
 }
+
+export function hoverTextbox(event: TextboxMouseEvent): void {
+    const { target, slide } = event.detail;
+
+    if (slide.isFocused(target.getId())) {
+        return;
+    }
+
+    slide.markGraphic(target.getId());
+
+    listenOnce(TEXTBOX_EVENTS.MOUSEOUT, unmark);
+    function unmark(): void {
+        slide.unmarkGraphic(target.getId());
+    }
+}

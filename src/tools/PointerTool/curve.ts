@@ -46,3 +46,18 @@ export function moveCurveAnchor(mutator: CurveMutator, role: CURVE_ANCHOR_ROLES,
         listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, moveAnchor);
     }
 }
+
+export function hoverCurve(event: CurveMouseEvent): void {
+    const { target, slide } = event.detail;
+
+    if (slide.isFocused(target.getId())) {
+        return;
+    }
+
+    slide.markGraphic(target.getId());
+
+    listenOnce(CURVE_EVENTS.MOUSEOUT, unmark);
+    function unmark(): void {
+        slide.unmarkGraphic(target.getId());
+    }
+}
