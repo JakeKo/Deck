@@ -1,14 +1,15 @@
 import * as SVG from 'svg.js';
 import { decorateSlideEvents } from '../events/decorators';
-import { SlideZoomEvent, SLIDE_EVENTS, SlideKeyboardEvent } from '../events/types';
+import { SlideKeyboardEvent, SlideZoomEvent, SLIDE_EVENTS } from '../events/types';
 import { listen } from '../events/utilities';
 import { Viewbox } from '../store/types';
 import SlideStateManager from '../utilities/SlideStateManager';
 import Vector from '../utilities/Vector';
-import { CurveRenderer, RectangleRenderer, EllipseRenderer, ImageRenderer, TextboxRenderer, VideoRenderer } from './graphics';
+import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from './graphics';
 import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, VideoMaker } from './makers';
-import { CurveMutator, RectangleMutator, EllipseMutator, ImageMutator, TextboxMutator, VideoMutator } from './mutators';
-import { GraphicMaker, GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
+import { CurveMarker, EllipseMarker, ImageMarker, RectangleMarker, TextboxMarker, VideoMarker } from './markers';
+import { CurveMutator, EllipseMutator, ImageMutator, RectangleMutator, TextboxMutator, VideoMutator } from './mutators';
+import { GraphicMaker, GraphicMarker, GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
 import { renderBackdrop } from './utilities';
 
 type SlideRendererArgs = {
@@ -26,6 +27,7 @@ class SlideRenderer {
     private _rawViewbox: Viewbox;
     private _focusedGraphics: { [index: string]: GraphicMutator };
     private _activeMakers: { [index: string]: GraphicMaker };
+    private _markedGraphics: { [key: string]: GraphicMarker };
     private _zoom: number;
 
     constructor(args: SlideRendererArgs) {
@@ -35,6 +37,7 @@ class SlideRenderer {
         this._rawViewbox = args.rawViewbox;
         this._focusedGraphics = {};
         this._activeMakers = {};
+        this._markedGraphics = {};
         this._zoom = args.zoom;
 
         renderBackdrop(this, args.croppedViewbox.width, args.croppedViewbox.height);
@@ -142,7 +145,10 @@ class SlideRenderer {
     }
 
     public removeGraphic(graphicId: string): void {
-        this.unfocusGraphic(graphicId);
+        if (this.isFocused(graphicId)) {
+            this.unfocusGraphic(graphicId);
+        }
+
         this._graphics[graphicId].unrender();
         delete this._graphics[graphicId];
     }
@@ -196,6 +202,42 @@ class SlideRenderer {
 
     public isFocused(graphicId: string): boolean {
         return this._focusedGraphics[graphicId] !== undefined;
+    }
+
+    public markGraphic(graphicId: string): void {
+        if (this.isMarked(graphicId)) {
+            return;
+        }
+
+        const graphic = this.getGraphic(graphicId);
+        let marker;
+
+        if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
+            marker = new CurveMarker({ slide: this, scale: 1 / this._zoom, target: graphic as CurveRenderer });
+        } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
+            marker = new EllipseMarker({ slide: this, scale: 1 / this._zoom, target: graphic as EllipseRenderer });
+        } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
+            marker = new ImageMarker({ slide: this, scale: 1 / this._zoom, target: graphic as ImageRenderer });
+        } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
+            marker = new RectangleMarker({ slide: this, scale: 1 / this._zoom, target: graphic as RectangleRenderer });
+        } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
+            marker = new TextboxMarker({ slide: this, scale: 1 / this._zoom, target: graphic as TextboxRenderer});
+        } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
+            marker = new VideoMarker({ slide: this, scale: 1 / this._zoom, target: graphic as VideoRenderer });
+        } else {
+            throw new Error(`Cannot focus unrecognized graphic type: ${graphic.getType()}`);
+        }
+
+        this._markedGraphics[graphicId] = marker;
+    }
+
+    public unmarkGraphic(graphicId: string): void {
+        this._markedGraphics[graphicId] && this._markedGraphics[graphicId].unmark();
+        delete this._markedGraphics[graphicId];
+    }
+
+    public isMarked(graphicId: string): boolean {
+        return this._markedGraphics[graphicId] !== undefined;
     }
 
     public setCursor(cursor: string): void {

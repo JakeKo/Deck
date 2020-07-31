@@ -14,6 +14,10 @@ export type GraphicMaker = {
     setScale: (scale: number) => void;
 };
 
+export type GraphicMarker = {
+    unmark: () => void;
+};
+
 export type GraphicMutator = {
     getType: () => GRAPHIC_TYPES;
     getTarget: () => GraphicRenderer;
