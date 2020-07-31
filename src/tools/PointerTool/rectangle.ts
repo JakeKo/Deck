@@ -47,6 +47,7 @@ export function moveRectangleVertex(mutator: RectangleMutator, vertex: VertexRen
     }
 }
 
+// TODO: Consider how to not mark while actively mutating graphics
 export function hoverRectangle(event: RectangleMouseEvent): void {
     const { target, slide } = event.detail;
 
