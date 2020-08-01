@@ -1,11 +1,11 @@
 import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from "../rendering/graphics";
-import { CurveAnchorRenderer, VertexRenderer } from "../rendering/helpers";
+import { VertexRenderer } from "../rendering/helpers";
 import SlideRenderer from "../rendering/SlideRenderer";
-import { GraphicRenderer, CURVE_ANCHOR_ROLES } from "../rendering/types";
+import { CURVE_ANCHOR_ROLES, GraphicRenderer } from "../rendering/types";
 
 export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
 type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
-type HELPER_EVENTS = CURVE_ANCHOR_EVENTS | VERTEX_EVENTS;
+type HELPER_EVENTS = CURVE_ANCHOR_EVENTS | ROTATOR_EVENTS | VERTEX_EVENTS;
 
 // SLIDE EVENTS
 export enum SLIDE_EVENTS {
@@ -125,6 +125,23 @@ export type RectangleMouseEventPayload = {
     slide: SlideRenderer;
     type: RECTANGLE_EVENTS;
     target: RectangleRenderer;
+};
+
+// ROTATOR EVENTS
+export enum ROTATOR_EVENTS {
+    MOUSEUP = 'deck-rotator-mouseup',
+    MOUSEDOWN = 'deck-rotator-mousedown',
+    MOUSEOVER = 'deck-rotator-mouseover',
+    MOUSEOUT = 'deck-rotator-mouseout',
+    MOUSEMOVE = 'deck-rotator-mousemove'
+}
+
+export type RotatorMouseEvent = CustomEvent<RotatorMouseEventPayload>;
+export type RotatorMouseEventPayload = {
+    baseEvent: MouseEvent;
+    slide: SlideRenderer;
+    type: ROTATOR_EVENTS;
+    parentId: string;
 };
 
 // TEXTBOX EVENTS

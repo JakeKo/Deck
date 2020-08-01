@@ -41,6 +41,7 @@ export enum GRAPHIC_TYPES {
     IMAGE = 'image',
     RECTANGLE = 'rectangle',
     RECTANGLE_OUTLINE = 'rectangle-outline',
+    ROTATOR = 'rotator',
     TEXTBOX = 'textbox',
     VERTEX = 'vertex',
     VIDEO = 'video'

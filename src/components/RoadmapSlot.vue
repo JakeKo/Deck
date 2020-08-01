@@ -72,6 +72,7 @@ export default class RoadmapSlot extends DeckComponent<StyleProps, Style> {
         return `${viewbox.x} ${viewbox.y} ${viewbox.width} ${viewbox.height}`;
     }
 
+    // TODO: Determine how to ignore helper graphics when updating preview
     public mounted(): void {
         this.bindEvents();
         setInterval(async () => {
