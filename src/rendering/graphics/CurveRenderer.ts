@@ -2,7 +2,7 @@ import * as SVG from 'svg.js';
 import { decorateCurveEvents } from '../../events/decorators';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from "../types";
+import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES, BoundingBox } from "../types";
 
 type CurveRendererArgs = {
     id: string;
@@ -127,6 +127,16 @@ class CurveRenderer implements GraphicRenderer {
     public setRotation(rotation: number): void {
         this._rotation = rotation;
         this._svg && this._svg.rotate(this._rotation);
+    }
+
+    public getBoundingBox(): BoundingBox {
+        return this._svg ? {
+            origin: new Vector(this._svg.bbox().x, this._svg.bbox().y),
+            dimensions: new Vector(this._svg.bbox().width, this._svg.bbox().height)
+        } : {
+            origin: Vector.zero,
+            dimensions: Vector.zero
+        };
     }
 
     // Reformat points from an array of objects to the bezier curve string
