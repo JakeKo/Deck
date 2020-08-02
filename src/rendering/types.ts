@@ -1,4 +1,5 @@
 import Vector from '../utilities/Vector';
+import { RectangleOutlineRenderer, RotatorRenderer, VertexRenderer } from './helpers';
 
 export type GraphicRenderer = {
     getId: () => string;
@@ -6,6 +7,9 @@ export type GraphicRenderer = {
     isRendered: () => boolean;
     render: () => void;
     unrender: () => void;
+    getRotation: () => number;
+    setRotation: (rotation: number) => void;
+    getBoundingBox: () => BoundingBox;
 };
 
 export type GraphicMaker = {
@@ -26,8 +30,14 @@ export type GraphicMutator = {
     setScale: (scale: number) => void;
 };
 
+export type BoundingBoxMutatorHelpers = {
+    outline: RectangleOutlineRenderer;
+    rotator: RotatorRenderer;
+} & { [key in VERTEX_ROLES]: VertexRenderer };
+
 export type BoundingBox = {
     origin: Vector;
+    center: Vector;
     dimensions: Vector;
 };
 

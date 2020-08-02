@@ -3,6 +3,7 @@ import CurveAnchorRenderer from './CurveAnchorRenderer';
 import CurveOutlineRenderer from './CurveOutlineRenderer';
 import EllipseOutlineRenderer from './EllipseOutlineRenderer';
 import RectangleOutlineRenderer from './RectangleOutlineRenderer';
+import RotatorRenderer from './RotatorRenderer';
 import VertexRenderer from './VertexRenderer';
 
 export {
@@ -11,5 +12,6 @@ export {
     CurveOutlineRenderer,
     EllipseOutlineRenderer,
     RectangleOutlineRenderer,
+    RotatorRenderer,
     VertexRenderer
 };
