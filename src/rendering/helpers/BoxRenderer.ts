@@ -11,6 +11,7 @@ type BoxRendererArgs = {
     height: number;
 };
 
+// TODO: Consider making distinct RectangleOutlineRenderer
 class BoxRenderer implements HelperRenderer {
     private _slide: SlideRenderer;
     private _svg: SVG.Rect | undefined;

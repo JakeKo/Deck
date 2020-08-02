@@ -1,5 +1,5 @@
 import Vector from '../utilities/Vector';
-import { RectangleOutlineRenderer, VertexRenderer } from './helpers';
+import { BoxRenderer, VertexRenderer } from './helpers';
 
 export type GraphicRenderer = {
     getId: () => string;
@@ -39,7 +39,7 @@ export type GraphicMutator = {
 };
 
 export type BoundingBoxMutatorHelpers = {
-    box: RectangleOutlineRenderer;
+    box: BoxRenderer;
     vertices: { [key in VERTEX_ROLES]: VertexRenderer };
 };
 

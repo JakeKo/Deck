@@ -1,5 +1,5 @@
 import Vector from '../utilities/Vector';
-import { CanvasRenderer, RectangleOutlineRenderer, VertexRenderer } from './helpers';
+import { BoxRenderer, CanvasRenderer, VertexRenderer } from './helpers';
 import SlideRenderer from './SlideRenderer';
 import { BoundingBox, BoundingBoxMutatorHelpers, GraphicRenderer, VERTEX_ROLES } from './types';
 
@@ -45,7 +45,7 @@ export function makeBoxHelpers(target: GraphicRenderer, slide: SlideRenderer, sc
                 role: VERTEX_ROLES.BOTTOM_RIGHT
             }),
         },
-        box: new RectangleOutlineRenderer({
+        box: new BoxRenderer({
             slide: slide,
             scale: scale,
             origin: box.origin,

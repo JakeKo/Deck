@@ -48,6 +48,7 @@ class CurveMaker implements GraphicMaker {
         return this._target;
     }
 
+    // TODO: Consider returning graphic so setGraphic may be called outside makers
     public complete(): void {
         // Trim the last anchor and persist
         this._target.removeAnchor(this._target.getAnchors().length - 1);
