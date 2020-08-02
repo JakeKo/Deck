@@ -1,7 +1,7 @@
 import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from "../rendering/graphics";
 import { VertexRenderer } from "../rendering/helpers";
 import SlideRenderer from "../rendering/SlideRenderer";
-import { CURVE_ANCHOR_ROLES, GraphicRenderer } from "../rendering/types";
+import { CURVE_ANCHOR_ROLES, GraphicRenderer, HelperRenderer } from "../rendering/types";
 
 export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
 type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
@@ -24,7 +24,7 @@ export type SlideMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
     type: SLIDE_EVENTS;
-    target: GraphicRenderer | undefined;
+    target: GraphicRenderer | HelperRenderer | undefined;
 };
 
 export type SlideKeyboardEvent = CustomEvent<SlideKeyboardEventPayload>;

@@ -1,8 +1,7 @@
 import * as SVG from 'svg.js';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from "../types";
-import { provideId } from '../../utilities/IdProvider';
+import { CurveAnchor, GRAPHIC_TYPES, HelperRenderer } from "../types";
 
 type CurveOutlineRendererArgs = {
     slide: SlideRenderer;
@@ -10,8 +9,7 @@ type CurveOutlineRendererArgs = {
     scale: number;
 };
 
-class CurveOutlineRenderer implements GraphicRenderer {
-    private _id: string;
+class CurveOutlineRenderer implements HelperRenderer {
     private _slide: SlideRenderer;
     private _svg: SVG.Path | undefined;
     private _anchors: CurveAnchor[];
@@ -22,7 +20,6 @@ class CurveOutlineRenderer implements GraphicRenderer {
     private _scale: number;
 
     constructor(args: CurveOutlineRendererArgs) {
-        this._id = provideId();
         this._slide = args.slide;
         this._anchors = args.anchors;
         this._fillColor = 'none';
@@ -32,12 +29,8 @@ class CurveOutlineRenderer implements GraphicRenderer {
         this._scale = args.scale;
     }
 
-    public getId(): string {
-        return this._id;
-    }
-
     public getType(): GRAPHIC_TYPES {
-        return GRAPHIC_TYPES.CURVE;
+        return GRAPHIC_TYPES.CURVE_OUTLINE;
     }
 
     public isRendered(): boolean {

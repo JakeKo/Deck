@@ -1,8 +1,7 @@
 import * as SVG from 'svg.js';
-import { provideId } from '../../utilities/IdProvider';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { GRAPHIC_TYPES, HelperRenderer } from '../types';
 
 type RectangleOutlineRendererArgs = {
     slide: SlideRenderer;
@@ -12,8 +11,7 @@ type RectangleOutlineRendererArgs = {
     height: number;
 };
 
-class RectangleOutlineRenderer implements GraphicRenderer {
-    private _id: string;
+class RectangleOutlineRenderer implements HelperRenderer {
     private _slide: SlideRenderer;
     private _svg: SVG.Rect | undefined;
     private _scale: number;
@@ -25,7 +23,6 @@ class RectangleOutlineRenderer implements GraphicRenderer {
     private _strokeWidth: number;
 
     constructor(args: RectangleOutlineRendererArgs) {
-        this._id = provideId();
         this._slide = args.slide;
         this._scale = args.scale;
         this._origin = args.origin;
@@ -34,10 +31,6 @@ class RectangleOutlineRenderer implements GraphicRenderer {
         this._fillColor = 'none';
         this._strokeColor = '#400c8b';
         this._strokeWidth = 1;
-    }
-
-    public getId(): string {
-        return this._id;
     }
 
     public getType(): GRAPHIC_TYPES {

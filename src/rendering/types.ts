@@ -1,5 +1,5 @@
 import Vector from '../utilities/Vector';
-import { RectangleOutlineRenderer, RotatorRenderer, VertexRenderer } from './helpers';
+import { RectangleOutlineRenderer, VertexRenderer } from './helpers';
 
 export type GraphicRenderer = {
     getId: () => string;
@@ -10,6 +10,13 @@ export type GraphicRenderer = {
     getRotation: () => number;
     setRotation: (rotation: number) => void;
     getBoundingBox: () => BoundingBox;
+};
+
+export type HelperRenderer = {
+    getType: () => GRAPHIC_TYPES;
+    isRendered: () => boolean;
+    render: () => void;
+    unrender: () => void;
 };
 
 export type GraphicMaker = {
@@ -52,6 +59,7 @@ export enum GRAPHIC_TYPES {
     CANVAS = 'canvas',
     CURVE = 'curve',
     CURVE_ANCHOR = 'curve-anchor',
+    CURVE_OUTLINE = 'curve-outline',
     ELLIPSE = 'ellipse',
     ELLIPSE_OUTLINE = 'ellipse-outline',
     IMAGE = 'image',
