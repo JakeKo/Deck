@@ -1,3 +1,4 @@
+import { SlideMouseEvent } from '../events/types';
 import Vector from '../utilities/Vector';
 import { BoxRenderer, VertexRenderer } from './helpers';
 
@@ -32,6 +33,7 @@ export type GraphicMarker = {
 
 export type GraphicMutator = {
     helpers: BoundingBoxMutatorHelpers;
+    boxListeners?: { [key in VERTEX_ROLES]: (event: SlideMouseEvent) => void };
     getType: () => GRAPHIC_TYPES;
     getTarget: () => GraphicRenderer;
     complete: () => void;

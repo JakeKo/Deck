@@ -1,3 +1,5 @@
+import { SlideMouseEvent } from "../../events/types";
+import { resolvePosition } from "../../tools/utilities";
 import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { RectangleRenderer } from "../graphics";
@@ -13,13 +15,15 @@ type RectangleMutatorArgs = {
 
 class RectangleMutator implements GraphicMutator {
     public target: RectangleRenderer;
+    public slide: SlideRenderer;
     public helpers: BoundingBoxMutatorHelpers;
 
     constructor(args: RectangleMutatorArgs) {
         this.target = args.target;
+        this.slide = args.slide;
 
         // Initialize helper graphics
-        this.helpers = makeBoxHelpers(this.target, args.slide, args.scale);
+        this.helpers = makeBoxHelpers(this.target, this.slide, args.scale);
 
         // Render helper graphics
         renderBoxHelpers(this.helpers);
@@ -31,6 +35,38 @@ class RectangleMutator implements GraphicMutator {
 
     public getTarget(): RectangleRenderer {
         return this.target;
+    }
+
+    // TODO: Account for ctrl, alt, and snapping
+    public get boxListeners(): { [key in VERTEX_ROLES]: (event: SlideMouseEvent) => void } {
+        const size = new Vector(this.target.getWidth(), this.target.getHeight());
+        const directions = [size, size.signAs(Vector.northwest), size.signAs(Vector.southwest), size.signAs(Vector.southeast)];
+
+        const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
+            return event => {
+                const { baseEvent } = event.detail;
+                const position = resolvePosition(baseEvent, this.slide);
+                const rawOffset = oppositeCorner.towards(position);
+                const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+
+                const dimensions = offset.abs;
+                const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
+
+                // Update rendering
+                this.target.setOrigin(origin);
+                this.target.setWidth(dimensions.x);
+                this.target.setHeight(dimensions.y);
+                this._refreshHelpers();
+            };
+        };
+
+        const corners = this._getCorners();
+        return {
+            [VERTEX_ROLES.TOP_LEFT]: makeListener(corners.bottomRight),
+            [VERTEX_ROLES.TOP_RIGHT]: makeListener(corners.bottomLeft),
+            [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(corners.topRight),
+            [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(corners.topLeft)
+        };
     }
 
     // TODO: Account for alt and snapping
@@ -46,36 +82,6 @@ class RectangleMutator implements GraphicMutator {
             this.target.setOrigin(initialOrigin.add(move));
             this._refreshHelpers();
         };
-    }
-
-    // TODO: Account for ctrl, alt, and snapping
-    public getVertexHandler(role: VERTEX_ROLES): (position: Vector, shift: boolean) => void {
-        const size = new Vector(this.target.getWidth(), this.target.getHeight());
-        const directions = [ size, size.signAs(Vector.northwest), size.signAs(Vector.southwest), size.signAs(Vector.southeast)];
-
-        const makeHandler = (oppositeCorner: Vector): (position: Vector, shift: boolean) => void => {
-            return (position, shift) => {
-                const rawOffset = oppositeCorner.towards(position);
-                const offset = shift ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
-
-                const dimensions = offset.abs;
-                const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
-
-                // Update rendering
-                this.target.setOrigin(origin);
-                this.target.setWidth(dimensions.x);
-                this.target.setHeight(dimensions.y);
-                this._refreshHelpers();
-            };
-        };
-
-        const corners = this._getCorners();
-        return ({
-            [VERTEX_ROLES.TOP_LEFT]: makeHandler(corners.bottomRight),
-            [VERTEX_ROLES.TOP_RIGHT]: makeHandler(corners.bottomLeft),
-            [VERTEX_ROLES.BOTTOM_LEFT]: makeHandler(corners.topRight),
-            [VERTEX_ROLES.BOTTOM_RIGHT]: makeHandler(corners.topLeft)
-        } as { [key in VERTEX_ROLES]: (position: Vector, shift: boolean) => void })[role];
     }
 
     // TODO: Include methods for other mutations

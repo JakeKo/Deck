@@ -56,17 +56,26 @@ export function makeBoxHelpers(target: GraphicRenderer, slide: SlideRenderer, sc
 }
 
 export function renderBoxHelpers(helpers: BoundingBoxMutatorHelpers): void {
-    Object.values(helpers.vertices).forEach(helper => helper.render());
+    helpers.vertices[VERTEX_ROLES.TOP_LEFT].render();
+    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].render();
+    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].render();
+    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].render();
     helpers.box.render();
 }
 
 export function unrenderBoxHelpers(helpers: BoundingBoxMutatorHelpers): void {
-    Object.values(helpers.vertices).forEach(helper => helper.unrender());
+    helpers.vertices[VERTEX_ROLES.TOP_LEFT].unrender();
+    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].unrender();
+    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].unrender();
+    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].unrender();
     helpers.box.unrender();
 }
 
 export function scaleBoxHelpers(helpers: BoundingBoxMutatorHelpers, scale: number): void {
-    Object.values(helpers.vertices).forEach(helper => helper.setScale(scale));
+    helpers.vertices[VERTEX_ROLES.TOP_LEFT].setScale(scale);
+    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].setScale(scale);
+    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].setScale(scale);
+    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].setScale(scale);
     helpers.box.setScale(scale);
 }
 
