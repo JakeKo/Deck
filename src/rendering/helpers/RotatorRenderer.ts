@@ -9,8 +9,6 @@ type RotatorRendererArgs = {
     slide: SlideRenderer;
     scale: number;
     center: Vector;
-    width: number;
-    height: number;
 };
 
 class RotatorRenderer implements GraphicRenderer {
@@ -30,8 +28,8 @@ class RotatorRenderer implements GraphicRenderer {
         this._slide = args.slide;
         this._scale = args.scale;
         this._center = args.center;
-        this._width = args.width;
-        this._height = args.height;
+        this._width = 8;
+        this._height = 8;
         this._fillColor = 'none';
         this._strokeColor = '#400c8b';
         this._strokeWidth = 1;

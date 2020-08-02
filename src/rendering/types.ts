@@ -24,6 +24,7 @@ export type GraphicMarker = {
 };
 
 export type GraphicMutator = {
+    helpers: BoundingBoxMutatorHelpers;
     getType: () => GRAPHIC_TYPES;
     getTarget: () => GraphicRenderer;
     complete: () => void;
@@ -31,9 +32,9 @@ export type GraphicMutator = {
 };
 
 export type BoundingBoxMutatorHelpers = {
-    outline: RectangleOutlineRenderer;
-    rotator: RotatorRenderer;
-} & { [key in VERTEX_ROLES]: VertexRenderer };
+    box: RectangleOutlineRenderer;
+    vertices: { [key in VERTEX_ROLES]: VertexRenderer };
+};
 
 export type BoundingBox = {
     origin: Vector;
