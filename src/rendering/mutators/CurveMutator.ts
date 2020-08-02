@@ -1,9 +1,9 @@
 import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { CurveRenderer } from "../graphics";
-import { CurveAnchorRenderer } from "../helpers";
+import { CurveAnchorRenderer, RectangleOutlineRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
-import { GraphicMutator, GRAPHIC_TYPES, CURVE_ANCHOR_ROLES } from "../types";
+import { GraphicMutator, GRAPHIC_TYPES, CURVE_ANCHOR_ROLES, BoundingBox } from "../types";
 
 type CurveMutatorArgs = {
     target: CurveRenderer;
@@ -14,20 +14,33 @@ type CurveMutatorArgs = {
 class CurveMutator implements GraphicMutator {
     private _target: CurveRenderer;
     private _slide: SlideRenderer;
-    private _helpers: CurveAnchorRenderer[];
+    private _helpers: {
+        anchors: CurveAnchorRenderer[];
+        box: RectangleOutlineRenderer;
+    };
 
     constructor(args: CurveMutatorArgs) {
         this._target = args.target;
         this._slide = args.slide;
-        this._helpers = this._target.getAnchors().map((anchor, index) => new CurveAnchorRenderer({
-            slide: this._slide,
-            scale: args.scale,
-            parentId: this._target.getId(),
-            index,
-            ...anchor
-        }));
+        this._helpers = {
+            anchors: this._target.getAnchors().map((anchor, index) => new CurveAnchorRenderer({
+                slide: this._slide,
+                scale: args.scale,
+                parentId: this._target.getId(),
+                index,
+                ...anchor
+            })),
+            box: new RectangleOutlineRenderer({
+                slide: this._slide,
+                scale: args.scale,
+                origin: this._target.getBoundingBox().origin,
+                width: this._target.getBoundingBox().dimensions.x,
+                height: this._target.getBoundingBox().dimensions.y
+            })
+        };
 
-        this._helpers.forEach(helper => helper.render());
+        this._helpers.anchors.forEach(helper => helper.render());
+        this._helpers.box.render();
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -91,22 +104,34 @@ class CurveMutator implements GraphicMutator {
     // TODO: Implement rectangular scaling
 
     public complete(): void {
-        this._helpers.forEach(helper => helper.unrender());
+        this._helpers.anchors.forEach(helper => helper.unrender());
+        this._helpers.box.unrender();
     }
 
     public setScale(scale: number): void {
-        this._helpers.forEach(helper => helper.setScale(scale));
+        this._helpers.anchors.forEach(helper => helper.setScale(scale));
+        this._helpers.box.setScale(scale);
     }
 
     private _repositionCurveAnchor(index: number): void {
         const anchor = this._target.getAnchor(index);
-        this._helpers[index].setInHandle(anchor.inHandle);
-        this._helpers[index].setPoint(anchor.point);
-        this._helpers[index].setOutHandle(anchor.outHandle);
+        this._helpers.anchors[index].setInHandle(anchor.inHandle);
+        this._helpers.anchors[index].setPoint(anchor.point);
+        this._helpers.anchors[index].setOutHandle(anchor.outHandle);
+
+        const boundingBox = this._target.getBoundingBox();
+        this._helpers.box.setOrigin(boundingBox.origin);
+        this._helpers.box.setWidth(boundingBox.dimensions.x);
+        this._helpers.box.setHeight(boundingBox.dimensions.y);
     }
 
     private _repositionCurveAnchors(): void {
-        this._helpers.forEach((_, index) => this._repositionCurveAnchor(index));
+        this._helpers.anchors.forEach((_, index) => this._repositionCurveAnchor(index));
+
+        const boundingBox = this._target.getBoundingBox();
+        this._helpers.box.setOrigin(boundingBox.origin);
+        this._helpers.box.setWidth(boundingBox.dimensions.x);
+        this._helpers.box.setHeight(boundingBox.dimensions.y);
     }
 }
 

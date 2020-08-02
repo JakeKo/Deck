@@ -26,6 +26,11 @@ export type GraphicMutator = {
     setScale: (scale: number) => void;
 };
 
+export type BoundingBox = {
+    origin: Vector;
+    dimensions: Vector;
+};
+
 export type CurveAnchor = {
     inHandle: Vector;
     point: Vector;
