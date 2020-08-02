@@ -1,9 +1,10 @@
 import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { CurveRenderer } from "../graphics";
-import { CurveAnchorRenderer, RectangleOutlineRenderer, VertexRenderer } from "../helpers";
+import { CurveAnchorRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
-import { BoundingBoxMutatorHelpers, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
+import { BoundingBoxMutatorHelpers, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES } from "../types";
+import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
 
 type CurveMutatorArgs = {
     target: CurveRenderer;
@@ -13,62 +14,27 @@ type CurveMutatorArgs = {
 
 class CurveMutator implements GraphicMutator {
     public target: CurveRenderer;
-    public helpers: { anchors: CurveAnchorRenderer[] } & BoundingBoxMutatorHelpers;
+    public helpers: {
+        anchors: CurveAnchorRenderer[];
+    } & BoundingBoxMutatorHelpers;
 
     constructor(args: CurveMutatorArgs) {
         this.target = args.target;
 
         const box = this.target.getBoundingBox();
         this.helpers = {
+            ...makeBoxHelpers(this.target, args.slide, args.scale),
             anchors: this.target.getAnchors().map((anchor, index) => new CurveAnchorRenderer({
                 slide: args.slide,
                 scale: args.scale,
                 parentId: this.target.getId(),
                 index,
                 ...anchor
-            })),
-            vertices: {
-                [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
-                    slide: args.slide,
-                    parent: this.target,
-                    center: box.origin,
-                    scale: args.scale,
-                    role: VERTEX_ROLES.TOP_LEFT
-                }),
-                [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
-                    slide: args.slide,
-                    parent: this.target,
-                    center: box.origin.add(new Vector(box.dimensions.x, 0)),
-                    scale: args.scale,
-                    role: VERTEX_ROLES.TOP_RIGHT
-                }),
-                [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
-                    slide: args.slide,
-                    parent: this.target,
-                    center: box.origin.add(new Vector(0, box.dimensions.y)),
-                    scale: args.scale,
-                    role: VERTEX_ROLES.BOTTOM_LEFT
-                }),
-                [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
-                    slide: args.slide,
-                    parent: this.target,
-                    center: box.origin.add(box.dimensions),
-                    scale: args.scale,
-                    role: VERTEX_ROLES.BOTTOM_RIGHT
-                }),
-            },
-            box: new RectangleOutlineRenderer({
-                slide: args.slide,
-                scale: args.scale,
-                origin: box.origin,
-                width: box.dimensions.x,
-                height: box.dimensions.y
-            })
+            }))
         };
 
         this.helpers.anchors.forEach(helper => helper.render());
-        Object.values(this.helpers.vertices).forEach(helper => helper.render());
-        this.helpers.box.render();
+        renderBoxHelpers(this.helpers);
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -133,14 +99,12 @@ class CurveMutator implements GraphicMutator {
 
     public complete(): void {
         this.helpers.anchors.forEach(helper => helper.unrender());
-        Object.values(this.helpers.vertices).forEach(helper => helper.unrender());
-        this.helpers.box.unrender();
+        unrenderBoxHelpers(this.helpers);
     }
 
     public setScale(scale: number): void {
         this.helpers.anchors.forEach(helper => helper.setScale(scale));
-        Object.values(this.helpers.vertices).forEach(helper => helper.setScale(scale));
-        this.helpers.box.setScale(scale);
+        scaleBoxHelpers(this.helpers, scale);
     }
 
     private _repositionCurveAnchor(index: number): void {
@@ -149,14 +113,7 @@ class CurveMutator implements GraphicMutator {
         this.helpers.anchors[index].setPoint(anchor.point);
         this.helpers.anchors[index].setOutHandle(anchor.outHandle);
 
-        const box = this.target.getBoundingBox();
-        this.helpers.box.setOrigin(box.origin);
-        this.helpers.box.setWidth(box.dimensions.x);
-        this.helpers.box.setHeight(box.dimensions.y);
-        this.helpers.vertices[VERTEX_ROLES.TOP_LEFT].setCenter(box.origin);
-        this.helpers.vertices[VERTEX_ROLES.TOP_RIGHT].setCenter(box.origin.add(new Vector(box.dimensions.x, 0)));
-        this.helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].setCenter(box.origin.add(new Vector(0, box.dimensions.y)));
-        this.helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(box.origin.add(box.dimensions));
+        resizeBoxHelpers(this.helpers, this.target.getBoundingBox());
     }
 
     private _repositionCurveAnchors(): void {
@@ -167,14 +124,7 @@ class CurveMutator implements GraphicMutator {
             this.helpers.anchors[index].setOutHandle(anchor.outHandle);
         });
 
-        const box = this.target.getBoundingBox();
-        this.helpers.box.setOrigin(box.origin);
-        this.helpers.box.setWidth(box.dimensions.x);
-        this.helpers.box.setHeight(box.dimensions.y);
-        this.helpers.vertices[VERTEX_ROLES.TOP_LEFT].setCenter(box.origin);
-        this.helpers.vertices[VERTEX_ROLES.TOP_RIGHT].setCenter(box.origin.add(new Vector(box.dimensions.x, 0)));
-        this.helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].setCenter(box.origin.add(new Vector(0, box.dimensions.y)));
-        this.helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(box.origin.add(box.dimensions));
+        resizeBoxHelpers(this.helpers, this.target.getBoundingBox());
     }
 }
 
