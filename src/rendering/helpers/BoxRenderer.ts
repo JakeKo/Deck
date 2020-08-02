@@ -3,7 +3,7 @@ import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GRAPHIC_TYPES, HelperRenderer } from '../types';
 
-type RectangleOutlineRendererArgs = {
+type BoxRendererArgs = {
     slide: SlideRenderer;
     scale: number;
     origin: Vector;
@@ -11,7 +11,7 @@ type RectangleOutlineRendererArgs = {
     height: number;
 };
 
-class RectangleOutlineRenderer implements HelperRenderer {
+class BoxRenderer implements HelperRenderer {
     private _slide: SlideRenderer;
     private _svg: SVG.Rect | undefined;
     private _scale: number;
@@ -22,7 +22,7 @@ class RectangleOutlineRenderer implements HelperRenderer {
     private _strokeColor: string;
     private _strokeWidth: number;
 
-    constructor(args: RectangleOutlineRendererArgs) {
+    constructor(args: BoxRendererArgs) {
         this._slide = args.slide;
         this._scale = args.scale;
         this._origin = args.origin;
@@ -80,4 +80,4 @@ class RectangleOutlineRenderer implements HelperRenderer {
     }
 }
 
-export default RectangleOutlineRenderer;
+export default BoxRenderer;

@@ -2,8 +2,7 @@ import { provideId } from "../../utilities/IdProvider";
 import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { VideoRenderer } from "../graphics";
-import { VertexRenderer } from "../helpers";
-import RectangleOutlineRenderer from "../helpers/RectangleOutlineRenderer";
+import { BoxRenderer, VertexRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
 import { GraphicMaker, VERTEX_ROLES } from "../types";
 
@@ -17,7 +16,7 @@ type VideoMakerArgs = {
 };
 
 type VideoMakerHelpers = { [key in VERTEX_ROLES]: VertexRenderer } & {
-    outline: RectangleOutlineRenderer;
+    outline: BoxRenderer;
 };
 
 class VideoMaker implements GraphicMaker {
@@ -74,7 +73,7 @@ class VideoMaker implements GraphicMaker {
                 scale: args.scale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
             }),
-            outline: new RectangleOutlineRenderer({
+            outline: new BoxRenderer({
                 slide: this._slide,
                 scale: args.scale,
                 origin: this._target.getOrigin(),
