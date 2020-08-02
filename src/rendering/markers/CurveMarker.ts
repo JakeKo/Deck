@@ -10,31 +10,24 @@ type CurveMarkerArgs = {
 };
 
 class CurveMarker implements GraphicMarker {
-    private _slide: SlideRenderer;
-    private _target: CurveRenderer;
-    private _scale: number;
-    private _helper: CurveOutlineRenderer;
+    public helper: CurveOutlineRenderer;
 
     constructor(args: CurveMarkerArgs) {
-        this._slide = args.slide;
-        this._target = args.target;
-        this._scale = args.scale;
-
-        this._helper = new CurveOutlineRenderer({
-            slide: this._slide,
-            scale: this._scale,
-            anchors: this._target.getAnchors()
+        this.helper = new CurveOutlineRenderer({
+            slide: args.slide,
+            scale: args.scale,
+            anchors: args.target.getAnchors()
         });
 
-        this._helper.render();
+        this.helper.render();
     }
 
     public unmark(): void {
-        this._helper.unrender();
+        this.helper.unrender();
     }
 
     public setScale(scale: number): void {
-        this._helper.setScale(scale);
+        this.helper.setScale(scale);
     }
 }
 

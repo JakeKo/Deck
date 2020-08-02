@@ -1,22 +1,20 @@
 import * as SVG from 'svg.js';
-import { provideId } from '../../utilities/IdProvider';
+import { decorateRotateEvents } from '../../events/decorators/rotators';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
-import { decorateRotateEvents } from '../../events/decorators/rotators';
+import { GraphicRenderer, GRAPHIC_TYPES, HelperRenderer } from '../types';
 
 type RotatorRendererArgs = {
     slide: SlideRenderer;
     scale: number;
     center: Vector;
-    width: number;
-    height: number;
+    parent: GraphicRenderer;
 };
 
-class RotatorRenderer implements GraphicRenderer {
-    private _id: string;
+class RotatorRenderer implements HelperRenderer {
     private _slide: SlideRenderer;
     private _svg: SVG.Ellipse | undefined;
+    private _parent: GraphicRenderer;
     private _scale: number;
     private _width: number;
     private _height: number;
@@ -26,19 +24,15 @@ class RotatorRenderer implements GraphicRenderer {
     private _strokeWidth: number;
 
     constructor(args: RotatorRendererArgs) {
-        this._id = provideId();
         this._slide = args.slide;
+        this._parent = args.parent;
         this._scale = args.scale;
         this._center = args.center;
-        this._width = args.width;
-        this._height = args.height;
+        this._width = 8;
+        this._height = 8;
         this._fillColor = 'none';
         this._strokeColor = '#400c8b';
         this._strokeWidth = 1;
-    }
-
-    public getId(): string {
-        return this._id;
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -47,6 +41,10 @@ class RotatorRenderer implements GraphicRenderer {
 
     public isRendered(): boolean {
         return this._svg !== undefined;
+    }
+
+    public getParent(): GraphicRenderer {
+        return this._parent;
     }
 
     public render(): void {

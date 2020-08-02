@@ -1,7 +1,18 @@
 import Vector from '../utilities/Vector';
+import { BoxRenderer, VertexRenderer } from './helpers';
 
 export type GraphicRenderer = {
     getId: () => string;
+    getType: () => GRAPHIC_TYPES;
+    isRendered: () => boolean;
+    render: () => void;
+    unrender: () => void;
+    getRotation: () => number;
+    setRotation: (rotation: number) => void;
+    getBoundingBox: () => BoundingBox;
+};
+
+export type HelperRenderer = {
     getType: () => GRAPHIC_TYPES;
     isRendered: () => boolean;
     render: () => void;
@@ -20,14 +31,21 @@ export type GraphicMarker = {
 };
 
 export type GraphicMutator = {
+    helpers: BoundingBoxMutatorHelpers;
     getType: () => GRAPHIC_TYPES;
     getTarget: () => GraphicRenderer;
     complete: () => void;
     setScale: (scale: number) => void;
 };
 
+export type BoundingBoxMutatorHelpers = {
+    box: BoxRenderer;
+    vertices: { [key in VERTEX_ROLES]: VertexRenderer };
+};
+
 export type BoundingBox = {
     origin: Vector;
+    center: Vector;
     dimensions: Vector;
 };
 
@@ -41,6 +59,7 @@ export enum GRAPHIC_TYPES {
     CANVAS = 'canvas',
     CURVE = 'curve',
     CURVE_ANCHOR = 'curve-anchor',
+    CURVE_OUTLINE = 'curve-outline',
     ELLIPSE = 'ellipse',
     ELLIPSE_OUTLINE = 'ellipse-outline',
     IMAGE = 'image',

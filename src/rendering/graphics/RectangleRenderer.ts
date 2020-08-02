@@ -2,7 +2,7 @@ import * as SVG from 'svg.js';
 import { decorateRectangleEvents } from '../../events/decorators';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
 type RectangleRendererArgs = {
     id: string;
@@ -132,6 +132,23 @@ class RectangleRenderer implements GraphicRenderer {
     public setRotation(rotation: number): void {
         this._rotation = rotation;
         this._svg && this._svg.rotate(this._rotation);
+    }
+
+    public getBoundingBox(): BoundingBox {
+        if (this._svg === undefined) {
+            return {
+                origin: Vector.zero,
+                center: Vector.zero,
+                dimensions: Vector.zero
+            };
+        } else {
+            const bbox = this._svg.bbox();
+            return {
+                origin: this._origin,
+                center: this._origin.add(new Vector(bbox.width, bbox.height).scale(0.5)),
+                dimensions: new Vector(bbox.width, bbox.height)
+            };
+        }
     }
 }
 

@@ -1,9 +1,8 @@
 import * as SVG from 'svg.js';
-import { provideId } from '../../utilities/IdProvider';
-import Vector from '../../utilities/Vector';
-import { GraphicRenderer, GRAPHIC_TYPES, CURVE_ANCHOR_ROLES } from '../types';
-import SlideRenderer from '../SlideRenderer';
 import { decorateCurveAnchorEvents } from '../../events/decorators/curve_anchor';
+import Vector from '../../utilities/Vector';
+import SlideRenderer from '../SlideRenderer';
+import { CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, HelperRenderer } from '../types';
 
 type CurveAnchorRendererArgs = {
     slide: SlideRenderer;
@@ -15,8 +14,7 @@ type CurveAnchorRendererArgs = {
     index: number;
 };
 
-class CurveAnchorRenderer implements GraphicRenderer {
-    private _id: string;
+class CurveAnchorRenderer implements HelperRenderer {
     private _slide: SlideRenderer;
     private _parentId: string;
     private _index: number;
@@ -43,7 +41,6 @@ class CurveAnchorRenderer implements GraphicRenderer {
     private _spanStrokeColor: string;
 
     constructor(args: CurveAnchorRendererArgs) {
-        this._id = provideId();
         this._slide = args.slide;
         this._parentId = args.parentId;
         this._index = args.index;
@@ -63,10 +60,6 @@ class CurveAnchorRenderer implements GraphicRenderer {
         this._pointStrokeColor = 'none';
         this._spanStrokeWidth = 1;
         this._spanStrokeColor = '#400c8b';
-    }
-
-    public getId(): string {
-        return this._id;
     }
 
     public getType(): GRAPHIC_TYPES {

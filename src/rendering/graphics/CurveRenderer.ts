@@ -2,7 +2,7 @@ import * as SVG from 'svg.js';
 import { decorateCurveEvents } from '../../events/decorators';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES, BoundingBox } from "../types";
+import { BoundingBox, CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from "../types";
 
 type CurveRendererArgs = {
     id: string;
@@ -130,13 +130,20 @@ class CurveRenderer implements GraphicRenderer {
     }
 
     public getBoundingBox(): BoundingBox {
-        return this._svg ? {
-            origin: new Vector(this._svg.bbox().x, this._svg.bbox().y),
-            dimensions: new Vector(this._svg.bbox().width, this._svg.bbox().height)
-        } : {
-            origin: Vector.zero,
-            dimensions: Vector.zero
-        };
+        if (this._svg === undefined) {
+            return {
+                origin: Vector.zero,
+                center: Vector.zero,
+                dimensions: Vector.zero
+            };
+        } else {
+            const bbox = this._svg.bbox();
+            return {
+                origin: new Vector(bbox.x, bbox.y),
+                center: new Vector(bbox.x, bbox.y).add(new Vector(bbox.width, bbox.height).scale(0.5)),
+                dimensions: new Vector(bbox.width, bbox.height)
+            };
+        }
     }
 
     // Reformat points from an array of objects to the bezier curve string

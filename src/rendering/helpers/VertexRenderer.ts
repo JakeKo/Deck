@@ -1,9 +1,8 @@
 import * as SVG from 'svg.js';
-import { provideId } from '../../utilities/IdProvider';
+import { decorateVertexEvents } from '../../events/decorators';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicRenderer, GRAPHIC_TYPES, VERTEX_ROLES } from '../types';
-import { decorateVertexEvents } from '../../events/decorators';
+import { GraphicRenderer, GRAPHIC_TYPES, HelperRenderer, VERTEX_ROLES } from '../types';
 
 type VertexRendererArgs = {
     slide: SlideRenderer;
@@ -13,8 +12,7 @@ type VertexRendererArgs = {
     parent: GraphicRenderer;
 };
 
-class VertexRenderer implements GraphicRenderer {
-    private _id: string;
+class VertexRenderer implements HelperRenderer {
     private _slide: SlideRenderer;
     private _svg: SVG.Ellipse | undefined;
     private _role: VERTEX_ROLES;
@@ -28,7 +26,6 @@ class VertexRenderer implements GraphicRenderer {
     private _strokeWidth: number;
 
     constructor(args: VertexRendererArgs) {
-        this._id = provideId();
         this._slide = args.slide;
         this._role = args.role;
         this._parent = args.parent;
@@ -39,10 +36,6 @@ class VertexRenderer implements GraphicRenderer {
         this._fillColor = '#400c8b';
         this._strokeColor = 'none';
         this._strokeWidth = 0;
-    }
-
-    public getId(): string {
-        return this._id;
     }
 
     public getType(): GRAPHIC_TYPES {

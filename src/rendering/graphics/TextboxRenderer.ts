@@ -1,8 +1,7 @@
-import * as SVG from 'svg.js';
 import { decorateTextboxEvents } from '../../events/decorators';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
 type TextboxRendererArgs = {
     id: string;
@@ -171,6 +170,22 @@ class TextboxRenderer implements GraphicRenderer {
         this._rotation = rotation;
         if (this._svg) {
             this._svg.style.transform = `rotate(${this._rotation}deg)`;
+        }
+    }
+
+    public getBoundingBox(): BoundingBox {
+        if (this._svg === undefined) {
+            return {
+                origin: Vector.zero,
+                center: Vector.zero,
+                dimensions: Vector.zero
+            };
+        } else {
+            return {
+                origin: this._origin,
+                center: this._origin.add(new Vector(this._width, this._height).scale(0.5)),
+                dimensions: new Vector(this._width, this._height)
+            };
         }
     }
 }

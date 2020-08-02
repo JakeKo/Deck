@@ -1,10 +1,9 @@
 import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { EllipseRenderer } from "../graphics";
-import { VertexRenderer } from "../helpers";
-import EllipseOutlineRenderer from "../helpers/EllipseOutlineRenderer";
 import SlideRenderer from "../SlideRenderer";
-import { GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
+import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
+import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
 
 type EllipseMutatorArgs = {
     target: EllipseRenderer;
@@ -12,65 +11,18 @@ type EllipseMutatorArgs = {
     scale: number;
 };
 
-type EllipseMutatorHelpers = { [key in VERTEX_ROLES]: VertexRenderer } & {
-    outline: EllipseOutlineRenderer;
-};
-
 class EllipseMutator implements GraphicMutator {
-    private _target: EllipseRenderer;
-    private _slide: SlideRenderer;
-    private _helpers: EllipseMutatorHelpers;
+    public target: EllipseRenderer;
+    public helpers: BoundingBoxMutatorHelpers;
 
     constructor(args: EllipseMutatorArgs) {
-        this._target = args.target;
-        this._slide = args.slide;
+        this.target = args.target;
 
         // Initialize helper graphics
-        const corners = this._getCorners();
-        this._helpers = {
-            [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
-                slide: this._slide,
-                parent: this.getTarget(),
-                center: corners.topLeft,
-                scale: args.scale,
-                role: VERTEX_ROLES.TOP_LEFT
-            }),
-            [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
-                slide: this._slide,
-                parent: this.getTarget(),
-                center: corners.topRight,
-                scale: args.scale,
-                role: VERTEX_ROLES.TOP_RIGHT
-            }),
-            [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
-                slide: this._slide,
-                parent: this.getTarget(),
-                center: corners.bottomLeft,
-                scale: args.scale,
-                role: VERTEX_ROLES.BOTTOM_LEFT
-            }),
-            [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
-                slide: this._slide,
-                parent: this.getTarget(),
-                center: corners.bottomRight,
-                scale: args.scale,
-                role: VERTEX_ROLES.BOTTOM_RIGHT
-            }),
-            outline: new EllipseOutlineRenderer({
-                slide: this._slide,
-                center: this._target.getCenter(),
-                width: this._target.getWidth(),
-                height: this._target.getHeight(),
-                scale: args.scale
-            })
-        };
+        this.helpers = makeBoxHelpers(this.target, args.slide, args.scale);
 
         // Render helper graphics
-        this._helpers[VERTEX_ROLES.TOP_LEFT].render();
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].render();
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].render();
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].render();
-        this._helpers.outline.render();
+        renderBoxHelpers(this.helpers);
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -78,12 +30,12 @@ class EllipseMutator implements GraphicMutator {
     }
 
     public getTarget(): EllipseRenderer {
-        return this._target;
+        return this.target;
     }
 
     // TODO: Account for alt snapping
     public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
-        const initialCenter = this._target.getCenter();
+        const initialCenter = this.target.getCenter();
         const directions = [Vector.east, Vector.northeast, Vector.north, Vector.northwest, Vector.west, Vector.southwest, Vector.south, Vector.southeast];
 
         return (position, shift, alt) => {
@@ -91,14 +43,14 @@ class EllipseMutator implements GraphicMutator {
             const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
             const move = rawMove.projectOn(moveDirection);
 
-            this._target.setCenter(initialCenter.add(move));
+            this.target.setCenter(initialCenter.add(move));
             this._refreshHelpers();
         };
     }
 
     // TODO: Account for ctrl, alt, and snapping
     public getVertexHandler(role: VERTEX_ROLES): (position: Vector, shift: boolean) => void {
-        const size = new Vector(this._target.getWidth(), this._target.getHeight());
+        const size = new Vector(this.target.getWidth(), this.target.getHeight());
         const directions = [ size, size.signAs(Vector.northwest), size.signAs(Vector.southwest), size.signAs(Vector.southeast)];
 
         const makeHandler = (oppositeCorner: Vector): (position: Vector, shift: boolean) => void => {
@@ -110,9 +62,9 @@ class EllipseMutator implements GraphicMutator {
                 const center = oppositeCorner.add(offset.scale(0.5));
 
                 // Update rendering
-                this._target.setCenter(center);
-                this._target.setWidth(dimensions.x);
-                this._target.setHeight(dimensions.y);
+                this.target.setCenter(center);
+                this.target.setWidth(dimensions.x);
+                this.target.setHeight(dimensions.y);
                 this._refreshHelpers();
             };
         };
@@ -130,35 +82,20 @@ class EllipseMutator implements GraphicMutator {
 
     public complete(): void {
         // Remove helper graphics
-        this._helpers[VERTEX_ROLES.TOP_LEFT].unrender();
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].unrender();
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].unrender();
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].unrender();
-        this._helpers.outline.unrender();
+        unrenderBoxHelpers(this.helpers);
     }
 
     public setScale(scale: number): void {
-        this._helpers[VERTEX_ROLES.TOP_LEFT].setScale(scale);
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].setScale(scale);
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setScale(scale);
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setScale(scale);
-        this._helpers.outline.setScale(scale);
+        scaleBoxHelpers(this.helpers, scale);
     }
 
     private _refreshHelpers(): void {
-        const corners = this._getCorners();
-        this._helpers[VERTEX_ROLES.TOP_LEFT].setCenter(corners.topLeft);
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].setCenter(corners.topRight);
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setCenter(corners.bottomLeft);
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(corners.bottomRight);
-        this._helpers.outline.setCenter(this._target.getCenter());
-        this._helpers.outline.setWidth(this._target.getWidth());
-        this._helpers.outline.setHeight(this._target.getHeight());
+        resizeBoxHelpers(this.helpers, this.target.getBoundingBox());
     }
 
     private _getCorners(): { topLeft: Vector; topRight: Vector; bottomLeft: Vector; bottomRight: Vector } {
-        const center = this._target.getCenter();
-        const radius = new Vector(this._target.getWidth(), this._target.getHeight()).scale(0.5);
+        const center = this.target.getCenter();
+        const radius = new Vector(this.target.getWidth(), this.target.getHeight()).scale(0.5);
 
         return {
             topLeft: center.add(radius.signAs(Vector.southwest)),
