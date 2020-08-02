@@ -10,33 +10,26 @@ type VideoMarkerArgs = {
 };
 
 class VideoMarker implements GraphicMarker {
-    private _slide: SlideRenderer;
-    private _target: VideoRenderer;
-    private _scale: number;
-    private _helper: RectangleOutlineRenderer;
+    public helper: RectangleOutlineRenderer;
 
     constructor(args: VideoMarkerArgs) {
-        this._slide = args.slide;
-        this._target = args.target;
-        this._scale = args.scale;
-
-        this._helper = new RectangleOutlineRenderer({
-            slide: this._slide,
-            scale: this._scale,
-            origin: this._target.getOrigin(),
-            width: this._target.getWidth(),
-            height: this._target.getHeight()
+        this.helper = new RectangleOutlineRenderer({
+            slide: args.slide,
+            scale: args.scale,
+            origin: args.target.getOrigin(),
+            width: args.target.getWidth(),
+            height: args.target.getHeight()
         });
 
-        this._helper.render();
+        this.helper.render();
     }
 
     public unmark(): void {
-        this._helper.unrender();
+        this.helper.unrender();
     }
 
     public setScale(scale: number): void {
-        this._helper.setScale(scale);
+        this.helper.setScale(scale);
     }
 }
 

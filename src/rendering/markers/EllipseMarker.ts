@@ -10,33 +10,26 @@ type EllipseMarkerArgs = {
 };
 
 class EllipseMarker implements GraphicMarker {
-    private _slide: SlideRenderer;
-    private _target: EllipseRenderer;
-    private _scale: number;
-    private _helper: EllipseOutlineRenderer;
+    public helper: EllipseOutlineRenderer;
 
     constructor(args: EllipseMarkerArgs) {
-        this._slide = args.slide;
-        this._target = args.target;
-        this._scale = args.scale;
-
-        this._helper = new EllipseOutlineRenderer({
-            slide: this._slide,
-            scale: this._scale,
-            center: this._target.getCenter(),
-            width: this._target.getWidth(),
-            height: this._target.getHeight()
+        this.helper = new EllipseOutlineRenderer({
+            slide: args.slide,
+            scale: args.scale,
+            center: args.target.getCenter(),
+            width: args.target.getWidth(),
+            height: args.target.getHeight()
         });
 
-        this._helper.render();
+        this.helper.render();
     }
 
     public unmark(): void {
-        this._helper.unrender();
+        this.helper.unrender();
     }
 
     public setScale(scale: number): void {
-        this._helper.setScale(scale);
+        this.helper.setScale(scale);
     }
 }
 
