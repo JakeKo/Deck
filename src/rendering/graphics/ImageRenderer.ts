@@ -138,8 +138,8 @@ class ImageRenderer implements GraphicRenderer {
         } else {
             const bbox = this._svg.bbox();
             return {
-                origin: new Vector(bbox.x, bbox.y),
-                center: new Vector(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2),
+                origin: this._origin,
+                center: this._origin.add(new Vector(bbox.width, bbox.height).scale(0.5)),
                 dimensions: new Vector(bbox.width, bbox.height)
             };
         }

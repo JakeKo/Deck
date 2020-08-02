@@ -182,9 +182,9 @@ class TextboxRenderer implements GraphicRenderer {
             };
         } else {
             return {
-                origin: this.getOrigin(),
-                center: this.getOrigin().add(new Vector(this.getWidth(), this.getHeight()).scale(0.5)),
-                dimensions: new Vector(this.getWidth(), this.getHeight())
+                origin: this._origin,
+                center: this._origin.add(new Vector(this._width, this._height).scale(0.5)),
+                dimensions: new Vector(this._width, this._height)
             };
         }
     }
