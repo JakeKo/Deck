@@ -87,10 +87,10 @@ class CurveMutator implements GraphicMutator {
         };
 
         return {
-            [VERTEX_ROLES.TOP_LEFT]: makeListener(box.origin.add(box.dimensions)),
-            [VERTEX_ROLES.TOP_RIGHT]: makeListener(box.origin.add(new Vector(0, box.dimensions.y))),
-            [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.origin.add(new Vector(box.dimensions.x, 0))),
-            [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.origin)
+            [VERTEX_ROLES.TOP_LEFT]: makeListener(box.bottomRight),
+            [VERTEX_ROLES.TOP_RIGHT]: makeListener(box.bottomLeft),
+            [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
+            [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
         };
     }
 

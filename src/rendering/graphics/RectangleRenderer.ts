@@ -146,15 +146,14 @@ class RectangleRenderer implements GraphicRenderer {
                 bottomRight: Vector.zero
             };
         } else {
-            const bbox = this._svg.bbox();
             return {
-                origin: new Vector(bbox.x, bbox.y),
-                center: new Vector(bbox.x, bbox.y).add(new Vector(bbox.width, bbox.height).scale(0.5)),
-                dimensions: new Vector(bbox.width, bbox.height),
-                topLeft: new Vector(bbox.x, bbox.y),
-                topRight: new Vector(bbox.x + bbox.width, bbox.y),
-                bottomLeft: new Vector(bbox.x, bbox.y + bbox.height),
-                bottomRight: new Vector(bbox.x + bbox.width, bbox.y + bbox.height)
+                origin: this._origin,
+                center: this._origin.add(new Vector(this._width, this._height).scale(0.5)),
+                dimensions: new Vector(this._width, this._height),
+                topLeft: this._origin,
+                topRight: this._origin.add(new Vector(this._width, 0)),
+                bottomLeft: this._origin.add(new Vector(0, this._height)),
+                bottomRight: this._origin.add(new Vector(this._width, this._height))
             };
         }
     }

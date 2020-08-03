@@ -37,8 +37,13 @@ class EllipseMutator implements GraphicMutator {
 
     // TODO: Account for ctrl, alt, and snapping
     public get boxListeners(): { [key in VERTEX_ROLES]: (event: SlideMouseEvent) => void } {
-        const size = new Vector(this.target.getWidth(), this.target.getHeight());
-        const directions = [size, size.signAs(Vector.northwest), size.signAs(Vector.southwest), size.signAs(Vector.southeast)];
+        const box = this.target.getBoundingBox();
+        const directions = [
+            box.dimensions,
+            box.dimensions.signAs(Vector.northwest),
+            box.dimensions.signAs(Vector.southwest),
+            box.dimensions.signAs(Vector.southeast)
+        ];
 
         const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
             return event => {
@@ -54,16 +59,15 @@ class EllipseMutator implements GraphicMutator {
                 this.target.setCenter(center);
                 this.target.setWidth(dimensions.x);
                 this.target.setHeight(dimensions.y);
-                this._refreshHelpers();
+                this._repositionBoxHelpers();
             };
         };
 
-        const corners = this._getCorners();
         return {
-            [VERTEX_ROLES.TOP_LEFT]: makeListener(corners.bottomRight),
-            [VERTEX_ROLES.TOP_RIGHT]: makeListener(corners.bottomLeft),
-            [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(corners.topRight),
-            [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(corners.topLeft)
+            [VERTEX_ROLES.TOP_LEFT]: makeListener(box.bottomRight),
+            [VERTEX_ROLES.TOP_RIGHT]: makeListener(box.bottomLeft),
+            [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
+            [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
         };
     }
 
@@ -78,7 +82,7 @@ class EllipseMutator implements GraphicMutator {
             const move = rawMove.projectOn(moveDirection);
 
             this.target.setCenter(initialCenter.add(move));
-            this._refreshHelpers();
+            this._repositionBoxHelpers();
         };
     }
 
@@ -93,20 +97,8 @@ class EllipseMutator implements GraphicMutator {
         scaleBoxHelpers(this.helpers, scale);
     }
 
-    private _refreshHelpers(): void {
+    private _repositionBoxHelpers(): void {
         resizeBoxHelpers(this.helpers, this.target.getBoundingBox());
-    }
-
-    private _getCorners(): { topLeft: Vector; topRight: Vector; bottomLeft: Vector; bottomRight: Vector } {
-        const center = this.target.getCenter();
-        const radius = new Vector(this.target.getWidth(), this.target.getHeight()).scale(0.5);
-
-        return {
-            topLeft: center.add(radius.signAs(Vector.southwest)),
-            topRight: center.add(radius.signAs(Vector.southeast)),
-            bottomLeft: center.add(radius.signAs(Vector.northwest)),
-            bottomRight: center.add(radius.signAs(Vector.northeast))
-        };
     }
 }
 
