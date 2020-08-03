@@ -29,16 +29,17 @@ export function moveImage(event: ImageMouseEvent): void {
     }
 }
 
-export function moveImageVertex(mutator: ImageMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
-    const handler = mutator.getVertexHandler(vertex.getRole());
+export function moveRectangleVertex(mutator: ImageMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
+    // Handler must be instantiated at the beginning of the mutation to capture initial state
+    // Handler cannot be instantiated immediately during each move event
+    const handler = mutator.boxListeners[vertex.getRole()];
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
 
     function move(event: SlideMouseEvent): void {
-        const { slide, baseEvent } = event.detail;
-        handler(resolvePosition(baseEvent, slide));
-        slide.broadcastSetGraphic(mutator.getTarget());
+        handler(event);
+        event.detail.slide.broadcastSetGraphic(mutator.getTarget());
     }
 
     function complete(): void {

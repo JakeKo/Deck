@@ -45,7 +45,7 @@ class VideoMutator implements GraphicMutator {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
                 const rawOffset = oppositeCorner.towards(position);
-                const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+                const offset = rawOffset.projectOn(closestVector(rawOffset, directions));
 
                 const dimensions = offset.abs;
                 const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
