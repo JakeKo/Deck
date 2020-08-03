@@ -62,6 +62,7 @@ export type CurveAnchor = {
 };
 
 export enum GRAPHIC_TYPES {
+    BOX = 'box',
     CANVAS = 'canvas',
     CURVE = 'curve',
     CURVE_ANCHOR = 'curve-anchor',

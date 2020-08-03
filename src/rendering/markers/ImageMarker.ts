@@ -1,5 +1,5 @@
 import { ImageRenderer } from "../graphics";
-import { BoxRenderer } from "../helpers";
+import { RectangleOutlineRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
 import { GraphicMarker } from "../types";
 
@@ -9,11 +9,11 @@ type ImageMarkerArgs = {
     scale: number;
 };
 
-class RectangleMarker implements GraphicMarker {
-    public helper: BoxRenderer;
+class ImageMarker implements GraphicMarker {
+    public helper: RectangleOutlineRenderer;
 
     constructor(args: ImageMarkerArgs) {
-        this.helper = new BoxRenderer({
+        this.helper = new RectangleOutlineRenderer({
             slide: args.slide,
             scale: args.scale,
             origin: args.target.getOrigin(),
@@ -33,4 +33,4 @@ class RectangleMarker implements GraphicMarker {
     }
 }
 
-export default RectangleMarker;
+export default ImageMarker;
