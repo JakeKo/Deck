@@ -15,15 +15,13 @@ type RectangleMutatorArgs = {
 
 class RectangleMutator implements GraphicMutator {
     public target: RectangleRenderer;
-    public slide: SlideRenderer;
     public helpers: BoundingBoxMutatorHelpers;
 
     constructor(args: RectangleMutatorArgs) {
         this.target = args.target;
-        this.slide = args.slide;
 
         // Initialize helper graphics
-        this.helpers = makeBoxHelpers(this.target, this.slide, args.scale);
+        this.helpers = makeBoxHelpers(this.target, args.slide, args.scale);
 
         // Render helper graphics
         renderBoxHelpers(this.helpers);
@@ -44,8 +42,8 @@ class RectangleMutator implements GraphicMutator {
 
         const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
             return event => {
-                const { baseEvent } = event.detail;
-                const position = resolvePosition(baseEvent, this.slide);
+                const { baseEvent, slide } = event.detail;
+                const position = resolvePosition(baseEvent, slide);
                 const rawOffset = oppositeCorner.towards(position);
                 const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
 
