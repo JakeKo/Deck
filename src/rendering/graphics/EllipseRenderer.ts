@@ -139,14 +139,22 @@ class EllipseRenderer implements GraphicRenderer {
             return {
                 origin: Vector.zero,
                 center: Vector.zero,
-                dimensions: Vector.zero
+                dimensions: Vector.zero,
+                topLeft: Vector.zero,
+                topRight: Vector.zero,
+                bottomLeft: Vector.zero,
+                bottomRight: Vector.zero
             };
         } else {
-            const bbox = this._svg.bbox();
+            const radius = new Vector(this._width, this._height).scale(0.5);
             return {
-                origin: this._center.add(new Vector(bbox.width, bbox.height).scale(-0.5)),
+                origin: this._center.add(radius.scale(-1)),
                 center: this._center,
-                dimensions: new Vector(bbox.width, bbox.height)
+                dimensions: radius.scale(2),
+                topLeft: this._center.add(radius.scale(-1)),
+                topRight: this._center.add(radius.signAs(Vector.southwest)),
+                bottomLeft: this._center.add(radius.signAs(Vector.northeast)),
+                bottomRight: this._center.add(radius)
             };
         }
     }

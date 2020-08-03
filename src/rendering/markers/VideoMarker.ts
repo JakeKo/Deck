@@ -1,5 +1,5 @@
 import { VideoRenderer } from "../graphics";
-import { BoxRenderer } from "../helpers";
+import { RectangleOutlineRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
 import { GraphicMarker } from "../types";
 
@@ -10,10 +10,10 @@ type VideoMarkerArgs = {
 };
 
 class VideoMarker implements GraphicMarker {
-    public helper: BoxRenderer;
+    public helper: RectangleOutlineRenderer;
 
     constructor(args: VideoMarkerArgs) {
-        this.helper = new BoxRenderer({
+        this.helper = new RectangleOutlineRenderer({
             slide: args.slide,
             scale: args.scale,
             origin: args.target.getOrigin(),

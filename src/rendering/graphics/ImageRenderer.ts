@@ -133,14 +133,21 @@ class ImageRenderer implements GraphicRenderer {
             return {
                 origin: Vector.zero,
                 center: Vector.zero,
-                dimensions: Vector.zero
+                dimensions: Vector.zero,
+                topLeft: Vector.zero,
+                topRight: Vector.zero,
+                bottomLeft: Vector.zero,
+                bottomRight: Vector.zero
             };
         } else {
-            const bbox = this._svg.bbox();
             return {
                 origin: this._origin,
-                center: this._origin.add(new Vector(bbox.width, bbox.height).scale(0.5)),
-                dimensions: new Vector(bbox.width, bbox.height)
+                center: this._origin.add(new Vector(this._width, this._height).scale(0.5)),
+                dimensions: new Vector(this._width, this._height),
+                topLeft: this._origin,
+                topRight: this._origin.add(new Vector(this._width, 0)),
+                bottomLeft: this._origin.add(new Vector(0, this._height)),
+                bottomRight: this._origin.add(new Vector(this._width, this._height))
             };
         }
     }
