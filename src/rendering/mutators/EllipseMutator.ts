@@ -1,3 +1,5 @@
+import { SlideMouseEvent } from "../../events/types";
+import { resolvePosition } from "../../tools/utilities";
 import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { EllipseRenderer } from "../graphics";
@@ -33,30 +35,17 @@ class EllipseMutator implements GraphicMutator {
         return this.target;
     }
 
-    // TODO: Account for alt snapping
-    public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
-        const initialCenter = this.target.getCenter();
-        const directions = [Vector.east, Vector.northeast, Vector.north, Vector.northwest, Vector.west, Vector.southwest, Vector.south, Vector.southeast];
-
-        return (position, shift, alt) => {
-            const rawMove = initialCenter.towards(position);
-            const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
-            const move = rawMove.projectOn(moveDirection);
-
-            this.target.setCenter(initialCenter.add(move));
-            this._refreshHelpers();
-        };
-    }
-
     // TODO: Account for ctrl, alt, and snapping
-    public getVertexHandler(role: VERTEX_ROLES): (position: Vector, shift: boolean) => void {
+    public get boxListeners(): { [key in VERTEX_ROLES]: (event: SlideMouseEvent) => void } {
         const size = new Vector(this.target.getWidth(), this.target.getHeight());
-        const directions = [ size, size.signAs(Vector.northwest), size.signAs(Vector.southwest), size.signAs(Vector.southeast)];
+        const directions = [size, size.signAs(Vector.northwest), size.signAs(Vector.southwest), size.signAs(Vector.southeast)];
 
-        const makeHandler = (oppositeCorner: Vector): (position: Vector, shift: boolean) => void => {
-            return (position, shift) => {
+        const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
+            return event => {
+                const { baseEvent, slide } = event.detail;
+                const position = resolvePosition(baseEvent, slide);
                 const rawOffset = oppositeCorner.towards(position);
-                const offset = shift ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+                const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
 
                 const dimensions = offset.abs;
                 const center = oppositeCorner.add(offset.scale(0.5));
@@ -70,12 +59,27 @@ class EllipseMutator implements GraphicMutator {
         };
 
         const corners = this._getCorners();
-        return ({
-            [VERTEX_ROLES.TOP_LEFT]: makeHandler(corners.bottomRight),
-            [VERTEX_ROLES.TOP_RIGHT]: makeHandler(corners.bottomLeft),
-            [VERTEX_ROLES.BOTTOM_LEFT]: makeHandler(corners.topRight),
-            [VERTEX_ROLES.BOTTOM_RIGHT]: makeHandler(corners.topLeft)
-        } as { [key in VERTEX_ROLES]: (position: Vector, shift: boolean) => void })[role];
+        return {
+            [VERTEX_ROLES.TOP_LEFT]: makeListener(corners.bottomRight),
+            [VERTEX_ROLES.TOP_RIGHT]: makeListener(corners.bottomLeft),
+            [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(corners.topRight),
+            [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(corners.topLeft)
+        };
+    }
+
+    // TODO: Account for alt snapping
+    public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
+        const initialCenter = this.target.getCenter();
+        const directions = [Vector.east, Vector.northeast, Vector.north, Vector.northwest, Vector.west, Vector.southwest, Vector.south, Vector.southeast];
+
+        return (position, shift, alt) => {
+            const rawMove = initialCenter.towards(position);
+            const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
+            const move = rawMove.projectOn(moveDirection);
+
+            this.target.setCenter(initialCenter.add(move));
+            this._refreshHelpers();
+        };
     }
 
     // TODO: Include methods for other mutations
