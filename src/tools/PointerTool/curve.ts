@@ -1,5 +1,6 @@
-import { CurveAnchorMouseEvent, CurveMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../../events/types";
+import { CurveAnchorMouseEvent, CurveMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, VertexMouseEvent, VERTEX_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
+import { VertexRenderer } from "../../rendering/helpers";
 import { CurveMutator } from "../../rendering/mutators";
 import { CURVE_ANCHOR_ROLES } from "../../rendering/types";
 import { resolvePosition } from "../utilities";
@@ -26,6 +27,25 @@ export function moveCurve(event: CurveMouseEvent): void {
     function complete(): void {
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(CURVE_EVENTS.MOUSEDOWN, moveCurve);
+    }
+}
+
+export function moveCurveVertex(mutator: CurveMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
+    // Handler must be instantiated at the beginning of the mutation to capture initial state
+    // Handler cannot be instantiated immediately during each move event
+    const handler = mutator.boxListeners[vertex.getRole()];
+
+    listen(SLIDE_EVENTS.MOUSEMOVE, move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+
+    function move(event: SlideMouseEvent): void {
+        handler(event);
+        event.detail.slide.broadcastSetGraphic(mutator.getTarget());
+    }
+
+    function complete(): void {
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
+        listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
     }
 }
 

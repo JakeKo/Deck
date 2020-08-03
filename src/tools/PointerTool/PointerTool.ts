@@ -4,12 +4,12 @@ import { CurveMutator, EllipseMutator, ImageMutator, RectangleMutator, TextboxMu
 import { GRAPHIC_TYPES } from "../../rendering/types";
 import { AppStore } from "../../store/types";
 import { EditorTool, TOOL_NAMES } from "../types";
-import { moveCurve, moveCurveAnchor, hoverCurve } from "./curve";
-import { moveEllipse, moveEllipseVertex, hoverEllipse } from "./ellipse";
-import { moveImage, moveImageVertex, hoverImage } from "./image";
-import { moveRectangle, moveRectangleVertex, hoverRectangle } from "./rectangle";
-import { moveTextbox, moveTextboxVertex, hoverTextbox } from "./textbox";
-import { moveVideo, moveVideoVertex, hoverVideo } from "./video";
+import { hoverCurve, moveCurve, moveCurveAnchor, moveCurveVertex } from "./curve";
+import { hoverEllipse, moveEllipse, moveEllipseVertex } from "./ellipse";
+import { hoverImage, moveImage, moveImageVertex } from "./image";
+import { hoverRectangle, moveRectangle, moveRectangleVertex } from "./rectangle";
+import { hoverTextbox, moveTextbox, moveTextboxVertex } from "./textbox";
+import { hoverVideo, moveVideo, moveVideoVertex } from "./video";
 
 export default (store: AppStore): EditorTool => {
     return {
@@ -74,10 +74,12 @@ function moveVertex(event: VertexMouseEvent): void {
     const { slide, graphic } = event.detail;
     const mutator = slide.focusGraphic(graphic.getParent().getId());
 
-    if (mutator.getType() === GRAPHIC_TYPES.IMAGE) {
-        moveImageVertex(mutator as ImageMutator, graphic, moveVertex);
+    if (mutator.getType() === GRAPHIC_TYPES.CURVE) {
+        moveCurveVertex(mutator as CurveMutator, graphic, moveVertex);
     } else if (mutator.getType() === GRAPHIC_TYPES.ELLIPSE) {
         moveEllipseVertex(mutator as EllipseMutator, graphic, moveVertex);
+    } else if (mutator.getType() === GRAPHIC_TYPES.IMAGE) {
+        moveImageVertex(mutator as ImageMutator, graphic, moveVertex);
     } else if (mutator.getType() === GRAPHIC_TYPES.RECTANGLE) {
         moveRectangleVertex(mutator as RectangleMutator, graphic, moveVertex);
     } else if (mutator.getType() === GRAPHIC_TYPES.TEXTBOX) {

@@ -29,7 +29,7 @@ export function moveImage(event: ImageMouseEvent): void {
     }
 }
 
-export function moveRectangleVertex(mutator: ImageMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
+export function moveImageVertex(mutator: ImageMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
     const handler = mutator.boxListeners[vertex.getRole()];

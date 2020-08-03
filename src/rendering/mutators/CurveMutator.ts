@@ -1,10 +1,12 @@
+import { SlideMouseEvent } from "../../events/types";
 import { closestVector } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { CurveRenderer } from "../graphics";
 import { CurveAnchorRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
-import { BoundingBoxMutatorHelpers, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES } from "../types";
+import { BoundingBoxMutatorHelpers, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES, CurveAnchor } from "../types";
 import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
+import { resolvePosition } from "../../tools/utilities";
 
 type CurveMutatorArgs = {
     target: CurveRenderer;
@@ -47,6 +49,49 @@ class CurveMutator implements GraphicMutator {
 
     public getOrigin(): Vector {
         return this.target.getAnchor(0).point;
+    }
+
+    // TODO: Account for ctrl, alt, and snapping
+    public get boxListeners(): { [key in VERTEX_ROLES]: (event: SlideMouseEvent) => void } {
+        const box = this.target.getBoundingBox();
+        const directions = [
+            box.dimensions,
+            box.dimensions.signAs(Vector.northwest),
+            box.dimensions.signAs(Vector.southwest),
+            box.dimensions.signAs(Vector.southeast)
+        ];
+
+        const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
+            const anchorOffsets = this.target.getAnchors().map<CurveAnchor>(anchor => ({
+                inHandle: oppositeCorner.towards(anchor.inHandle).abs,
+                point: oppositeCorner.towards(anchor.point).abs,
+                outHandle: oppositeCorner.towards(anchor.outHandle).abs,
+            }));
+
+            return event => {
+                const { baseEvent, slide } = event.detail;
+                const position = resolvePosition(baseEvent, slide);
+                const rawOffset = oppositeCorner.towards(position);
+                const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+
+                const scale = new Vector(offset.x / box.dimensions.x, offset.y / box.dimensions.y);
+
+                // Update rendering
+                this.target.setAnchors(anchorOffsets.map<CurveAnchor>(anchor => ({
+                    inHandle: new Vector(anchor.inHandle.x * scale.x, anchor.inHandle.y * scale.y).add(oppositeCorner),
+                    point: new Vector(anchor.point.x * scale.x, anchor.point.y * scale.y).add(oppositeCorner),
+                    outHandle: new Vector(anchor.outHandle.x * scale.x, anchor.outHandle.y * scale.y).add(oppositeCorner)
+                })));
+                this._repositionCurveAnchors();
+            };
+        };
+
+        return {
+            [VERTEX_ROLES.TOP_LEFT]: makeListener(box.origin.add(box.dimensions)),
+            [VERTEX_ROLES.TOP_RIGHT]: makeListener(box.origin.add(new Vector(0, box.dimensions.y))),
+            [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.origin.add(new Vector(box.dimensions.x, 0))),
+            [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.origin)
+        };
     }
 
     // TODO: Account for alt and snapping
