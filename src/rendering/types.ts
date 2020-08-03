@@ -49,6 +49,10 @@ export type BoundingBox = {
     origin: Vector;
     center: Vector;
     dimensions: Vector;
+    topLeft: Vector;
+    topRight: Vector;
+    bottomLeft: Vector;
+    bottomRight: Vector;
 };
 
 export type CurveAnchor = {
