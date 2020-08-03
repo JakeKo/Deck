@@ -30,15 +30,16 @@ export function moveVideo(event: VideoMouseEvent): void {
 }
 
 export function moveVideoVertex(mutator: VideoMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
-    const handler = mutator.getVertexHandler(vertex.getRole());
+    // Handler must be instantiated at the beginning of the mutation to capture initial state
+    // Handler cannot be instantiated immediately during each move event
+    const handler = mutator.boxListeners[vertex.getRole()];
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
 
     function move(event: SlideMouseEvent): void {
-        const { slide, baseEvent } = event.detail;
-        handler(resolvePosition(baseEvent, slide));
-        slide.broadcastSetGraphic(mutator.getTarget());
+        handler(event);
+        event.detail.slide.broadcastSetGraphic(mutator.getTarget());
     }
 
     function complete(): void {
