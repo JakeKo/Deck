@@ -7,6 +7,8 @@ export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
 type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
 type HELPER_EVENTS = CURVE_ANCHOR_EVENTS | ROTATOR_EVENTS | VERTEX_EVENTS;
 
+export type GraphicMouseEvent = CurveMouseEvent | EllipseMouseEvent | ImageMouseEvent | RectangleMouseEvent | TextboxMouseEvent | VideoMouseEvent;
+
 // SLIDE EVENTS
 export enum SLIDE_EVENTS {
     MOUSEUP = 'deck-slide-mouseup',

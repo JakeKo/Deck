@@ -1,6 +1,5 @@
-import { EllipseMouseEvent, ELLIPSE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, VertexMouseEvent, VERTEX_EVENTS } from "../../events/types";
+import { EllipseMouseEvent, ELLIPSE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { VertexRenderer } from "../../rendering/helpers";
 import { EllipseMutator } from "../../rendering/mutators";
 import { resolvePosition } from "../utilities";
 
@@ -29,25 +28,6 @@ export function moveEllipse(event: EllipseMouseEvent): void {
     }
 }
 
-export function moveEllipseVertex(mutator: EllipseMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
-    // Handler must be instantiated at the beginning of the mutation to capture initial state
-    // Handler cannot be instantiated immediately during each move event
-    const handler = mutator.boxListeners[vertex.getRole()];
-
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
-
-    function move(event: SlideMouseEvent): void {
-        handler(event);
-        event.detail.slide.broadcastSetGraphic(mutator.getTarget());
-    }
-
-    function complete(): void {
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
-    }
-}
-
 export function hoverEllipse(event: EllipseMouseEvent): void {
     const { target, slide } = event.detail;
 
@@ -56,9 +36,12 @@ export function hoverEllipse(event: EllipseMouseEvent): void {
     }
 
     slide.markGraphic(target.getId());
+    slide.cursor = 'move';
+    slide.cursorLock = true;
 
     listenOnce(ELLIPSE_EVENTS.MOUSEOUT, unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.getId());
+        slide.cursorLock = false;
     }
 }

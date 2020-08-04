@@ -1,6 +1,5 @@
-import { SlideMouseEvent, SLIDE_EVENTS, TextboxMouseEvent, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS } from "../../events/types";
+import { SlideMouseEvent, SLIDE_EVENTS, TextboxMouseEvent, TEXTBOX_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { VertexRenderer } from "../../rendering/helpers";
 import { TextboxMutator } from "../../rendering/mutators";
 import { resolvePosition } from "../utilities";
 
@@ -29,25 +28,6 @@ export function moveTextbox(event: TextboxMouseEvent): void {
     }
 }
 
-export function moveTextboxVertex(mutator: TextboxMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
-    // Handler must be instantiated at the beginning of the mutation to capture initial state
-    // Handler cannot be instantiated immediately during each move event
-    const handler = mutator.boxListeners[vertex.getRole()];
-
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
-
-    function move(event: SlideMouseEvent): void {
-        handler(event);
-        event.detail.slide.broadcastSetGraphic(mutator.getTarget());
-    }
-
-    function complete(): void {
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
-    }
-}
-
 export function hoverTextbox(event: TextboxMouseEvent): void {
     const { target, slide } = event.detail;
 
@@ -56,9 +36,12 @@ export function hoverTextbox(event: TextboxMouseEvent): void {
     }
 
     slide.markGraphic(target.getId());
+    slide.cursor = 'move';
+    slide.cursorLock = true;
 
     listenOnce(TEXTBOX_EVENTS.MOUSEOUT, unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.getId());
+        slide.cursorLock = false;
     }
 }
