@@ -49,6 +49,10 @@ class CanvasRenderer implements HelperRenderer {
         this._svg && this._svg.remove();
         this._svg = undefined;
     }
+
+    public setScale(): void {
+        return;
+    }
 }
 
 export default CanvasRenderer;
