@@ -13,15 +13,14 @@ type RotatorRendererArgs = {
 
 class RotatorRenderer implements HelperRenderer {
     private _slide: SlideRenderer;
-    private _svg: SVG.Ellipse | undefined;
+    private _svg: SVG.Rect | undefined;
     private _parent: GraphicRenderer;
     private _scale: number;
     private _width: number;
     private _height: number;
     private _center: Vector;
     private _fillColor: string;
-    private _strokeColor: string;
-    private _strokeWidth: number;
+    private _rotation: number;
 
     constructor(args: RotatorRendererArgs) {
         this._slide = args.slide;
@@ -30,9 +29,8 @@ class RotatorRenderer implements HelperRenderer {
         this._center = args.center;
         this._width = 8;
         this._height = 8;
-        this._fillColor = 'none';
-        this._strokeColor = '#400c8b';
-        this._strokeWidth = 1;
+        this._fillColor = '#400c8b';
+        this._rotation = 45;
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -53,10 +51,10 @@ class RotatorRenderer implements HelperRenderer {
             return;
         }
 
-        this._svg = this._slide.canvas.ellipse(this._width, this._height)
-            .center(this._center.x, this._center.y)
+        this._svg = this._slide.canvas.rect(this._width * this._scale, this._height * this._scale)
+            .translate(this._center.x - this._width * this._scale / 2, this._center.y - this._height * this._scale / 2)
             .fill(this._fillColor)
-            .stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale });
+            .rotate(this._rotation);
         decorateRotateEvents(this._svg, this._slide, this);
     }
 
@@ -67,13 +65,17 @@ class RotatorRenderer implements HelperRenderer {
 
     public setCenter(center: Vector): void {
         this._center = center;
-        this._svg && this._svg.center(this._center.x, this._center.y);
+        this._svg && this._svg.rotate(0)
+            .translate(this._center.x - this._width * this._scale / 2, this._center.y - this._height * this._scale / 2)
+            .rotate(this._rotation);
     }
 
     public setScale(scale: number): void {
         this._scale = scale;
-        this._svg && this._svg.size(this._width * this._scale, this._height * this._scale);
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale });
+        this._svg && this._svg.size(this._width * this._scale, this._height * this._scale)
+            .rotate(0)
+            .translate(this._center.x - this._width * this._scale / 2, this._center.y - this._height * this._scale / 2)
+            .rotate(this._rotation);
     }
 }
 

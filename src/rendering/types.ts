@@ -1,6 +1,6 @@
 import { SlideMouseEvent } from '../events/types';
 import Vector from '../utilities/Vector';
-import { BoxRenderer, VertexRenderer } from './helpers';
+import { BoxRenderer, VertexRenderer, RotatorRenderer } from './helpers';
 
 export type GraphicRenderer = {
     getId: () => string;
@@ -18,6 +18,7 @@ export type HelperRenderer = {
     isRendered: () => boolean;
     render: () => void;
     unrender: () => void;
+    setScale: (scale: number) => void;
 };
 
 export type GraphicMaker = {
@@ -42,6 +43,7 @@ export type GraphicMutator = {
 
 export type BoundingBoxMutatorHelpers = {
     box: BoxRenderer;
+    rotator: RotatorRenderer;
     vertices: { [key in VERTEX_ROLES]: VertexRenderer };
 };
 
