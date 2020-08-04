@@ -67,7 +67,19 @@ function reevaluateFocusedGraphics(event: SlideMouseEvent): void {
 
 function reevaluateCursor(event: SlideMouseEvent): void {
     const { slide, target } = event.detail;
-    slide.setCursor(target === undefined ? 'default' : 'move');
+
+    if (target === undefined) {
+        slide.cursor = 'default';
+    } else {
+        const type = target.getType();
+        if ([GRAPHIC_TYPES.VERTEX, GRAPHIC_TYPES.CURVE_ANCHOR].indexOf(type) !== -1) {
+            slide.cursor = 'grab';
+        } else if ([GRAPHIC_TYPES.CURVE, GRAPHIC_TYPES.ELLIPSE, GRAPHIC_TYPES.IMAGE, GRAPHIC_TYPES.RECTANGLE, GRAPHIC_TYPES.TEXTBOX, GRAPHIC_TYPES.VIDEO].indexOf(type) !== -1) {
+            slide.cursor = 'move';
+        } else {
+            slide.cursor = 'default';
+        }
+    }
 }
 
 function moveVertex(event: VertexMouseEvent): void {
