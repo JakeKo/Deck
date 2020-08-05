@@ -12,6 +12,8 @@ export function moveCurve(event: CurveMouseEvent): void {
     const mutator = slide.focusGraphic(target.getId()) as CurveMutator;
     const originOffset = resolvePosition(baseEvent, slide).towards(mutator.getOrigin());
     const moveHandler = mutator.graphicMoveHandler();
+    slide.cursor = 'move';
+    slide.cursorLock = true;
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
@@ -23,6 +25,7 @@ export function moveCurve(event: CurveMouseEvent): void {
     }
 
     function complete(): void {
+        slide.cursorLock = false;
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(CURVE_EVENTS.MOUSEDOWN, moveCurve);
     }
@@ -64,12 +67,9 @@ export function hoverCurve(event: CurveMouseEvent): void {
     }
 
     slide.markGraphic(target.getId());
-    slide.cursor = 'move';
-    slide.cursorLock = true;
 
     listenOnce(CURVE_EVENTS.MOUSEOUT, unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.getId());
-        slide.cursorLock = false;
     }
 }

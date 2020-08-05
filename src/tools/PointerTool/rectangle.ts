@@ -12,6 +12,8 @@ export function moveRectangle(event: RectangleMouseEvent): void {
     const originOffset = resolvePosition(baseEvent, slide).towards(target.getOrigin());
     const mutator = slide.focusGraphic(target.getId()) as RectangleMutator;
     const moveHandler = mutator.graphicMoveHandler();
+    slide.cursor = 'move';
+    slide.cursorLock = true;
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
@@ -23,6 +25,7 @@ export function moveRectangle(event: RectangleMouseEvent): void {
     }
 
     function complete(): void {
+        slide.cursorLock = false;
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
     }
@@ -37,12 +40,9 @@ export function hoverRectangle(event: RectangleMouseEvent): void {
     }
 
     slide.markGraphic(target.getId());
-    slide.cursor = 'move';
-    slide.cursorLock = true;
 
     listenOnce(RECTANGLE_EVENTS.MOUSEOUT, unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.getId());
-        slide.cursorLock = false;
     }
 }

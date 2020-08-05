@@ -12,6 +12,8 @@ export function moveEllipse(event: EllipseMouseEvent): void {
     const centerOffset = resolvePosition(baseEvent, slide).towards(target.getCenter());
     const mutator = slide.focusGraphic(target.getId()) as EllipseMutator;
     const moveHandler = mutator.graphicMoveHandler();
+    slide.cursor = 'move';
+    slide.cursorLock = true;
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
@@ -23,6 +25,7 @@ export function moveEllipse(event: EllipseMouseEvent): void {
     }
 
     function complete(): void {
+        slide.cursorLock = false;
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);
     }
@@ -36,12 +39,9 @@ export function hoverEllipse(event: EllipseMouseEvent): void {
     }
 
     slide.markGraphic(target.getId());
-    slide.cursor = 'move';
-    slide.cursorLock = true;
 
     listenOnce(ELLIPSE_EVENTS.MOUSEOUT, unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.getId());
-        slide.cursorLock = false;
     }
 }
