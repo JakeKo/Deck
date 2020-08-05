@@ -35,8 +35,8 @@ class CurveMutator implements GraphicMutator {
             }))
         };
 
-        this.helpers.anchors.forEach(helper => helper.render());
         renderBoxHelpers(this.helpers);
+        this.helpers.anchors.forEach(helper => helper.render());
     }
 
     public getType(): GRAPHIC_TYPES {

@@ -1,15 +1,14 @@
 import { CurveAnchorMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { CurveMutator, EllipseMutator, ImageMutator, RectangleMutator, TextboxMutator, VideoMutator } from "../../rendering/mutators";
 import { GRAPHIC_TYPES } from "../../rendering/types";
 import { AppStore } from "../../store/types";
 import { EditorTool, TOOL_NAMES } from "../types";
-import { hoverCurve, moveCurve, moveCurveAnchor, moveCurveVertex } from "./curve";
-import { hoverEllipse, moveEllipse, moveEllipseVertex } from "./ellipse";
-import { hoverImage, moveImage, moveImageVertex } from "./image";
-import { hoverRectangle, moveRectangle, moveRectangleVertex } from "./rectangle";
-import { hoverTextbox, moveTextbox, moveTextboxVertex } from "./textbox";
-import { hoverVideo, moveVideo, moveVideoVertex } from "./video";
+import { hoverCurve, moveCurve, moveCurveAnchor } from "./curve";
+import { hoverEllipse, moveEllipse } from "./ellipse";
+import { hoverImage, moveImage } from "./image";
+import { hoverRectangle, moveRectangle } from "./rectangle";
+import { hoverTextbox, moveTextbox } from "./textbox";
+import { hoverVideo, moveVideo } from "./video";
 
 export default (store: AppStore): EditorTool => {
     return {
@@ -67,30 +66,48 @@ function reevaluateFocusedGraphics(event: SlideMouseEvent): void {
 
 function reevaluateCursor(event: SlideMouseEvent): void {
     const { slide, target } = event.detail;
-    slide.setCursor(target === undefined ? 'default' : 'move');
+
+    if (target === undefined) {
+        slide.cursor = 'default';
+    } else {
+        const type = target.getType();
+        if ([GRAPHIC_TYPES.VERTEX, GRAPHIC_TYPES.CURVE_ANCHOR].indexOf(type) !== -1) {
+            slide.cursor = 'grab';
+        } else if ([GRAPHIC_TYPES.CURVE, GRAPHIC_TYPES.ELLIPSE, GRAPHIC_TYPES.IMAGE, GRAPHIC_TYPES.RECTANGLE, GRAPHIC_TYPES.TEXTBOX, GRAPHIC_TYPES.VIDEO].indexOf(type) !== -1) {
+            slide.cursor = 'move';
+        } else {
+            slide.cursor = 'default';
+        }
+    }
 }
 
 function moveVertex(event: VertexMouseEvent): void {
     const { slide, graphic } = event.detail;
     const mutator = slide.focusGraphic(graphic.getParent().getId());
 
-    if (mutator.getType() === GRAPHIC_TYPES.CURVE) {
-        moveCurveVertex(mutator as CurveMutator, graphic, moveVertex);
-    } else if (mutator.getType() === GRAPHIC_TYPES.ELLIPSE) {
-        moveEllipseVertex(mutator as EllipseMutator, graphic, moveVertex);
-    } else if (mutator.getType() === GRAPHIC_TYPES.IMAGE) {
-        moveImageVertex(mutator as ImageMutator, graphic, moveVertex);
-    } else if (mutator.getType() === GRAPHIC_TYPES.RECTANGLE) {
-        moveRectangleVertex(mutator as RectangleMutator, graphic, moveVertex);
-    } else if (mutator.getType() === GRAPHIC_TYPES.TEXTBOX) {
-        moveTextboxVertex(mutator as TextboxMutator, graphic, moveVertex);
-    } else if (mutator.getType() === GRAPHIC_TYPES.VIDEO) {
-        moveVideoVertex(mutator as VideoMutator, graphic, moveVertex);
+    // Handler must be instantiated at the beginning of the mutation to capture initial state
+    // Handler cannot be instantiated immediately during each move event
+    const handler = mutator.boxListeners[graphic.getRole()];
+    slide.cursor = 'grabbing';
+    slide.cursorLock = true;
+
+    listen(SLIDE_EVENTS.MOUSEMOVE, move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+
+    function move(event: SlideMouseEvent): void {
+        handler(event);
+        slide.broadcastSetGraphic(mutator.getTarget());
+    }
+
+    function complete(): void {
+        slide.cursorLock = false;
+        slide.cursor = 'grab';
+
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
+        listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
     }
 }
 
 function moveAnchor(event: CurveAnchorMouseEvent): void {
-    const { slide, parentId, role, index } = event.detail;
-    const mutator = slide.focusGraphic(parentId);
-    moveCurveAnchor(mutator as CurveMutator, role, index, moveAnchor);
+    moveCurveAnchor(event, moveAnchor);
 }

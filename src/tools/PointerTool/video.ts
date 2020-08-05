@@ -1,6 +1,5 @@
-import { SlideMouseEvent, SLIDE_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VideoMouseEvent, VIDEO_EVENTS } from "../../events/types";
+import { SlideMouseEvent, SLIDE_EVENTS, VideoMouseEvent, VIDEO_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { VertexRenderer } from "../../rendering/helpers";
 import { VideoMutator } from "../../rendering/mutators";
 import { resolvePosition } from "../utilities";
 
@@ -13,6 +12,8 @@ export function moveVideo(event: VideoMouseEvent): void {
     const originOffset = resolvePosition(baseEvent, slide).towards(target.getOrigin());
     const mutator = slide.focusGraphic(target.getId()) as VideoMutator;
     const moveHandler = mutator.graphicMoveHandler();
+    slide.cursor = 'move';
+    slide.cursorLock = true;
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
@@ -24,27 +25,9 @@ export function moveVideo(event: VideoMouseEvent): void {
     }
 
     function complete(): void {
+        slide.cursorLock = false;
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
-    }
-}
-
-export function moveVideoVertex(mutator: VideoMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
-    // Handler must be instantiated at the beginning of the mutation to capture initial state
-    // Handler cannot be instantiated immediately during each move event
-    const handler = mutator.boxListeners[vertex.getRole()];
-
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
-
-    function move(event: SlideMouseEvent): void {
-        handler(event);
-        event.detail.slide.broadcastSetGraphic(mutator.getTarget());
-    }
-
-    function complete(): void {
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
     }
 }
 

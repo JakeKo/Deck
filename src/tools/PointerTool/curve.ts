@@ -1,8 +1,6 @@
-import { CurveAnchorMouseEvent, CurveMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, VertexMouseEvent, VERTEX_EVENTS } from "../../events/types";
+import { CurveAnchorMouseEvent, CurveMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { VertexRenderer } from "../../rendering/helpers";
 import { CurveMutator } from "../../rendering/mutators";
-import { CURVE_ANCHOR_ROLES } from "../../rendering/types";
 import { resolvePosition } from "../utilities";
 
 export function moveCurve(event: CurveMouseEvent): void {
@@ -14,6 +12,8 @@ export function moveCurve(event: CurveMouseEvent): void {
     const mutator = slide.focusGraphic(target.getId()) as CurveMutator;
     const originOffset = resolvePosition(baseEvent, slide).towards(mutator.getOrigin());
     const moveHandler = mutator.graphicMoveHandler();
+    slide.cursor = 'move';
+    slide.cursorLock = true;
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
@@ -25,32 +25,21 @@ export function moveCurve(event: CurveMouseEvent): void {
     }
 
     function complete(): void {
+        slide.cursorLock = false;
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(CURVE_EVENTS.MOUSEDOWN, moveCurve);
     }
 }
 
-export function moveCurveVertex(mutator: CurveMutator, vertex: VertexRenderer, moveVertex: (event: VertexMouseEvent) => void) {
+export function moveCurveAnchor(event: CurveAnchorMouseEvent, moveAnchor: (event: CurveAnchorMouseEvent) => void): void {
+    const { slide, parentId, index, role } = event.detail;
+    const mutator = slide.focusGraphic(parentId) as CurveMutator;
+
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
-    const handler = mutator.boxListeners[vertex.getRole()];
-
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
-
-    function move(event: SlideMouseEvent): void {
-        handler(event);
-        event.detail.slide.broadcastSetGraphic(mutator.getTarget());
-    }
-
-    function complete(): void {
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
-    }
-}
-
-export function moveCurveAnchor(mutator: CurveMutator, role: CURVE_ANCHOR_ROLES, index: number, moveAnchor: (event: CurveAnchorMouseEvent) => void): void {
     const handler = mutator.getAnchorHandler(index, role);
+    slide.cursor = 'grabbing';
+    slide.cursorLock = true;
 
     listen(SLIDE_EVENTS.MOUSEMOVE, move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
@@ -62,6 +51,9 @@ export function moveCurveAnchor(mutator: CurveMutator, role: CURVE_ANCHOR_ROLES,
     }
 
     function complete(): void {
+        slide.cursorLock = false;
+        slide.cursor = 'grab';
+
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, moveAnchor);
     }

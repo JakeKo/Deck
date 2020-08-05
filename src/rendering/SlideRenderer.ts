@@ -29,6 +29,9 @@ class SlideRenderer {
     private _activeMakers: { [index: string]: GraphicMaker };
     private _markedGraphics: { [key: string]: GraphicMarker };
     private _zoom: number;
+    private _defaultCursor = 'default';
+    private _cursor: string;
+    private _cursorLock = false;
 
     constructor(args: SlideRendererArgs) {
         this._stateManager = args.stateManager;
@@ -39,6 +42,7 @@ class SlideRenderer {
         this._activeMakers = {};
         this._markedGraphics = {};
         this._zoom = args.zoom;
+        this._cursor = this._defaultCursor;
 
         renderBackdrop(this, args.croppedViewbox.width, args.croppedViewbox.height);
         decorateSlideEvents(this);
@@ -77,6 +81,20 @@ class SlideRenderer {
     public get bounds(): { origin: Vector; height: number; width: number } {
         const bounds = this._canvas.node.getBoundingClientRect() as DOMRect;
         return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
+    }
+
+    public set cursor(cursor: string) {
+        if (this._cursorLock) {
+            return;
+        }
+
+        this._cursor = cursor;
+        this._canvas.node.style.cursor = this._cursor;
+    }
+
+    public set cursorLock(cursorLock: boolean) {
+        console.log(cursorLock ? 'LOCKED' : 'UNLOCKED');
+        this._cursorLock = cursorLock;
     }
 
     public completeMaker(graphicId: string): void {
@@ -250,10 +268,6 @@ class SlideRenderer {
 
     public isMarked(graphicId: string): boolean {
         return this._markedGraphics[graphicId] !== undefined;
-    }
-
-    public setCursor(cursor: string): void {
-        this._canvas.node.style.cursor = cursor;
     }
 
     private activateMaker<T extends GraphicMaker>(maker: T): T {
