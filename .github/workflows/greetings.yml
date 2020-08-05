@@ -9,5 +9,5 @@ jobs:
     - uses: actions/first-interaction@v1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: 'Hey there - welcome to Deck!'
-        pr-message: 'Hey there - welcome to Deck! I see you're already hard at work, introducing a pull request into the system. Thanks so much for your hard work! I'll be sure to review it as soon as I can!'
+        issue-message: "Hey there - welcome to Deck!"
+        pr-message: "Hey there - welcome to Deck! I see you're already hard at work, introducing a pull request into the system. Thanks so much for your hard work! I'll be sure to review it as soon as I can!""
