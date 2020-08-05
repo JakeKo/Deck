@@ -11,7 +11,8 @@
 		"build": "webpack --config ./webpack-prod.config.js",
 		"start": "webpack-dev-server --hot --inline",
 		"test": "mocha-webpack --webpack-config ./webpack-test.config.js --require ./test/setup.js ./test/*.spec.js",
-		"audit": "./node_modules/.bin/lighthouse https://jakeko.github.io/Deck/ --view"
+		"audit": "./node_modules/.bin/lighthouse https://jakeko.github.io/Deck/ --view",
+		"lint:actions": "yamllint ./.github/workflows/*.yml"
 	},
 	"devDependencies": {
 		"@vue/test-utils": "^1.0.3",
@@ -40,7 +41,8 @@
 		"webpack": "^4.43.0",
 		"webpack-cli": "^3.3.12",
 		"webpack-dev-server": "^3.11.0",
-		"webpack-node-externals": "^1.7.2"
+		"webpack-node-externals": "^1.7.2",
+		"yaml-lint": "^1.2.4"
 	},
 	"dependencies": {}
 }
