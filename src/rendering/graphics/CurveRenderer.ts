@@ -1,5 +1,6 @@
 import * as SVG from 'svg.js';
 import { decorateCurveEvents } from '../../events/decorators';
+import { radToDeg } from '../../utilities/utilities';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { BoundingBox, CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from "../types";
@@ -55,7 +56,7 @@ class CurveRenderer implements GraphicRenderer {
         this._svg = this._slide.canvas.path(this._getFormattedPoints())
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
-            .rotate(this._rotation);
+            .rotate(radToDeg(this._rotation));
         decorateCurveEvents(this._svg, this._slide, this);
     }
 
@@ -126,7 +127,7 @@ class CurveRenderer implements GraphicRenderer {
 
     public setRotation(rotation: number): void {
         this._rotation = rotation;
-        this._svg && this._svg.rotate(this._rotation);
+        this._svg && this._svg.rotate(radToDeg(this._rotation));
     }
 
     public getBoundingBox(): BoundingBox {
@@ -143,7 +144,7 @@ class CurveRenderer implements GraphicRenderer {
             };
         } else {
             const bbox = this._svg.bbox();
-            return {
+            const preRotateBox: BoundingBox = {
                 origin: new Vector(bbox.x, bbox.y),
                 center: new Vector(bbox.x, bbox.y).add(new Vector(bbox.width, bbox.height).scale(0.5)),
                 dimensions: new Vector(bbox.width, bbox.height),
@@ -152,6 +153,24 @@ class CurveRenderer implements GraphicRenderer {
                 bottomLeft: new Vector(bbox.x, bbox.y + bbox.height),
                 bottomRight: new Vector(bbox.x + bbox.width, bbox.y + bbox.height),
                 rotation: this._rotation
+            };
+
+            const corners = {
+                topLeft: preRotateBox.center.towards(preRotateBox.topLeft),
+                topRight: preRotateBox.center.towards(preRotateBox.topRight),
+                bottomLeft: preRotateBox.center.towards(preRotateBox.bottomLeft),
+                bottomRight: preRotateBox.center.towards(preRotateBox.bottomRight)
+            };
+
+            return {
+                origin: preRotateBox.origin,
+                center: preRotateBox.center,
+                dimensions: preRotateBox.dimensions,
+                topLeft: preRotateBox.center.add(corners.topLeft.rotate(corners.topLeft.theta(Vector.east) + preRotateBox.rotation)),
+                topRight: preRotateBox.center.add(corners.topRight.rotate(corners.topRight.theta(Vector.east) + preRotateBox.rotation)),
+                bottomLeft: preRotateBox.center.add(corners.bottomLeft.rotate(corners.bottomLeft.theta(Vector.east) + preRotateBox.rotation)),
+                bottomRight: preRotateBox.center.add(corners.bottomRight.rotate(corners.bottomRight.theta(Vector.east) + preRotateBox.rotation)),
+                rotation: preRotateBox.rotation
             };
         }
     }

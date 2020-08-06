@@ -1,11 +1,11 @@
 import { SlideMouseEvent } from "../../events/types";
 import { resolvePosition } from "../../tools/utilities";
-import { closestVector } from "../../utilities/utilities";
+import { closestVector, mod } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { VideoRenderer } from "../graphics";
 import SlideRenderer from "../SlideRenderer";
 import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
-import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
+import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
 
 type VideoMutatorArgs = {
     target: VideoRenderer;
@@ -68,6 +68,22 @@ class VideoMutator implements GraphicMutator {
             [VERTEX_ROLES.TOP_RIGHT]: makeListener(box.bottomLeft),
             [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
             [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
+        };
+    }
+
+    public get rotateListener(): (event: SlideMouseEvent) => void {
+        const { center } = this.target.getBoundingBox();
+        const directions = [...Vector.cardinals, ...Vector.intermediates];
+
+        return event => {
+            const { slide, baseEvent } = event.detail;
+            const position = resolvePosition(baseEvent, slide);
+            const rawOffset = center.towards(position);
+            const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
+            const theta = Math.atan2(offset.y, offset.x);
+
+            this.target.setRotation(mod(theta, Math.PI * 2));
+            rotateBoxHelpers(this.helpers, this.target.getBoundingBox());
         };
     }
 

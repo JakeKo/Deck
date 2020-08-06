@@ -2,6 +2,7 @@ import * as SVG from 'svg.js';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GRAPHIC_TYPES, HelperRenderer } from '../types';
+import { radToDeg } from '../../utilities/utilities';
 
 type BoxRendererArgs = {
     slide: SlideRenderer;
@@ -33,7 +34,7 @@ class BoxRenderer implements HelperRenderer {
         this._fillColor = 'none';
         this._strokeColor = '#400c8b';
         this._strokeWidth = 1;
-        this._rotation = args.rotation * 180 / Math.PI;
+        this._rotation = args.rotation;
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -54,7 +55,7 @@ class BoxRenderer implements HelperRenderer {
             .translate(this._origin.x, this._origin.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale })
-            .rotate(this._rotation);
+            .rotate(radToDeg(this._rotation));
     }
 
     public unrender(): void {
@@ -64,7 +65,7 @@ class BoxRenderer implements HelperRenderer {
 
     public setOrigin(origin: Vector): void {
         this._origin = origin;
-        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
+        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(radToDeg(this._rotation));
     }
 
     public setWidth(width: number): void {
@@ -84,8 +85,8 @@ class BoxRenderer implements HelperRenderer {
     }
 
     public setRotation(rotation: number): void {
-        this._rotation = rotation * 180 / Math.PI;
-        this._svg && this._svg.rotate(this._rotation);
+        this._rotation = rotation;
+        this._svg && this._svg.rotate(radToDeg(this._rotation));
     }
 }
 

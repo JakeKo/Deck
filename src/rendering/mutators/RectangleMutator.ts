@@ -73,15 +73,16 @@ class RectangleMutator implements GraphicMutator {
 
     public get rotateListener(): (event: SlideMouseEvent) => void {
         const { center } = this.target.getBoundingBox();
+        const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
             const { slide, baseEvent } = event.detail;
             const position = resolvePosition(baseEvent, slide);
-            const offset = center.towards(position);
-            const theta = Math.atan2(offset.y , offset.x);
-            const radians = mod(theta, Math.PI * 2);
+            const rawOffset = center.towards(position);
+            const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
+            const theta = Math.atan2(offset.y, offset.x);
 
-            this.target.setRotation(radians);
+            this.target.setRotation(mod(theta, Math.PI * 2));
             rotateBoxHelpers(this.helpers, this.target.getBoundingBox());
         };
     }

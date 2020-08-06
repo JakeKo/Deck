@@ -11,6 +11,8 @@ export default class Vector {
     public static southwest = new Vector(-Math.SQRT2 / 2, -Math.SQRT2 / 2);
     public static west = new Vector(-1, 0);
     public static northwest = new Vector(-Math.SQRT2 / 2, Math.SQRT2 / 2);
+    public static cardinals = [Vector.north, Vector.east, Vector.south, Vector.west];
+    public static intermediates = [Vector.northeast, Vector.southeast, Vector.southwest, Vector.northwest];
 
     public x: number;
     public y: number;

@@ -1,9 +1,9 @@
 import * as SVG from 'svg.js';
 import { decorateRectangleEvents } from '../../events/decorators';
+import { radToDeg } from '../../utilities/utilities';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from '../types';
-import { mod } from '../../utilities/utilities';
 
 type RectangleRendererArgs = {
     id: string;
@@ -38,7 +38,7 @@ class RectangleRenderer implements GraphicRenderer {
         this._fillColor = args.fillColor || '#CCCCCC';
         this._strokeColor = args.strokeColor || 'none';
         this._strokeWidth = args.strokeWidth || 0;
-        this._rotation = args.rotation ? args.rotation * 180 / Math.PI : 0;
+        this._rotation = args.rotation || 0;
     }
 
     public getId(): string {
@@ -63,7 +63,7 @@ class RectangleRenderer implements GraphicRenderer {
             .translate(this._origin.x, this._origin.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
-            .rotate(this._rotation);
+            .rotate(radToDeg(this._rotation));
         decorateRectangleEvents(this._svg, this._slide, this);
     }
 
@@ -78,7 +78,7 @@ class RectangleRenderer implements GraphicRenderer {
 
     public setOrigin(origin: Vector): void {
         this._origin = origin;
-        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
+        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(radToDeg(this._rotation));
     }
 
     public getWidth(): number {
@@ -131,8 +131,8 @@ class RectangleRenderer implements GraphicRenderer {
     }
 
     public setRotation(rotation: number): void {
-        this._rotation = rotation * 180 / Math.PI;
-        this._svg && this._svg.rotate(this._rotation);
+        this._rotation = rotation;
+        this._svg && this._svg.rotate(radToDeg(this._rotation));
     }
 
     public getBoundingBox(): BoundingBox {
@@ -156,7 +156,7 @@ class RectangleRenderer implements GraphicRenderer {
                 topRight: this._origin.add(new Vector(this._width, 0)),
                 bottomLeft: this._origin.add(new Vector(0, this._height)),
                 bottomRight: this._origin.add(new Vector(this._width, this._height)),
-                rotation: this._rotation * Math.PI / 180
+                rotation: this._rotation
             };
 
             const corners = {

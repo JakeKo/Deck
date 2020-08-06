@@ -3,6 +3,7 @@ import { decorateEllipseEvents } from "../../events/decorators";
 import Vector from "../../utilities/Vector";
 import SlideRenderer from "../SlideRenderer";
 import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from "../types";
+import { radToDeg } from '../../utilities/utilities';
 
 type EllipseRendererArgs = {
     id: string;
@@ -62,7 +63,7 @@ class EllipseRenderer implements GraphicRenderer {
             .translate(this._center.x, this._center.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
-            .rotate(this._rotation);
+            .rotate(radToDeg(this._rotation));
         decorateEllipseEvents(this._svg, this._slide, this);
     }
 
@@ -77,7 +78,7 @@ class EllipseRenderer implements GraphicRenderer {
 
     public setCenter(origin: Vector): void {
         this._center = origin;
-        this._svg && this._svg.rotate(0).translate(this._center.x, this._center.y).rotate(this._rotation);
+        this._svg && this._svg.rotate(0).translate(this._center.x, this._center.y).rotate(radToDeg(this._rotation));
     }
 
     public getWidth(): number {
@@ -131,7 +132,7 @@ class EllipseRenderer implements GraphicRenderer {
 
     public setRotation(rotation: number): void {
         this._rotation = rotation;
-        this._svg && this._svg.rotate(this._rotation);
+        this._svg && this._svg.rotate(radToDeg(this._rotation));
     }
 
     public getBoundingBox(): BoundingBox {
@@ -148,15 +149,33 @@ class EllipseRenderer implements GraphicRenderer {
             };
         } else {
             const radius = new Vector(this._width, this._height).scale(0.5);
-            return {
+            const preRotateBox: BoundingBox = {
                 origin: this._center.add(radius.scale(-1)),
                 center: this._center,
                 dimensions: radius.scale(2),
                 topLeft: this._center.add(radius.scale(-1)),
-                topRight: this._center.add(radius.signAs(Vector.southwest)),
-                bottomLeft: this._center.add(radius.signAs(Vector.northeast)),
+                topRight: this._center.add(radius.signAs(Vector.southeast)),
+                bottomLeft: this._center.add(radius.signAs(Vector.northwest)),
                 bottomRight: this._center.add(radius),
                 rotation: this._rotation
+            };
+
+            const corners = {
+                topLeft: preRotateBox.center.towards(preRotateBox.topLeft),
+                topRight: preRotateBox.center.towards(preRotateBox.topRight),
+                bottomLeft: preRotateBox.center.towards(preRotateBox.bottomLeft),
+                bottomRight: preRotateBox.center.towards(preRotateBox.bottomRight)
+            };
+
+            return {
+                origin: preRotateBox.origin,
+                center: preRotateBox.center,
+                dimensions: preRotateBox.dimensions,
+                topLeft: preRotateBox.center.add(corners.topLeft.rotate(corners.topLeft.theta(Vector.east) + preRotateBox.rotation)),
+                topRight: preRotateBox.center.add(corners.topRight.rotate(corners.topRight.theta(Vector.east) + preRotateBox.rotation)),
+                bottomLeft: preRotateBox.center.add(corners.bottomLeft.rotate(corners.bottomLeft.theta(Vector.east) + preRotateBox.rotation)),
+                bottomRight: preRotateBox.center.add(corners.bottomRight.rotate(corners.bottomRight.theta(Vector.east) + preRotateBox.rotation)),
+                rotation: preRotateBox.rotation
             };
         }
     }
