@@ -75,7 +75,7 @@ function reevaluateCursor(event: SlideMouseEvent): void {
         slide.cursor = 'default';
     } else {
         const type = target.getType();
-        if ([GRAPHIC_TYPES.VERTEX, GRAPHIC_TYPES.CURVE_ANCHOR].indexOf(type) !== -1) {
+        if ([GRAPHIC_TYPES.VERTEX, GRAPHIC_TYPES.CURVE_ANCHOR, GRAPHIC_TYPES.ROTATOR].indexOf(type) !== -1) {
             slide.cursor = 'grab';
         } else if ([GRAPHIC_TYPES.CURVE, GRAPHIC_TYPES.ELLIPSE, GRAPHIC_TYPES.IMAGE, GRAPHIC_TYPES.RECTANGLE, GRAPHIC_TYPES.TEXTBOX, GRAPHIC_TYPES.VIDEO].indexOf(type) !== -1) {
             slide.cursor = 'move';
@@ -119,6 +119,8 @@ function rotateGraphic(event: RotatorMouseEvent): void {
 
     listen(SLIDE_EVENTS.MOUSEMOVE, rotate);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    slide.cursor = 'grabbing';
+    slide.cursorLock = true;
 
     function rotate(event: SlideMouseEvent): void {
         rotateListener(event);
@@ -126,6 +128,8 @@ function rotateGraphic(event: RotatorMouseEvent): void {
     }
 
     function complete(): void {
+        slide.cursorLock = false;
+        slide.cursor = 'grab';
         unlisten(SLIDE_EVENTS.MOUSEMOVE, rotate);
     }
 }

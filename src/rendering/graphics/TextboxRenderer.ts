@@ -65,8 +65,9 @@ class TextboxRenderer implements GraphicRenderer {
         this._svg = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
         this._svg.setAttribute('x', `${this._origin.x}px`);
         this._svg.setAttribute('y', `${this._origin.y}px`);
-        this._svg.setAttribute('width', `${this._width}px`);
-        this._svg.setAttribute('height', `${this._height}px`);
+        this._svg.style.transformOrigin = `${this._origin.x + this._width / 2}px ${this._origin.y + this._height / 2}px`;
+        this._svg.style.width = `${this._width}px`;
+        this._svg.style.height = `${this._height}px`;
         this._svg.style.transform = `rotate(${radToDeg(this._rotation)}deg)`;
         this._slide.canvas.node.appendChild(this._svg);
 
@@ -94,8 +95,11 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setOrigin(origin: Vector): void {
         this._origin = origin;
-        this._svg && this._svg.setAttribute('x', `${this._origin.x}px`);
-        this._svg && this._svg.setAttribute('y', `${this._origin.y}px`);
+        if (this._svg) {
+            this._svg.setAttribute('x', `${this._origin.x}px`);
+            this._svg.setAttribute('y', `${this._origin.y}px`);
+            this._svg.style.transformOrigin = `${this._origin.x + this._width / 2}px ${this._origin.y + this._height / 2}px`;
+        }
     }
 
     public getWidth(): number {
@@ -104,7 +108,9 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setWidth(width: number): void {
         this._width = width;
-        this._svg && this._svg.setAttribute('width', `${this._width}px`);
+        if (this._svg) {
+            this._svg.style.width = `${this._width}px`;
+        }
     }
 
     public getHeight(): number {
@@ -113,7 +119,9 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setHeight(height: number): void {
         this._height = height;
-        this._svg && this._svg.setAttribute('height', `${this._height}px`);
+        if (this._svg) {
+            this._svg.style.height = `${this._height}px`;
+        }
     }
 
     public getText(): string {
