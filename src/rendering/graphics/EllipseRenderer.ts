@@ -143,7 +143,8 @@ class EllipseRenderer implements GraphicRenderer {
                 topLeft: Vector.zero,
                 topRight: Vector.zero,
                 bottomLeft: Vector.zero,
-                bottomRight: Vector.zero
+                bottomRight: Vector.zero,
+                rotation: 0
             };
         } else {
             const radius = new Vector(this._width, this._height).scale(0.5);
@@ -154,7 +155,8 @@ class EllipseRenderer implements GraphicRenderer {
                 topLeft: this._center.add(radius.scale(-1)),
                 topRight: this._center.add(radius.signAs(Vector.southwest)),
                 bottomLeft: this._center.add(radius.signAs(Vector.northeast)),
-                bottomRight: this._center.add(radius)
+                bottomRight: this._center.add(radius),
+                rotation: this._rotation
             };
         }
     }

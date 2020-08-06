@@ -11,7 +11,7 @@
 		"build": "webpack --config ./webpack-prod.config.js",
 		"start": "webpack-dev-server --hot --inline",
 		"test": "mocha-webpack --webpack-config ./webpack-test.config.js --require ./test/setup.js ./test/*.spec.js",
-		"audit": "./node_modules/.bin/lighthouse https://jakeko.github.io/Deck/ --view",
+		"audit": "lighthouse https://jakeko.github.io/Deck/ --view",
 		"lint:actions": "yamllint ./.github/workflows/*.yml"
 	},
 	"devDependencies": {

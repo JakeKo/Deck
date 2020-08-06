@@ -9,6 +9,7 @@ type RotatorRendererArgs = {
     scale: number;
     center: Vector;
     parent: GraphicRenderer;
+    rotation: number;
 };
 
 class RotatorRenderer implements HelperRenderer {
@@ -20,6 +21,7 @@ class RotatorRenderer implements HelperRenderer {
     private _height: number;
     private _center: Vector;
     private _fillColor: string;
+    private _baseRotation = 45;
     private _rotation: number;
 
     constructor(args: RotatorRendererArgs) {
@@ -30,7 +32,7 @@ class RotatorRenderer implements HelperRenderer {
         this._width = 8;
         this._height = 8;
         this._fillColor = '#400c8b';
-        this._rotation = 45;
+        this._rotation = args.rotation * 180 / Math.PI;
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -54,7 +56,7 @@ class RotatorRenderer implements HelperRenderer {
         this._svg = this._slide.canvas.rect(this._width * this._scale, this._height * this._scale)
             .translate(this._center.x - this._width * this._scale / 2, this._center.y - this._height * this._scale / 2)
             .fill(this._fillColor)
-            .rotate(this._rotation);
+            .rotate((this._baseRotation + this._rotation) % 360);
         decorateRotateEvents(this._svg, this._slide, this);
     }
 
@@ -67,7 +69,7 @@ class RotatorRenderer implements HelperRenderer {
         this._center = center;
         this._svg && this._svg.rotate(0)
             .translate(this._center.x - this._width * this._scale / 2, this._center.y - this._height * this._scale / 2)
-            .rotate(this._rotation);
+            .rotate((this._baseRotation + this._rotation) % 360);
     }
 
     public setScale(scale: number): void {
@@ -75,7 +77,12 @@ class RotatorRenderer implements HelperRenderer {
         this._svg && this._svg.size(this._width * this._scale, this._height * this._scale)
             .rotate(0)
             .translate(this._center.x - this._width * this._scale / 2, this._center.y - this._height * this._scale / 2)
-            .rotate(this._rotation);
+            .rotate((this._baseRotation + this._rotation) % 360);
+    }
+
+    public setRotation(rotation: number): void {
+        this._rotation = rotation * 180 / Math.PI;
+        this._svg && this._svg.rotate((this._baseRotation + this._rotation) % 360);
     }
 }
 

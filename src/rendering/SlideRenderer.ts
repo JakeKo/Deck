@@ -93,7 +93,6 @@ class SlideRenderer {
     }
 
     public set cursorLock(cursorLock: boolean) {
-        console.log(cursorLock ? 'LOCKED' : 'UNLOCKED');
         this._cursorLock = cursorLock;
     }
 

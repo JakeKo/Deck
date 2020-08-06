@@ -3,6 +3,7 @@ import { decorateRectangleEvents } from '../../events/decorators';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { mod } from '../../utilities/utilities';
 
 type RectangleRendererArgs = {
     id: string;
@@ -37,7 +38,7 @@ class RectangleRenderer implements GraphicRenderer {
         this._fillColor = args.fillColor || '#CCCCCC';
         this._strokeColor = args.strokeColor || 'none';
         this._strokeWidth = args.strokeWidth || 0;
-        this._rotation = args.rotation || 0;
+        this._rotation = args.rotation ? args.rotation * 180 / Math.PI : 0;
     }
 
     public getId(): string {
@@ -130,7 +131,7 @@ class RectangleRenderer implements GraphicRenderer {
     }
 
     public setRotation(rotation: number): void {
-        this._rotation = rotation;
+        this._rotation = rotation * 180 / Math.PI;
         this._svg && this._svg.rotate(this._rotation);
     }
 
@@ -143,17 +144,37 @@ class RectangleRenderer implements GraphicRenderer {
                 topLeft: Vector.zero,
                 topRight: Vector.zero,
                 bottomLeft: Vector.zero,
-                bottomRight: Vector.zero
+                bottomRight: Vector.zero,
+                rotation: 0
             };
         } else {
-            return {
+            const preRotateBox: BoundingBox = {
                 origin: this._origin,
                 center: this._origin.add(new Vector(this._width, this._height).scale(0.5)),
                 dimensions: new Vector(this._width, this._height),
                 topLeft: this._origin,
                 topRight: this._origin.add(new Vector(this._width, 0)),
                 bottomLeft: this._origin.add(new Vector(0, this._height)),
-                bottomRight: this._origin.add(new Vector(this._width, this._height))
+                bottomRight: this._origin.add(new Vector(this._width, this._height)),
+                rotation: this._rotation * Math.PI / 180
+            };
+
+            const corners = {
+                topLeft: preRotateBox.center.towards(preRotateBox.topLeft),
+                topRight: preRotateBox.center.towards(preRotateBox.topRight),
+                bottomLeft: preRotateBox.center.towards(preRotateBox.bottomLeft),
+                bottomRight: preRotateBox.center.towards(preRotateBox.bottomRight)
+            };
+
+            return {
+                origin: preRotateBox.origin,
+                center: preRotateBox.center,
+                dimensions: preRotateBox.dimensions,
+                topLeft: preRotateBox.center.add(corners.topLeft.rotate(corners.topLeft.theta(Vector.east) + preRotateBox.rotation)),
+                topRight: preRotateBox.center.add(corners.topRight.rotate(corners.topRight.theta(Vector.east) + preRotateBox.rotation)),
+                bottomLeft: preRotateBox.center.add(corners.bottomLeft.rotate(corners.bottomLeft.theta(Vector.east) + preRotateBox.rotation)),
+                bottomRight: preRotateBox.center.add(corners.bottomRight.rotate(corners.bottomRight.theta(Vector.east) + preRotateBox.rotation)),
+                rotation: preRotateBox.rotation
             };
         }
     }

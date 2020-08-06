@@ -137,7 +137,8 @@ class ImageRenderer implements GraphicRenderer {
                 topLeft: Vector.zero,
                 topRight: Vector.zero,
                 bottomLeft: Vector.zero,
-                bottomRight: Vector.zero
+                bottomRight: Vector.zero,
+                rotation: 0
             };
         } else {
             return {
@@ -147,7 +148,8 @@ class ImageRenderer implements GraphicRenderer {
                 topLeft: this._origin,
                 topRight: this._origin.add(new Vector(this._width, 0)),
                 bottomLeft: this._origin.add(new Vector(0, this._height)),
-                bottomRight: this._origin.add(new Vector(this._width, this._height))
+                bottomRight: this._origin.add(new Vector(this._width, this._height)),
+                rotation: this._rotation
             };
         }
     }

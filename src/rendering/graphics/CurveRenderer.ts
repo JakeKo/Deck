@@ -138,7 +138,8 @@ class CurveRenderer implements GraphicRenderer {
                 topLeft: Vector.zero,
                 topRight: Vector.zero,
                 bottomLeft: Vector.zero,
-                bottomRight: Vector.zero
+                bottomRight: Vector.zero,
+                rotation: 0
             };
         } else {
             const bbox = this._svg.bbox();
@@ -149,7 +150,8 @@ class CurveRenderer implements GraphicRenderer {
                 topLeft: new Vector(bbox.x, bbox.y),
                 topRight: new Vector(bbox.x + bbox.width, bbox.y),
                 bottomLeft: new Vector(bbox.x, bbox.y + bbox.height),
-                bottomRight: new Vector(bbox.x + bbox.width, bbox.y + bbox.height)
+                bottomRight: new Vector(bbox.x + bbox.width, bbox.y + bbox.height),
+                rotation: this._rotation
             };
         }
     }

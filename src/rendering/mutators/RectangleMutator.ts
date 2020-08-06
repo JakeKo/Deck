@@ -1,11 +1,11 @@
 import { SlideMouseEvent } from "../../events/types";
 import { resolvePosition } from "../../tools/utilities";
-import { closestVector } from "../../utilities/utilities";
+import { closestVector, mod } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { RectangleRenderer } from "../graphics";
 import SlideRenderer from "../SlideRenderer";
 import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
-import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
+import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
 
 type RectangleMutatorArgs = {
     target: RectangleRenderer;
@@ -68,6 +68,21 @@ class RectangleMutator implements GraphicMutator {
             [VERTEX_ROLES.TOP_RIGHT]: makeListener(box.bottomLeft),
             [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
             [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
+        };
+    }
+
+    public get rotateListener(): (event: SlideMouseEvent) => void {
+        const { center } = this.target.getBoundingBox();
+
+        return event => {
+            const { slide, baseEvent } = event.detail;
+            const position = resolvePosition(baseEvent, slide);
+            const offset = center.towards(position);
+            const theta = Math.atan2(offset.y , offset.x);
+            const radians = mod(theta, Math.PI * 2);
+
+            this.target.setRotation(radians);
+            rotateBoxHelpers(this.helpers, this.target.getBoundingBox());
         };
     }
 

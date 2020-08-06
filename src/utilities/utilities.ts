@@ -7,3 +7,7 @@ export function closestVector(target: Vector, candidates: Vector[]): Vector {
     const minDiffIndex = diffs.indexOf(minDiff);
     return candidates[minDiffIndex];
 }
+
+export function mod(n: number, m: number): number {
+    return ((n % m) + m) % m;
+}

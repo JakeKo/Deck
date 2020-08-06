@@ -1,3 +1,5 @@
+import { mod } from "./utilities";
+
 export default class Vector {
     public static undefined: Vector = new Vector(NaN, NaN);
     public static zero = new Vector(0, 0);
@@ -51,7 +53,9 @@ export default class Vector {
     }
 
     public theta(vector: Vector): number {
-        return Math.acos(this.dot(vector) / (this.magnitude * vector.magnitude));
+        const thisTheta = mod(Math.atan2(this.y, this.x), Math.PI * 2);
+        const otherTheta = mod(Math.atan2(vector.y, vector.x), Math.PI * 2);
+        return mod(thisTheta - otherTheta, Math.PI * 2);
     }
 
     public projectOn(vector: Vector): Vector {
@@ -76,5 +80,9 @@ export default class Vector {
 
     public signAs(sign: Vector): Vector {
         return new Vector(Math.sign(sign.x) * this.x, Math.sign(sign.y) * this.y);
+    }
+
+    public rotate(theta: number): Vector {
+        return new Vector(this.magnitude * Math.cos(theta), this.magnitude * Math.sin(theta));
     }
 }

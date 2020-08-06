@@ -1,4 +1,4 @@
-import { CurveAnchorMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS } from "../../events/types";
+import { CurveAnchorMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS, RotatorMouseEvent, ROTATOR_EVENTS } from "../../events/types";
 import { listen, listenOnce, unlisten } from "../../events/utilities";
 import { GRAPHIC_TYPES } from "../../rendering/types";
 import { AppStore } from "../../store/types";
@@ -30,6 +30,8 @@ export default (store: AppStore): EditorTool => {
             listen(TEXTBOX_EVENTS.MOUSEOVER, hoverTextbox);
             listen(VIDEO_EVENTS.MOUSEOVER, hoverVideo);
 
+            listen(ROTATOR_EVENTS.MOUSEDOWN, rotateGraphic);
+
             listen(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
             listen(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
         },
@@ -49,6 +51,8 @@ export default (store: AppStore): EditorTool => {
             unlisten(RECTANGLE_EVENTS.MOUSEOVER, hoverRectangle);
             unlisten(TEXTBOX_EVENTS.MOUSEOVER, hoverTextbox);
             unlisten(VIDEO_EVENTS.MOUSEOVER, hoverVideo);
+
+            unlisten(ROTATOR_EVENTS.MOUSEDOWN, rotateGraphic);
 
             unlisten(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
             unlisten(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
@@ -105,6 +109,24 @@ function moveVertex(event: VertexMouseEvent): void {
 
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
+    }
+}
+
+function rotateGraphic(event: RotatorMouseEvent): void {
+    const { parentId, slide } = event.detail;
+    const mutator = slide.focusGraphic(parentId);
+    const rotateListener = mutator.rotateListener!;
+
+    listen(SLIDE_EVENTS.MOUSEMOVE, rotate);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+
+    function rotate(event: SlideMouseEvent): void {
+        rotateListener(event);
+        slide.broadcastSetGraphic(mutator.getTarget());
+    }
+
+    function complete(): void {
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, rotate);
     }
 }
 
