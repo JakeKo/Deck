@@ -69,7 +69,8 @@ class RectangleMaker implements GraphicMaker {
                 scale: args.scale,
                 origin: this._target.getOrigin(),
                 width: this._target.getWidth(),
-                height: this._target.getHeight()
+                height: this._target.getHeight(),
+                rotation: this._target.getRotation()
             })
         };
 

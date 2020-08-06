@@ -1,4 +1,5 @@
 import * as SVG from 'svg.js';
+import { radToDeg } from '../../utilities/utilities';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GRAPHIC_TYPES, HelperRenderer } from '../types';
@@ -9,6 +10,7 @@ type RectangleOutlineRendererArgs = {
     origin: Vector;
     width: number;
     height: number;
+    rotation: number;
 };
 
 class RectangleOutlineRenderer implements HelperRenderer {
@@ -21,6 +23,7 @@ class RectangleOutlineRenderer implements HelperRenderer {
     private _fillColor: string;
     private _strokeColor: string;
     private _strokeWidth: number;
+    private _rotation: number;
 
     constructor(args: RectangleOutlineRendererArgs) {
         this._slide = args.slide;
@@ -31,6 +34,7 @@ class RectangleOutlineRenderer implements HelperRenderer {
         this._fillColor = 'none';
         this._strokeColor = '#400c8b';
         this._strokeWidth = 1;
+        this._rotation = args.rotation;
     }
 
     public getType(): GRAPHIC_TYPES {
@@ -50,7 +54,8 @@ class RectangleOutlineRenderer implements HelperRenderer {
         this._svg = this._slide.canvas.rect(this._width, this._height)
             .translate(this._origin.x, this._origin.y)
             .fill(this._fillColor)
-            .stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale });
+            .stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale })
+            .rotate(radToDeg(this._rotation));
     }
 
     public unrender(): void {

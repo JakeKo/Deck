@@ -156,8 +156,6 @@ class CurveMutator implements GraphicMutator {
         } as { [key in CURVE_ANCHOR_ROLES]: (position: Vector) => void })[role];
     }
 
-    // TODO: Implement rectangular scaling
-
     public complete(): void {
         this.helpers.anchors.forEach(helper => helper.unrender());
         unrenderBoxHelpers(this.helpers);

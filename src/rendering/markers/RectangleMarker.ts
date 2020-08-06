@@ -18,7 +18,8 @@ class RectangleMarker implements GraphicMarker {
             scale: args.scale,
             origin: args.target.getOrigin(),
             width: args.target.getWidth(),
-            height: args.target.getHeight()
+            height: args.target.getHeight(),
+            rotation: args.target.getRotation()
         });
 
         this.helper.render();
