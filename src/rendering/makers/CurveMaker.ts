@@ -11,7 +11,6 @@ type CurveMakerArgs = {
     scale: number;
 };
 
-// TODO: Fix drifting anchor bug
 class CurveMaker implements GraphicMaker {
     private _target: CurveRenderer;
     private _slide: SlideRenderer;

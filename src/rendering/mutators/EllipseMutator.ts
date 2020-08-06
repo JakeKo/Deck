@@ -36,7 +36,7 @@ class EllipseMutator implements GraphicMutator {
     }
 
     // TODO: Account for ctrl, alt, and snapping
-    public get boxListeners(): { [key in VERTEX_ROLES]: (event: SlideMouseEvent) => void } {
+    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
         const box = this.target.getBoundingBox();
         const directions = [
             box.dimensions,
@@ -63,15 +63,15 @@ class EllipseMutator implements GraphicMutator {
             };
         };
 
-        return {
+        return ({
             [VERTEX_ROLES.TOP_LEFT]: makeListener(box.bottomRight),
             [VERTEX_ROLES.TOP_RIGHT]: makeListener(box.bottomLeft),
             [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
             [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
-        };
+        })[role];
     }
 
-    public get rotateListener(): (event: SlideMouseEvent) => void {
+    public rotateListener(): (event: SlideMouseEvent) => void {
         const { center } = this.target.getBoundingBox();
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
@@ -88,13 +88,15 @@ class EllipseMutator implements GraphicMutator {
     }
 
     // TODO: Account for alt snapping
-    public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
+    public moveListener(initialPosition: Vector): (event: SlideMouseEvent) => void {
         const initialCenter = this.target.getCenter();
-        const directions = [Vector.east, Vector.northeast, Vector.north, Vector.northwest, Vector.west, Vector.southwest, Vector.south, Vector.southeast];
+        const offset = initialPosition.towards(initialCenter);
+        const directions = [...Vector.cardinals, ...Vector.intermediates];
 
-        return (position, shift, alt) => {
-            const rawMove = initialCenter.towards(position);
-            const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
+        return event => {
+            const { slide, baseEvent } = event.detail;
+            const rawMove = initialCenter.towards(resolvePosition(baseEvent, slide).add(offset));
+            const moveDirection = (baseEvent.shiftKey ? closestVector(rawMove, directions) : rawMove).normalized;
             const move = rawMove.projectOn(moveDirection);
 
             this.target.setCenter(initialCenter.add(move));

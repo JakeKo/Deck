@@ -91,7 +91,7 @@ function moveVertex(event: VertexMouseEvent): void {
 
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
-    const handler = mutator.boxListeners[graphic.getRole()];
+    const handler = mutator.vertexListener(graphic.getRole());
     slide.cursor = 'grabbing';
     slide.cursorLock = true;
 
@@ -115,7 +115,7 @@ function moveVertex(event: VertexMouseEvent): void {
 function rotateGraphic(event: RotatorMouseEvent): void {
     const { parentId, slide } = event.detail;
     const mutator = slide.focusGraphic(parentId);
-    const rotateListener = mutator.rotateListener!;
+    const rotateListener = mutator.rotateListener();
 
     listen(SLIDE_EVENTS.MOUSEMOVE, rotate);
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);

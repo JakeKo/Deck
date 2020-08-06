@@ -36,7 +36,7 @@ class ImageMutator implements GraphicMutator {
     }
 
     // TODO: Account for ctrl, alt, and snapping
-    public get boxListeners(): { [key in VERTEX_ROLES]: (event: SlideMouseEvent) => void } {
+    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
         const box = this.target.getBoundingBox();
         const directions = [
             box.dimensions,
@@ -63,15 +63,15 @@ class ImageMutator implements GraphicMutator {
             };
         };
 
-        return {
+        return ({
             [VERTEX_ROLES.TOP_LEFT]: makeListener(box.bottomRight),
             [VERTEX_ROLES.TOP_RIGHT]: makeListener(box.bottomLeft),
             [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
             [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
-        };
+        })[role];
     }
 
-    public get rotateListener(): (event: SlideMouseEvent) => void {
+    public rotateListener(): (event: SlideMouseEvent) => void {
         const { center } = this.target.getBoundingBox();
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
@@ -88,13 +88,15 @@ class ImageMutator implements GraphicMutator {
     }
 
     // TODO: Account for alt and snapping
-    public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
+    public moveListener(initialPosition: Vector): (event: SlideMouseEvent) => void {
         const initialOrigin = this.target.getOrigin();
-        const directions = [Vector.east, Vector.northeast, Vector.north, Vector.northwest, Vector.west, Vector.southwest, Vector.south, Vector.southeast];
+        const offset = initialPosition.towards(initialOrigin);
+        const directions = [...Vector.cardinals, ...Vector.intermediates];
 
-        return (position, shift, alt) => {
-            const rawMove = initialOrigin.towards(position);
-            const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
+        return event => {
+            const { slide, baseEvent } = event.detail;
+            const rawMove = initialOrigin.towards(resolvePosition(baseEvent, slide).add(offset));
+            const moveDirection = (baseEvent.shiftKey ? closestVector(rawMove, directions) : rawMove).normalized;
             const move = rawMove.projectOn(moveDirection);
 
             this.target.setOrigin(initialOrigin.add(move));
