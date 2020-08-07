@@ -71,7 +71,7 @@ class CurveRenderer implements GraphicRenderer {
 
     public setAnchors(anchors: CurveAnchor[]): void {
         this._anchors = anchors;
-        this._svg && this._svg.plot(this._getFormattedPoints());
+        this._svg && this._svg.rotate(0).plot(this._getFormattedPoints()).rotate(radToDeg(this._rotation));
     }
 
     public getAnchor(index: number): CurveAnchor {
@@ -80,18 +80,18 @@ class CurveRenderer implements GraphicRenderer {
 
     public setAnchor(index: number, anchor: CurveAnchor): void {
         this._anchors[index] = anchor;
-        this._svg && this._svg.plot(this._getFormattedPoints());
+        this._svg && this._svg.rotate(0).plot(this._getFormattedPoints()).rotate(radToDeg(this._rotation));
     }
 
     public addAnchor(anchor: CurveAnchor): number {
         this._anchors.push(anchor);
-        this._svg && this._svg.plot(this._getFormattedPoints());
+        this._svg && this._svg.rotate(0).plot(this._getFormattedPoints()).rotate(radToDeg(this._rotation));
         return this._anchors.length - 1;
     }
 
     public removeAnchor(index: number): void {
         this._anchors.splice(index, 1);
-        this._svg && this._svg.plot(this._getFormattedPoints());
+        this._svg && this._svg.rotate(0).plot(this._getFormattedPoints()).rotate(radToDeg(this._rotation));
     }
 
     public getFillColor(): string {
