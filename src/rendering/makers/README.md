@@ -1,6 +1,10 @@
 # Graphic Makers
 
-Makers and mutators behave similarly in that they follow the same three step process:
+Makers provide an interface for creating graphics in an interactive way by rendering helper graphics, initializing listeners for different mouse events, and cleaning up when the interaction is complete.
+
+![I made it gif](https://media.giphy.com/media/13Aj3FyKK6tcn6/giphy.gif)
+
+Makers and mutators behave similarly in that they follow the same three-step process:
 1. Initialize with a few necessary properties and render helper graphics
 2. Expose a suite of interaction listeners (typically for mouse events), updating helper graphics as necessary
 3. Wrap up with a completion operation that removes helpers graphics
