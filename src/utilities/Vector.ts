@@ -87,4 +87,8 @@ export default class Vector {
     public rotate(theta: number): Vector {
         return new Vector(this.magnitude * Math.cos(theta), this.magnitude * Math.sin(theta));
     }
+
+    public rotateMore(theta: number): Vector {
+        return this.rotate(mod(this.theta(Vector.east) + theta, Math.PI * 2));
+    }
 }

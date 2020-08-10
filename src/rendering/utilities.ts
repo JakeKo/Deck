@@ -101,9 +101,7 @@ export function rotateBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: Boundi
 }
 
 export function resizeBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
-    helpers.box.setOrigin(box.origin);
-    helpers.box.setWidth(box.dimensions.x);
-    helpers.box.setHeight(box.dimensions.y);
+    helpers.box.setOriginAndDimensions(box.origin, box.dimensions);
     helpers.rotator.setCenter(box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5)));
     helpers.vertices[VERTEX_ROLES.TOP_LEFT].setCenter(box.topLeft);
     helpers.vertices[VERTEX_ROLES.TOP_RIGHT].setCenter(box.topRight);
