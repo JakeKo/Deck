@@ -1,4 +1,5 @@
 import Vector from '../src/utilities/Vector';
+import { closeEnough } from './utilities';
 
 describe('Vector', () => {
     it('can calculate magnitude', () => {
@@ -126,22 +127,22 @@ describe('Vector', () => {
 
     it('can calculate the angle between two vectors (in radians)', () => {
         // Arrange
-        const epsilon = 1E-5;
-        const vector1 = Vector.right;
+        const epsilon = 1E-8;
+        const vector1 = Vector.east;
         const vector2 = new Vector(5, 5);
         const vector3 = new Vector(-5, 5);
         const vector4 = new Vector(-5, -5);
         const vector5 = new Vector(5, -5);
         const expectedAngle1 = Math.PI * 1 / 4;
         const expectedAngle2 = Math.PI * 3 / 4;
-        const expectedAngle3 = Math.PI * 3 / 4;
-        const expectedAngle4 = Math.PI * 1 / 4;
+        const expectedAngle3 = Math.PI * 5 / 4;
+        const expectedAngle4 = Math.PI * 7 / 4;
         
         // Act
-        const actualAngle1 = vector1.theta(vector2);
-        const actualAngle2 = vector1.theta(vector3);
-        const actualAngle3 = vector1.theta(vector4);
-        const actualAngle4 = vector1.theta(vector5);
+        const actualAngle1 = vector2.theta(vector1);
+        const actualAngle2 = vector3.theta(vector1);
+        const actualAngle3 = vector4.theta(vector1);
+        const actualAngle4 = vector5.theta(vector1);
 
         // Assert
         expect(closeEnough(actualAngle1, expectedAngle1, epsilon)).toBe(true);

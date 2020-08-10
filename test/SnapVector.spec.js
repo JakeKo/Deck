@@ -1,5 +1,6 @@
 import SnapVector from '../src/utilities/SnapVector';
 import Vector from '../src/utilities/Vector';
+import { closeEnough, vectorsCloseEnough } from './utilities';
 
 describe('SnapVector', () => {
     it('can instantiate with reasonable defaults', () => {
@@ -56,7 +57,7 @@ describe('SnapVector', () => {
 
     it('can calculate the distance from a point with a vertical direction', () => {
         // Arrange
-        const snapVector = new SnapVector('', new Vector(0, 0), Vector.up);
+        const snapVector = new SnapVector('', new Vector(0, 0), Vector.north);
         const point = new Vector(1, 1);
         const expectedDistance = 1;
 
@@ -69,7 +70,7 @@ describe('SnapVector', () => {
 
     it('can calculate the distance from a point with a horizontal direction', () => {
         // Arrange
-        const snapVector = new SnapVector('', new Vector(0, 0), Vector.right);
+        const snapVector = new SnapVector('', new Vector(0, 0), Vector.east);
         const point = new Vector(1, 1);
         const expectedDistance = 1;
 
