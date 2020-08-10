@@ -34,7 +34,9 @@ export type GraphicMarker = {
 
 export type GraphicMutator = {
     helpers: BoundingBoxMutatorHelpers;
-    boxListeners: { [key in VERTEX_ROLES]: (event: SlideMouseEvent) => void };
+    vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => void;
+    rotateListener: () => (event: SlideMouseEvent) => void;
+    moveListener: (initialPosition: Vector) => (event: SlideMouseEvent) => void;
     getType: () => GRAPHIC_TYPES;
     getTarget: () => GraphicRenderer;
     complete: () => void;
@@ -55,6 +57,7 @@ export type BoundingBox = {
     topRight: Vector;
     bottomLeft: Vector;
     bottomRight: Vector;
+    rotation: number;
 };
 
 export type CurveAnchor = {

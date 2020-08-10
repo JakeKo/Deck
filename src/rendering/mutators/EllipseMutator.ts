@@ -1,11 +1,11 @@
 import { SlideMouseEvent } from "../../events/types";
 import { resolvePosition } from "../../tools/utilities";
-import { closestVector } from "../../utilities/utilities";
+import { closestVector, mod } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { EllipseRenderer } from "../graphics";
 import SlideRenderer from "../SlideRenderer";
 import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
-import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
+import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
 
 type EllipseMutatorArgs = {
     target: EllipseRenderer;
@@ -36,49 +36,71 @@ class EllipseMutator implements GraphicMutator {
     }
 
     // TODO: Account for ctrl, alt, and snapping
-    public get boxListeners(): { [key in VERTEX_ROLES]: (event: SlideMouseEvent) => void } {
+    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
         const box = this.target.getBoundingBox();
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
             box.dimensions.signAs(Vector.southwest),
             box.dimensions.signAs(Vector.southeast)
-        ];
+        ].map(direction => direction.rotateMore(box.rotation));
 
+        // 1. Resolve the slide-relative mouse position
+        // 2. Create a vector which represents how to change the respective corner
+        // 3. Constrain the vector (to maintain aspect ratio) if shift is pressed
+        // 4. Unrotate the corner vector to correct for graphic rotation
+        // 5. Use the post-shift corner vector and corrected corner vector to update props
         const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
             return event => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
-                const rawOffset = oppositeCorner.towards(position);
-                const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+                const rawCornerVector = oppositeCorner.towards(position);
+                const cornerVector = baseEvent.shiftKey ? rawCornerVector.projectOn(closestVector(rawCornerVector, directions)) : rawCornerVector;
+                const correctedCornerVector = cornerVector.rotateMore(-box.rotation);
 
-                const dimensions = offset.abs;
-                const center = oppositeCorner.add(offset.scale(0.5));
+                const dimensions = correctedCornerVector.abs;
+                const center = oppositeCorner.add(cornerVector.scale(0.5));
 
                 // Update rendering
-                this.target.setCenter(center);
-                this.target.setWidth(dimensions.x);
-                this.target.setHeight(dimensions.y);
+                this.target.setCenterAndDimensions(center, dimensions);
                 this._repositionBoxHelpers();
             };
         };
 
-        return {
+        return ({
             [VERTEX_ROLES.TOP_LEFT]: makeListener(box.bottomRight),
             [VERTEX_ROLES.TOP_RIGHT]: makeListener(box.bottomLeft),
             [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
             [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
+        })[role];
+    }
+
+    public rotateListener(): (event: SlideMouseEvent) => void {
+        const { center } = this.target.getBoundingBox();
+        const directions = [...Vector.cardinals, ...Vector.intermediates];
+
+        return event => {
+            const { slide, baseEvent } = event.detail;
+            const position = resolvePosition(baseEvent, slide);
+            const rawOffset = center.towards(position);
+            const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
+            const theta = Math.atan2(offset.y, offset.x);
+
+            this.target.setRotation(mod(theta, Math.PI * 2));
+            rotateBoxHelpers(this.helpers, this.target.getBoundingBox());
         };
     }
 
     // TODO: Account for alt snapping
-    public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
+    public moveListener(initialPosition: Vector): (event: SlideMouseEvent) => void {
         const initialCenter = this.target.getCenter();
-        const directions = [Vector.east, Vector.northeast, Vector.north, Vector.northwest, Vector.west, Vector.southwest, Vector.south, Vector.southeast];
+        const offset = initialPosition.towards(initialCenter);
+        const directions = [...Vector.cardinals, ...Vector.intermediates];
 
-        return (position, shift, alt) => {
-            const rawMove = initialCenter.towards(position);
-            const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
+        return event => {
+            const { slide, baseEvent } = event.detail;
+            const rawMove = initialCenter.towards(resolvePosition(baseEvent, slide).add(offset));
+            const moveDirection = (baseEvent.shiftKey ? closestVector(rawMove, directions) : rawMove).normalized;
             const move = rawMove.projectOn(moveDirection);
 
             this.target.setCenter(initialCenter.add(move));

@@ -1,3 +1,5 @@
+import { mod } from "./utilities";
+
 export default class Vector {
     public static undefined: Vector = new Vector(NaN, NaN);
     public static zero = new Vector(0, 0);
@@ -9,6 +11,8 @@ export default class Vector {
     public static southwest = new Vector(-Math.SQRT2 / 2, -Math.SQRT2 / 2);
     public static west = new Vector(-1, 0);
     public static northwest = new Vector(-Math.SQRT2 / 2, Math.SQRT2 / 2);
+    public static cardinals = [Vector.north, Vector.east, Vector.south, Vector.west];
+    public static intermediates = [Vector.northeast, Vector.southeast, Vector.southwest, Vector.northwest];
 
     public x: number;
     public y: number;
@@ -18,24 +22,20 @@ export default class Vector {
         this.y = y;
     }
 
-    get magnitude(): number {
+    public get magnitude(): number {
         return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
     }
 
-    get normalized(): Vector {
+    public get normalized(): Vector {
         return this.magnitude === 0 ? Vector.zero : new Vector(this.x / this.magnitude, this.y / this.magnitude);
     }
 
-    get array(): Array<number> {
+    public get array(): Array<number> {
         return [this.x, this.y];
     }
 
-    get abs(): Vector {
+    public get abs(): Vector {
         return this.transform(Math.abs);
-    }
-
-    public toArray(): Array<number> {
-        return [this.x, this.y];
     }
 
     public add(vector: Vector): Vector {
@@ -51,7 +51,9 @@ export default class Vector {
     }
 
     public theta(vector: Vector): number {
-        return Math.acos(this.dot(vector) / (this.magnitude * vector.magnitude));
+        const thisTheta = mod(Math.atan2(this.y, this.x), Math.PI * 2);
+        const otherTheta = mod(Math.atan2(vector.y, vector.x), Math.PI * 2);
+        return mod(thisTheta - otherTheta, Math.PI * 2);
     }
 
     public projectOn(vector: Vector): Vector {
@@ -76,5 +78,13 @@ export default class Vector {
 
     public signAs(sign: Vector): Vector {
         return new Vector(Math.sign(sign.x) * this.x, Math.sign(sign.y) * this.y);
+    }
+
+    public rotate(theta: number): Vector {
+        return new Vector(this.magnitude * Math.cos(theta), this.magnitude * Math.sin(theta));
+    }
+
+    public rotateMore(theta: number): Vector {
+        return this.rotate(mod(this.theta(Vector.east) + theta, Math.PI * 2));
     }
 }

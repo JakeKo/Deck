@@ -9,9 +9,8 @@ export function moveEllipse(event: EllipseMouseEvent): void {
         slide.unfocusAllGraphics([target.getId()]);
     }
 
-    const centerOffset = resolvePosition(baseEvent, slide).towards(target.getCenter());
     const mutator = slide.focusGraphic(target.getId()) as EllipseMutator;
-    const moveHandler = mutator.graphicMoveHandler();
+    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide));
     slide.cursor = 'move';
     slide.cursorLock = true;
 
@@ -19,12 +18,12 @@ export function moveEllipse(event: EllipseMouseEvent): void {
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
 
     function move(event: SlideMouseEvent): void {
-        const { slide, baseEvent } = event.detail;
-        moveHandler(resolvePosition(baseEvent, slide).add(centerOffset), baseEvent.shiftKey, baseEvent.altKey);
+        moveListener(event);
         slide.broadcastSetGraphic(mutator.getTarget());
     }
 
-    function complete(): void {
+    function complete(event: SlideMouseEvent): void {
+        moveListener(event);
         slide.cursorLock = false;
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);

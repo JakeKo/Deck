@@ -70,7 +70,8 @@ class EllipseMaker implements GraphicMaker {
                 center: this._target.getCenter(),
                 width: this._target.getWidth(),
                 height: this._target.getHeight(),
-                scale: args.scale
+                scale: args.scale,
+                rotation: this._target.getRotation()
             })
         };
 

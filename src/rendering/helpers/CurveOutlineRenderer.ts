@@ -2,11 +2,13 @@ import * as SVG from 'svg.js';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { CurveAnchor, GRAPHIC_TYPES, HelperRenderer } from "../types";
+import { radToDeg } from '../../utilities/utilities';
 
 type CurveOutlineRendererArgs = {
     slide: SlideRenderer;
     anchors: CurveAnchor[];
     scale: number;
+    rotation: number;
 };
 
 class CurveOutlineRenderer implements HelperRenderer {
@@ -25,7 +27,7 @@ class CurveOutlineRenderer implements HelperRenderer {
         this._fillColor = 'none';
         this._strokeColor = '#400c8b';
         this._strokeWidth = 1;
-        this._rotation = 0;
+        this._rotation = args.rotation;
         this._scale = args.scale;
     }
 
@@ -46,7 +48,7 @@ class CurveOutlineRenderer implements HelperRenderer {
         this._svg = this._slide.canvas.path(this._getFormattedPoints())
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale })
-            .rotate(this._rotation);
+            .rotate(radToDeg(this._rotation));
     }
 
     public unrender(): void {

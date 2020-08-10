@@ -20,13 +20,15 @@ export function makeBoxHelpers(target: GraphicRenderer, slide: SlideRenderer, sc
             scale: scale,
             origin: box.origin,
             width: box.dimensions.x,
-            height: box.dimensions.y
+            height: box.dimensions.y,
+            rotation: box.rotation
         }),
         rotator: new RotatorRenderer({
             slide: slide,
             scale: scale,
-            center: box.center.add(new Vector(box.dimensions.x / 2, 0)),
-            parent: target
+            center: box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5)),
+            parent: target,
+            rotation: box.rotation
         }),
         vertices: {
             [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
@@ -88,13 +90,21 @@ export function scaleBoxHelpers(helpers: BoundingBoxMutatorHelpers, scale: numbe
     helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].setScale(scale);
 }
 
+export function rotateBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
+    helpers.box.setRotation(box.rotation);
+    helpers.rotator.setRotation(box.rotation);
+    helpers.rotator.setCenter(box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5)));
+    helpers.vertices[VERTEX_ROLES.TOP_LEFT].setCenter(box.topLeft);
+    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].setCenter(box.topRight);
+    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].setCenter(box.bottomLeft);
+    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(box.bottomRight);
+}
+
 export function resizeBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
-    helpers.box.setOrigin(box.origin);
-    helpers.box.setWidth(box.dimensions.x);
-    helpers.box.setHeight(box.dimensions.y);
-    helpers.rotator.setCenter(box.center.add(new Vector(box.dimensions.x / 2, 0)));
-    helpers.vertices[VERTEX_ROLES.TOP_LEFT].setCenter(box.origin);
-    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].setCenter(box.origin.add(new Vector(box.dimensions.x, 0)));
-    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].setCenter(box.origin.add(new Vector(0, box.dimensions.y)));
-    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(box.origin.add(box.dimensions));
+    helpers.box.setOriginAndDimensions(box.origin, box.dimensions);
+    helpers.rotator.setCenter(box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5)));
+    helpers.vertices[VERTEX_ROLES.TOP_LEFT].setCenter(box.topLeft);
+    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].setCenter(box.topRight);
+    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].setCenter(box.bottomLeft);
+    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(box.bottomRight);
 }
