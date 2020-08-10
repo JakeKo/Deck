@@ -10,7 +10,7 @@
 	"scripts": {
 		"build": "webpack --config ./webpack-prod.config.js",
 		"start": "webpack-dev-server --hot --inline",
-		"test": "mocha-webpack --webpack-config ./webpack-test.config.js --require ./test/setup.js ./test/*.spec.js",
+		"test": "nyc mocha-webpack --webpack-config ./webpack-test.config.js --require ./test/setup.js ./test/*.spec.js",
 		"audit": "lighthouse https://jakeko.github.io/Deck/ --view",
 		"lint:actions": "yamllint ./.github/workflows/*.yml"
 	},
@@ -25,6 +25,7 @@
 		"mocha": "^5.2.0",
 		"mocha-webpack": "^2.0.0-beta.0",
 		"node-sass": "^4.14.1",
+		"nyc": "^15.1.0",
 		"sass-loader": "^7.3.1",
 		"svg.js": "^2.7.1",
 		"ts-loader": "^4.5.0",
