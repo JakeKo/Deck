@@ -43,22 +43,27 @@ class ImageMutator implements GraphicMutator {
             box.dimensions.signAs(Vector.northwest),
             box.dimensions.signAs(Vector.southwest),
             box.dimensions.signAs(Vector.southeast)
-        ];
+        ].map(direction => direction.rotateMore(box.rotation));
 
+        // 1. Resolve the slide-relative mouse position
+        // 2. Create a vector which represents how to change the respective corner
+        // 3. Constrain the vector (to maintain aspect ratio)
+        // 4. Unrotate the corner vector to correct for graphic rotation
+        // 5. Use the post-shift corner vector and corrected corner vector to update props
         const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
             return event => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
-                const rawOffset = oppositeCorner.towards(position);
-                const offset = rawOffset.projectOn(closestVector(rawOffset, directions));
+                const rawCornerVector = oppositeCorner.towards(position);
+                const cornerVector = rawCornerVector.projectOn(closestVector(rawCornerVector, directions));
+                const correctedCornerVector = cornerVector.rotateMore(-box.rotation);
 
-                const dimensions = offset.abs;
-                const origin = oppositeCorner.add(offset.scale(0.5).add(dimensions.scale(-0.5)));
+                const dimensions = correctedCornerVector.abs;
+                const center = oppositeCorner.add(cornerVector.scale(0.5));
+                const origin = center.add(dimensions.scale(-0.5));
 
                 // Update rendering
-                this.target.setOrigin(origin);
-                this.target.setWidth(dimensions.x);
-                this.target.setHeight(dimensions.y);
+                this.target.setOriginAndDimensions(origin, dimensions);
                 this._repositionBoxHelpers();
             };
         };

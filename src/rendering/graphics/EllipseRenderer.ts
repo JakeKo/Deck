@@ -72,6 +72,19 @@ class EllipseRenderer implements GraphicRenderer {
         this._svg = undefined;
     }
 
+    public setCenterAndDimensions(center: Vector, dimensions: Vector): void {
+        this._center = center;
+        this._width = dimensions.x;
+        this._height = dimensions.y;
+
+        this._svg && this._svg
+            .rotate(0)
+            .translate(this._center.x, this._center.y)
+            .width(this._width)
+            .height(this._height)
+            .rotate(radToDeg(this._rotation));
+    }
+
     public getCenter(): Vector {
         return this._center;
     }

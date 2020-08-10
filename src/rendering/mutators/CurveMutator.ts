@@ -59,8 +59,13 @@ class CurveMutator implements GraphicMutator {
             box.dimensions.signAs(Vector.northwest),
             box.dimensions.signAs(Vector.southwest),
             box.dimensions.signAs(Vector.southeast)
-        ];
+        ].map(direction => direction.rotateMore(box.rotation));
 
+        // 1. Resolve the slide-relative mouse position
+        // 2. Create a vector which represents how to change the respective corner
+        // 3. Constrain the vector (to maintain aspect ratio) if shift is pressed
+        // 4. Unrotate the corner vector to correct for graphic rotation
+        // 5. Use the post-shift corner vector and corrected corner vector to update props
         const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
             const anchorOffsets = this.target.getAnchors().map<CurveAnchor>(anchor => ({
                 inHandle: oppositeCorner.towards(anchor.inHandle).abs,
@@ -71,10 +76,11 @@ class CurveMutator implements GraphicMutator {
             return event => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
-                const rawOffset = oppositeCorner.towards(position);
-                const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+                const rawCornerVector = oppositeCorner.towards(position);
+                const cornerVector = baseEvent.shiftKey ? rawCornerVector.projectOn(closestVector(rawCornerVector, directions)) : rawCornerVector;
+                const correctedCornerVector = cornerVector.rotateMore(-box.rotation);
 
-                const scale = new Vector(offset.x / box.dimensions.x, offset.y / box.dimensions.y);
+                const scale = new Vector(correctedCornerVector.x / box.dimensions.x, correctedCornerVector.y / box.dimensions.y);
 
                 // Update rendering
                 this.target.setAnchors(anchorOffsets.map<CurveAnchor>(anchor => ({
