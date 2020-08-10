@@ -22,24 +22,20 @@ export default class Vector {
         this.y = y;
     }
 
-    get magnitude(): number {
+    public get magnitude(): number {
         return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
     }
 
-    get normalized(): Vector {
+    public get normalized(): Vector {
         return this.magnitude === 0 ? Vector.zero : new Vector(this.x / this.magnitude, this.y / this.magnitude);
     }
 
-    get array(): Array<number> {
+    public get array(): Array<number> {
         return [this.x, this.y];
     }
 
-    get abs(): Vector {
+    public get abs(): Vector {
         return this.transform(Math.abs);
-    }
-
-    public toArray(): Array<number> {
-        return [this.x, this.y];
     }
 
     public add(vector: Vector): Vector {
