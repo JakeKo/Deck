@@ -1,6 +1,5 @@
-import SnapVector from '../src/utilities/SnapVector';
-import Vector from '../src/utilities/Vector';
-import { closeEnough, vectorsCloseEnough } from './utilities';
+import SnapVector from '../SnapVector';
+import Vector from '../Vector';
 
 describe('SnapVector', () => {
     it('can instantiate with reasonable defaults', () => {

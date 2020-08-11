@@ -10,7 +10,7 @@
 	"scripts": {
 		"build": "webpack --config ./webpack-prod.config.js",
 		"start": "webpack-dev-server --hot --inline",
-		"test": "nyc mocha-webpack --webpack-config ./webpack-test.config.js --require ./test/setup.js ./test/*.spec.js",
+		"test": "nyc mocha-webpack --webpack-config ./webpack-test.config.js --require ./test/setup.js --inline-diffs ./**/*.spec.js",
 		"audit": "lighthouse https://jakeko.github.io/Deck/ --view",
 		"lint:actions": "yamllint ./.github/workflows/*.yml"
 	},

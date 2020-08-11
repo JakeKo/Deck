@@ -1,5 +1,4 @@
-import Vector from '../src/utilities/Vector';
-import { closeEnough } from './utilities';
+import Vector from '../Vector';
 
 describe('Vector', () => {
     it('can calculate magnitude', () => {
@@ -14,7 +13,7 @@ describe('Vector', () => {
         const expectedMagnitude3 = Math.sqrt(17);
         const expectedMagnitude4 = 5 * Math.sqrt(5);
         const expectedMagnitude5 = Math.sqrt(13);
-        
+
         // Act
         const actualMagnitude1 = vector1.magnitude;
         const actualMagnitude2 = vector2.magnitude;
@@ -42,7 +41,7 @@ describe('Vector', () => {
         const expectedNormal3 = new Vector(-4 / Math.sqrt(17), 1 / Math.sqrt(17));
         const expectedNormal4 = new Vector(-1 / Math.sqrt(5), -2 / Math.sqrt(5));
         const expectedNormal5 = new Vector(3 / Math.sqrt(13), -2 / Math.sqrt(13));
-        
+
         // Act
         const actualNormal1 = vector1.normalized;
         const actualNormal2 = vector2.normalized;
@@ -70,7 +69,7 @@ describe('Vector', () => {
         const expectedArray3 = [-4, 1];
         const expectedArray4 = [-5, -10];
         const expectedArray5 = [3, -2];
-        
+
         // Act
         const actualArray1 = vector1.array;
         const actualArray2 = vector2.array;
@@ -86,12 +85,33 @@ describe('Vector', () => {
         expect(actualArray5).toEqual(expectedArray5);
     });
 
+    it('can take the absolute value of vectos', () => {
+        // Arrange
+        const vector1 = Vector.northeast;
+        const vector2 = Vector.northwest;
+        const vector3 = Vector.southwest;
+        const vector4 = Vector.southeast;
+        const expected = Vector.northeast;
+
+        // Act
+        const actual1 = vector1.abs;
+        const actual2 = vector2.abs;
+        const actual3 = vector3.abs;
+        const actual4 = vector4.abs;
+
+        // Assert
+        expect(actual1).toEqual(expected);
+        expect(actual2).toEqual(expected);
+        expect(actual3).toEqual(expected);
+        expect(actual4).toEqual(expected);
+    });
+
     it('can calculate the sum of two vectors', () => {
         // Arrange
         const vector1 = new Vector(-3, 4);
         const vector2 = new Vector(2, 3);
         const expectedSum = new Vector(-1, 7);
-        
+
         // Act
         const actualSum = vector1.add(vector2);
 
@@ -104,7 +124,7 @@ describe('Vector', () => {
         const vector1 = new Vector(-3, 4);
         const vector2 = new Vector(2, 3);
         const expectedDifference = new Vector(-5, 1);
-        
+
         // Act
         const actualDifference = vector2.towards(vector1);
 
@@ -117,7 +137,7 @@ describe('Vector', () => {
         const vector1 = new Vector(-3, 4);
         const vector2 = new Vector(2, 3);
         const expectedDotProduct = 6;
-        
+
         // Act
         const actualDotProduct = vector1.dot(vector2);
 
@@ -137,18 +157,21 @@ describe('Vector', () => {
         const expectedAngle2 = Math.PI * 3 / 4;
         const expectedAngle3 = Math.PI * 5 / 4;
         const expectedAngle4 = Math.PI * 7 / 4;
-        
+        const expectedAngle5 = Math.PI * 3 / 2;
+
         // Act
         const actualAngle1 = vector2.theta(vector1);
         const actualAngle2 = vector3.theta(vector1);
         const actualAngle3 = vector4.theta(vector1);
         const actualAngle4 = vector5.theta(vector1);
+        const actualAngle5 = vector5.theta(vector2);
 
         // Assert
         expect(closeEnough(actualAngle1, expectedAngle1, epsilon)).toBe(true);
         expect(closeEnough(actualAngle2, expectedAngle2, epsilon)).toBe(true);
         expect(closeEnough(actualAngle3, expectedAngle3, epsilon)).toBe(true);
         expect(closeEnough(actualAngle4, expectedAngle4, epsilon)).toBe(true);
+        expect(closeEnough(actualAngle5, expectedAngle5, epsilon)).toBe(true);
     });
 
     it('can calculate the projection of one vector onto another', () => {
@@ -156,7 +179,7 @@ describe('Vector', () => {
         const vector1 = new Vector(2, 0);
         const vector2 = new Vector(5, 5);
         const expectedProjection = new Vector(5, 0);
-        
+
         // Act
         const actualProjection = vector2.projectOn(vector1);
 
@@ -169,7 +192,7 @@ describe('Vector', () => {
         const vector = new Vector(2, -3);
         const scalar = 3;
         const expectedScaledVector = new Vector(6, -9);
-        
+
         // Act
         const actualScaledVector = vector.scale(scalar);
 
@@ -181,7 +204,7 @@ describe('Vector', () => {
         // Arrange
         const vector = new Vector(2, -3);
         const expectedReflectedVector = new Vector(2, -3);
-        
+
         // Act
         const actualReflectedVector = vector.reflect();
 
@@ -194,7 +217,7 @@ describe('Vector', () => {
         const vector = new Vector(2, -3);
         const origin = new Vector(-1, 2)
         const expectedReflectedVector = new Vector(-4, 7);
-        
+
         // Act
         const actualReflectedVector = vector.reflect(origin);
 
@@ -207,7 +230,7 @@ describe('Vector', () => {
         const vector1 = new Vector(2, -3);
         const vector2 = new Vector(2, -3);
         const vector3 = new Vector(-1, 5);
-        
+
         // Act
         const firstEqual = vector1.equals(vector2);
         const secondEqual = vector2.equals(vector3);
@@ -215,5 +238,48 @@ describe('Vector', () => {
         // Assert
         expect(firstEqual).toBe(true);
         expect(secondEqual).toBe(false);
+    });
+
+    it('can sign vectors', () => {
+        // Arrange
+        const v = Vector.southwest;
+        const expected = Vector.northeast;
+
+        // Act
+        const actual = v.signAs(new Vector(2, 7));
+
+        // Assert
+        expect(actual).toEqual(expected);
+    });
+
+    it('can rotate vectors', () => {
+        // Arrange
+        const v1 = Vector.east;
+        const v2 = Vector.south;
+        const expected = Vector.northeast;
+
+        // Act
+        const actual1 = v1.rotate(Math.PI / 4);
+        const actual2 = v2.rotate(Math.PI / 4);
+
+        // Assert
+        expect(vectorsCloseEnough(actual1, expected, 1E-8)).toBe(true);
+        expect(vectorsCloseEnough(actual2, expected, 1E-8)).toBe(true);
+    });
+
+    it('can append rotation to vectors', () => {
+        // Arrange
+        const v1 = Vector.east;
+        const v2 = Vector.southwest;
+        const expected1 = Vector.northeast;
+        const expected2 = Vector.south;
+
+        // Act
+        const actual1 = v1.rotateMore(Math.PI / 4);
+        const actual2 = v2.rotateMore(Math.PI / 4);
+
+        // Assert
+        expect(vectorsCloseEnough(actual1, expected1, 1E-8)).toBe(true);
+        expect(vectorsCloseEnough(actual2, expected2, 1E-8)).toBe(true);
     });
 });
