@@ -1,12 +1,12 @@
 import { SlideMouseEvent } from "../../events/types";
-import { closestVector } from "../../utilities/utilities";
+import { resolvePosition } from "../../tools/utilities";
+import { closestVector, mod } from "../../utilities/utilities";
 import Vector from "../../utilities/Vector";
 import { CurveRenderer } from "../graphics";
 import { CurveAnchorRenderer } from "../helpers";
 import SlideRenderer from "../SlideRenderer";
-import { BoundingBoxMutatorHelpers, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES, CurveAnchor } from "../types";
-import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
-import { resolvePosition } from "../../tools/utilities";
+import { BoundingBoxMutatorHelpers, CurveAnchor, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
+import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
 
 type CurveMutatorArgs = {
     target: CurveRenderer;
@@ -52,15 +52,20 @@ class CurveMutator implements GraphicMutator {
     }
 
     // TODO: Account for ctrl, alt, and snapping
-    public get boxListeners(): { [key in VERTEX_ROLES]: (event: SlideMouseEvent) => void } {
+    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
         const box = this.target.getBoundingBox();
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
             box.dimensions.signAs(Vector.southwest),
             box.dimensions.signAs(Vector.southeast)
-        ];
+        ].map(direction => direction.rotateMore(box.rotation));
 
+        // 1. Resolve the slide-relative mouse position
+        // 2. Create a vector which represents how to change the respective corner
+        // 3. Constrain the vector (to maintain aspect ratio) if shift is pressed
+        // 4. Unrotate the corner vector to correct for graphic rotation
+        // 5. Use the post-shift corner vector and corrected corner vector to update props
         const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
             const anchorOffsets = this.target.getAnchors().map<CurveAnchor>(anchor => ({
                 inHandle: oppositeCorner.towards(anchor.inHandle).abs,
@@ -71,10 +76,11 @@ class CurveMutator implements GraphicMutator {
             return event => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
-                const rawOffset = oppositeCorner.towards(position);
-                const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+                const rawCornerVector = oppositeCorner.towards(position);
+                const cornerVector = baseEvent.shiftKey ? rawCornerVector.projectOn(closestVector(rawCornerVector, directions)) : rawCornerVector;
+                const correctedCornerVector = cornerVector.rotateMore(-box.rotation);
 
-                const scale = new Vector(offset.x / box.dimensions.x, offset.y / box.dimensions.y);
+                const scale = new Vector(correctedCornerVector.x / box.dimensions.x, correctedCornerVector.y / box.dimensions.y);
 
                 // Update rendering
                 this.target.setAnchors(anchorOffsets.map<CurveAnchor>(anchor => ({
@@ -86,24 +92,42 @@ class CurveMutator implements GraphicMutator {
             };
         };
 
-        return {
+        return ({
             [VERTEX_ROLES.TOP_LEFT]: makeListener(box.bottomRight),
             [VERTEX_ROLES.TOP_RIGHT]: makeListener(box.bottomLeft),
             [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
             [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
+        })[role];
+    }
+
+    public rotateListener(): (event: SlideMouseEvent) => void {
+        const { center } = this.target.getBoundingBox();
+        const directions = [...Vector.cardinals, ...Vector.intermediates];
+
+        return event => {
+            const { slide, baseEvent } = event.detail;
+            const position = resolvePosition(baseEvent, slide);
+            const rawOffset = center.towards(position);
+            const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
+            const theta = Math.atan2(offset.y, offset.x);
+
+            this.target.setRotation(mod(theta, Math.PI * 2));
+            rotateBoxHelpers(this.helpers, this.target.getBoundingBox());
         };
     }
 
     // TODO: Account for alt and snapping
     // TODO: Extract shift operations to utilities
-    public graphicMoveHandler(): (position: Vector, shift: boolean, alt: boolean) => void {
+    public moveListener(initialPosition: Vector): (event: SlideMouseEvent) => void {
         const initialOrigin = this.getOrigin();
+        const offset = initialPosition.towards(initialOrigin);
         const initialAnchors = this.target.getAnchors();
-        const directions = [Vector.east, Vector.northeast, Vector.north, Vector.northwest, Vector.west, Vector.southwest, Vector.south, Vector.southeast];
+        const directions = [...Vector.cardinals, ...Vector.intermediates];
 
-        return (position, shift, alt) => {
-            const rawMove = initialOrigin.towards(position);
-            const moveDirection = (shift ? closestVector(rawMove, directions) : rawMove).normalized;
+        return event => {
+            const { slide, baseEvent } = event.detail;
+            const rawMove = initialOrigin.towards(resolvePosition(baseEvent, slide).add(offset));
+            const moveDirection = (baseEvent.shiftKey ? closestVector(rawMove, directions) : rawMove).normalized;
             const move = rawMove.projectOn(moveDirection);
 
             const newAnchors = initialAnchors.map(anchor => ({
@@ -139,8 +163,6 @@ class CurveMutator implements GraphicMutator {
             }
         } as { [key in CURVE_ANCHOR_ROLES]: (position: Vector) => void })[role];
     }
-
-    // TODO: Implement rectangular scaling
 
     public complete(): void {
         this.helpers.anchors.forEach(helper => helper.unrender());

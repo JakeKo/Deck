@@ -2,6 +2,7 @@ import { decorateTextboxEvents } from '../../events/decorators';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { radToDeg } from '../../utilities/utilities';
 
 type TextboxRendererArgs = {
     id: string;
@@ -64,9 +65,10 @@ class TextboxRenderer implements GraphicRenderer {
         this._svg = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
         this._svg.setAttribute('x', `${this._origin.x}px`);
         this._svg.setAttribute('y', `${this._origin.y}px`);
-        this._svg.setAttribute('width', `${this._width}px`);
-        this._svg.setAttribute('height', `${this._height}px`);
-        this._svg.style.transform = `rotate(${this._rotation}deg)`;
+        this._svg.style.transformOrigin = `${this._origin.x + this._width / 2}px ${this._origin.y + this._height / 2}px`;
+        this._svg.style.width = `${this._width}px`;
+        this._svg.style.height = `${this._height}px`;
+        this._svg.style.transform = `rotate(${radToDeg(this._rotation)}deg)`;
         this._slide.canvas.node.appendChild(this._svg);
 
         this._textbox = document.createElement('div');
@@ -87,14 +89,31 @@ class TextboxRenderer implements GraphicRenderer {
         this._textbox = undefined;
     }
 
+    public setOriginAndDimensions(origin: Vector, dimensions: Vector): void {
+        this._origin = origin;
+        this._width = dimensions.x;
+        this._height = dimensions.y;
+
+        if (this._svg) {
+            this._svg.setAttribute('x', `${this._origin.x}px`);
+            this._svg.setAttribute('y', `${this._origin.y}px`);
+            this._svg.style.transformOrigin = `${this._origin.x + this._width / 2}px ${this._origin.y + this._height / 2}px`;
+            this._svg.style.width = `${this._width}px`;
+            this._svg.style.height = `${this._height}px`;
+        }
+    }
+
     public getOrigin(): Vector {
         return this._origin;
     }
 
     public setOrigin(origin: Vector): void {
         this._origin = origin;
-        this._svg && this._svg.setAttribute('x', `${this._origin.x}px`);
-        this._svg && this._svg.setAttribute('y', `${this._origin.y}px`);
+        if (this._svg) {
+            this._svg.setAttribute('x', `${this._origin.x}px`);
+            this._svg.setAttribute('y', `${this._origin.y}px`);
+            this._svg.style.transformOrigin = `${this._origin.x + this._width / 2}px ${this._origin.y + this._height / 2}px`;
+        }
     }
 
     public getWidth(): number {
@@ -103,7 +122,9 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setWidth(width: number): void {
         this._width = width;
-        this._svg && this._svg.setAttribute('width', `${this._width}px`);
+        if (this._svg) {
+            this._svg.style.width = `${this._width}px`;
+        }
     }
 
     public getHeight(): number {
@@ -112,7 +133,9 @@ class TextboxRenderer implements GraphicRenderer {
 
     public setHeight(height: number): void {
         this._height = height;
-        this._svg && this._svg.setAttribute('height', `${this._height}px`);
+        if (this._svg) {
+            this._svg.style.height = `${this._height}px`;
+        }
     }
 
     public getText(): string {
@@ -169,7 +192,7 @@ class TextboxRenderer implements GraphicRenderer {
     public setRotation(rotation: number): void {
         this._rotation = rotation;
         if (this._svg) {
-            this._svg.style.transform = `rotate(${this._rotation}deg)`;
+            this._svg.style.transform = `rotate(${radToDeg(this._rotation)}deg)`;
         }
     }
 
@@ -182,17 +205,37 @@ class TextboxRenderer implements GraphicRenderer {
                 topLeft: Vector.zero,
                 topRight: Vector.zero,
                 bottomLeft: Vector.zero,
-                bottomRight: Vector.zero
+                bottomRight: Vector.zero,
+                rotation: 0
             };
         } else {
-            return {
+            const preRotateBox: BoundingBox = {
                 origin: this._origin,
                 center: this._origin.add(new Vector(this._width, this._height).scale(0.5)),
                 dimensions: new Vector(this._width, this._height),
                 topLeft: this._origin,
                 topRight: this._origin.add(new Vector(this._width, 0)),
                 bottomLeft: this._origin.add(new Vector(0, this._height)),
-                bottomRight: this._origin.add(new Vector(this._width, this._height))
+                bottomRight: this._origin.add(new Vector(this._width, this._height)),
+                rotation: this._rotation
+            };
+
+            const corners = {
+                topLeft: preRotateBox.center.towards(preRotateBox.topLeft),
+                topRight: preRotateBox.center.towards(preRotateBox.topRight),
+                bottomLeft: preRotateBox.center.towards(preRotateBox.bottomLeft),
+                bottomRight: preRotateBox.center.towards(preRotateBox.bottomRight)
+            };
+
+            return {
+                origin: preRotateBox.origin,
+                center: preRotateBox.center,
+                dimensions: preRotateBox.dimensions,
+                topLeft: preRotateBox.center.add(corners.topLeft.rotate(corners.topLeft.theta(Vector.east) + preRotateBox.rotation)),
+                topRight: preRotateBox.center.add(corners.topRight.rotate(corners.topRight.theta(Vector.east) + preRotateBox.rotation)),
+                bottomLeft: preRotateBox.center.add(corners.bottomLeft.rotate(corners.bottomLeft.theta(Vector.east) + preRotateBox.rotation)),
+                bottomRight: preRotateBox.center.add(corners.bottomRight.rotate(corners.bottomRight.theta(Vector.east) + preRotateBox.rotation)),
+                rotation: preRotateBox.rotation
             };
         }
     }

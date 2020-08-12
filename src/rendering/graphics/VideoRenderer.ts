@@ -1,5 +1,6 @@
 import * as SVG from 'svg.js';
 import { decorateVideoEvents } from '../../events/decorators';
+import { radToDeg } from '../../utilities/utilities';
 import Vector from '../../utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from '../types';
@@ -66,7 +67,7 @@ class VideoRenderer implements GraphicRenderer {
             .width(this._width)
             .height(this._height)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
-            .rotate(this._rotation);
+            .rotate(radToDeg(this._rotation));
 
         this._slide.canvas.add(this._svg);
         decorateVideoEvents(this._svg, this._slide, this);
@@ -75,6 +76,19 @@ class VideoRenderer implements GraphicRenderer {
     public unrender(): void {
         this._svg && this._svg.remove();
         this._svg = undefined;
+    }
+
+    public setOriginAndDimensions(origin: Vector, dimensions: Vector): void {
+        this._origin = origin;
+        this._width = dimensions.x;
+        this._height = dimensions.y;
+
+        this._svg && this._svg
+            .rotate(0)
+            .translate(this._origin.x, this._origin.y)
+            .width(this._width)
+            .height(this._height)
+            .rotate(radToDeg(this._rotation));
     }
 
     public getSource(): HTMLVideoElement {
@@ -87,7 +101,7 @@ class VideoRenderer implements GraphicRenderer {
 
     public setOrigin(origin: Vector): void {
         this._origin = origin;
-        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(this._rotation);
+        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(radToDeg(this._rotation));
     }
 
     public getWidth(): number {
@@ -132,7 +146,7 @@ class VideoRenderer implements GraphicRenderer {
 
     public setRotation(rotation: number): void {
         this._rotation = rotation;
-        this._svg && this._svg.rotate(this._rotation);
+        this._svg && this._svg.rotate(radToDeg(this._rotation));
     }
 
     public getBoundingBox(): BoundingBox {
@@ -144,17 +158,37 @@ class VideoRenderer implements GraphicRenderer {
                 topLeft: Vector.zero,
                 topRight: Vector.zero,
                 bottomLeft: Vector.zero,
-                bottomRight: Vector.zero
+                bottomRight: Vector.zero,
+                rotation: 0
             };
         } else {
-            return {
+            const preRotateBox: BoundingBox = {
                 origin: this._origin,
                 center: this._origin.add(new Vector(this._width, this._height).scale(0.5)),
                 dimensions: new Vector(this._width, this._height),
                 topLeft: this._origin,
                 topRight: this._origin.add(new Vector(this._width, 0)),
                 bottomLeft: this._origin.add(new Vector(0, this._height)),
-                bottomRight: this._origin.add(new Vector(this._width, this._height))
+                bottomRight: this._origin.add(new Vector(this._width, this._height)),
+                rotation: this._rotation
+            };
+
+            const corners = {
+                topLeft: preRotateBox.center.towards(preRotateBox.topLeft),
+                topRight: preRotateBox.center.towards(preRotateBox.topRight),
+                bottomLeft: preRotateBox.center.towards(preRotateBox.bottomLeft),
+                bottomRight: preRotateBox.center.towards(preRotateBox.bottomRight)
+            };
+
+            return {
+                origin: preRotateBox.origin,
+                center: preRotateBox.center,
+                dimensions: preRotateBox.dimensions,
+                topLeft: preRotateBox.center.add(corners.topLeft.rotate(corners.topLeft.theta(Vector.east) + preRotateBox.rotation)),
+                topRight: preRotateBox.center.add(corners.topRight.rotate(corners.topRight.theta(Vector.east) + preRotateBox.rotation)),
+                bottomLeft: preRotateBox.center.add(corners.bottomLeft.rotate(corners.bottomLeft.theta(Vector.east) + preRotateBox.rotation)),
+                bottomRight: preRotateBox.center.add(corners.bottomRight.rotate(corners.bottomRight.theta(Vector.east) + preRotateBox.rotation)),
+                rotation: preRotateBox.rotation
             };
         }
     }

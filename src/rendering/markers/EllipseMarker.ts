@@ -18,7 +18,8 @@ class EllipseMarker implements GraphicMarker {
             scale: args.scale,
             center: args.target.getCenter(),
             width: args.target.getWidth(),
-            height: args.target.getHeight()
+            height: args.target.getHeight(),
+            rotation: args.target.getRotation()
         });
 
         this.helper.render();

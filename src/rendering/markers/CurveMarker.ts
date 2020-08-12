@@ -16,7 +16,8 @@ class CurveMarker implements GraphicMarker {
         this.helper = new CurveOutlineRenderer({
             slide: args.slide,
             scale: args.scale,
-            anchors: args.target.getAnchors()
+            anchors: args.target.getAnchors(),
+            rotation: args.target.getRotation()
         });
 
         this.helper.render();
