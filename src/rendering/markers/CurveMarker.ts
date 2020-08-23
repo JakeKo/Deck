@@ -1,7 +1,7 @@
-import { CurveRenderer } from "../graphics";
-import CurveOutlineRenderer from "../helpers/CurveOutlineRenderer";
-import SlideRenderer from "../SlideRenderer";
-import { GraphicMarker } from "../types";
+import { CurveRenderer } from '../graphics';
+import { CurveOutlineRenderer } from '../helpers';
+import SlideRenderer from '../SlideRenderer';
+import { GraphicMarker } from '../types';
 
 type CurveMarkerArgs = {
     slide: SlideRenderer;

@@ -1,13 +1,13 @@
 <template>
-<div :style="roadmapStyle">
-    <roadmap-slot v-for='slide in getRoadmapSlides'
+<div ref='root' :style="style.roadmap">
+    <RoadmapSlot v-for='slide in roadmapSlides'
         :key='slide.id'
         :id='slide.id'
         :isActive='slide.isActive'
     />
-    <div :style="addSlideSlotStyle" @click='createNewSlide'>
-        <div :style="addSlideLabelStyle">Add Slide</div>
-        <div :style="addSlideButtonStyle">
+    <div :style="style.addSlideSlot" @click='createNewSlide'>
+        <div :style="style.addSlideLabel">Add Slide</div>
+        <div :style="style.addSlideButton">
             <i class='fas fa-plus' />
         </div>
     </div>
@@ -15,90 +15,69 @@
 </template>
 
 <script lang='ts'>
-import { Vue, Component } from 'vue-property-decorator';
 import RoadmapSlot from './RoadmapSlot.vue';
-import { MUTATIONS, GETTERS, RoadmapSlide, Slide } from '../store/types';
-import { Getter, Mutation } from 'vuex-class';
-import { StyleCreator } from '../styling/types';
 import DeckComponent from './generic/DeckComponent';
+import { defineComponent, computed, reactive } from 'vue';
 
-type StyleProps = {};
-type Style = {
-    roadmap: any;
-    addSlideSlot: any;
-    addSlideLabel: any;
-    addSlideButton: any;
-};
-const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
-    roadmap: {
-        boxSizing: 'border-box',
-        borderTop: `1px solid ${theme.color.base.flush}`,
-        height: '80px',
-        ...base.flexRow,
-        flexShrink: '0',
-        overflowX: 'scroll'
+const Roadmap = defineComponent({
+    components: {
+        RoadmapSlot
     },
-    addSlideSlot: {
-        height: '100%',
-        padding: '8px',
-        boxSizing: 'border-box',
-        ...base.flexColCC,
-        justifyContent: 'space-between',
-        cursor: 'pointer'
-    },
-    addSlideLabel: {
-        ...base.fontBody
-    },
-    addSlideButton: {
-        height: '45px',
-        width: '80px',
-        ...base.flexRowCC,
-        color: theme.color.base.highest,
-        background: theme.color.primary.flush
+    setup: () => {
+        const { root, store, baseStyle, baseTheme } = DeckComponent();
+        const style = reactive({
+            roadmap: computed(() => ({
+                boxSizing: 'border-box',
+                borderTop: `1px solid ${baseTheme.value.color.base.flush}`,
+                height: '80px',
+                ...baseStyle.value.flexRow,
+                flexShrink: '0',
+                overflowX: 'scroll'
+            })),
+            addSlideSlot: computed(() => ({
+                height: '100%',
+                padding: '8px',
+                boxSizing: 'border-box',
+                ...baseStyle.value.flexColCC,
+                justifyContent: 'space-between',
+                cursor: 'pointer'
+            })),
+            addSlideLabel: computed(() => ({
+                ...baseStyle.value.fontBody
+            })),
+            addSlideButton: computed(() => ({
+                height: '45px',
+                width: '80px',
+                ...baseStyle.value.flexRowCC,
+                color: baseTheme.value.color.base.highest,
+                background: baseTheme.value.color.primary.flush
+            }))
+        });
+
+        function createNewSlide(): void {
+            store.mutations.addSlide(store.getters.slides.length);
+            console.log(store);
+
+            if (store.getters.lastSlide === undefined) {
+                throw new Error('Failed to create new slide');
+            }
+
+            store.mutations.setActiveSlide(store.getters.lastSlide.id);
+        }
+
+        return {
+            root,
+            style,
+            createNewSlide,
+            roadmapSlides: store.getters.roadmapSlides
+        };
     }
 });
 
-@Component({
-    components: {
-        RoadmapSlot
-    }
-})
-export default class Roadmap extends DeckComponent<StyleProps, Style> {
-    @Getter private [GETTERS.ROADMAP_SLIDES]: RoadmapSlide[];
-    @Getter private [GETTERS.ACTIVE_SLIDE]: Slide;
-    @Getter private [GETTERS.SLIDES]: Slide[];
-    @Getter private [GETTERS.LAST_SLIDE]: Slide;
-    @Mutation private [MUTATIONS.ADD_SLIDE]: (index: number) => void;
-    @Mutation private [MUTATIONS.ACTIVE_SLIDE_ID]: (id: string) => void;
-
-    private createNewSlide(): void {
-        this[MUTATIONS.ADD_SLIDE](this[GETTERS.SLIDES].length);
-        this[MUTATIONS.ACTIVE_SLIDE_ID](this[GETTERS.LAST_SLIDE].id);
-    }
-
-    private get roadmapStyle(): void {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return style.roadmap;
-    }
-
-    private get addSlideSlotStyle(): void {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return style.addSlideSlot;
-    }
-
-    private get addSlideLabelStyle(): void {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return style.addSlideLabel;
-    }
-
-    private get addSlideButtonStyle(): void {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return style.addSlideButton;
-    }
-}
+export default Roadmap;
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 ::-webkit-scrollbar {
     display: none;
 }

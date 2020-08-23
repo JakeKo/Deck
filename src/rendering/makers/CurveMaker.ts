@@ -1,9 +1,9 @@
-import { provideId } from "../../utilities/IdProvider";
-import Vector from "../../utilities/Vector";
-import { CurveRenderer } from "../graphics";
+import { provideId } from '@/utilities/IdProvider';
+import Vector from '@/utilities/Vector';
+import { CurveRenderer } from '../graphics';
 import { CurveAnchorRenderer } from '../helpers';
-import SlideRenderer from "../SlideRenderer";
-import { CurveAnchor, GraphicMaker } from "../types";
+import SlideRenderer from '../SlideRenderer';
+import { CurveAnchor, GraphicMaker } from '../types';
 
 type CurveMakerArgs = {
     slide: SlideRenderer;

@@ -1,6 +1,6 @@
-import * as SVG from 'svg.js';
-import { decorateCurveAnchorEvents } from '../../events/decorators/curve_anchor';
-import Vector from '../../utilities/Vector';
+import SVG from 'svg.js';
+import { decorateCurveAnchorEvents } from '@/events/decorators/curve_anchor';
+import Vector from '@/utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, HelperRenderer } from '../types';
 

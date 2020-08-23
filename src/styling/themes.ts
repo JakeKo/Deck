@@ -1,28 +1,28 @@
-import { THEMES, Theme } from "./types";
+import { THEMES, Theme } from './types';
 
 // Color Scheme Maker: https://noeldelgado.github.io/shadowlord
 const lightTheme: Theme = {
     color: {
         base: {
             highest: '#ffffff', // 100% tint
-            higher: '#ededed',  // 75% tint
-            flush: '#dbdbdb',   // 50% tint
-            lower: '#c8c8c8',   // 25% tint
-            lowest: '#b6b6b6'   // base
+            higher: '#ededed', // 75% tint
+            flush: '#dbdbdb', // 50% tint
+            lower: '#c8c8c8', // 25% tint
+            lowest: '#b6b6b6' // base
         },
         basecomp: {
             highest: '#494949', // base
-            higher: '#373737',  // 25% tint
-            flush: '#252525',   // 50% tint
-            lower: '#121212',   // 75% tint
-            lowest: '#000000'   // 100% tint
+            higher: '#373737', // 25% tint
+            flush: '#252525', // 50% tint
+            lower: '#121212', // 75% tint
+            lowest: '#000000' // 100% tint
         },
         primary: {
             highest: '#7955ae', // 30% tint
-            higher: '#532497',  // 10% tint
-            flush: '#400c8b',   // base
-            lower: '#3a0b7d',   // 10% shade
-            lowest: '#2d0861'   // 30% shade
+            higher: '#532497', // 10% tint
+            flush: '#400c8b', // base
+            lower: '#3a0b7d', // 10% shade
+            lowest: '#2d0861' // 30% shade
         }
     },
     text: {

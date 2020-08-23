@@ -1,6 +1,6 @@
-import { SlideMouseEvent, SLIDE_EVENTS, TextboxMouseEvent, TEXTBOX_EVENTS } from "../../events/types";
-import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { TextboxMutator } from "../../rendering/mutators";
+import { SlideMouseEvent, SLIDE_EVENTS, TextboxMouseEvent, TEXTBOX_EVENTS } from "@/events/types";
+import { listen, listenOnce, unlisten } from "@/events/utilities";
+import { TextboxMutator } from "@/rendering/mutators";
 import { resolvePosition } from "../utilities";
 
 export function moveTextbox(event: TextboxMouseEvent): void {

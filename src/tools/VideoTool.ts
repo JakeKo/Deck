@@ -1,9 +1,9 @@
-import { PointerTool } from ".";
-import { SlideMouseEvent, SLIDE_EVENTS } from "../events/types";
-import { listen, listenOnce, unlisten } from "../events/utilities";
-import { AppStore, MUTATIONS } from "../store/types";
-import { EditorTool, TOOL_NAMES } from "./types";
-import { resolvePosition } from "./utilities";
+import { SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
+import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { AppStore } from '@/store/types';
+import { PointerTool } from '.';
+import { EditorTool, TOOL_NAMES } from './types';
+import { resolvePosition } from './utilities';
 
 export default (store: AppStore): EditorTool => {
     function seedVideo(video: HTMLVideoElement, width: number, height: number): (event: SlideMouseEvent) => void {
@@ -26,7 +26,7 @@ export default (store: AppStore): EditorTool => {
                 maker.complete();
                 unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
 
-                store.commit(MUTATIONS.ACTIVE_TOOL, PointerTool(store));
+                store.mutations.setActiveTool(PointerTool(store));
             }
         };
     }
@@ -34,13 +34,13 @@ export default (store: AppStore): EditorTool => {
     let make: (event: SlideMouseEvent) => void;
     return {
         name: TOOL_NAMES.VIDEO,
-        mount: async () => {
+        mount: async() => {
             const uploadVideo = new Promise<{ source: HTMLVideoElement; width: number; height: number }>(resolve => {
                 const reader = new FileReader();
                 const input = document.createElement('input');
                 input.type = 'file';
 
-                input.addEventListener('input', (): void => reader.readAsDataURL(input.files![0]));
+                input.addEventListener('input', (): void => reader.readAsDataURL(input.files ? input.files[0] : new Blob()));
                 reader.addEventListener('loadend', (): void => {
                     // Wait for the video width and height to be determined
                     const video = document.createElement('video');

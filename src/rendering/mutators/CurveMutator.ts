@@ -1,12 +1,12 @@
-import { SlideMouseEvent } from "../../events/types";
-import { resolvePosition } from "../../tools/utilities";
-import { closestVector, mod } from "../../utilities/utilities";
-import Vector from "../../utilities/Vector";
-import { CurveRenderer } from "../graphics";
-import { CurveAnchorRenderer } from "../helpers";
-import SlideRenderer from "../SlideRenderer";
-import { BoundingBoxMutatorHelpers, CurveAnchor, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
-import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
+import { SlideMouseEvent } from '@/events/types';
+import { resolvePosition } from '@/tools/utilities';
+import { closestVector, mod } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
+import { CurveRenderer } from '../graphics';
+import { CurveAnchorRenderer } from '../helpers';
+import SlideRenderer from '../SlideRenderer';
+import { BoundingBoxMutatorHelpers, CurveAnchor, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from '../types';
+import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from '../utilities';
 
 type CurveMutatorArgs = {
     target: CurveRenderer;

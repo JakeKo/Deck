@@ -1,7 +1,7 @@
-import * as SVG from 'svg.js';
-import { decorateRectangleEvents } from '../../events/decorators';
-import { radToDeg } from '../../utilities/utilities';
-import Vector from '../../utilities/Vector';
+import { decorateRectangleEvents } from '@/events/decorators';
+import { radToDeg } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
+import SVG from 'svg.js';
 import SlideRenderer from '../SlideRenderer';
 import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from '../types';
 

@@ -1,9 +1,9 @@
-import { ActionTree, GetterTree, MutationTree, Store } from "vuex";
-import { GRAPHIC_TYPES } from "../rendering/types";
-import { Theme } from "../styling/types";
-import { EditorTool } from "../tools/types";
-import SlideStateManager from "../utilities/SlideStateManager";
-import Vector from "../utilities/Vector";
+import { GRAPHIC_TYPES } from '@/rendering/types';
+import { BaseStyles, Theme } from '@/styling/types';
+import { EditorTool, TOOL_NAMES } from '@/tools/types';
+import SlideStateManager from '@/utilities/SlideStateManager';
+import Vector from '@/utilities/Vector';
+import { ComputedRef } from 'vue';
 
 export type AppState = {
     activeSlideId: string;
@@ -18,13 +18,38 @@ export type AppState = {
     };
 };
 
-export type AppStore = Store<AppState>;
+export type AppStore = {
+    getters: AppGetters;
+    mutations: AppMutations;
+};
 
-export type AppGetters = GetterTree<AppState, AppState>;
+export type AppGetters = {
+    slides: Slide[];
+    roadmapSlides: RoadmapSlide[];
+    lastSlide: Slide | undefined;
+    activeSlide: Slide | undefined;
+    activeToolName: TOOL_NAMES;
+    rawViewbox: Viewbox;
+    croppedViewbox: Viewbox;
+    editorZoomLevel: number;
+    deckTitle: string | undefined;
+    style: { theme: Theme, baseStyle: BaseStyles };
+};
 
-export type AppMutations = MutationTree<AppState>;
+export type AppMutations = {
+    addSlide: (index: number) => void;
+    setActiveSlide: (slideId: string) => void;
+    setActiveTool: (tool: EditorTool) => void;
+    setEditorZoom: (zoom: number) => void;
+    setDeckTitle: (deckTitle: string) => void;
+    setGraphic: (slideId: string, graphic: GraphicStoreModel) => void;
+    removeGraphic: (slideId: string, graphicId: string) => void;
+    broadcastSetGraphic: (slideId: string, graphic: GraphicStoreModel) => void;
+    broadcastRemoveGraphic: (slideId: string, graphicId: string) => void;
+    setTheme: (theme: Theme) => void;
+};
 
-export type AppActions = ActionTree<AppState, AppState>;
+export type ComputedType<T> = { [K in keyof T]: ComputedRef<T[K]> };
 
 export type Viewbox = {
     x: number;
@@ -44,35 +69,6 @@ export type RoadmapSlide = {
     id: string;
     isActive: boolean;
 };
-
-export enum GETTERS {
-    SLIDES = 'getSlides',
-    ROADMAP_SLIDES = 'getRoadmapSlides',
-    LAST_SLIDE = 'getLastSlide',
-    SLIDE = 'getSlide',
-    ACTIVE_SLIDE = 'getActiveSlide',
-    ACTIVE_TOOL_NAME = 'getActiveToolName',
-    RAW_VIEWBOX = 'getRawViewbox',
-    CROPPED_VIEWBOX = 'getCroppedViewbox',
-    EDITOR_ZOOM_LEVEL = 'getEditorZoomLevel',
-    DECK_TITLE = 'getDeckTitle',
-    STYLE = 'style'
-}
-
-export enum MUTATIONS {
-    ADD_SLIDE = 'addSlide',
-    ACTIVE_SLIDE_ID = 'setActiveSlideId',
-    ACTIVE_TOOL = 'setActiveTool',
-    EDITOR_ZOOM_LEVEL = 'setEditorZoomLevel',
-    DECK_TITLE = 'setDeckTitle',
-    SET_GRAPHIC = 'setGraphic',
-    REMOVE_GRAPHIC = 'removeGraphic',
-    BROADCAST_SET_GRAPHIC = 'broadcastSetGraphic',
-    BROADCAST_REMOVE_GRAPHIC = 'broadcastRemoveGraphic',
-    THEME = 'setTheme'
-}
-
-export enum ACTIONS { }
 
 export type GraphicStoreModel = CurveStoreModel | EllipseStoreModel | ImageStoreModel | RectangleStoreModel | TextboxStoreModel | VideoStoreModel;
 

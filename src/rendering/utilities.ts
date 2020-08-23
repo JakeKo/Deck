@@ -1,4 +1,4 @@
-import Vector from '../utilities/Vector';
+import Vector from '@/utilities/Vector';
 import { BoxRenderer, CanvasRenderer, RotatorRenderer, VertexRenderer } from './helpers';
 import SlideRenderer from './SlideRenderer';
 import { BoundingBox, BoundingBoxMutatorHelpers, GraphicRenderer, VERTEX_ROLES } from './types';

@@ -1,8 +1,8 @@
-import * as SVG from 'svg.js';
-import { VertexRenderer } from '../../rendering/helpers';
-import SlideRenderer from "../../rendering/SlideRenderer";
-import { SLIDE_EVENTS, VertexMouseEvent, VertexMouseEventPayload, VERTEX_EVENTS } from "../types";
-import { dispatch, makeSlideMouseEvent } from "../utilities";
+import { VertexRenderer } from '@/rendering/helpers';
+import SlideRenderer from '@/rendering/SlideRenderer';
+import SVG from 'svg.js';
+import { SLIDE_EVENTS, VertexMouseEvent, VertexMouseEventPayload, VERTEX_EVENTS } from '../types';
+import { dispatch, makeSlideMouseEvent } from '../utilities';
 
 function makeVertexMouseEvent(name: VERTEX_EVENTS, slide: SlideRenderer, graphic: VertexRenderer, baseEvent: MouseEvent): VertexMouseEvent {
     return new CustomEvent<VertexMouseEventPayload>(name, { detail: { type: name, slide, graphic, baseEvent } });

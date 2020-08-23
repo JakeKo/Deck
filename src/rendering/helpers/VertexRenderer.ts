@@ -1,6 +1,6 @@
-import * as SVG from 'svg.js';
-import { decorateVertexEvents } from '../../events/decorators';
-import Vector from '../../utilities/Vector';
+import SVG from 'svg.js';
+import { decorateVertexEvents } from '@/events/decorators';
+import Vector from '@/utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GraphicRenderer, GRAPHIC_TYPES, HelperRenderer, VERTEX_ROLES } from '../types';
 

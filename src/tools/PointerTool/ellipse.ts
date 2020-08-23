@@ -1,6 +1,6 @@
-import { EllipseMouseEvent, ELLIPSE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../../events/types";
-import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { EllipseMutator } from "../../rendering/mutators";
+import { EllipseMouseEvent, ELLIPSE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "@/events/types";
+import { listen, listenOnce, unlisten } from "@/events/utilities";
+import { EllipseMutator } from "@/rendering/mutators";
 import { resolvePosition } from "../utilities";
 
 export function moveEllipse(event: EllipseMouseEvent): void {

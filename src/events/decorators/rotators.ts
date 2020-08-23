@@ -1,6 +1,6 @@
-import * as SVG from 'svg.js';
-import RotatorRenderer from '../../rendering/helpers/RotatorRenderer';
-import SlideRenderer from "../../rendering/SlideRenderer";
+import RotatorRenderer from '@/rendering/helpers/RotatorRenderer';
+import SlideRenderer from "@/rendering/SlideRenderer";
+import SVG from 'svg.js';
 import { RotatorMouseEvent, RotatorMouseEventPayload, ROTATOR_EVENTS, SLIDE_EVENTS } from "../types";
 import { dispatch, makeSlideMouseEvent } from "../utilities";
 

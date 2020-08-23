@@ -1,11 +1,11 @@
-import { SlideMouseEvent } from "../../events/types";
-import { resolvePosition } from "../../tools/utilities";
-import { closestVector, mod } from "../../utilities/utilities";
-import Vector from "../../utilities/Vector";
-import { ImageRenderer } from "../graphics";
-import SlideRenderer from "../SlideRenderer";
-import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
-import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
+import { SlideMouseEvent } from '@/events/types';
+import { resolvePosition } from '@/tools/utilities';
+import { closestVector, mod } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
+import { ImageRenderer } from '../graphics';
+import SlideRenderer from '../SlideRenderer';
+import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from '../types';
+import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from '../utilities';
 
 type ImageMutatorArgs = {
     target: ImageRenderer;

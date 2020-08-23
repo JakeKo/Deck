@@ -1,7 +1,7 @@
-import SlideRenderer from "../../rendering/SlideRenderer";
-import { GraphicRenderer } from "../../rendering/types";
-import { SlideKeyboardEvent, SlideKeyboardEventPayload, SLIDE_EVENTS } from "../types";
-import { dispatch, makeSlideMouseEvent } from "../utilities";
+import SlideRenderer from '@/rendering/SlideRenderer';
+import { GraphicRenderer } from '@/rendering/types';
+import { SlideKeyboardEvent, SlideKeyboardEventPayload, SLIDE_EVENTS } from '../types';
+import { dispatch, makeSlideMouseEvent } from '../utilities';
 
 function makeSlideKeyboardEvent(name: SLIDE_EVENTS, slide: SlideRenderer, target: GraphicRenderer | undefined, baseEvent: KeyboardEvent): SlideKeyboardEvent {
     return new CustomEvent<SlideKeyboardEventPayload>(name, { detail: { type: name, slide, target, baseEvent } });

@@ -1,7 +1,7 @@
-import { VideoRenderer } from "../graphics";
-import { RectangleOutlineRenderer } from "../helpers";
-import SlideRenderer from "../SlideRenderer";
-import { GraphicMarker } from "../types";
+import { VideoRenderer } from '../graphics';
+import { RectangleOutlineRenderer } from '../helpers';
+import SlideRenderer from '../SlideRenderer';
+import { GraphicMarker } from '../types';
 
 type VideoMarkerArgs = {
     slide: SlideRenderer;

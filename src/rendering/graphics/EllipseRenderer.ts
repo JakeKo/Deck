@@ -1,9 +1,9 @@
-import * as SVG from 'svg.js';
-import { decorateEllipseEvents } from "../../events/decorators";
-import Vector from "../../utilities/Vector";
-import SlideRenderer from "../SlideRenderer";
-import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from "../types";
-import { radToDeg } from '../../utilities/utilities';
+import { decorateEllipseEvents } from '@/events/decorators';
+import { radToDeg } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
+import SVG from 'svg.js';
+import SlideRenderer from '../SlideRenderer';
+import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
 type EllipseRendererArgs = {
     id: string;
