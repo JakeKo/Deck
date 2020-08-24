@@ -24,27 +24,27 @@ export default class SlideStateManager {
     public setGraphicFromRenderer(graphic: GraphicRenderer): void {
         if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
             const storeModel = this._curveRendererToStoreModel(graphic as CurveRenderer);
-            this._store && this._store.mutations.setGraphic(this._slideId, storeModel);
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
             const storeModel = this._ellipseRendererToStoreModel(graphic as EllipseRenderer);
-            this._store && this._store.mutations.setGraphic(this._slideId, storeModel);
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
             const storeModel = this._imageRendererToStoreModel(graphic as ImageRenderer);
-            this._store && this._store.mutations.setGraphic(this._slideId, storeModel);
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
             const storeModel = this._rectangleRendererToStoreModel(graphic as RectangleRenderer);
-            this._store && this._store.mutations.setGraphic(this._slideId, storeModel);
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
             const storeModel = this._textboxRendererToStoreModel(graphic as TextboxRenderer);
-            this._store && this._store.mutations.setGraphic(this._slideId, storeModel);
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
             const storeModel = this._videoRendererToStoreModel(graphic as VideoRenderer);
-            this._store && this._store.mutations.setGraphic(this._slideId, storeModel);
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         }
     }
 
     public removeGraphicFromRenderer(graphicId: string): void {
-        this._store && this._store.mutations.removeGraphic(this._slideId, graphicId);
+        this._store && this._store.removeGraphic(this._slideId, graphicId);
     }
 
     public setGraphicFromStore(graphic: GraphicStoreModel): void {

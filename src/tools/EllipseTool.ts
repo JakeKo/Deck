@@ -1,9 +1,9 @@
-import { SlideMouseEvent, SLIDE_EVENTS } from "@/events/types";
-import { listen, listenOnce, unlisten } from "@/events/utilities";
-import { AppStore } from "@/store/types";
-import { PointerTool } from ".";
-import { EditorTool, TOOL_NAMES } from "./types";
-import { resolvePosition } from "./utilities";
+import { SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
+import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { AppStore } from '@/store/types';
+import { PointerTool } from '.';
+import { EditorTool, TOOL_NAMES } from './types';
+import { resolvePosition } from './utilities';
 
 export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
@@ -25,7 +25,7 @@ export default (store: AppStore): EditorTool => {
             maker.complete();
             unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
 
-            store.mutations.setActiveTool(PointerTool(store));
+            store.setActiveTool(PointerTool());
         }
     }
 

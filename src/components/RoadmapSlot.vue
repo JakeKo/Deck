@@ -9,12 +9,12 @@
 import DeckComponent from './generic/DeckComponent';
 import { defineComponent, computed, reactive, onMounted, ref } from 'vue';
 
-type Props = {
-    id: string;
-    isActive: boolean;
-};
 const RoadmapSlot = defineComponent({
-    setup: (props: Props) => {
+    props: {
+        id: { type: String, required: true },
+        isActive: { type: Boolean, required: true }
+    },
+    setup: props => {
         const { root, store, baseStyle, baseTheme } = DeckComponent();
         const style = reactive({
             roadmapSlot: computed(() => ({
@@ -38,7 +38,7 @@ const RoadmapSlot = defineComponent({
             }))
         });
         const previewViewbox = computed(() => {
-            const viewbox = store.getters.croppedViewbox;
+            const viewbox = store.croppedViewbox.value;
             return `${viewbox.x} ${viewbox.y} ${viewbox.width} ${viewbox.height}`;
         });
         const canvas = ref<SVGElement | undefined>(undefined);
@@ -59,7 +59,7 @@ const RoadmapSlot = defineComponent({
             root,
             style,
             previewViewbox,
-            setActiveSlide: store.mutations.setActiveSlide
+            setActiveSlide: store.setActiveSlide
         };
     }
 });

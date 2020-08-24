@@ -34,37 +34,37 @@ const Toolbox = defineComponent({
             {
                 name: TOOL_NAMES.POINTER,
                 icon: 'fas fa-mouse-pointer',
-                activator: () => store.mutations.setActiveTool(PointerTool(store))
+                activator: () => store.setActiveTool(PointerTool())
             },
             {
                 name: TOOL_NAMES.RECTANGLE,
                 icon: 'fas fa-square',
-                activator: () => store.mutations.setActiveTool(RectangleTool(store))
+                activator: () => store.setActiveTool(RectangleTool(store))
             },
             {
                 name: TOOL_NAMES.ELLIPSE,
                 icon: 'fas fa-circle',
-                activator: () => store.mutations.setActiveTool(EllipseTool(store))
+                activator: () => store.setActiveTool(EllipseTool(store))
             },
             {
                 name: TOOL_NAMES.CURVE,
                 icon: 'fas fa-pen-nib',
-                activator: () => store.mutations.setActiveTool(CurveTool(store))
+                activator: () => store.setActiveTool(CurveTool(store))
             },
             {
                 name: TOOL_NAMES.TEXTBOX,
                 icon: 'fas fa-font',
-                activator: () => store.mutations.setActiveTool(TextboxTool(store))
+                activator: () => store.setActiveTool(TextboxTool(store))
             },
             {
                 name: TOOL_NAMES.IMAGE,
                 icon: 'fas fa-image',
-                activator: () => store.mutations.setActiveTool(ImageTool(store))
+                activator: () => store.setActiveTool(ImageTool(store))
             },
             {
                 name: TOOL_NAMES.VIDEO,
                 icon: 'fas fa-video',
-                activator: () => store.mutations.setActiveTool(VideoTool(store))
+                activator: () => store.setActiveTool(VideoTool(store))
             }
         ]);
 

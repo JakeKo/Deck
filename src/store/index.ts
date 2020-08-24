@@ -33,7 +33,7 @@ function createStore(): AppStore {
         }
     }) as AppState;
 
-    const getters = reactive<ComputedType<AppGetters>>({
+    const getters: ComputedType<AppGetters> = {
         slides: computed(() => state.slides),
         roadmapSlides: computed(() => state.slides.map<RoadmapSlide>(s => s)),
         lastSlide: computed(() => state.slides[state.slides.length - 1]),
@@ -47,10 +47,10 @@ function createStore(): AppStore {
             theme: state.theme,
             baseStyle: getBaseStyles(state.theme)
         }))
-    }) as AppGetters;
+    };
 
-    const mutations = reactive<ComputedType<AppMutations>>({
-        addSlide: computed(() => index => {
+    const mutations: AppMutations = {
+        addSlide: index => {
             const slideId = provideId();
             state.slides.splice(index, 0, {
                 id: slideId,
@@ -58,63 +58,63 @@ function createStore(): AppStore {
                 graphics: {},
                 stateManager: new SlideStateManager(slideId)
             });
-        }),
-        setActiveSlide: computed(() => slideId => {
+        },
+        setActiveSlide: slideId => {
             const oldActiveSlide = getSlide(state, state.activeSlideId);
             if (oldActiveSlide !== undefined) {
                 oldActiveSlide.isActive = false;
             }
-    
+
             state.activeSlideId = slideId;
-    
+
             const newActiveSlide = getSlide(state, state.activeSlideId);
             if (newActiveSlide !== undefined) {
                 newActiveSlide.isActive = true;
             }
-        }),
-        setActiveTool: computed(() => tool => {
+        },
+        setActiveTool: tool => {
             state.activeTool.unmount();
             state.activeTool = tool;
             state.activeTool.mount();
-        }),
-        setEditorZoom: computed(() => zoom => {
+        },
+        setEditorZoom: zoom => {
             state.editorViewbox.zoom = zoom;
-        }),
-        setDeckTitle: computed(() => deckTitle => {
+        },
+        setDeckTitle: deckTitle => {
             state.deckTitle = deckTitle === '' ? undefined : deckTitle;
-        }),
-        setGraphic: computed(() => (slideId, graphic) => {
+        },
+        setGraphic: (slideId, graphic) => {
             const slide = getSlide(state, slideId);
             if (slide !== undefined) {
                 slide.graphics[graphic.id] = graphic;
             }
-        }),
-        removeGraphic: computed(() => (slideId, graphicId) => {
+        },
+        removeGraphic: (slideId, graphicId) => {
             const slide = getSlide(state, slideId);
             if (slide !== undefined) {
                 delete slide.graphics[graphicId];
             }
-        }),
-        broadcastSetGraphic: computed(() => (slideId, graphic) => {
+        },
+        broadcastSetGraphic: (slideId, graphic) => {
             const slide = getSlide(state, slideId);
             if (slide !== undefined) {
                 slide.stateManager.setGraphicFromStore(graphic);
             }
-        }),
-        broadcastRemoveGraphic: computed(() => (slideId, graphicId) => {
+        },
+        broadcastRemoveGraphic: (slideId, graphicId) => {
             const slide = getSlide(state, slideId);
             if (slide !== undefined) {
                 slide.stateManager.removeGraphicFromStore(graphicId);
             }
-        }),
-        setTheme: computed(() => theme => {
+        },
+        setTheme: theme => {
             state.theme = theme;
-        })
-    }) as AppMutations;
-    
+        }
+    };
+
     return {
-        getters,
-        mutations
+        ...getters,
+        ...mutations
     };
 }
 
@@ -132,4 +132,3 @@ function useStore(): AppStore {
 }
 
 export { provideStore, useStore };
-

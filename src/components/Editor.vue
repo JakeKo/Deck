@@ -41,8 +41,8 @@ const Editor = defineComponent({
 
             const editorWidth = root.value.offsetWidth;
             const editorHeight = root.value.offsetHeight;
-            const slideWidth = store.getters.croppedViewbox.width + 100;
-            const slideHeight = store.getters.croppedViewbox.height + 100;
+            const slideWidth = store.croppedViewbox.value.width + 100;
+            const slideHeight = store.croppedViewbox.value.height + 100;
             return Math.min(editorWidth / slideWidth, editorHeight / slideHeight);
         });
 
@@ -53,7 +53,7 @@ const Editor = defineComponent({
                 throw new Error('Root ref not specified.');
             }
 
-            store.mutations.setEditorZoom(defaultZoom.value);
+            store.setEditorZoom(defaultZoom.value);
             root.value.style.zoom = defaultZoom.value.toString();
             root.value.scrollTop = (root.value.scrollHeight - root.value.clientHeight) / 2;
             root.value.scrollLeft = (root.value.scrollWidth - root.value.clientWidth) / 2;
@@ -69,8 +69,8 @@ const Editor = defineComponent({
 
                 event.preventDefault();
                 const deltaZoom = event.deltaY < 0 ? 1.1 : 0.9;
-                const newZoom = store.getters.editorZoomLevel * deltaZoom;
-                store.mutations.setEditorZoom(newZoom);
+                const newZoom = store.editorZoomLevel.value * deltaZoom;
+                store.setEditorZoom(newZoom);
                 root.value.style.zoom = newZoom.toString();
 
                 dispatch(new CustomEvent<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { detail: { zoom: newZoom } }));
@@ -87,7 +87,7 @@ const Editor = defineComponent({
 
         onMounted(reorientSlide);
         watchEffect(() => {
-            if (store.getters.activeSlide !== undefined) {
+            if (store.activeSlide.value !== undefined) {
                 reorientSlide();
             }
         });
@@ -96,7 +96,7 @@ const Editor = defineComponent({
             root,
             style,
             handleMouseWheel,
-            slides: store.getters.slides
+            slides: store.slides.value
         };
     }
 });

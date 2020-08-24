@@ -53,7 +53,7 @@ const App = defineComponent({
             }))
         });
 
-        store.mutations.setActiveTool(PointerTool(store));
+        store.setActiveTool(PointerTool());
 
         return {
             root,

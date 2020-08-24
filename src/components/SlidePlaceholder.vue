@@ -16,15 +16,15 @@ const SlidePlaceholder = defineComponent({
         const style = reactive({
             container: computed(() => ({
                 ...baseStyle.value.flexRowCC,
-                minWidth: `${store.getters.rawViewbox.width}px`,
-                minHeight: `${store.getters.rawViewbox.height}px`
+                minWidth: `${store.rawViewbox.value.width}px`,
+                minHeight: `${store.rawViewbox.value.height}px`
             })),
             slide: computed(() => ({
                 ...baseStyle.value.flexRowCC,
                 ...baseStyle.value.fontBody,
                 border: `4px dashed ${baseTheme.value.color.basecomp.flush}`,
-                width: `${store.getters.croppedViewbox.width}px`,
-                height: `${store.getters.croppedViewbox.height}px`
+                width: `${store.croppedViewbox.value.width}px`,
+                height: `${store.croppedViewbox.value.height}px`
             }))
         });
 

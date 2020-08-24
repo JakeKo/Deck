@@ -129,7 +129,7 @@ class CurveAnchorRenderer implements HelperRenderer {
         this._point = point;
 
         const position = this._pointPosition();
-        this._pointSvg && this._pointSvg.translate(position.x ,position.y);
+        this._pointSvg && this._pointSvg.translate(position.x, position.y);
     }
 
     public setOutHandle(outHandle: Vector): void {

@@ -8,16 +8,15 @@
 <script lang='ts'>
 import DeckComponent from './generic/DeckComponent';
 import { defineComponent, reactive, computed } from 'vue';
-import { TOOL_NAMES } from '@/tools/types';
 
-type Props = {
-    name: TOOL_NAMES;
-    icon: string;
-}
 const Tool = defineComponent({
-    setup: (props: Props) => {
+    props: {
+        name: { type: String, required: true },
+        icon: { type: String, required: true }
+    },
+    setup: props => {
         const { root, store, baseStyle, baseTheme, isHovered } = DeckComponent();
-        const isActive = computed(() => store.getters.activeToolName === props.name);
+        const isActive = computed(() => store.activeToolName.value === props.name);
         const style = reactive({
             tool: computed(() => ({
                 ...baseStyle.value.flexColCC,
@@ -40,9 +39,7 @@ const Tool = defineComponent({
 
         return {
             root,
-            style,
-            name: props.name,
-            icon: props.icon
+            style
         };
     }
 });

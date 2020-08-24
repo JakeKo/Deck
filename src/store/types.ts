@@ -18,10 +18,7 @@ export type AppState = {
     };
 };
 
-export type AppStore = {
-    getters: AppGetters;
-    mutations: AppMutations;
-};
+export type AppStore = ComputedType<AppGetters> & AppMutations;
 
 export type AppGetters = {
     slides: Slide[];
@@ -33,7 +30,7 @@ export type AppGetters = {
     croppedViewbox: Viewbox;
     editorZoomLevel: number;
     deckTitle: string | undefined;
-    style: { theme: Theme, baseStyle: BaseStyles };
+    style: { theme: Theme; baseStyle: BaseStyles };
 };
 
 export type AppMutations = {

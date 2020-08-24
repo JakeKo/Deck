@@ -58,7 +58,7 @@ export function makeBoxHelpers(target: GraphicRenderer, slide: SlideRenderer, sc
                 center: box.bottomRight,
                 scale: scale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
-            }),
+            })
         }
     };
 }

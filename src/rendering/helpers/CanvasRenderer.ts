@@ -50,9 +50,7 @@ class CanvasRenderer implements HelperRenderer {
         this._svg = undefined;
     }
 
-    public setScale(): void {
-        return;
-    }
+    public setScale(): void { ; }
 }
 
 export default CanvasRenderer;

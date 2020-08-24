@@ -22,8 +22,8 @@ const TitleField = defineComponent({
             }))
         });
         const deckTitle = computed(() => ({
-            get: store.getters.deckTitle,
-            set: store.mutations.setDeckTitle
+            get: store.deckTitle.value,
+            set: store.setDeckTitle
         }));
 
         function handleKeydown(event: KeyboardEvent): void {

@@ -55,21 +55,20 @@ const Roadmap = defineComponent({
         });
 
         function createNewSlide(): void {
-            store.mutations.addSlide(store.getters.slides.length);
-            console.log(store);
+            store.addSlide(store.slides.value.length);
 
-            if (store.getters.lastSlide === undefined) {
+            if (store.lastSlide.value === undefined) {
                 throw new Error('Failed to create new slide');
             }
 
-            store.mutations.setActiveSlide(store.getters.lastSlide.id);
+            store.setActiveSlide(store.lastSlide.value.id);
         }
 
         return {
             root,
             style,
             createNewSlide,
-            roadmapSlides: store.getters.roadmapSlides
+            roadmapSlides: store.roadmapSlides.value
         };
     }
 });
