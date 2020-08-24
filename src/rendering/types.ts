@@ -1,5 +1,5 @@
-import { SlideMouseEvent } from '../events/types';
-import Vector from '../utilities/Vector';
+import { SlideMouseEvent } from '@/events/types';
+import Vector from '@/utilities/Vector';
 import { BoxRenderer, VertexRenderer, RotatorRenderer } from './helpers';
 
 export type GraphicRenderer = {

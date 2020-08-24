@@ -1,12 +1,12 @@
-import { SlideMouseEvent } from "../../events/types";
-import { resolvePosition } from "../../tools/utilities";
-import { closestVector, mod } from "../../utilities/utilities";
-import Vector from "../../utilities/Vector";
-import { CurveRenderer } from "../graphics";
-import { CurveAnchorRenderer } from "../helpers";
-import SlideRenderer from "../SlideRenderer";
-import { BoundingBoxMutatorHelpers, CurveAnchor, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from "../types";
-import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from "../utilities";
+import { SlideMouseEvent } from '@/events/types';
+import { resolvePosition } from '@/tools/utilities';
+import { closestVector, mod } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
+import { CurveRenderer } from '../graphics';
+import { CurveAnchorRenderer } from '../helpers';
+import SlideRenderer from '../SlideRenderer';
+import { BoundingBoxMutatorHelpers, CurveAnchor, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from '../types';
+import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from '../utilities';
 
 type CurveMutatorArgs = {
     target: CurveRenderer;
@@ -23,7 +23,6 @@ class CurveMutator implements GraphicMutator {
     constructor(args: CurveMutatorArgs) {
         this.target = args.target;
 
-        const box = this.target.getBoundingBox();
         this.helpers = {
             ...makeBoxHelpers(this.target, args.slide, args.scale),
             anchors: this.target.getAnchors().map((anchor, index) => new CurveAnchorRenderer({
@@ -70,7 +69,7 @@ class CurveMutator implements GraphicMutator {
             const anchorOffsets = this.target.getAnchors().map<CurveAnchor>(anchor => ({
                 inHandle: oppositeCorner.towards(anchor.inHandle).abs,
                 point: oppositeCorner.towards(anchor.point).abs,
-                outHandle: oppositeCorner.towards(anchor.outHandle).abs,
+                outHandle: oppositeCorner.towards(anchor.outHandle).abs
             }));
 
             return event => {
@@ -153,7 +152,7 @@ class CurveMutator implements GraphicMutator {
                 this.target.setAnchor(index, {
                     inHandle: anchor.inHandle.add(move),
                     point: anchor.point.add(move),
-                    outHandle: anchor.outHandle.add(move),
+                    outHandle: anchor.outHandle.add(move)
                 });
                 this._repositionCurveAnchor(index);
             },

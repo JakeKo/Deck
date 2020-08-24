@@ -1,7 +1,7 @@
-import { RectangleMouseEvent, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../../events/types";
-import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { RectangleMutator } from "../../rendering/mutators";
-import { resolvePosition } from "../utilities";
+import { RectangleMouseEvent, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
+import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { RectangleMutator } from '@/rendering/mutators';
+import { resolvePosition } from '../utilities';
 
 export function moveRectangle(event: RectangleMouseEvent): void {
     const { slide, baseEvent, target } = event.detail;

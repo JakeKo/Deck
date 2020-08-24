@@ -1,3 +1,4 @@
+import { closeEnough, vectorsCloseEnough } from '@/test/utilities';
 import Vector from '../Vector';
 
 describe('Vector', () => {
@@ -215,7 +216,7 @@ describe('Vector', () => {
     it('can reflect a vector over an arbitrary origin vector', () => {
         // Arrange
         const vector = new Vector(2, -3);
-        const origin = new Vector(-1, 2)
+        const origin = new Vector(-1, 2);
         const expectedReflectedVector = new Vector(-4, 7);
 
         // Act

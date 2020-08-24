@@ -1,6 +1,6 @@
-import * as SVG from 'svg.js';
-import { RectangleRenderer } from "../../rendering/graphics";
-import SlideRenderer from "../../rendering/SlideRenderer";
+import { RectangleRenderer } from '@/rendering/graphics';
+import SlideRenderer from '@/rendering/SlideRenderer';
+import SVG from 'svg.js';
 import { RectangleMouseEvent, RectangleMouseEventPayload, RECTANGLE_EVENTS, SLIDE_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 

@@ -1,11 +1,10 @@
-import { provideId } from "../../utilities/IdProvider";
-import { closestVector } from "../../utilities/utilities";
-import Vector from "../../utilities/Vector";
-import { EllipseRenderer } from "../graphics";
-import { VertexRenderer } from "../helpers";
-import EllipseOutlineRenderer from "../helpers/EllipseOutlineRenderer";
-import SlideRenderer from "../SlideRenderer";
-import { GraphicMaker, VERTEX_ROLES } from "../types";
+import { provideId } from '@/utilities/IdProvider';
+import { closestVector } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
+import { EllipseRenderer } from '../graphics';
+import { EllipseOutlineRenderer, VertexRenderer } from '../helpers';
+import SlideRenderer from '../SlideRenderer';
+import { GraphicMaker, VERTEX_ROLES } from '../types';
 
 type EllipseMakerArgs = {
     slide: SlideRenderer;

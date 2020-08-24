@@ -1,6 +1,7 @@
-import { EllipseMaker } from '..';
-import Vector from '../../../utilities/Vector';
-import { EllipseRenderer } from '../../graphics';
+import { closeEnough, vectorsCloseEnough } from '@/test/utilities';
+import { RectangleMaker } from '..';
+import Vector from '@/utilities/Vector';
+import { RectangleRenderer } from '../../graphics';
 
 const rectMock = {
     translate: () => rectMock,
@@ -39,10 +40,10 @@ const slideMock = {
     setGraphic: () => { return; }
 };
 
-function ellipsesAreEqual(actual, expected) {
+function rectanglesAreEqual(actual: RectangleRenderer, expected: RectangleRenderer) {
     const epsilon = 1E-8;
 
-    expect(vectorsCloseEnough(actual.getCenter(), expected.getCenter(), epsilon)).toBe(true);
+    expect(vectorsCloseEnough(actual.getOrigin(), expected.getOrigin(), epsilon)).toBe(true);
     expect(closeEnough(actual.getWidth(), expected.getWidth(), epsilon)).toBe(true);
     expect(closeEnough(actual.getHeight(), expected.getHeight(), epsilon)).toBe(true);
     expect(closeEnough(actual.getRotation(), expected.getRotation(), epsilon)).toBe(true);
@@ -52,18 +53,18 @@ function ellipsesAreEqual(actual, expected) {
     expect(actual.getStrokeWidth()).toEqual(expected.getStrokeWidth());
 }
 
-describe('EllipseMaker', () => {
-    it('makes an ellipse', () => {
+describe('RectangleMaker', () => {
+    it('makes a rectangle', () => {
         // Arrange
-        const maker = new EllipseMaker({
+        const maker = new RectangleMaker({
             slide: slideMock,
             initialPosition: Vector.zero,
             scale: 1
         });
-        const expected = new EllipseRenderer({
+        const expected = new RectangleRenderer({
             id: '',
             slide: slideMock,
-            center: Vector.zero
+            origin: Vector.zero
         });
 
         // Act
@@ -71,20 +72,20 @@ describe('EllipseMaker', () => {
         const actual = maker.getTarget();
 
         // Assert
-        ellipsesAreEqual(actual, expected);
+        rectanglesAreEqual(actual, expected);
     });
 
-    it('makes an ellipse with a single resize event', () => {
+    it('makes a rectangle with a single resize event', () => {
         // Arrange
-        const maker = new EllipseMaker({
+        const maker = new RectangleMaker({
             slide: slideMock,
             initialPosition: Vector.zero,
             scale: 1
         });
-        const expected = new EllipseRenderer({
+        const expected = new RectangleRenderer({
             id: '',
             slide: slideMock,
-            center: new Vector(2, 3.5),
+            origin: Vector.zero,
             width: 4,
             height: 7
         });
@@ -95,20 +96,20 @@ describe('EllipseMaker', () => {
         const actual = maker.getTarget();
 
         // Assert
-        ellipsesAreEqual(actual, expected);
+        rectanglesAreEqual(actual, expected);
     });
 
-    it('makes an ellipse with multiple resize events', () => {
+    it('makes a rectangle with multiple resize events', () => {
         // Arrange
-        const maker = new EllipseMaker({
+        const maker = new RectangleMaker({
             slide: slideMock,
             initialPosition: Vector.zero,
             scale: 1
         });
-        const expected = new EllipseRenderer({
+        const expected = new RectangleRenderer({
             id: '',
             slide: slideMock,
-            center: new Vector(2.5, 1),
+            origin: Vector.zero,
             width: 5,
             height: 2
         });
@@ -120,44 +121,44 @@ describe('EllipseMaker', () => {
         const actual = maker.getTarget();
 
         // Assert
-        ellipsesAreEqual(actual, expected);
+        rectanglesAreEqual(actual, expected);
     });
 
-    it('makes an ellipse with a shift resize event', () => {
+    it('makes a rectangle with a shift resize event', () => {
         // Arrange
-        const maker = new EllipseMaker({
+        const maker = new RectangleMaker({
             slide: slideMock,
             initialPosition: Vector.zero,
             scale: 1
         });
-        const expected = new EllipseRenderer({
+        const expected = new RectangleRenderer({
             id: '',
             slide: slideMock,
-            center: new Vector(-3, 3),
-            width: 6,
-            height: 6
+            origin: new Vector(-5.5, 0),
+            width: 5.5,
+            height: 5.5
         });
 
         // Act
-        maker.resize(new Vector(-4, 8), true, false, false);
+        maker.resize(new Vector(-4, 7), true, false, false);
         maker.complete();
         const actual = maker.getTarget();
 
         // Assert
-        ellipsesAreEqual(actual, expected);
+        rectanglesAreEqual(actual, expected);
     });
 
-    it('makes an ellipse with a ctrl resize event', () => {
+    it('makes a rectangle with a ctrl resize event', () => {
         // Arrange
-        const maker = new EllipseMaker({
+        const maker = new RectangleMaker({
             slide: slideMock,
             initialPosition: Vector.zero,
             scale: 1
         });
-        const expected = new EllipseRenderer({
+        const expected = new RectangleRenderer({
             id: '',
             slide: slideMock,
-            center: Vector.zero,
+            origin: new Vector(-5, -2),
             width: 10,
             height: 4
         });
@@ -168,20 +169,20 @@ describe('EllipseMaker', () => {
         const actual = maker.getTarget();
 
         // Assert
-        ellipsesAreEqual(actual, expected);
+        rectanglesAreEqual(actual, expected);
     });
 
-    it('makes an ellipse with a ctrl and shift resize event', () => {
+    it('makes a rectangle with a ctrl and shift resize event', () => {
         // Arrange
-        const maker = new EllipseMaker({
+        const maker = new RectangleMaker({
             slide: slideMock,
             initialPosition: Vector.zero,
             scale: 1
         });
-        const expected = new EllipseRenderer({
+        const expected = new RectangleRenderer({
             id: '',
             slide: slideMock,
-            origin: Vector.zero,
+            origin: new Vector(-7, -7),
             width: 14,
             height: 14
         });
@@ -192,12 +193,12 @@ describe('EllipseMaker', () => {
         const actual = maker.getTarget();
 
         // Assert
-        ellipsesAreEqual(actual, expected);
+        rectanglesAreEqual(actual, expected);
     });
 
     it('can correct for zooming', () => {
         // Arrange
-        const maker = new EllipseMaker({
+        const maker = new RectangleMaker({
             slide: slideMock,
             initialPosition: Vector.zero,
             scale: 1

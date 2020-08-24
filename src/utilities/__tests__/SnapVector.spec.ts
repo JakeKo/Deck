@@ -1,3 +1,4 @@
+import { closeEnough, vectorsCloseEnough } from '@/test/utilities';
 import SnapVector from '../SnapVector';
 import Vector from '../Vector';
 

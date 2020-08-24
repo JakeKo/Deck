@@ -1,8 +1,8 @@
-import * as SVG from 'svg.js';
-import { CurveRenderer } from "../../rendering/graphics";
-import SlideRenderer from "../../rendering/SlideRenderer";
-import { CurveMouseEvent, CurveMouseEventPayload, CURVE_EVENTS, SLIDE_EVENTS } from "../types";
-import { dispatch, makeSlideMouseEvent } from "../utilities";
+import { CurveRenderer } from '@/rendering/graphics';
+import SlideRenderer from '@/rendering/SlideRenderer';
+import SVG from 'svg.js';
+import { CurveMouseEvent, CurveMouseEventPayload, CURVE_EVENTS, SLIDE_EVENTS } from '../types';
+import { dispatch, makeSlideMouseEvent } from '../utilities';
 
 function makeCurveMouseEvent(name: CURVE_EVENTS, slide: SlideRenderer, target: CurveRenderer, baseEvent: MouseEvent): CurveMouseEvent {
     return new CustomEvent<CurveMouseEventPayload>(name, { detail: { type: name, slide, target, baseEvent } });

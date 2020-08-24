@@ -1,5 +1,6 @@
+import { closeEnough, vectorsCloseEnough } from '@/test/utilities';
+import Vector from '@/utilities/Vector';
 import { ImageMaker } from '..';
-import Vector from '../../../utilities/Vector';
 import { ImageRenderer } from '../../graphics';
 
 const rectMock = {
@@ -54,7 +55,7 @@ const slideMock = {
     setGraphic: () => { return; }
 };
 
-function imagesAreEqual(actual, expected) {
+function imagesAreEqual(actual: ImageRenderer, expected: ImageRenderer) {
     const epsilon = 1E-8;
 
     expect(vectorsCloseEnough(actual.getOrigin(), expected.getOrigin(), epsilon)).toBe(true);

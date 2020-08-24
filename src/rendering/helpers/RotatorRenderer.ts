@@ -1,9 +1,9 @@
-import * as SVG from 'svg.js';
-import { decorateRotateEvents } from '../../events/decorators/rotators';
-import Vector from '../../utilities/Vector';
+import SVG from 'svg.js';
+import { decorateRotateEvents } from '@/events/decorators/rotators';
+import Vector from '@/utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GraphicRenderer, GRAPHIC_TYPES, HelperRenderer } from '../types';
-import { radToDeg } from '../../utilities/utilities';
+import { radToDeg } from '@/utilities/utilities';
 
 type RotatorRendererArgs = {
     slide: SlideRenderer;

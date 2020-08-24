@@ -1,9 +1,9 @@
-import * as SVG from 'svg.js';
-import { CurveAnchorRenderer } from '../../rendering/helpers';
-import SlideRenderer from "../../rendering/SlideRenderer";
-import { CurveAnchorMouseEvent, CurveAnchorMouseEventPayload, CURVE_ANCHOR_EVENTS, SLIDE_EVENTS } from "../types";
-import { dispatch, makeSlideMouseEvent } from "../utilities";
-import { CURVE_ANCHOR_ROLES } from '../../rendering/types';
+import { CurveAnchorRenderer } from '@/rendering/helpers';
+import SlideRenderer from '@/rendering/SlideRenderer';
+import { CURVE_ANCHOR_ROLES } from '@/rendering/types';
+import SVG from 'svg.js';
+import { CurveAnchorMouseEvent, CurveAnchorMouseEventPayload, CURVE_ANCHOR_EVENTS, SLIDE_EVENTS } from '../types';
+import { dispatch, makeSlideMouseEvent } from '../utilities';
 
 function makeCurveAnchorMouseEvent(name: CURVE_ANCHOR_EVENTS, slide: SlideRenderer, parentId: string, index: number, role: CURVE_ANCHOR_ROLES, baseEvent: MouseEvent): CurveAnchorMouseEvent {
     return new CustomEvent<CurveAnchorMouseEventPayload>(name, {

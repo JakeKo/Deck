@@ -9,6 +9,6 @@ describe('IdProvider', () => {
         const id2 = IdProvider.provideId();
 
         // Assert
-        expect(id1 === id2).toBe(false);
+        expect(id1).not.toEqual(id2);
     });
 });

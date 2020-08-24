@@ -1,80 +1,48 @@
-<template>   
-<div :style='toolStyle' @click='$emit("tool-click")'>
-    <i :style='toolIconStyle' :class='icon' />
+<template>
+<div ref='root' :style='style.tool'>
+    <i :style='style.toolIcon' :class='icon' />
     {{name}}
 </div>
 </template>
 
 <script lang='ts'>
-import { Component, Prop } from 'vue-property-decorator';
-import { StyleCreator, BaseStyles } from '../styling/types';
-import { Getter } from 'vuex-class';
-import { GETTERS } from '../store/types';
 import DeckComponent from './generic/DeckComponent';
+import { defineComponent, reactive, computed } from 'vue';
 
-// TODO: Consider implementing CSS type
-export type StyleProps = {};
-export type Style = {
-    tool: any;
-    toolIcon: any;
-    toolHover: any;
-    activeTool: any;
-    activeToolHover: any;
-    activeToolIcon: any;
-};
-const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
-    tool: {
-        ...base.flexColCC,
-        ...base.fontLabel,
-        width: '100%',
-        cursor: 'pointer',
-        padding: '8px 0',
-        color: theme.color.basecomp.lowest,
-        background: theme.color.base.highest,
-        transition: '0.25s'
+const Tool = defineComponent({
+    props: {
+        name: { type: String, required: true },
+        icon: { type: String, required: true }
     },
-    toolIcon: {
-        fontSize: theme.text.body.size,
-        color: theme.color.basecomp.lowest,
-        padding: '4px 0'
-    },
-    toolHover: {
-        background: theme.color.base.flush
-    },
-    activeTool: {
-        color: theme.color.base.highest,
-        background: theme.color.primary.flush
-    },
-    activeToolHover: {
-        background: theme.color.primary.lowest
-    },
-    activeToolIcon: {
-        color: theme.color.base.highest
+    setup: props => {
+        const { root, store, baseStyle, baseTheme, isHovered } = DeckComponent();
+        const isActive = computed(() => store.activeToolName.value === props.name);
+        const style = reactive({
+            tool: computed(() => ({
+                ...baseStyle.value.flexColCC,
+                ...baseStyle.value.fontLabel,
+                width: '100%',
+                cursor: 'pointer',
+                padding: '8px 0',
+                color: isActive.value ? baseTheme.value.color.base.highest : baseTheme.value.color.basecomp.lowest,
+                background: isActive.value
+                    ? (isHovered.value ? baseTheme.value.color.primary.lowest : baseTheme.value.color.primary.flush)
+                    : (isHovered.value ? baseTheme.value.color.base.flush : baseTheme.value.color.base.highest),
+                transition: '0.25s'
+            })),
+            toolIcon: computed(() => ({
+                fontSize: baseTheme.value.text.body.size,
+                color: isActive.value ? baseTheme.value.color.base.highest : baseTheme.value.color.basecomp.lowest,
+                padding: '4px 0'
+            }))
+        });
+
+        return {
+            root,
+            style
+        };
     }
 });
 
-@Component
-export default class Tool extends DeckComponent<StyleProps, Style> {
-    @Prop({ type: String, required: true }) private name!: string;
-    @Prop({ type: Boolean, required: true }) private isActive!: boolean;
-    @Prop({ type: String, required: true }) private icon!: string;
-
-    private get toolStyle(): any {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return {
-            ...style.tool,
-            ...this.isHovered && style.toolHover,
-            ...this.isActive && style.activeTool,
-            ...this.isHovered && this.isActive && style.activeToolHover
-        };
-    }
-
-    private get toolIconStyle(): any {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return {
-            ...style.toolIcon,
-            ...this.isActive && style.activeToolIcon
-        };
-    }
-}
+export default Tool;
 </script>

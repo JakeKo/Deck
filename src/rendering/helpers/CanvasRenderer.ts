@@ -1,7 +1,7 @@
-import * as SVG from 'svg.js';
-import Vector from "../../utilities/Vector";
+import SVG from 'svg.js';
+import Vector from '@/utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
-import { GRAPHIC_TYPES, HelperRenderer } from "../types";
+import { GRAPHIC_TYPES, HelperRenderer } from '../types';
 
 type CanvasRendererArgs = {
     slide: SlideRenderer;
@@ -50,9 +50,7 @@ class CanvasRenderer implements HelperRenderer {
         this._svg = undefined;
     }
 
-    public setScale(): void {
-        return;
-    }
+    public setScale(): void { ; }
 }
 
 export default CanvasRenderer;

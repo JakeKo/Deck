@@ -1,5 +1,5 @@
 import * as Utilities from '../utilities';
-import Vector from "../Vector";
+import Vector from '../Vector';
 
 describe('Utilities', () => {
     describe('closestVector', () => {

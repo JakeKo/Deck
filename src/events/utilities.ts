@@ -1,6 +1,6 @@
-import SlideRenderer from "../rendering/SlideRenderer";
-import { GraphicRenderer, HelperRenderer } from "../rendering/types";
-import { DECK_EVENTS, SlideMouseEvent, SlideMouseEventPayload, SLIDE_EVENTS } from "./types";
+import SlideRenderer from '@/rendering/SlideRenderer';
+import { GraphicRenderer, HelperRenderer } from '@/rendering/types';
+import { DECK_EVENTS, SlideMouseEvent, SlideMouseEventPayload, SLIDE_EVENTS } from './types';
 
 export function listen(eventName: DECK_EVENTS, handler: (event: CustomEvent) => void): void {
     document.addEventListener(eventName, handler as EventListener);

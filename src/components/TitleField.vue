@@ -1,63 +1,45 @@
 <template>
-<input :style="titleFieldStyle" v-model='deckTitle' @keydown='handleKeydown' autocomplete='off' placeholder='Untitled'>
+<input ref='root' :style="style.titleField" v-model='deckTitle' @keydown='handleKeydown' autocomplete='off' placeholder='Untitled'>
 </template>
 
 <script lang='ts'>
-import { Component } from 'vue-property-decorator';
-import { MUTATIONS, GETTERS } from '../store/types';
-import { Getter, Mutation } from 'vuex-class';
-import { StyleCreator } from '../styling/types';
 import DeckComponent from './generic/DeckComponent';
+import { defineComponent, reactive, computed } from 'vue';
 
-type StyleProps = {};
-type Style = {
-    titleField: any;
-    titleFieldHover: any;
-    titleFieldFocus: any;
-};
-const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
-    titleField: {
-        outline: 'none',
-        border: 'none',
-        textAlign: 'center',
-        ...base.fontBody,
-        transition: '0.25s',
-        background: 'transparent'
-    },
-    titleFieldHover: {
-        background: theme.color.base.higher
-    },
-    titleFieldFocus: {
-        background: theme.color.base.flush
+const TitleField = defineComponent({
+    setup: () => {
+        const { root, store, baseStyle, baseTheme, isFocused, isHovered } = DeckComponent();
+        const style = reactive({
+            titleField: computed(() => ({
+                outline: 'none',
+                border: 'none',
+                textAlign: 'center',
+                ...baseStyle.value.fontBody,
+                transition: '0.25s',
+                background: isFocused.value
+                    ? baseTheme.value.color.base.flush
+                    : isHovered.value ? baseTheme.value.color.base.higher : 'transparent'
+            }))
+        });
+        const deckTitle = computed({
+            get: () => store.deckTitle.value ?? '',
+            set: value => store.setDeckTitle(value)
+        });
+
+        function handleKeydown(event: KeyboardEvent): void {
+            if (['Tab', 'Enter', 'Escape'].indexOf(event.key) !== -1) {
+                (event.target as HTMLInputElement).blur();
+            }
+        }
+
+        return {
+            root,
+            style,
+            deckTitle,
+            handleKeydown
+        };
     }
 });
 
-@Component
-export default class TitleField extends DeckComponent<StyleProps, Style> {
-    @Getter private [GETTERS.DECK_TITLE]: string;
-    @Mutation private [MUTATIONS.DECK_TITLE]: (deckTitle: string) => void;
-
-    private get deckTitle(): string {
-        return this[GETTERS.DECK_TITLE];
-    }
-
-    private set deckTitle(deckTitle: string) {
-        this[MUTATIONS.DECK_TITLE](deckTitle);
-    }
-
-    private get titleFieldStyle(): any {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return {
-            ...style.titleField,
-            ...this.isHovered && style.titleFieldHover,
-            ...this.isFocused && style.titleFieldFocus
-        };
-    }
-
-    private handleKeydown(event: KeyboardEvent): void {
-        if (['Tab', 'Enter', 'Escape'].indexOf(event.key) !== -1) {
-            (event.target as HTMLInputElement).blur();
-        }
-    }
-}
+export default TitleField;
 </script>

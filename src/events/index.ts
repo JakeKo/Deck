@@ -1,4 +1,4 @@
-import { DECK_EVENTS } from "./types";
+import { DECK_EVENTS } from './types';
 
 type DeckEventHandler = (event: CustomEvent) => void;
 

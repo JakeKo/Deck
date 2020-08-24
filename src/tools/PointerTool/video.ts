@@ -1,7 +1,7 @@
-import { SlideMouseEvent, SLIDE_EVENTS, VideoMouseEvent, VIDEO_EVENTS } from "../../events/types";
-import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { VideoMutator } from "../../rendering/mutators";
-import { resolvePosition } from "../utilities";
+import { SlideMouseEvent, SLIDE_EVENTS, VideoMouseEvent, VIDEO_EVENTS } from '@/events/types';
+import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { VideoMutator } from '@/rendering/mutators';
+import { resolvePosition } from '../utilities';
 
 export function moveVideo(event: VideoMouseEvent): void {
     const { slide, baseEvent, target } = event.detail;

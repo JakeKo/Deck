@@ -1,4 +1,4 @@
-import Vector from '../utilities/Vector';
+import Vector from '@/utilities/Vector';
 import { BoxRenderer, CanvasRenderer, RotatorRenderer, VertexRenderer } from './helpers';
 import SlideRenderer from './SlideRenderer';
 import { BoundingBox, BoundingBoxMutatorHelpers, GraphicRenderer, VERTEX_ROLES } from './types';
@@ -58,7 +58,7 @@ export function makeBoxHelpers(target: GraphicRenderer, slide: SlideRenderer, sc
                 center: box.bottomRight,
                 scale: scale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
-            }),
+            })
         }
     };
 }
