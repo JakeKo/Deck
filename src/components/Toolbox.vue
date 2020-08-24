@@ -4,7 +4,7 @@
         :key='tool.name'
         :name='tool.name'
         :icon='tool.icon'
-        @tool-click='tool.activator'
+        @click='tool.activator'
     />
 </div>
 </template>

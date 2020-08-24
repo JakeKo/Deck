@@ -21,10 +21,10 @@ const TitleField = defineComponent({
                     : isHovered.value ? baseTheme.value.color.base.higher : 'transparent'
             }))
         });
-        const deckTitle = computed(() => ({
-            get: store.deckTitle.value,
-            set: store.setDeckTitle
-        }));
+        const deckTitle = computed({
+            get: () => store.deckTitle.value ?? '',
+            set: value => store.setDeckTitle(value)
+        });
 
         function handleKeydown(event: KeyboardEvent): void {
             if (['Tab', 'Enter', 'Escape'].indexOf(event.key) !== -1) {

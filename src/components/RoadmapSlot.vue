@@ -1,5 +1,5 @@
 <template>
-<div ref='root' :style='style.roadmapSlot' @click='() => setActiveSlideId(id)'>
+<div ref='root' :style='style.roadmapSlot' @click='() => setActiveSlide(id)'>
     <div :style="style.slideTopic">Topic</div>
     <svg ref='canvas' :viewBox="previewViewbox" :style="style.slidePreview" />
 </div>
@@ -57,6 +57,7 @@ const RoadmapSlot = defineComponent({
 
         return {
             root,
+            canvas,
             style,
             previewViewbox,
             setActiveSlide: store.setActiveSlide

@@ -1,5 +1,5 @@
 <template>
-<div ref='root' :style="style.editor" @mousewheel='handleMouseWheel'>
+<div ref='root' :style="style.editor" @mousewheel.passive='handleMouseWheel'>
     <SlidePlaceholder v-if='slides.length === 0' />
     <Slide v-for='slide in slides'
         :key='slide.id'

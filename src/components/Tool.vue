@@ -1,5 +1,5 @@
 <template>
-<div ref='root' :style='style.tool' @click='$emit("tool-click")'>
+<div ref='root' :style='style.tool'>
     <i :style='style.toolIcon' :class='icon' />
     {{name}}
 </div>
@@ -26,8 +26,8 @@ const Tool = defineComponent({
                 padding: '8px 0',
                 color: isActive.value ? baseTheme.value.color.base.highest : baseTheme.value.color.basecomp.lowest,
                 background: isActive.value
-                    ? isHovered ? baseTheme.value.color.primary.lowest : baseTheme.value.color.primary.flush
-                    : isHovered ? baseTheme.value.color.base.flush : baseTheme.value.color.base.highest,
+                    ? (isHovered.value ? baseTheme.value.color.primary.lowest : baseTheme.value.color.primary.flush)
+                    : (isHovered.value ? baseTheme.value.color.base.flush : baseTheme.value.color.base.highest),
                 transition: '0.25s'
             })),
             toolIcon: computed(() => ({

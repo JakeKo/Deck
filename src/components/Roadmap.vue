@@ -53,6 +53,7 @@ const Roadmap = defineComponent({
                 background: baseTheme.value.color.primary.flush
             }))
         });
+        const roadmapSlides = computed(() => store.roadmapSlides.value);
 
         function createNewSlide(): void {
             store.addSlide(store.slides.value.length);
@@ -68,7 +69,7 @@ const Roadmap = defineComponent({
             root,
             style,
             createNewSlide,
-            roadmapSlides: store.roadmapSlides.value
+            roadmapSlides
         };
     }
 });
