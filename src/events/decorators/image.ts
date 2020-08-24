@@ -1,6 +1,6 @@
-import * as SVG from 'svg.js';
-import ImageRenderer from '../../rendering/graphics/ImageRenderer';
-import SlideRenderer from "../../rendering/SlideRenderer";
+import ImageRenderer from '@/rendering/graphics/ImageRenderer';
+import SlideRenderer from '@/rendering/SlideRenderer';
+import SVG from 'svg.js';
 import { ImageMouseEvent, ImageMouseEventPayload, IMAGE_EVENTS, SLIDE_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 

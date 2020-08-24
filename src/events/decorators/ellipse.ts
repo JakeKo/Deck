@@ -1,6 +1,6 @@
-import * as SVG from 'svg.js';
-import EllipseRenderer from '../../rendering/graphics/EllipseRenderer';
-import SlideRenderer from "../../rendering/SlideRenderer";
+import EllipseRenderer from '@/rendering/graphics/EllipseRenderer';
+import SlideRenderer from '@/rendering/SlideRenderer';
+import SVG from 'svg.js';
 import { EllipseMouseEvent, EllipseMouseEventPayload, ELLIPSE_EVENTS, SLIDE_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 

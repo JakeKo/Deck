@@ -1,4 +1,4 @@
-import Vector from "./Vector";
+import Vector from './Vector';
 
 // Returns the vector in candidates which is closest to the target vector
 export function closestVector(target: Vector, candidates: Vector[]): Vector {

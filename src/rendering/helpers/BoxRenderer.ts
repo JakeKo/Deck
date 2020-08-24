@@ -1,8 +1,8 @@
-import * as SVG from 'svg.js';
-import Vector from '../../utilities/Vector';
+import SVG from 'svg.js';
+import Vector from '@/utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GRAPHIC_TYPES, HelperRenderer } from '../types';
-import { radToDeg } from '../../utilities/utilities';
+import { radToDeg } from '@/utilities/utilities';
 
 type BoxRendererArgs = {
     slide: SlideRenderer;

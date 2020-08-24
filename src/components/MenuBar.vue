@@ -1,41 +1,38 @@
 <template>
-<div :style="menuBarStyle">
-    <title-field />
+<div ref='root' :style="style.menuBar">
+    <TitleField />
 </div>
 </template>
 
 <script lang='ts'>
-import { Component } from 'vue-property-decorator';
-import { MUTATIONS, GETTERS } from '../store/types';
-import { StyleCreator } from '../styling/types';
 import DeckComponent from './generic/DeckComponent';
 import TitleField from './TitleField.vue';
+import { defineComponent, computed, reactive } from 'vue';
 
-type StyleProps = {};
-type Style = {
-    menuBar: any;
-};
-const menuBarStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
-    menuBar: {
-        height: '28px',
-        flexShrink: '0',
-        boxSizing: 'border-box',
-        borderBottom: `1px solid ${theme.color.base.flush}`,
-        background: theme.color.base.highest,
-        ...base.fontBody,
-        ...base.flexRowCC
+const MenuBar = defineComponent({
+    components: {
+        TitleField
+    },
+    setup: () => {
+        const { root, baseStyle, baseTheme } = DeckComponent();
+        const style = reactive({
+            menuBar: computed(() => ({
+                height: '28px',
+                flexShrink: '0',
+                boxSizing: 'border-box',
+                borderBottom: `1px solid ${baseTheme.value.color.base.flush}`,
+                background: baseTheme.value.color.base.highest,
+                ...baseStyle.value.fontBody,
+                ...baseStyle.value.flexRowCC
+            }))
+        });
+
+        return {
+            root,
+            style
+        };
     }
 });
 
-@Component({
-    components: {
-        TitleField
-    }
-})
-export default class MenuBar extends DeckComponent<StyleProps, Style> {
-    private get menuBarStyle(): any {
-        const style = this[GETTERS.STYLE]({}, menuBarStyle);
-        return style.menuBar;
-    }
-}
+export default MenuBar;
 </script>

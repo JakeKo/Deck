@@ -1,10 +1,10 @@
-import { provideId } from "../../utilities/IdProvider";
-import { closestVector } from "../../utilities/utilities";
-import Vector from "../../utilities/Vector";
-import { VideoRenderer } from "../graphics";
-import { RectangleOutlineRenderer, VertexRenderer } from "../helpers";
-import SlideRenderer from "../SlideRenderer";
-import { GraphicMaker, VERTEX_ROLES } from "../types";
+import { provideId } from '@/utilities/IdProvider';
+import { closestVector } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
+import { VideoRenderer } from '../graphics';
+import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
+import SlideRenderer from '../SlideRenderer';
+import { GraphicMaker, VERTEX_ROLES } from '../types';
 
 type VideoMakerArgs = {
     slide: SlideRenderer;

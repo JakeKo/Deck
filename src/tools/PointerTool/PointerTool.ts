@@ -1,16 +1,15 @@
-import { CurveAnchorMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, RotatorMouseEvent, ROTATOR_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS } from "../../events/types";
-import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { GRAPHIC_TYPES } from "../../rendering/types";
-import { AppStore } from "../../store/types";
-import { EditorTool, TOOL_NAMES } from "../types";
-import { hoverCurve, moveCurve, moveCurveAnchor } from "./curve";
-import { hoverEllipse, moveEllipse } from "./ellipse";
-import { hoverImage, moveImage } from "./image";
-import { hoverRectangle, moveRectangle } from "./rectangle";
-import { hoverTextbox, moveTextbox } from "./textbox";
-import { hoverVideo, moveVideo } from "./video";
+import { CurveAnchorMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, ELLIPSE_EVENTS, IMAGE_EVENTS, RECTANGLE_EVENTS, RotatorMouseEvent, ROTATOR_EVENTS, SlideMouseEvent, SLIDE_EVENTS, TEXTBOX_EVENTS, VertexMouseEvent, VERTEX_EVENTS, VIDEO_EVENTS } from '@/events/types';
+import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { GRAPHIC_TYPES } from '@/rendering/types';
+import { EditorTool, TOOL_NAMES } from '../types';
+import { hoverCurve, moveCurve, moveCurveAnchor } from './curve';
+import { hoverEllipse, moveEllipse } from './ellipse';
+import { hoverImage, moveImage } from './image';
+import { hoverRectangle, moveRectangle } from './rectangle';
+import { hoverTextbox, moveTextbox } from './textbox';
+import { hoverVideo, moveVideo } from './video';
 
-export default (store: AppStore): EditorTool => {
+export default (): EditorTool => {
     return {
         name: TOOL_NAMES.POINTER,
         mount: () => {

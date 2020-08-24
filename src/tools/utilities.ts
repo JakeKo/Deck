@@ -1,5 +1,5 @@
-import SlideRenderer from "../rendering/SlideRenderer";
-import Vector from "../utilities/Vector";
+import SlideRenderer from '../rendering/SlideRenderer';
+import Vector from '@/utilities/Vector';
 
 export function resolvePosition(event: MouseEvent, slideRenderer: SlideRenderer): Vector {
     return new Vector(event.pageX, event.pageY)

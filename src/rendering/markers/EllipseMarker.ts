@@ -1,7 +1,7 @@
-import { EllipseRenderer } from "../graphics";
-import EllipseOutlineRenderer from "../helpers/EllipseOutlineRenderer";
-import SlideRenderer from "../SlideRenderer";
-import { GraphicMarker } from "../types";
+import { EllipseRenderer } from '../graphics';
+import { EllipseOutlineRenderer } from '../helpers';
+import SlideRenderer from '../SlideRenderer';
+import { GraphicMarker } from '../types';
 
 type EllipseMarkerArgs = {
     slide: SlideRenderer;

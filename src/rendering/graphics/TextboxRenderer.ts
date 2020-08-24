@@ -1,8 +1,8 @@
-import { decorateTextboxEvents } from '../../events/decorators';
-import Vector from '../../utilities/Vector';
+import { decorateTextboxEvents } from '@/events/decorators';
+import Vector from '@/utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from '../types';
-import { radToDeg } from '../../utilities/utilities';
+import { radToDeg } from '@/utilities/utilities';
 
 type TextboxRendererArgs = {
     id: string;

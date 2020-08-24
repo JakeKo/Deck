@@ -1,10 +1,10 @@
 import * as SVG from 'svg.js';
-import { decorateSlideEvents } from '../events/decorators';
-import { SlideKeyboardEvent, SlideZoomEvent, SLIDE_EVENTS } from '../events/types';
-import { listen } from '../events/utilities';
-import { Viewbox } from '../store/types';
-import SlideStateManager from '../utilities/SlideStateManager';
-import Vector from '../utilities/Vector';
+import { decorateSlideEvents } from '@/events/decorators';
+import { SlideKeyboardEvent, SlideZoomEvent, SLIDE_EVENTS } from '@/events/types';
+import { listen } from '@/events/utilities';
+import { Viewbox } from '@/store/types';
+import SlideStateManager from '@/utilities/SlideStateManager';
+import Vector from '@/utilities/Vector';
 import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from './graphics';
 import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, VideoMaker } from './makers';
 import { CurveMarker, EllipseMarker, ImageMarker, RectangleMarker, TextboxMarker, VideoMarker } from './markers';
@@ -206,7 +206,7 @@ class SlideRenderer {
         } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
             mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, target: graphic as RectangleRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
-            mutator = new TextboxMutator({ slide: this, scale: 1 / this._zoom, target: graphic as TextboxRenderer});
+            mutator = new TextboxMutator({ slide: this, scale: 1 / this._zoom, target: graphic as TextboxRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
             mutator = new VideoMutator({ slide: this, scale: 1 / this._zoom, target: graphic as VideoRenderer });
         } else {
@@ -249,7 +249,7 @@ class SlideRenderer {
         } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
             marker = new RectangleMarker({ slide: this, scale: 1 / this._zoom, target: graphic as RectangleRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
-            marker = new TextboxMarker({ slide: this, scale: 1 / this._zoom, target: graphic as TextboxRenderer});
+            marker = new TextboxMarker({ slide: this, scale: 1 / this._zoom, target: graphic as TextboxRenderer });
         } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
             marker = new VideoMarker({ slide: this, scale: 1 / this._zoom, target: graphic as VideoRenderer });
         } else {

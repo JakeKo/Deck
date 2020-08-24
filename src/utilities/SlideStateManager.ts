@@ -1,8 +1,8 @@
-import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from "../rendering/graphics";
-import SlideRenderer from "../rendering/SlideRenderer";
-import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from "../rendering/types";
-import { AppStore, CurveStoreModel, EllipseStoreModel, GraphicStoreModel, ImageStoreModel, MUTATIONS, RectangleStoreModel, TextboxStoreModel, VideoStoreModel } from "../store/types";
-import Vector from "./Vector";
+import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from '@/rendering/graphics';
+import SlideRenderer from '@/rendering/SlideRenderer';
+import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from '@/rendering/types';
+import { AppStore, CurveStoreModel, EllipseStoreModel, GraphicStoreModel, ImageStoreModel, RectangleStoreModel, TextboxStoreModel, VideoStoreModel } from '@/store/types';
+import Vector from './Vector';
 
 export default class SlideStateManager {
     private _slideId: string;
@@ -24,30 +24,27 @@ export default class SlideStateManager {
     public setGraphicFromRenderer(graphic: GraphicRenderer): void {
         if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
             const storeModel = this._curveRendererToStoreModel(graphic as CurveRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
             const storeModel = this._ellipseRendererToStoreModel(graphic as EllipseRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
             const storeModel = this._imageRendererToStoreModel(graphic as ImageRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
             const storeModel = this._rectangleRendererToStoreModel(graphic as RectangleRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
             const storeModel = this._textboxRendererToStoreModel(graphic as TextboxRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
             const storeModel = this._videoRendererToStoreModel(graphic as VideoRenderer);
-            this._store && this._store.commit(MUTATIONS.SET_GRAPHIC, { slide: this._slideId, graphic: storeModel });
+            this._store && this._store.setGraphic(this._slideId, storeModel);
         }
     }
 
     public removeGraphicFromRenderer(graphicId: string): void {
-        this._store && this._store.commit(MUTATIONS.REMOVE_GRAPHIC, {
-            slideId: this._slideId,
-            graphicId
-        });
+        this._store && this._store.removeGraphic(this._slideId, graphicId);
     }
 
     public setGraphicFromStore(graphic: GraphicStoreModel): void {
@@ -77,9 +74,13 @@ export default class SlideStateManager {
     }
 
     private _curveStoreModelToRenderer(curve: CurveStoreModel): CurveRenderer {
+        if (this._renderer === undefined) {
+            throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
+        }
+
         return new CurveRenderer({
             id: curve.id,
-            slide: this._renderer!,
+            slide: this._renderer,
             anchors: curve.points.reduce<CurveAnchor[]>((anchors, _, index) => index % 3 === 0 ? [...anchors, {
                 inHandle: curve.points[index],
                 point: curve.points[index + 1],
@@ -105,9 +106,13 @@ export default class SlideStateManager {
     }
 
     private _ellipseStoreModelToRenderer(ellipse: EllipseStoreModel): EllipseRenderer {
+        if (this._renderer === undefined) {
+            throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
+        }
+
         return new EllipseRenderer({
             id: ellipse.id,
-            slide: this._renderer!,
+            slide: this._renderer,
             center: ellipse.center,
             width: ellipse.width,
             height: ellipse.height,
@@ -133,9 +138,13 @@ export default class SlideStateManager {
     }
 
     private _imageStoreModelToRenderer(image: ImageStoreModel): ImageRenderer {
+        if (this._renderer === undefined) {
+            throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
+        }
+
         return new ImageRenderer({
             id: image.id,
-            slide: this._renderer!,
+            slide: this._renderer,
             origin: image.origin,
             source: image.source,
             width: image.width,
@@ -161,9 +170,13 @@ export default class SlideStateManager {
     }
 
     private _rectangleStoreModelToRenderer(rectangle: RectangleStoreModel): RectangleRenderer {
+        if (this._renderer === undefined) {
+            throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
+        }
+
         return new RectangleRenderer({
             id: rectangle.id,
-            slide: this._renderer!,
+            slide: this._renderer,
             origin: rectangle.origin,
             width: rectangle.width,
             height: rectangle.height,
@@ -189,9 +202,13 @@ export default class SlideStateManager {
     }
 
     private _textboxStoreModelToRenderer(textbox: TextboxStoreModel): TextboxRenderer {
+        if (this._renderer === undefined) {
+            throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
+        }
+
         return new TextboxRenderer({
             id: textbox.id,
-            slide: this._renderer!,
+            slide: this._renderer,
             text: textbox.text,
             origin: textbox.origin,
             width: textbox.width,
@@ -221,9 +238,13 @@ export default class SlideStateManager {
     private _videoStoreModelToRenderer(video: VideoStoreModel): VideoRenderer {
         const el = document.createElement('video');
         el.src = video.source;
+        if (this._renderer === undefined) {
+            throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
+        }
+
         return new VideoRenderer({
             id: video.id,
-            slide: this._renderer!,
+            slide: this._renderer,
             origin: video.origin,
             source: el,
             width: video.width,

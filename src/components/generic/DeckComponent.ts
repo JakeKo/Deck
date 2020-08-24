@@ -1,25 +1,35 @@
-import { Component, Vue } from 'vue-property-decorator';
-import { Getter } from 'vuex-class';
-import { GETTERS } from '../../store/types';
-import { BaseStyles, StyleCreator } from '../../styling/types';
+import { getBaseStyles, themes } from '@/styling';
+import { onMounted, ref } from 'vue';
+import { useStore } from '@/store';
 
-@Component
-class DeckComponent<T, U> extends Vue {
-    @Getter public [GETTERS.STYLE]: (props: T, customStyles: StyleCreator<T, U>) => BaseStyles & U;
-    public isHovered: boolean = false;
-    public isFocused: boolean = false;
+function DeckComponent() {
+    const root = ref<HTMLElement | undefined>(undefined);
+    const baseTheme = ref(themes.light);
+    const baseStyle = ref(getBaseStyles(baseTheme.value));
+    const isHovered = ref(false);
+    const isFocused = ref(false);
+    const store = useStore();
 
-    public mounted(): void {
-        this.bindEvents();
-    }
+    onMounted(() => {
+        if (root.value === undefined) {
+            console.warn('Root ref not specified. Interaction setters like isHovered and isFocused will not update.');
+            return;
+        }
 
-    // TODO: Investigate ways for events to be automatically bound on all components
-    public bindEvents(): void {
-        this.$el.addEventListener('mouseover', () => this.isHovered = true);
-        this.$el.addEventListener('mouseleave', () => this.isHovered = false);
-        this.$el.addEventListener('focus', () => this.isFocused = true);
-        this.$el.addEventListener('blur', () => this.isFocused = false);
-    }
+        root.value.addEventListener('mouseover', () => { isHovered.value = true; });
+        root.value.addEventListener('mouseleave', () => { isHovered.value = false; });
+        root.value.addEventListener('focus', () => { isFocused.value = true; });
+        root.value.addEventListener('blur', () => { isFocused.value = false; });
+    });
+
+    return {
+        root,
+        baseTheme,
+        baseStyle,
+        isHovered,
+        isFocused,
+        store
+    };
 }
 
 export default DeckComponent;
