@@ -1,7 +1,7 @@
-import { ImageRenderer } from "../graphics";
-import { RectangleOutlineRenderer } from "../helpers";
-import SlideRenderer from "../SlideRenderer";
-import { GraphicMarker } from "../types";
+import { ImageRenderer } from '../graphics';
+import { RectangleOutlineRenderer } from '../helpers';
+import SlideRenderer from '../SlideRenderer';
+import { GraphicMarker } from '../types';
 
 type ImageMarkerArgs = {
     slide: SlideRenderer;

@@ -1,9 +1,9 @@
-import * as SVG from 'svg.js';
-import { decorateCurveEvents } from '../../events/decorators';
-import { radToDeg } from '../../utilities/utilities';
-import Vector from '../../utilities/Vector';
+import { decorateCurveEvents } from '@/events/decorators';
+import { radToDeg } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
+import SVG from 'svg.js';
 import SlideRenderer from '../SlideRenderer';
-import { BoundingBox, CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from "../types";
+import { BoundingBox, CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from '../types';
 
 type CurveRendererArgs = {
     id: string;

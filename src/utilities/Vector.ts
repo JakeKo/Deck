@@ -1,4 +1,4 @@
-import { mod } from "./utilities";
+import { mod } from './utilities';
 
 export default class Vector {
     public static undefined: Vector = new Vector(NaN, NaN);

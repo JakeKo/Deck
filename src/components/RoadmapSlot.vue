@@ -1,85 +1,69 @@
 <template>
-<div :style='roadmapSlotStyle' @click='() => setActiveSlideId(id)'>
-    <div :style="slideTopicStyle">Topic</div>
-    <svg ref='canvas' :viewBox="previewViewbox" :style="slidePreviewStyle" />
+<div ref='root' :style='style.roadmapSlot' @click='() => setActiveSlide(id)'>
+    <div :style="style.slideTopic">Topic</div>
+    <svg ref='canvas' :viewBox="previewViewbox" :style="style.slidePreview" />
 </div>
 </template>
 
 <script lang='ts'>
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { MUTATIONS, GETTERS, Viewbox } from '../store/types';
-import { Getter, Mutation } from 'vuex-class';
-import { StyleCreator } from '../styling/types';
 import DeckComponent from './generic/DeckComponent';
+import { defineComponent, computed, reactive, onMounted, ref } from 'vue';
 
-type StyleProps = {};
-type Style = {
-    roadmapSlot: any;
-    slideTopic: any;
-    slidePreview: any;
-    activeSlidePreview: any;
-};
-const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
-    roadmapSlot: {
-        height: '100%',
-        padding: '8px',
-        boxSizing: 'border-box',
-        ...base.flexColCC,
-        justifyContent: 'space-between',
-        cursor: 'pointer'
+const RoadmapSlot = defineComponent({
+    props: {
+        id: { type: String, required: true },
+        isActive: { type: Boolean, required: true }
     },
-    slideTopic: {
-        ...base.fontBody
-    },
-    slidePreview: {
-        height: '45px',
-        width: '80px',
-        border: `2px solid ${theme.color.base.flush}`,
-        boxSizing: 'border-box'
-    },
-    activeSlidePreview: {
-        border: `2px solid ${theme.color.primary.flush}`
+    setup: props => {
+        const { root, store, baseStyle, baseTheme } = DeckComponent();
+        const style = reactive({
+            roadmapSlot: computed(() => ({
+                height: '100%',
+                padding: '8px',
+                boxSizing: 'border-box',
+                ...baseStyle.value.flexColCC,
+                justifyContent: 'space-between',
+                cursor: 'pointer'
+            })),
+            slideTopic: computed(() => ({
+                ...baseStyle.value.fontBody
+            })),
+            slidePreview: computed(() => ({
+                height: '45px',
+                width: '80px',
+                border: props.isActive
+                    ? `2px solid ${baseTheme.value.color.primary.flush}`
+                    : `2px solid ${baseTheme.value.color.base.flush}`,
+                boxSizing: 'border-box'
+            }))
+        });
+        const previewViewbox = computed(() => {
+            const viewbox = store.croppedViewbox.value;
+            return `${viewbox.x} ${viewbox.y} ${viewbox.width} ${viewbox.height}`;
+        });
+        const canvas = ref<SVGElement | undefined>(undefined);
+
+        // TODO: Determine how to ignore helper graphics when updating preview
+        onMounted(() => {
+            setInterval(async() => {
+                if (canvas.value === undefined) {
+                    throw new Error('Canvas ref not specified.');
+                }
+
+                const source = document.querySelector(`#slide_${props.id} svg`) as SVGElement;
+                canvas.value.innerHTML = source.innerHTML;
+            }, 5000);
+        });
+
+        return {
+            root,
+            canvas,
+            style,
+            previewViewbox,
+            setActiveSlide: store.setActiveSlide
+        };
     }
 });
 
-@Component
-export default class RoadmapSlot extends DeckComponent<StyleProps, Style> {
-    @Prop({ type: String, required: true }) private id!: string;
-    @Prop({ type: Boolean, required: true }) private isActive!: boolean;
-    @Getter private [GETTERS.CROPPED_VIEWBOX]: Viewbox;
-    @Mutation private [MUTATIONS.ACTIVE_SLIDE_ID]: (id: string) => void;
-
-    private get roadmapSlotStyle(): any {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return style.roadmapSlot;
-    }
-
-    private get slideTopicStyle(): any {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return style.slideTopic;
-    }
-
-    private get slidePreviewStyle(): any {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return {
-            ...style.slidePreview,
-            ...this.isActive && style.activeSlidePreview
-        };
-    }
-
-    private get previewViewbox(): string {
-        const viewbox = this[GETTERS.CROPPED_VIEWBOX];
-        return `${viewbox.x} ${viewbox.y} ${viewbox.width} ${viewbox.height}`;
-    }
-
-    // TODO: Determine how to ignore helper graphics when updating preview
-    public mounted(): void {
-        this.bindEvents();
-        setInterval(async () => {
-            const source = document.querySelector(`#slide_${this.id} svg`) as SVGElement;
-            const target = this.$refs['canvas'] as SVGElement;
-            target.innerHTML = source.innerHTML;
-        }, 5000);
-    }
-}
+export default RoadmapSlot;
 </script>

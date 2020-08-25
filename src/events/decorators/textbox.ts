@@ -1,5 +1,5 @@
-import { TextboxRenderer } from "../../rendering/graphics";
-import SlideRenderer from "../../rendering/SlideRenderer";
+import { TextboxRenderer } from '@/rendering/graphics';
+import SlideRenderer from '@/rendering/SlideRenderer';
 import { SLIDE_EVENTS, TextboxMouseEvent, TextboxMouseEventPayload, TEXTBOX_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 

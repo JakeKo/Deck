@@ -1,6 +1,6 @@
-import * as SVG from 'svg.js';
-import { radToDeg } from '../../utilities/utilities';
-import Vector from '../../utilities/Vector';
+import SVG from 'svg.js';
+import { radToDeg } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { GRAPHIC_TYPES, HelperRenderer } from '../types';
 

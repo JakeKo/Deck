@@ -1,7 +1,7 @@
-import { CurveAnchorMouseEvent, CurveMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../../events/types";
-import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { CurveMutator } from "../../rendering/mutators";
-import { resolvePosition } from "../utilities";
+import { CurveAnchorMouseEvent, CurveMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
+import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { CurveMutator } from '@/rendering/mutators';
+import { resolvePosition } from '../utilities';
 
 export function moveCurve(event: CurveMouseEvent): void {
     const { slide, baseEvent, target } = event.detail;

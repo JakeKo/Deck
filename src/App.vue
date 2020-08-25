@@ -1,90 +1,66 @@
 <template>
-<div :style="appStyle">
-    <menu-bar />
-    <div :style="interfaceStyle">
-        <toolbox />
-        <div :style="workspaceStyle">
-            <editor></editor>
-            <roadmap></roadmap>
+<div ref='root' :style='style.app'>
+    <MenuBar />
+    <div :style='style.interface'>
+        <Toolbox />
+        <div :style='style.workspace'>
+            <Editor />
+            <Roadmap />
         </div>
     </div>
 </div>
 </template>
 
 <script lang='ts'>
-import { Vue, Component } from 'vue-property-decorator';
 import MenuBar from './components/MenuBar.vue';
 import Toolbox from './components/Toolbox.vue';
 import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
 import { PointerTool } from './tools';
-import { MUTATIONS, GETTERS } from './store/types';
-import { mapMutations } from 'vuex';
-import { EditorTool } from './tools/types';
-import { Mutation } from 'vuex-class';
-import { StyleCreator } from './styling/types';
 import DeckComponent from './components/generic/DeckComponent';
+import { provideStore } from './store';
+import { defineComponent, computed, readonly } from 'vue';
+import './styling/application.css';
 
-type StyleProps = {};
-type Style = {
-    app: any;
-    interface: any;
-    workspace: any;
-};
-const componentStyle: StyleCreator<StyleProps, Style> = ({ theme, base, props }) => ({
-    app: {
-        ...base.fullScreen,
-        ...base.flexCol,
-        overflow: 'none'
-    },
-    interface: {
-        flexGrow: '1',
-        flexBasis: '0',
-        display: 'flex',
-        minHeight: '0'
-    },
-    workspace: {
-        ...base.flexCol,
-        height: '100%',
-        flexGrow: '1',
-        minWidth: '0'
-    }
-});
-
-@Component({
+const App = defineComponent({
     components: {
         MenuBar,
         Toolbox,
         Editor,
         Roadmap
-    }
-})
-export default class App extends DeckComponent<StyleProps, Style> {
-    @Mutation private [MUTATIONS.ACTIVE_TOOL]: (tool: EditorTool) => void;
+    },
+    setup: () => {
+        provideStore();
+        const { root, store, baseStyle } = DeckComponent();
 
-    // Initialize application settings
-    public mounted(): void {
-        this.bindEvents();
-        this[MUTATIONS.ACTIVE_TOOL](PointerTool(this.$store));
-    }
+        const style = readonly({
+            app: computed(() => ({
+                ...baseStyle.value.fullScreen,
+                ...baseStyle.value.flexCol,
+                overflow: 'none'
+            })),
+            interface: computed(() => ({
+                flexGrow: '1',
+                flexBasis: '0',
+                display: 'flex',
+                minHeight: '0'
+            })),
+            workspace: computed(() => ({
+                ...baseStyle.value.flexCol,
+                height: '100%',
+                flexGrow: '1',
+                minWidth: '0'
+            }))
+        });
 
-    private get appStyle(): any {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return style.app;
-    }
+        store.setActiveTool(PointerTool());
 
-    private get interfaceStyle(): any {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return style.interface;
+        return {
+            root,
+            style
+        };
     }
+});
 
-    private get workspaceStyle(): any {
-        const style = this[GETTERS.STYLE]({}, componentStyle);
-        return style.workspace;
-    }
-}
+export default App;
 </script>
-
-<style lang='scss'>
-@import './styling/application';
-</style>

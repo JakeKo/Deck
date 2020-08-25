@@ -1,7 +1,7 @@
-import { ImageMouseEvent, IMAGE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from "../../events/types";
-import { listen, listenOnce, unlisten } from "../../events/utilities";
-import { ImageMutator } from "../../rendering/mutators";
-import { resolvePosition } from "../utilities";
+import { ImageMouseEvent, IMAGE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
+import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { ImageMutator } from '@/rendering/mutators';
+import { resolvePosition } from '../utilities';
 
 export function moveImage(event: ImageMouseEvent): void {
     const { slide, baseEvent, target } = event.detail;

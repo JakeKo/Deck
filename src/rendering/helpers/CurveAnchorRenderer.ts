@@ -1,6 +1,6 @@
-import * as SVG from 'svg.js';
-import { decorateCurveAnchorEvents } from '../../events/decorators/curve_anchor';
-import Vector from '../../utilities/Vector';
+import SVG from 'svg.js';
+import { decorateCurveAnchorEvents } from '@/events/decorators/curve_anchor';
+import Vector from '@/utilities/Vector';
 import SlideRenderer from '../SlideRenderer';
 import { CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, HelperRenderer } from '../types';
 
@@ -129,7 +129,7 @@ class CurveAnchorRenderer implements HelperRenderer {
         this._point = point;
 
         const position = this._pointPosition();
-        this._pointSvg && this._pointSvg.translate(position.x ,position.y);
+        this._pointSvg && this._pointSvg.translate(position.x, position.y);
     }
 
     public setOutHandle(outHandle: Vector): void {

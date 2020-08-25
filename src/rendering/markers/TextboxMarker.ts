@@ -1,7 +1,7 @@
-import { TextboxRenderer } from "../graphics";
-import { RectangleOutlineRenderer } from "../helpers";
-import SlideRenderer from "../SlideRenderer";
-import { GraphicMarker } from "../types";
+import { TextboxRenderer } from '../graphics';
+import { RectangleOutlineRenderer } from '../helpers';
+import SlideRenderer from '../SlideRenderer';
+import { GraphicMarker } from '../types';
 
 type TextboxMarkerArgs = {
     slide: SlideRenderer;
