@@ -15,19 +15,19 @@ Nearly all of the graphic mutators implement the generic mutator interface with 
 The generic `GraphicMutator` type and individual maker types are featured below.
 ```ts
 type GraphicMutator = {
+    type: GRAPHIC_TYPES;
+    target: GraphicRenderer;
+    scale: number;
     helpers: BoundingBoxMutatorHelpers;
     vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => void;
     rotateListener: () => (event: SlideMouseEvent) => void;
     moveListener: (initialPosition: Vector) => (event: SlideMouseEvent) => void;
-    getType: () => GRAPHIC_TYPES;
-    getTarget: () => GraphicRenderer;
     complete: () => void;
-    setScale: (scale: number) => void;
 }
 
-type CurveMutator = {
+type CurveMutator = GraphicMutator & {
     anchorListener: (index: number, role: CURVE_ANCHOR_ROLES) => (event: SlideMouseEvent) => void;
-} & GraphicMutator;
+};
 
 type EllipseMutator = GraphicMutator;
 

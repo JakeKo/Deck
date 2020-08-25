@@ -40,35 +40,35 @@ While the current makers look pretty similar, there are some slight distinctions
 The generic `GraphicMaker` type and individual maker types are featured below.
 ```ts
 type GraphicMaker = {
+    scale: number;
     getTarget: () => GraphicRenderer;
-    setScale: (scale: number) => void;
     complete: () => void;
 }
 
-type CurveMaker = {
+type CurveMaker = GraphicMaker & {
     addAnchorListener: () => {
         setPoint: (event: SlideMouseEvent) => void;
         setHandles: (event: SlideMouseEvent) => void;
     };
-} & GraphicMaker;
+};
 
-type EllipseMaker = {
+type EllipseMaker = GraphicMaker & {
     resizeListener: () => (event: SlideMouseEvent) => void;
-} & GraphicMaker;
+};
 
-type ImageMaker = {
+type ImageMaker = GraphicMaker & {
     resizeListener: () => (event: SlideMouseEvent) => void;
-} & GraphicMaker;
+};
 
-type RectangleMaker = {
+type RectangleMaker = GraphicMaker & {
     resizeListener: () => (event: SlideMouseEvent) => void;
-} & GraphicMaker;
+};
 
-type TextboxMaker = {
+type TextboxMaker = GraphicMaker & {
     resizeListener: () => (event: SlideMouseEvent) => void;
-} & GraphicMaker;
+};
 
-type VideoMaker = {
+type VideoMaker = GraphicMaker & {
     resizeListener: () => (event: SlideMouseEvent) => void;
-} & GraphicMaker;
+};
 ```
