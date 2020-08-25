@@ -1,4 +1,3 @@
-import { closeEnough, vectorsCloseEnough } from '@/test/utilities';
 import Vector from '../Vector';
 
 describe('Vector', () => {
@@ -168,11 +167,11 @@ describe('Vector', () => {
         const actualAngle5 = vector5.theta(vector2);
 
         // Assert
-        expect(closeEnough(actualAngle1, expectedAngle1, epsilon)).toBe(true);
-        expect(closeEnough(actualAngle2, expectedAngle2, epsilon)).toBe(true);
-        expect(closeEnough(actualAngle3, expectedAngle3, epsilon)).toBe(true);
-        expect(closeEnough(actualAngle4, expectedAngle4, epsilon)).toBe(true);
-        expect(closeEnough(actualAngle5, expectedAngle5, epsilon)).toBe(true);
+        expect(actualAngle1).toBeCloseTo(expectedAngle1, 5);
+        expect(actualAngle2).toBeCloseTo(expectedAngle2, 5);
+        expect(actualAngle3).toBeCloseTo(expectedAngle3, 5);
+        expect(actualAngle4).toBeCloseTo(expectedAngle4, 5);
+        expect(actualAngle5).toBeCloseTo(expectedAngle5, 5);
     });
 
     it('can calculate the projection of one vector onto another', () => {
@@ -264,8 +263,10 @@ describe('Vector', () => {
         const actual2 = v2.rotate(Math.PI / 4);
 
         // Assert
-        expect(vectorsCloseEnough(actual1, expected, 1E-8)).toBe(true);
-        expect(vectorsCloseEnough(actual2, expected, 1E-8)).toBe(true);
+        expect(actual1.x).toBeCloseTo(expected.x, 5);
+        expect(actual1.y).toBeCloseTo(expected.y, 5);
+        expect(actual2.x).toBeCloseTo(expected.x, 5);
+        expect(actual2.y).toBeCloseTo(expected.y, 5);
     });
 
     it('can append rotation to vectors', () => {
@@ -280,7 +281,9 @@ describe('Vector', () => {
         const actual2 = v2.rotateMore(Math.PI / 4);
 
         // Assert
-        expect(vectorsCloseEnough(actual1, expected1, 1E-8)).toBe(true);
-        expect(vectorsCloseEnough(actual2, expected2, 1E-8)).toBe(true);
+        expect(actual1.x).toBeCloseTo(expected1.x, 5);
+        expect(actual1.y).toBeCloseTo(expected1.y, 5);
+        expect(actual2.x).toBeCloseTo(expected2.x, 5);
+        expect(actual2.y).toBeCloseTo(expected2.y, 5);
     });
 });

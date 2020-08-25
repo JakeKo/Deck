@@ -1,52 +1,19 @@
-import { closeEnough, vectorsCloseEnough } from '@/test/utilities';
+jest.mock('../../SlideRenderer');
+
+import SlideStateManager from '@/utilities/SlideStateManager';
+import Vector from '@/utilities/Vector';
+import SVG from 'svg.js';
 import { EllipseMaker } from '..';
-import Vector from '../../../utilities/Vector';
 import { EllipseRenderer } from '../../graphics';
-
-const rectMock = {
-    translate: () => rectMock,
-    rotate: () => rectMock,
-    width: () => rectMock,
-    height: () => rectMock,
-    size: () => rectMock,
-    fill: () => rectMock,
-    stroke: () => rectMock,
-    remove: () => { return; },
-    node: {
-        addEventListener: () => { return; }
-    }
-};
-
-const ellipseMock = {
-    center: () => ellipseMock,
-    translate: () => ellipseMock,
-    rotate: () => ellipseMock,
-    width: () => ellipseMock,
-    height: () => ellipseMock,
-    size: () => rectMock,
-    fill: () => ellipseMock,
-    stroke: () => ellipseMock,
-    remove: () => { return; },
-    node: {
-        addEventListener: () => { return; }
-    }
-};
-
-const slideMock = {
-    canvas: {
-        rect: () => rectMock,
-        ellipse: () => ellipseMock
-    },
-    setGraphic: () => { return; }
-};
+import SlideRenderer from '../../SlideRenderer';
+import { mocked } from 'ts-jest';
 
 function ellipsesAreEqual(actual: EllipseRenderer, expected: EllipseRenderer) {
-    const epsilon = 1E-8;
-
-    expect(vectorsCloseEnough(actual.getCenter(), expected.getCenter(), epsilon)).toBe(true);
-    expect(closeEnough(actual.getWidth(), expected.getWidth(), epsilon)).toBe(true);
-    expect(closeEnough(actual.getHeight(), expected.getHeight(), epsilon)).toBe(true);
-    expect(closeEnough(actual.getRotation(), expected.getRotation(), epsilon)).toBe(true);
+    expect(actual.getCenter().x).toBeCloseTo(expected.getCenter().x, 5);
+    expect(actual.getCenter().y).toBeCloseTo(expected.getCenter().y, 5);
+    expect(actual.getWidth()).toBeCloseTo(expected.getWidth(), 5);
+    expect(actual.getHeight()).toBeCloseTo(expected.getHeight(), 5);
+    expect(actual.getRotation()).toBeCloseTo(expected.getRotation(), 5);
 
     expect(actual.getFillColor()).toEqual(expected.getFillColor());
     expect(actual.getStrokeColor()).toEqual(expected.getStrokeColor());
@@ -56,14 +23,15 @@ function ellipsesAreEqual(actual: EllipseRenderer, expected: EllipseRenderer) {
 describe('EllipseMaker', () => {
     it('makes an ellipse', () => {
         // Arrange
+        const slide = mocked(SlideRenderer);
         const maker = new EllipseMaker({
-            slide: slideMock,
+            slide: slide.prototype,
             initialPosition: Vector.zero,
             scale: 1
         });
         const expected = new EllipseRenderer({
             id: '',
-            slide: slideMock,
+            slide: slide.prototype,
             center: Vector.zero
         });
 
@@ -77,14 +45,15 @@ describe('EllipseMaker', () => {
 
     it('makes an ellipse with a single resize event', () => {
         // Arrange
+        const slide = mocked(SlideRenderer);
         const maker = new EllipseMaker({
-            slide: slideMock,
+            slide: slide.prototype,
             initialPosition: Vector.zero,
             scale: 1
         });
         const expected = new EllipseRenderer({
             id: '',
-            slide: slideMock,
+            slide: slide.prototype,
             center: new Vector(2, 3.5),
             width: 4,
             height: 7
@@ -101,14 +70,15 @@ describe('EllipseMaker', () => {
 
     it('makes an ellipse with multiple resize events', () => {
         // Arrange
+        const slide = mocked(SlideRenderer);
         const maker = new EllipseMaker({
-            slide: slideMock,
+            slide: slide.prototype,
             initialPosition: Vector.zero,
             scale: 1
         });
         const expected = new EllipseRenderer({
             id: '',
-            slide: slideMock,
+            slide: slide.prototype,
             center: new Vector(2.5, 1),
             width: 5,
             height: 2
@@ -126,14 +96,15 @@ describe('EllipseMaker', () => {
 
     it('makes an ellipse with a shift resize event', () => {
         // Arrange
+        const slide = mocked(SlideRenderer);
         const maker = new EllipseMaker({
-            slide: slideMock,
+            slide: slide.prototype,
             initialPosition: Vector.zero,
             scale: 1
         });
         const expected = new EllipseRenderer({
             id: '',
-            slide: slideMock,
+            slide: slide.prototype,
             center: new Vector(-3, 3),
             width: 6,
             height: 6
@@ -150,14 +121,15 @@ describe('EllipseMaker', () => {
 
     it('makes an ellipse with a ctrl resize event', () => {
         // Arrange
+        const slide = mocked(SlideRenderer);
         const maker = new EllipseMaker({
-            slide: slideMock,
+            slide: slide.prototype,
             initialPosition: Vector.zero,
             scale: 1
         });
         const expected = new EllipseRenderer({
             id: '',
-            slide: slideMock,
+            slide: slide.prototype,
             center: Vector.zero,
             width: 10,
             height: 4
@@ -174,15 +146,16 @@ describe('EllipseMaker', () => {
 
     it('makes an ellipse with a ctrl and shift resize event', () => {
         // Arrange
+        const slide = mocked(SlideRenderer);
         const maker = new EllipseMaker({
-            slide: slideMock,
+            slide: slide.prototype,
             initialPosition: Vector.zero,
             scale: 1
         });
         const expected = new EllipseRenderer({
             id: '',
-            slide: slideMock,
-            origin: Vector.zero,
+            slide: slide.prototype,
+            center: Vector.zero,
             width: 14,
             height: 14
         });
@@ -198,8 +171,9 @@ describe('EllipseMaker', () => {
 
     it('can correct for zooming', () => {
         // Arrange
+        const slide = mocked(SlideRenderer);
         const maker = new EllipseMaker({
-            slide: slideMock,
+            slide: slide.prototype,
             initialPosition: Vector.zero,
             scale: 1
         });

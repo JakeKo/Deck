@@ -1,6 +1,5 @@
-import { closeEnough, vectorsCloseEnough } from '@/test/utilities';
-import { RectangleMaker } from '..';
 import Vector from '@/utilities/Vector';
+import { RectangleMaker } from '..';
 import { RectangleRenderer } from '../../graphics';
 
 const rectMock = {
@@ -41,12 +40,11 @@ const slideMock = {
 };
 
 function rectanglesAreEqual(actual: RectangleRenderer, expected: RectangleRenderer) {
-    const epsilon = 1E-8;
-
-    expect(vectorsCloseEnough(actual.getOrigin(), expected.getOrigin(), epsilon)).toBe(true);
-    expect(closeEnough(actual.getWidth(), expected.getWidth(), epsilon)).toBe(true);
-    expect(closeEnough(actual.getHeight(), expected.getHeight(), epsilon)).toBe(true);
-    expect(closeEnough(actual.getRotation(), expected.getRotation(), epsilon)).toBe(true);
+    expect(actual.getOrigin().x).toBeCloseTo(expected.getOrigin().x, 5);
+    expect(actual.getOrigin().y).toBeCloseTo(expected.getOrigin().y, 5);
+    expect(actual.getWidth()).toBeCloseTo(expected.getWidth(), 5);
+    expect(actual.getHeight()).toBeCloseTo(expected.getHeight(), 5);
+    expect(actual.getRotation()).toBeCloseTo(expected.getRotation(), 5);
 
     expect(actual.getFillColor()).toEqual(expected.getFillColor());
     expect(actual.getStrokeColor()).toEqual(expected.getStrokeColor());
