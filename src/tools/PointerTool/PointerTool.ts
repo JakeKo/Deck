@@ -73,7 +73,7 @@ function reevaluateCursor(event: SlideMouseEvent): void {
     if (target === undefined) {
         slide.cursor = 'default';
     } else {
-        const type = target.getType();
+        const type = target.type;
         if ([GRAPHIC_TYPES.VERTEX, GRAPHIC_TYPES.CURVE_ANCHOR, GRAPHIC_TYPES.ROTATOR].indexOf(type) !== -1) {
             slide.cursor = 'grab';
         } else if ([GRAPHIC_TYPES.CURVE, GRAPHIC_TYPES.ELLIPSE, GRAPHIC_TYPES.IMAGE, GRAPHIC_TYPES.RECTANGLE, GRAPHIC_TYPES.TEXTBOX, GRAPHIC_TYPES.VIDEO].indexOf(type) !== -1) {
@@ -86,11 +86,11 @@ function reevaluateCursor(event: SlideMouseEvent): void {
 
 function moveVertex(event: VertexMouseEvent): void {
     const { slide, graphic } = event.detail;
-    const mutator = slide.focusGraphic(graphic.getParent().getId());
+    const mutator = slide.focusGraphic(graphic.parent.id);
 
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
-    const vertexListener = mutator.vertexListener(graphic.getRole());
+    const vertexListener = mutator.vertexListener(graphic.role);
     slide.cursor = 'grabbing';
     slide.cursorLock = true;
 
@@ -99,12 +99,12 @@ function moveVertex(event: VertexMouseEvent): void {
 
     function move(event: SlideMouseEvent): void {
         vertexListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
     }
 
     function complete(event: SlideMouseEvent): void {
         vertexListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
 
         slide.cursorLock = false;
         slide.cursor = 'grab';
@@ -128,12 +128,12 @@ function rotateGraphic(event: RotatorMouseEvent): void {
 
     function rotate(event: SlideMouseEvent): void {
         rotateListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
     }
 
     function complete(event: SlideMouseEvent): void {
         rotateListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
 
         slide.cursorLock = false;
         slide.cursor = 'grab';

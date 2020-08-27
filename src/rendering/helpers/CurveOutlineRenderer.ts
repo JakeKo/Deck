@@ -1,18 +1,18 @@
-import SVG from 'svg.js';
-import Vector from '@/utilities/Vector';
-import SlideRenderer from '../SlideRenderer';
-import { CurveAnchor, GRAPHIC_TYPES, HelperRenderer } from '../types';
 import { radToDeg } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
+import SVG from 'svg.js';
+import { CurveAnchor, GRAPHIC_TYPES, ICurveOutlineRenderer, ISlideRenderer } from '../types';
 
 type CurveOutlineRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     anchors: CurveAnchor[];
     scale: number;
     rotation: number;
 };
 
-class CurveOutlineRenderer implements HelperRenderer {
-    private _slide: SlideRenderer;
+class CurveOutlineRenderer implements ICurveOutlineRenderer {
+    public readonly type = GRAPHIC_TYPES.CURVE_OUTLINE;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Path | undefined;
     private _anchors: CurveAnchor[];
     private _fillColor: string;
@@ -31,17 +31,18 @@ class CurveOutlineRenderer implements HelperRenderer {
         this._scale = args.scale;
     }
 
-    public getType(): GRAPHIC_TYPES {
-        return GRAPHIC_TYPES.CURVE_OUTLINE;
+    public get isRendered(): boolean {
+        return this._svg !== undefined;
     }
 
-    public isRendered(): boolean {
-        return this._svg !== undefined;
+    public set scale(scale: number) {
+        this._scale = scale;
+        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale });
     }
 
     public render(): void {
         // Silently fail if the SVG is already rendered
-        if (this.isRendered()) {
+        if (this.isRendered) {
             return;
         }
 
@@ -54,11 +55,6 @@ class CurveOutlineRenderer implements HelperRenderer {
     public unrender(): void {
         this._svg && this._svg.remove();
         this._svg = undefined;
-    }
-
-    public setScale(scale: number): void {
-        this._scale = scale;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale });
     }
 
     // Reformat points from an array of objects to the bezier curve string

@@ -1,22 +1,22 @@
-import SVG from 'svg.js';
 import { decorateRotateEvents } from '@/events/decorators/rotators';
-import Vector from '@/utilities/Vector';
-import SlideRenderer from '../SlideRenderer';
-import { GraphicRenderer, GRAPHIC_TYPES, HelperRenderer } from '../types';
 import { radToDeg } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
+import SVG from 'svg.js';
+import { GRAPHIC_TYPES, IGraphicRenderer, IRotatorRenderer, ISlideRenderer } from '../types';
 
 type RotatorRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     scale: number;
     center: Vector;
-    parent: GraphicRenderer;
+    parent: IGraphicRenderer;
     rotation: number;
 };
 
-class RotatorRenderer implements HelperRenderer {
-    private _slide: SlideRenderer;
+class RotatorRenderer implements IRotatorRenderer {
+    public readonly type = GRAPHIC_TYPES.ROTATOR;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Rect | undefined;
-    private _parent: GraphicRenderer;
+    private _parent: IGraphicRenderer;
     private _scale: number;
     private _width: number;
     private _height: number;
@@ -36,21 +36,34 @@ class RotatorRenderer implements HelperRenderer {
         this._rotation = args.rotation;
     }
 
-    public getType(): GRAPHIC_TYPES {
-        return GRAPHIC_TYPES.ROTATOR;
-    }
-
-    public isRendered(): boolean {
+    public get isRendered(): boolean {
         return this._svg !== undefined;
     }
 
-    public getParent(): GraphicRenderer {
+    public get parent(): IGraphicRenderer {
         return this._parent;
+    }
+
+    public set center(center: Vector) {
+        this._center = center;
+        this._svg && this._svg.rotate(0)
+            .translate(this._center.x - this._width * this._scale / 2, this._center.y - this._height * this._scale / 2)
+            .rotate((this._baseRotation + radToDeg(this._rotation)) % 360);
+    }
+
+    public set scale(scale: number) {
+        this._scale = scale;
+        this._svg && this._svg.size(this._width * this._scale, this._height * this._scale);
+    }
+
+    public set rotation(rotation: number) {
+        this._rotation = rotation;
+        this._svg && this._svg.rotate((this._baseRotation + radToDeg(this._rotation)) % 360);
     }
 
     public render(): void {
         // Silently fail if the SVG is already rendered
-        if (this.isRendered()) {
+        if (this.isRendered) {
             return;
         }
 
@@ -64,23 +77,6 @@ class RotatorRenderer implements HelperRenderer {
     public unrender(): void {
         this._svg && this._svg.remove();
         this._svg = undefined;
-    }
-
-    public setCenter(center: Vector): void {
-        this._center = center;
-        this._svg && this._svg.rotate(0)
-            .translate(this._center.x - this._width * this._scale / 2, this._center.y - this._height * this._scale / 2)
-            .rotate((this._baseRotation + radToDeg(this._rotation)) % 360);
-    }
-
-    public setScale(scale: number): void {
-        this._scale = scale;
-        this._svg && this._svg.size(this._width * this._scale, this._height * this._scale);
-    }
-
-    public setRotation(rotation: number): void {
-        this._rotation = rotation;
-        this._svg && this._svg.rotate((this._baseRotation + radToDeg(this._rotation)) % 360);
     }
 }
 

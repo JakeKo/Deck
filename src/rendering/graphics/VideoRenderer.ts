@@ -2,154 +2,92 @@ import { decorateVideoEvents } from '@/events/decorators';
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { BoundingBox, GraphicRenderer, GRAPHIC_TYPES } from '../types';
+import { BoundingBox, GRAPHIC_TYPES, ISlideRenderer, IVideoRenderer } from '../types';
 
 type VideoRendererArgs = {
     id: string;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     source: HTMLVideoElement;
     origin?: Vector;
-    width?: number;
-    height?: number;
+    dimensions?: Vector;
     strokeColor?: string;
     strokeWidth?: number;
     rotation?: number;
 };
 
-class VideoRenderer implements GraphicRenderer {
-    private _id: string;
-    private _slide: SlideRenderer;
+class VideoRenderer implements IVideoRenderer {
+    public readonly id: string;
+    public readonly type = GRAPHIC_TYPES.VIDEO;
+    public readonly source: HTMLVideoElement;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Element | undefined;
-    private _source: HTMLVideoElement;
     private _origin: Vector;
-    private _width: number;
-    private _height: number;
+    private _dimensions: Vector;
     private _strokeColor: string;
     private _strokeWidth: number;
     private _rotation: number;
 
     constructor(args: VideoRendererArgs) {
-        this._id = args.id;
+        this.id = args.id;
         this._slide = args.slide;
-        this._source = args.source;
+        this.source = args.source;
         this._origin = args.origin || Vector.zero;
-        this._width = args.width || 0;
-        this._height = args.height || 0;
+        this._dimensions = args.dimensions || Vector.zero;
         this._strokeColor = args.strokeColor || 'none';
         this._strokeWidth = args.strokeWidth || 0;
         this._rotation = args.rotation || 0;
     }
 
-    public getId(): string {
-        return this._id;
-    }
-
-    public getType(): GRAPHIC_TYPES {
-        return GRAPHIC_TYPES.VIDEO;
-    }
-
-    public isRendered(): boolean {
+    public get isRendered(): boolean {
         return this._svg !== undefined;
     }
 
-    public render(): void {
-        // Silently fail if the SVG is already rendered
-        if (this.isRendered()) {
-            return;
-        }
-
-        const foreignObject = SVG.create('foreignObject') as HTMLElement;
-        foreignObject.appendChild(this._source);
-
-        this._svg = (foreignObject as any as SVG.Element)
-            .translate(this._origin.x, this._origin.y)
-            .width(this._width)
-            .height(this._height)
-            .stroke({ color: this._strokeColor, width: this._strokeWidth })
-            .rotate(radToDeg(this._rotation));
-
-        this._slide.canvas.add(this._svg);
-        decorateVideoEvents(this._svg, this._slide, this);
-    }
-
-    public unrender(): void {
-        this._svg && this._svg.remove();
-        this._svg = undefined;
-    }
-
-    public setOriginAndDimensions(origin: Vector, dimensions: Vector): void {
-        this._origin = origin;
-        this._width = dimensions.x;
-        this._height = dimensions.y;
-
-        this._svg && this._svg
-            .rotate(0)
-            .translate(this._origin.x, this._origin.y)
-            .width(this._width)
-            .height(this._height)
-            .rotate(radToDeg(this._rotation));
-    }
-
-    public getSource(): HTMLVideoElement {
-        return this._source;
-    }
-
-    public getOrigin(): Vector {
+    public get origin(): Vector {
         return this._origin;
     }
 
-    public setOrigin(origin: Vector): void {
+    public set origin(origin: Vector) {
         this._origin = origin;
         this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(radToDeg(this._rotation));
     }
 
-    public getWidth(): number {
-        return this._width;
+    public get dimensions(): Vector {
+        return this._dimensions;
     }
 
-    public setWidth(width: number): void {
-        this._width = width;
-        this._svg && this._svg.width(this._width);
+    public set dimensions(dimensions: Vector) {
+        this._dimensions = dimensions;
+        this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
     }
 
-    public getHeight(): number {
-        return this._height;
-    }
-
-    public setHeight(height: number): void {
-        this._height = height;
-        this._svg && this._svg.height(this._height);
-    }
-
-    public getStrokeColor(): string {
+    public get strokeColor(): string {
         return this._strokeColor;
     }
 
-    public setStrokeColor(strokeColor: string): void {
+    public set strokeColor(strokeColor: string) {
         this._strokeColor = strokeColor;
         this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
-    public getStrokeWidth(): number {
+    public get strokeWidth(): number {
         return this._strokeWidth;
     }
 
-    public setStrokeWidth(strokeWidth: number): void {
+    public set strokeWidth(strokeWidth: number) {
         this._strokeWidth = strokeWidth;
         this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
-    public getRotation(): number {
+    public get rotation(): number {
         return this._rotation;
     }
 
-    public setRotation(rotation: number): void {
+    public set rotation(rotation: number) {
         this._rotation = rotation;
         this._svg && this._svg.rotate(radToDeg(this._rotation));
     }
 
-    public getBoundingBox(): BoundingBox {
+    public get box(): BoundingBox {
         if (this._svg === undefined) {
             return {
                 origin: Vector.zero,
@@ -164,12 +102,12 @@ class VideoRenderer implements GraphicRenderer {
         } else {
             const preRotateBox: BoundingBox = {
                 origin: this._origin,
-                center: this._origin.add(new Vector(this._width, this._height).scale(0.5)),
-                dimensions: new Vector(this._width, this._height),
+                center: this._origin.add(this._dimensions.scale(0.5)),
+                dimensions: this._dimensions,
                 topLeft: this._origin,
-                topRight: this._origin.add(new Vector(this._width, 0)),
-                bottomLeft: this._origin.add(new Vector(0, this._height)),
-                bottomRight: this._origin.add(new Vector(this._width, this._height)),
+                topRight: this._origin.add(new Vector(this._dimensions.x, 0)),
+                bottomLeft: this._origin.add(new Vector(0, this._dimensions.y)),
+                bottomRight: this._origin.add(this._dimensions),
                 rotation: this._rotation
             };
 
@@ -191,6 +129,41 @@ class VideoRenderer implements GraphicRenderer {
                 rotation: preRotateBox.rotation
             };
         }
+    }
+
+    public setOriginAndDimensions(origin: Vector, dimensions: Vector): void {
+        this._origin = origin;
+        this._dimensions = dimensions;
+
+        this._svg && this._svg
+            .rotate(0)
+            .translate(this._origin.x, this._origin.y)
+            .size(this._dimensions.x, this._dimensions.y)
+            .rotate(radToDeg(this._rotation));
+    }
+
+    public render(): void {
+        // Silently fail if the SVG is already rendered
+        if (this.isRendered) {
+            return;
+        }
+
+        const foreignObject = SVG.create('foreignObject') as HTMLElement;
+        foreignObject.appendChild(this.source);
+
+        this._svg = (foreignObject as any as SVG.Element)
+            .translate(this._origin.x, this._origin.y)
+            .size(this._dimensions.x, this._dimensions.y)
+            .stroke({ color: this._strokeColor, width: this._strokeWidth })
+            .rotate(radToDeg(this._rotation));
+
+        this._slide.canvas.add(this._svg);
+        decorateVideoEvents(this._svg, this._slide, this);
+    }
+
+    public unrender(): void {
+        this._svg && this._svg.remove();
+        this._svg = undefined;
     }
 }
 

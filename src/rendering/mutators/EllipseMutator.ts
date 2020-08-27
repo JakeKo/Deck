@@ -2,42 +2,51 @@ import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import { closestVector, mod } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
-import { EllipseRenderer } from '../graphics';
-import SlideRenderer from '../SlideRenderer';
-import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from '../types';
-import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from '../utilities';
+import {
+    BoundingBoxMutatorHelpers,
+    GRAPHIC_TYPES,
+    IEllipseMutator,
+    IEllipseRenderer,
+    ISlideRenderer,
+    VERTEX_ROLES
+} from '../types';
+import {
+    makeBoxHelpers,
+    renderBoxHelpers,
+    resizeBoxHelpers,
+    rotateBoxHelpers,
+    scaleBoxHelpers,
+    unrenderBoxHelpers
+} from '../utilities';
 
 type EllipseMutatorArgs = {
-    target: EllipseRenderer;
-    slide: SlideRenderer;
+    target: IEllipseRenderer;
+    slide: ISlideRenderer;
     scale: number;
 };
 
-class EllipseMutator implements GraphicMutator {
-    public target: EllipseRenderer;
-    public helpers: BoundingBoxMutatorHelpers;
+class EllipseMutator implements IEllipseMutator {
+    public readonly type = GRAPHIC_TYPES.ELLIPSE;
+    public readonly target: IEllipseRenderer;
+    private _helpers: BoundingBoxMutatorHelpers;
 
     constructor(args: EllipseMutatorArgs) {
         this.target = args.target;
 
         // Initialize helper graphics
-        this.helpers = makeBoxHelpers(this.target, args.slide, args.scale);
+        this._helpers = makeBoxHelpers(this.target, args.slide, args.scale);
 
         // Render helper graphics
-        renderBoxHelpers(this.helpers);
+        renderBoxHelpers(this._helpers);
     }
 
-    public getType(): GRAPHIC_TYPES {
-        return GRAPHIC_TYPES.ELLIPSE;
-    }
-
-    public getTarget(): EllipseRenderer {
-        return this.target;
+    public set scale(scale: number) {
+        scaleBoxHelpers(this._helpers, scale);
     }
 
     // TODO: Account for ctrl, alt, and snapping
     public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
-        const box = this.target.getBoundingBox();
+        const box = this.target.box;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
@@ -76,7 +85,7 @@ class EllipseMutator implements GraphicMutator {
     }
 
     public rotateListener(): (event: SlideMouseEvent) => void {
-        const { center } = this.target.getBoundingBox();
+        const { center } = this.target.box;
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
@@ -86,14 +95,14 @@ class EllipseMutator implements GraphicMutator {
             const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
             const theta = Math.atan2(offset.y, offset.x);
 
-            this.target.setRotation(mod(theta, Math.PI * 2));
-            rotateBoxHelpers(this.helpers, this.target.getBoundingBox());
+            this.target.rotation = mod(theta, Math.PI * 2);
+            rotateBoxHelpers(this._helpers, this.target.box);
         };
     }
 
     // TODO: Account for alt snapping
     public moveListener(initialPosition: Vector): (event: SlideMouseEvent) => void {
-        const initialCenter = this.target.getCenter();
+        const initialCenter = this.target.center;
         const offset = initialPosition.towards(initialCenter);
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
@@ -103,7 +112,7 @@ class EllipseMutator implements GraphicMutator {
             const moveDirection = (baseEvent.shiftKey ? closestVector(rawMove, directions) : rawMove).normalized;
             const move = rawMove.projectOn(moveDirection);
 
-            this.target.setCenter(initialCenter.add(move));
+            this.target.center = initialCenter.add(move);
             this._repositionBoxHelpers();
         };
     }
@@ -112,15 +121,11 @@ class EllipseMutator implements GraphicMutator {
 
     public complete(): void {
         // Remove helper graphics
-        unrenderBoxHelpers(this.helpers);
-    }
-
-    public setScale(scale: number): void {
-        scaleBoxHelpers(this.helpers, scale);
+        unrenderBoxHelpers(this._helpers);
     }
 
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this.helpers, this.target.getBoundingBox());
+        resizeBoxHelpers(this._helpers, this.target.box);
     }
 }
 

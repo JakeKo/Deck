@@ -1,14 +1,13 @@
-import { RectangleRenderer } from '@/rendering/graphics';
-import SlideRenderer from '@/rendering/SlideRenderer';
+import { IRectangleRenderer, ISlideRenderer } from '@/rendering/types';
 import SVG from 'svg.js';
 import { RectangleMouseEvent, RectangleMouseEventPayload, RECTANGLE_EVENTS, SLIDE_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 
-function makeRectangleMouseEvent(name: RECTANGLE_EVENTS, slide: SlideRenderer, target: RectangleRenderer, baseEvent: MouseEvent): RectangleMouseEvent {
+function makeRectangleMouseEvent(name: RECTANGLE_EVENTS, slide: ISlideRenderer, target: IRectangleRenderer, baseEvent: MouseEvent): RectangleMouseEvent {
     return new CustomEvent<RectangleMouseEventPayload>(name, { detail: { type: name, slide, target, baseEvent } });
 }
 
-export function decorateRectangleEvents(svg: SVG.Element, slide: SlideRenderer, graphic: RectangleRenderer) {
+export function decorateRectangleEvents(svg: SVG.Element, slide: ISlideRenderer, graphic: IRectangleRenderer) {
     svg.node.addEventListener('mouseup', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(makeRectangleMouseEvent(RECTANGLE_EVENTS.MOUSEUP, slide, graphic, baseEvent));
