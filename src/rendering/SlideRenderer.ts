@@ -1,15 +1,14 @@
-import * as SVG from 'svg.js';
 import { decorateSlideEvents } from '@/events/decorators';
 import { SlideKeyboardEvent, SlideZoomEvent, SLIDE_EVENTS } from '@/events/types';
 import { listen } from '@/events/utilities';
 import { Viewbox } from '@/store/types';
 import SlideStateManager from '@/utilities/SlideStateManager';
 import Vector from '@/utilities/Vector';
-import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from './graphics';
+import * as SVG from 'svg.js';
 import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, VideoMaker } from './makers';
 import { CurveMarker, EllipseMarker, ImageMarker, RectangleMarker, TextboxMarker, VideoMarker } from './markers';
 import { CurveMutator, EllipseMutator, ImageMutator, RectangleMutator, TextboxMutator, VideoMutator } from './mutators';
-import { GraphicMaker, GraphicMarker, GraphicMutator, GraphicRenderer, GRAPHIC_TYPES } from './types';
+import { GraphicMaker, GraphicMarker, GraphicMutator, GRAPHIC_TYPES, IGraphicRenderer } from './types';
 import { renderBackdrop } from './utilities';
 
 type SlideRendererArgs = {
@@ -23,7 +22,7 @@ type SlideRendererArgs = {
 class SlideRenderer {
     private _stateManager: SlideStateManager;
     private _canvas: SVG.Doc;
-    private _graphics: { [index: string]: GraphicRenderer };
+    private _graphics: { [index: string]: IGraphicRenderer };
     private _rawViewbox: Viewbox;
     private _focusedGraphics: { [index: string]: GraphicMutator };
     private _activeMakers: { [index: string]: GraphicMaker };
@@ -51,7 +50,7 @@ class SlideRenderer {
         listen(SLIDE_EVENTS.ZOOM, (event: SlideZoomEvent): void => {
             this._zoom = event.detail.zoom;
             Object.values(this._focusedGraphics).forEach(mutator => mutator.setScale(1 / this._zoom));
-            Object.values(this._activeMakers).forEach(maker => maker.setScale(1 / this._zoom));
+            Object.values(this._activeMakers).forEach(maker => (maker.scale = 1 / this._zoom));
             Object.values(this._markedGraphics).forEach(marker => marker.setScale(1 / this._zoom));
         });
 
@@ -154,12 +153,12 @@ class SlideRenderer {
         }));
     }
 
-    public getGraphic(graphicId: string): GraphicRenderer {
+    public getGraphic(graphicId: string): IGraphicRenderer {
         return this._graphics[graphicId];
     }
 
-    public setGraphic(graphic: GraphicRenderer): void {
-        this._graphics[graphic.getId()] = graphic;
+    public setGraphic(graphic: IGraphicRenderer): void {
+        this._graphics[graphic.id] = graphic;
     }
 
     public removeGraphic(graphicId: string): void {
@@ -177,7 +176,7 @@ class SlideRenderer {
         delete this._graphics[graphicId];
     }
 
-    public broadcastSetGraphic(graphic: GraphicRenderer): void {
+    public broadcastSetGraphic(graphic: IGraphicRenderer): void {
         this._stateManager.setGraphicFromRenderer(graphic);
     }
 
@@ -197,20 +196,20 @@ class SlideRenderer {
         const graphic = this.getGraphic(graphicId);
         let mutator;
 
-        if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
-            mutator = new CurveMutator({ slide: this, scale: 1 / this._zoom, target: graphic as CurveRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
-            mutator = new EllipseMutator({ slide: this, scale: 1 / this._zoom, target: graphic as EllipseRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
-            mutator = new ImageMutator({ slide: this, scale: 1 / this._zoom, target: graphic as ImageRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
-            mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, target: graphic as RectangleRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
-            mutator = new TextboxMutator({ slide: this, scale: 1 / this._zoom, target: graphic as TextboxRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
-            mutator = new VideoMutator({ slide: this, scale: 1 / this._zoom, target: graphic as VideoRenderer });
+        if (graphic.type === GRAPHIC_TYPES.CURVE) {
+            mutator = new CurveMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+            mutator = new EllipseMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+        } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
+            mutator = new ImageMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+        } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+            mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+        } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
+            mutator = new TextboxMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+        } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
+            mutator = new VideoMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
         } else {
-            throw new Error(`Cannot focus unrecognized graphic type: ${graphic.getType()}`);
+            throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }
 
         this._focusedGraphics[graphicId] = mutator;
@@ -240,20 +239,20 @@ class SlideRenderer {
         const graphic = this.getGraphic(graphicId);
         let marker;
 
-        if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
-            marker = new CurveMarker({ slide: this, scale: 1 / this._zoom, target: graphic as CurveRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
-            marker = new EllipseMarker({ slide: this, scale: 1 / this._zoom, target: graphic as EllipseRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
-            marker = new ImageMarker({ slide: this, scale: 1 / this._zoom, target: graphic as ImageRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
-            marker = new RectangleMarker({ slide: this, scale: 1 / this._zoom, target: graphic as RectangleRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
-            marker = new TextboxMarker({ slide: this, scale: 1 / this._zoom, target: graphic as TextboxRenderer });
-        } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
-            marker = new VideoMarker({ slide: this, scale: 1 / this._zoom, target: graphic as VideoRenderer });
+        if (graphic.type === GRAPHIC_TYPES.CURVE) {
+            marker = new CurveMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+            marker = new EllipseMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+        } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
+            marker = new ImageMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+        } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+            marker = new RectangleMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+        } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
+            marker = new TextboxMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+        } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
+            marker = new VideoMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
         } else {
-            throw new Error(`Cannot focus unrecognized graphic type: ${graphic.getType()}`);
+            throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }
 
         this._markedGraphics[graphicId] = marker;
@@ -270,7 +269,7 @@ class SlideRenderer {
     }
 
     private activateMaker<T extends GraphicMaker>(maker: T): T {
-        this._activeMakers[maker.getTarget().getId()] = maker;
+        this._activeMakers[maker.target.id] = maker;
         return maker;
     }
 }

@@ -1,14 +1,14 @@
-import { CurveRenderer } from '@/rendering/graphics';
 import SlideRenderer from '@/rendering/SlideRenderer';
+import { ICurveRenderer } from '@/rendering/types';
 import SVG from 'svg.js';
 import { CurveMouseEvent, CurveMouseEventPayload, CURVE_EVENTS, SLIDE_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 
-function makeCurveMouseEvent(name: CURVE_EVENTS, slide: SlideRenderer, target: CurveRenderer, baseEvent: MouseEvent): CurveMouseEvent {
+function makeCurveMouseEvent(name: CURVE_EVENTS, slide: SlideRenderer, target: ICurveRenderer, baseEvent: MouseEvent): CurveMouseEvent {
     return new CustomEvent<CurveMouseEventPayload>(name, { detail: { type: name, slide, target, baseEvent } });
 }
 
-export function decorateCurveEvents(svg: SVG.Element, slide: SlideRenderer, graphic: CurveRenderer) {
+export function decorateCurveEvents(svg: SVG.Element, slide: SlideRenderer, graphic: ICurveRenderer) {
     svg.node.addEventListener('mouseup', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(makeCurveMouseEvent(CURVE_EVENTS.MOUSEUP, slide, graphic, baseEvent));

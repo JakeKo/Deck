@@ -4,7 +4,7 @@ import Vector from '@/utilities/Vector';
 import { ImageRenderer } from '../graphics';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicMaker, VERTEX_ROLES } from '../types';
+import { GraphicMaker, IImageRenderer, VERTEX_ROLES } from '../types';
 
 type ImageMakerArgs = {
     slide: SlideRenderer;
@@ -20,7 +20,7 @@ type ImageMakerHelpers = { [key in VERTEX_ROLES]: VertexRenderer } & {
 };
 
 class ImageMaker implements GraphicMaker {
-    private _target: ImageRenderer;
+    public readonly target: IImageRenderer;
     private _slide: SlideRenderer;
     private _initialPosition: Vector;
     private _width: number;
@@ -34,57 +34,55 @@ class ImageMaker implements GraphicMaker {
         this._height = args.height;
 
         // Initialize primary graphic
-        this._target = new ImageRenderer({
+        this.target = new ImageRenderer({
             id: provideId(),
             slide: this._slide,
             origin: this._initialPosition,
             source: args.source,
-            width: args.width,
-            height: args.height
+            dimensions: new Vector(args.width, args.height)
         });
 
         // Initialize helper graphics
         this._helpers = {
             [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
                 slide: this._slide,
-                parent: this.getTarget(),
-                center: this._target.getOrigin(),
+                parent: this.target,
+                center: this.target.origin,
                 scale: args.scale,
                 role: VERTEX_ROLES.TOP_LEFT
             }),
             [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
                 slide: this._slide,
-                parent: this.getTarget(),
-                center: this._target.getOrigin().add(new Vector(this._target.getWidth(), 0)),
+                parent: this.target,
+                center: this.target.origin.add(new Vector(this.target.dimensions.x, 0)),
                 scale: args.scale,
                 role: VERTEX_ROLES.TOP_RIGHT
             }),
             [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
                 slide: this._slide,
-                parent: this.getTarget(),
-                center: this._target.getOrigin().add(new Vector(0, this._target.getHeight())),
+                parent: this.target,
+                center: this.target.origin.add(new Vector(0, this.target.dimensions.y)),
                 scale: args.scale,
                 role: VERTEX_ROLES.BOTTOM_LEFT
             }),
             [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
                 slide: this._slide,
-                parent: this.getTarget(),
-                center: this._target.getOrigin().add(new Vector(this._target.getWidth(), this._target.getHeight())),
+                parent: this.target,
+                center: this.target.origin.add(this.target.dimensions),
                 scale: args.scale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
             }),
             outline: new RectangleOutlineRenderer({
                 slide: this._slide,
                 scale: args.scale,
-                origin: this._target.getOrigin(),
-                width: this._target.getWidth(),
-                height: this._target.getHeight(),
-                rotation: this._target.getRotation()
+                origin: this.target.origin,
+                dimensions: this.target.dimensions,
+                rotation: this.target.rotation
             })
         };
 
         // Render primary graphic
-        this._target.render();
+        this.target.render();
 
         // Render helper graphics
         this._helpers[VERTEX_ROLES.TOP_LEFT].render();
@@ -94,20 +92,16 @@ class ImageMaker implements GraphicMaker {
         this._helpers.outline.render();
     }
 
-    public getTarget(): ImageRenderer {
-        return this._target;
-    }
-
-    public setScale(scale: number): void {
-        this._helpers[VERTEX_ROLES.TOP_LEFT].setScale(scale);
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].setScale(scale);
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setScale(scale);
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setScale(scale);
-        this._helpers.outline.setScale(scale);
+    public set scale(scale: number) {
+        this._helpers[VERTEX_ROLES.TOP_LEFT].scale = scale;
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].scale = scale;
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].scale = scale;
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].scale = scale;
+        this._helpers.outline.scale = scale;
     }
 
     public complete(): void {
-        this._slide.setGraphic(this._target);
+        this._slide.setGraphic(this.target);
 
         // Remove helper graphics
         this._helpers[VERTEX_ROLES.TOP_LEFT].unrender();
@@ -125,27 +119,20 @@ class ImageMaker implements GraphicMaker {
         const offset = rawOffset.projectOn(closestVector(rawOffset, directions));
 
         if (ctrl) {
-            const dimensions = offset.abs.scale(2);
-            const originOffset = offset.abs.scale(-1);
-            this._target.setOrigin(this._initialPosition.add(originOffset));
-            this._target.setWidth(dimensions.x);
-            this._target.setHeight(dimensions.y);
+            this.target.origin = this._initialPosition.add(offset.abs.scale(-1));
+            this.target.dimensions = offset.abs.scale(2);
         } else {
-            const dimensions = offset.abs;
-            const originOffset = offset.scale(0.5).add(dimensions.scale(-0.5));
-            this._target.setOrigin(this._initialPosition.add(originOffset));
-            this._target.setWidth(dimensions.x);
-            this._target.setHeight(dimensions.y);
+            this.target.origin = this._initialPosition.add(offset.scale(0.5).add(offset.abs.scale(-0.5)));
+            this.target.dimensions = offset.abs;
         }
 
         // Update helper graphics
-        this._helpers[VERTEX_ROLES.TOP_LEFT].setCenter(this._target.getOrigin());
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].setCenter(this._target.getOrigin().add(new Vector(this._target.getWidth(), 0)));
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setCenter(this._target.getOrigin().add(new Vector(0, this._target.getHeight())));
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(this._target.getOrigin().add(new Vector(this._target.getWidth(), this._target.getHeight())));
-        this._helpers.outline.setOrigin(this._target.getOrigin());
-        this._helpers.outline.setWidth(this._target.getWidth());
-        this._helpers.outline.setHeight(this._target.getHeight());
+        this._helpers[VERTEX_ROLES.TOP_LEFT].center = this.target.origin;
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].center = this.target.origin.add(new Vector(this.target.dimensions.x, 0));
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].center = this.target.origin.add(new Vector(0, this.target.dimensions.y));
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = this.target.origin.add(this.target.dimensions);
+        this._helpers.outline.origin = this.target.origin;
+        this._helpers.outline.dimensions = this.target.dimensions;
     }
 }
 

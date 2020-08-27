@@ -2,20 +2,19 @@ import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import { closestVector, mod } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
-import { CurveRenderer } from '../graphics';
 import { CurveAnchorRenderer } from '../helpers';
 import SlideRenderer from '../SlideRenderer';
-import { BoundingBoxMutatorHelpers, CurveAnchor, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from '../types';
+import { BoundingBoxMutatorHelpers, CurveAnchor, CURVE_ANCHOR_ROLES, GraphicMutator, GRAPHIC_TYPES, ICurveRenderer, VERTEX_ROLES } from '../types';
 import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from '../utilities';
 
 type CurveMutatorArgs = {
-    target: CurveRenderer;
+    target: ICurveRenderer;
     slide: SlideRenderer;
     scale: number;
 };
 
 class CurveMutator implements GraphicMutator {
-    public target: CurveRenderer;
+    public target: ICurveRenderer;
     public helpers: {
         anchors: CurveAnchorRenderer[];
     } & BoundingBoxMutatorHelpers;
@@ -25,10 +24,10 @@ class CurveMutator implements GraphicMutator {
 
         this.helpers = {
             ...makeBoxHelpers(this.target, args.slide, args.scale),
-            anchors: this.target.getAnchors().map((anchor, index) => new CurveAnchorRenderer({
+            anchors: this.target.anchors.map((anchor, index) => new CurveAnchorRenderer({
                 slide: args.slide,
                 scale: args.scale,
-                parentId: this.target.getId(),
+                parentId: this.target.id,
                 index,
                 ...anchor
             }))
@@ -42,7 +41,7 @@ class CurveMutator implements GraphicMutator {
         return GRAPHIC_TYPES.CURVE;
     }
 
-    public getTarget(): CurveRenderer {
+    public getTarget(): ICurveRenderer {
         return this.target;
     }
 
@@ -52,7 +51,7 @@ class CurveMutator implements GraphicMutator {
 
     // TODO: Account for ctrl, alt, and snapping
     public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
-        const box = this.target.getBoundingBox();
+        const box = this.target.box;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
@@ -66,7 +65,7 @@ class CurveMutator implements GraphicMutator {
         // 4. Unrotate the corner vector to correct for graphic rotation
         // 5. Use the post-shift corner vector and corrected corner vector to update props
         const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
-            const anchorOffsets = this.target.getAnchors().map<CurveAnchor>(anchor => ({
+            const anchorOffsets = this.target.anchors.map<CurveAnchor>(anchor => ({
                 inHandle: oppositeCorner.towards(anchor.inHandle).abs,
                 point: oppositeCorner.towards(anchor.point).abs,
                 outHandle: oppositeCorner.towards(anchor.outHandle).abs
@@ -82,11 +81,11 @@ class CurveMutator implements GraphicMutator {
                 const scale = new Vector(correctedCornerVector.x / box.dimensions.x, correctedCornerVector.y / box.dimensions.y);
 
                 // Update rendering
-                this.target.setAnchors(anchorOffsets.map<CurveAnchor>(anchor => ({
+                this.target.anchors = anchorOffsets.map<CurveAnchor>(anchor => ({
                     inHandle: new Vector(anchor.inHandle.x * scale.x, anchor.inHandle.y * scale.y).add(oppositeCorner),
                     point: new Vector(anchor.point.x * scale.x, anchor.point.y * scale.y).add(oppositeCorner),
                     outHandle: new Vector(anchor.outHandle.x * scale.x, anchor.outHandle.y * scale.y).add(oppositeCorner)
-                })));
+                }));
                 this._repositionCurveAnchors();
             };
         };
@@ -100,7 +99,7 @@ class CurveMutator implements GraphicMutator {
     }
 
     public rotateListener(): (event: SlideMouseEvent) => void {
-        const { center } = this.target.getBoundingBox();
+        const { center } = this.target.box;
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
@@ -110,8 +109,8 @@ class CurveMutator implements GraphicMutator {
             const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
             const theta = Math.atan2(offset.y, offset.x);
 
-            this.target.setRotation(mod(theta, Math.PI * 2));
-            rotateBoxHelpers(this.helpers, this.target.getBoundingBox());
+            this.target.rotation = mod(theta, Math.PI * 2);
+            rotateBoxHelpers(this.helpers, this.target.box);
         };
     }
 
@@ -120,7 +119,7 @@ class CurveMutator implements GraphicMutator {
     public moveListener(initialPosition: Vector): (event: SlideMouseEvent) => void {
         const initialOrigin = this.getOrigin();
         const offset = initialPosition.towards(initialOrigin);
-        const initialAnchors = this.target.getAnchors();
+        const initialAnchors = this.target.anchors;
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
@@ -134,7 +133,7 @@ class CurveMutator implements GraphicMutator {
                 point: anchor.point.add(move),
                 outHandle: anchor.outHandle.add(move)
             }));
-            this.target.setAnchors(newAnchors);
+            this.target.anchors = newAnchors;
             this._repositionCurveAnchors();
         };
     }
@@ -169,28 +168,28 @@ class CurveMutator implements GraphicMutator {
     }
 
     public setScale(scale: number): void {
-        this.helpers.anchors.forEach(helper => helper.setScale(scale));
+        this.helpers.anchors.forEach(helper => (helper.scale = scale));
         scaleBoxHelpers(this.helpers, scale);
     }
 
     private _repositionCurveAnchor(index: number): void {
         const anchor = this.target.getAnchor(index);
-        this.helpers.anchors[index].setInHandle(anchor.inHandle);
-        this.helpers.anchors[index].setPoint(anchor.point);
-        this.helpers.anchors[index].setOutHandle(anchor.outHandle);
+        this.helpers.anchors[index].inHandle = anchor.inHandle;
+        this.helpers.anchors[index].point = anchor.point;
+        this.helpers.anchors[index].outHandle = anchor.outHandle;
 
-        resizeBoxHelpers(this.helpers, this.target.getBoundingBox());
+        resizeBoxHelpers(this.helpers, this.target.box);
     }
 
     private _repositionCurveAnchors(): void {
         this.helpers.anchors.forEach((_, index) => {
             const anchor = this.target.getAnchor(index);
-            this.helpers.anchors[index].setInHandle(anchor.inHandle);
-            this.helpers.anchors[index].setPoint(anchor.point);
-            this.helpers.anchors[index].setOutHandle(anchor.outHandle);
+            this.helpers.anchors[index].inHandle = anchor.inHandle;
+            this.helpers.anchors[index].point = anchor.point;
+            this.helpers.anchors[index].outHandle = anchor.outHandle;
         });
 
-        resizeBoxHelpers(this.helpers, this.target.getBoundingBox());
+        resizeBoxHelpers(this.helpers, this.target.box);
     }
 }
 

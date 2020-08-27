@@ -1,11 +1,10 @@
-import { EllipseRenderer } from '../graphics';
 import { EllipseOutlineRenderer } from '../helpers';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicMarker } from '../types';
+import { GraphicMarker, IEllipseRenderer } from '../types';
 
 type EllipseMarkerArgs = {
     slide: SlideRenderer;
-    target: EllipseRenderer;
+    target: IEllipseRenderer;
     scale: number;
 };
 
@@ -16,10 +15,9 @@ class EllipseMarker implements GraphicMarker {
         this.helper = new EllipseOutlineRenderer({
             slide: args.slide,
             scale: args.scale,
-            center: args.target.getCenter(),
-            width: args.target.getWidth(),
-            height: args.target.getHeight(),
-            rotation: args.target.getRotation()
+            center: args.target.center,
+            dimensions: args.target.dimensions,
+            rotation: args.target.rotation
         });
 
         this.helper.render();
@@ -30,7 +28,7 @@ class EllipseMarker implements GraphicMarker {
     }
 
     public setScale(scale: number): void {
-        this.helper.setScale(scale);
+        this.helper.scale = scale;
     }
 }
 

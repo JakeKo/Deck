@@ -2,19 +2,18 @@ import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import { closestVector, mod } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
-import { TextboxRenderer } from '../graphics';
 import SlideRenderer from '../SlideRenderer';
-import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from '../types';
+import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, ITextboxRenderer, VERTEX_ROLES } from '../types';
 import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from '../utilities';
 
 type TextboxMutatorArgs = {
-    target: TextboxRenderer;
+    target: ITextboxRenderer;
     slide: SlideRenderer;
     scale: number;
 };
 
 class TextboxMutator implements GraphicMutator {
-    public target: TextboxRenderer;
+    public target: ITextboxRenderer;
     public helpers: BoundingBoxMutatorHelpers;
 
     constructor(args: TextboxMutatorArgs) {
@@ -31,13 +30,13 @@ class TextboxMutator implements GraphicMutator {
         return GRAPHIC_TYPES.TEXTBOX;
     }
 
-    public getTarget(): TextboxRenderer {
+    public getTarget(): ITextboxRenderer {
         return this.target;
     }
 
     // TODO: Account for ctrl, alt, and snapping
     public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
-        const box = this.target.getBoundingBox();
+        const box = this.target.box;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
@@ -77,7 +76,7 @@ class TextboxMutator implements GraphicMutator {
     }
 
     public rotateListener(): (event: SlideMouseEvent) => void {
-        const { center } = this.target.getBoundingBox();
+        const { center } = this.target.box;
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
@@ -87,14 +86,14 @@ class TextboxMutator implements GraphicMutator {
             const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
             const theta = Math.atan2(offset.y, offset.x);
 
-            this.target.setRotation(mod(theta, Math.PI * 2));
-            rotateBoxHelpers(this.helpers, this.target.getBoundingBox());
+            this.target.rotation = mod(theta, Math.PI * 2);
+            rotateBoxHelpers(this.helpers, this.target.box);
         };
     }
 
     // TODO: Account for alt and snapping
     public moveListener(initialPosition: Vector): (event: SlideMouseEvent) => void {
-        const initialOrigin = this.target.getOrigin();
+        const initialOrigin = this.target.origin;
         const offset = initialPosition.towards(initialOrigin);
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
@@ -104,7 +103,7 @@ class TextboxMutator implements GraphicMutator {
             const moveDirection = (baseEvent.shiftKey ? closestVector(rawMove, directions) : rawMove).normalized;
             const move = rawMove.projectOn(moveDirection);
 
-            this.target.setOrigin(initialOrigin.add(move));
+            this.target.origin = initialOrigin.add(move);
             this._repositionBoxHelpers();
         };
     }
@@ -121,7 +120,7 @@ class TextboxMutator implements GraphicMutator {
     }
 
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this.helpers, this.target.getBoundingBox());
+        resizeBoxHelpers(this.helpers, this.target.box);
     }
 }
 

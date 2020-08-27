@@ -2,19 +2,18 @@ import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import { closestVector, mod } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
-import { EllipseRenderer } from '../graphics';
 import SlideRenderer from '../SlideRenderer';
-import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, VERTEX_ROLES } from '../types';
+import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, IEllipseRenderer, VERTEX_ROLES } from '../types';
 import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from '../utilities';
 
 type EllipseMutatorArgs = {
-    target: EllipseRenderer;
+    target: IEllipseRenderer;
     slide: SlideRenderer;
     scale: number;
 };
 
 class EllipseMutator implements GraphicMutator {
-    public target: EllipseRenderer;
+    public target: IEllipseRenderer;
     public helpers: BoundingBoxMutatorHelpers;
 
     constructor(args: EllipseMutatorArgs) {
@@ -31,13 +30,13 @@ class EllipseMutator implements GraphicMutator {
         return GRAPHIC_TYPES.ELLIPSE;
     }
 
-    public getTarget(): EllipseRenderer {
+    public getTarget(): IEllipseRenderer {
         return this.target;
     }
 
     // TODO: Account for ctrl, alt, and snapping
     public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
-        const box = this.target.getBoundingBox();
+        const box = this.target.box;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
@@ -76,7 +75,7 @@ class EllipseMutator implements GraphicMutator {
     }
 
     public rotateListener(): (event: SlideMouseEvent) => void {
-        const { center } = this.target.getBoundingBox();
+        const { center } = this.target.box;
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
@@ -86,14 +85,14 @@ class EllipseMutator implements GraphicMutator {
             const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
             const theta = Math.atan2(offset.y, offset.x);
 
-            this.target.setRotation(mod(theta, Math.PI * 2));
-            rotateBoxHelpers(this.helpers, this.target.getBoundingBox());
+            this.target.rotation = mod(theta, Math.PI * 2);
+            rotateBoxHelpers(this.helpers, this.target.box);
         };
     }
 
     // TODO: Account for alt snapping
     public moveListener(initialPosition: Vector): (event: SlideMouseEvent) => void {
-        const initialCenter = this.target.getCenter();
+        const initialCenter = this.target.center;
         const offset = initialPosition.towards(initialCenter);
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
@@ -103,7 +102,7 @@ class EllipseMutator implements GraphicMutator {
             const moveDirection = (baseEvent.shiftKey ? closestVector(rawMove, directions) : rawMove).normalized;
             const move = rawMove.projectOn(moveDirection);
 
-            this.target.setCenter(initialCenter.add(move));
+            this.target.center = initialCenter.add(move);
             this._repositionBoxHelpers();
         };
     }
@@ -120,7 +119,7 @@ class EllipseMutator implements GraphicMutator {
     }
 
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this.helpers, this.target.getBoundingBox());
+        resizeBoxHelpers(this.helpers, this.target.box);
     }
 }
 

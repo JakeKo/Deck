@@ -1,7 +1,16 @@
-import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from '@/rendering/graphics';
-import { VertexRenderer } from '@/rendering/helpers';
 import SlideRenderer from '@/rendering/SlideRenderer';
-import { CURVE_ANCHOR_ROLES, GraphicRenderer, HelperRenderer } from '@/rendering/types';
+import {
+    CURVE_ANCHOR_ROLES,
+    ICurveRenderer,
+    IEllipseRenderer,
+    IGraphicRenderer,
+    IHelperRenderer,
+    IImageRenderer,
+    IRectangleRenderer,
+    ITextboxRenderer,
+    IVertexRenderer,
+    IVideoRenderer
+} from '@/rendering/types';
 
 export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
 type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
@@ -26,7 +35,7 @@ export type SlideMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
     type: SLIDE_EVENTS;
-    target: GraphicRenderer | HelperRenderer | undefined;
+    target: IGraphicRenderer | IHelperRenderer | undefined;
 };
 
 export type SlideKeyboardEvent = CustomEvent<SlideKeyboardEventPayload>;
@@ -34,7 +43,7 @@ export type SlideKeyboardEventPayload = {
     baseEvent: KeyboardEvent;
     slide: SlideRenderer;
     type: SLIDE_EVENTS;
-    target: GraphicRenderer | undefined;
+    target: IGraphicRenderer | undefined;
 };
 
 export type SlideZoomEvent = CustomEvent<SlideZoomEventPayload>;
@@ -56,7 +65,7 @@ export type CurveMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
     type: CURVE_EVENTS;
-    target: CurveRenderer;
+    target: ICurveRenderer;
 };
 
 // CURVE ANCHOR EVENTS
@@ -92,7 +101,7 @@ export type EllipseMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
     type: ELLIPSE_EVENTS;
-    target: EllipseRenderer;
+    target: IEllipseRenderer;
 };
 
 // IMAGE EVENTS
@@ -109,7 +118,7 @@ export type ImageMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
     type: IMAGE_EVENTS;
-    target: ImageRenderer;
+    target: IImageRenderer;
 };
 
 // RECTANGLE EVENTS
@@ -126,7 +135,7 @@ export type RectangleMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
     type: RECTANGLE_EVENTS;
-    target: RectangleRenderer;
+    target: IRectangleRenderer;
 };
 
 // ROTATOR EVENTS
@@ -160,7 +169,7 @@ export type TextboxMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
     type: TEXTBOX_EVENTS;
-    target: TextboxRenderer;
+    target: ITextboxRenderer;
 };
 
 // VIDEO EVENTS
@@ -177,7 +186,7 @@ export type VideoMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
     type: VIDEO_EVENTS;
-    target: VideoRenderer;
+    target: IVideoRenderer;
 };
 
 // VERTEX EVENTS
@@ -194,5 +203,5 @@ export type VertexMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: SlideRenderer;
     type: VERTEX_EVENTS;
-    graphic: VertexRenderer;
+    graphic: IVertexRenderer;
 };

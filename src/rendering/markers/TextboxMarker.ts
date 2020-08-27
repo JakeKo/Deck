@@ -1,11 +1,10 @@
-import { TextboxRenderer } from '../graphics';
 import { RectangleOutlineRenderer } from '../helpers';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicMarker } from '../types';
+import { GraphicMarker, ITextboxRenderer } from '../types';
 
 type TextboxMarkerArgs = {
     slide: SlideRenderer;
-    target: TextboxRenderer;
+    target: ITextboxRenderer;
     scale: number;
 };
 
@@ -16,10 +15,9 @@ class TextboxMarker implements GraphicMarker {
         this.helper = new RectangleOutlineRenderer({
             slide: args.slide,
             scale: args.scale,
-            origin: args.target.getOrigin(),
-            width: args.target.getWidth(),
-            height: args.target.getHeight(),
-            rotation: args.target.getRotation()
+            origin: args.target.origin,
+            dimensions: args.target.dimensions,
+            rotation: args.target.rotation
         });
 
         this.helper.render();
@@ -30,7 +28,7 @@ class TextboxMarker implements GraphicMarker {
     }
 
     public setScale(scale: number): void {
-        this.helper.setScale(scale);
+        this.helper.scale = scale;
     }
 }
 

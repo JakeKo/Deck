@@ -1,14 +1,14 @@
-import ImageRenderer from '@/rendering/graphics/ImageRenderer';
 import SlideRenderer from '@/rendering/SlideRenderer';
+import { IImageRenderer } from '@/rendering/types';
 import SVG from 'svg.js';
 import { ImageMouseEvent, ImageMouseEventPayload, IMAGE_EVENTS, SLIDE_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 
-function makeImageMouseEvent(name: IMAGE_EVENTS, slide: SlideRenderer, target: ImageRenderer, baseEvent: MouseEvent): ImageMouseEvent {
+function makeImageMouseEvent(name: IMAGE_EVENTS, slide: SlideRenderer, target: IImageRenderer, baseEvent: MouseEvent): ImageMouseEvent {
     return new CustomEvent<ImageMouseEventPayload>(name, { detail: { type: name, slide, target, baseEvent } });
 }
 
-export function decorateImageEvents(svg: SVG.Element, slide: SlideRenderer, graphic: ImageRenderer) {
+export function decorateImageEvents(svg: SVG.Element, slide: SlideRenderer, graphic: IImageRenderer) {
     svg.node.addEventListener('mouseup', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(makeImageMouseEvent(IMAGE_EVENTS.MOUSEUP, slide, graphic, baseEvent));

@@ -1,14 +1,14 @@
-import EllipseRenderer from '@/rendering/graphics/EllipseRenderer';
 import SlideRenderer from '@/rendering/SlideRenderer';
+import { IEllipseRenderer } from '@/rendering/types';
 import SVG from 'svg.js';
 import { EllipseMouseEvent, EllipseMouseEventPayload, ELLIPSE_EVENTS, SLIDE_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 
-function makeEllipseMouseEvent(name: ELLIPSE_EVENTS, slide: SlideRenderer, target: EllipseRenderer, baseEvent: MouseEvent): EllipseMouseEvent {
+function makeEllipseMouseEvent(name: ELLIPSE_EVENTS, slide: SlideRenderer, target: IEllipseRenderer, baseEvent: MouseEvent): EllipseMouseEvent {
     return new CustomEvent<EllipseMouseEventPayload>(name, { detail: { type: name, slide, target, baseEvent } });
 }
 
-export function decorateEllipseEvents(svg: SVG.Element, slide: SlideRenderer, graphic: EllipseRenderer) {
+export function decorateEllipseEvents(svg: SVG.Element, slide: SlideRenderer, graphic: IEllipseRenderer) {
     svg.node.addEventListener('mouseup', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(makeEllipseMouseEvent(ELLIPSE_EVENTS.MOUSEUP, slide, graphic, baseEvent));

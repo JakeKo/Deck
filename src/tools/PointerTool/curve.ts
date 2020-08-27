@@ -5,11 +5,11 @@ import { resolvePosition } from '../utilities';
 
 export function moveCurve(event: CurveMouseEvent): void {
     const { slide, baseEvent, target } = event.detail;
-    if (!baseEvent.ctrlKey && !slide.isFocused(target.getId())) {
-        slide.unfocusAllGraphics([target.getId()]);
+    if (!baseEvent.ctrlKey && !slide.isFocused(target.id)) {
+        slide.unfocusAllGraphics([target.id]);
     }
 
-    const mutator = slide.focusGraphic(target.getId()) as CurveMutator;
+    const mutator = slide.focusGraphic(target.id) as CurveMutator;
     const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide));
     slide.cursor = 'move';
     slide.cursorLock = true;
@@ -61,14 +61,14 @@ export function moveCurveAnchor(event: CurveAnchorMouseEvent, moveAnchor: (event
 export function hoverCurve(event: CurveMouseEvent): void {
     const { target, slide } = event.detail;
 
-    if (slide.isFocused(target.getId())) {
+    if (slide.isFocused(target.id)) {
         return;
     }
 
-    slide.markGraphic(target.getId());
+    slide.markGraphic(target.id);
 
     listenOnce(CURVE_EVENTS.MOUSEOUT, unmark);
     function unmark(): void {
-        slide.unmarkGraphic(target.getId());
+        slide.unmarkGraphic(target.id);
     }
 }

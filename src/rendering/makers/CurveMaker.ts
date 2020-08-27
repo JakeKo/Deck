@@ -3,7 +3,7 @@ import Vector from '@/utilities/Vector';
 import { CurveRenderer } from '../graphics';
 import { CurveAnchorRenderer } from '../helpers';
 import SlideRenderer from '../SlideRenderer';
-import { CurveAnchor, GraphicMaker } from '../types';
+import { CurveAnchor, GraphicMaker, ICurveRenderer } from '../types';
 
 type CurveMakerArgs = {
     slide: SlideRenderer;
@@ -12,7 +12,7 @@ type CurveMakerArgs = {
 };
 
 class CurveMaker implements GraphicMaker {
-    private _target: CurveRenderer;
+    public readonly target: ICurveRenderer;
     private _slide: SlideRenderer;
     private _helper: CurveAnchorRenderer;
 
@@ -20,7 +20,7 @@ class CurveMaker implements GraphicMaker {
         this._slide = args.slide;
 
         // Inititalize primary graphic
-        this._target = new CurveRenderer({
+        this.target = new CurveRenderer({
             id: provideId(),
             slide: this._slide
         });
@@ -32,55 +32,51 @@ class CurveMaker implements GraphicMaker {
             inHandle: args.initialPosition,
             point: args.initialPosition,
             outHandle: args.initialPosition,
-            parentId: this._target.getId(),
+            parentId: this.target.id,
             index: -1
         });
 
         // Render primary graphic
-        this._target.render();
+        this.target.render();
 
         // Render helper graphic
         this._helper.render();
     }
 
-    public getTarget(): CurveRenderer {
-        return this._target;
+    public set scale(scale: number) {
+        this._helper.scale = scale;
     }
 
     // TODO: Consider returning graphic so setGraphic may be called outside makers
     public complete(): void {
         // Trim the last anchor and persist
-        this._target.removeAnchor(this._target.getAnchors().length - 1);
-        this._slide.setGraphic(this._target);
+        this.target.removeAnchor(this.target.anchors.length - 1);
+        this._slide.setGraphic(this.target);
 
         // Remove helper graphics
         this._helper.unrender();
     }
 
-    public setScale(scale: number): void {
-        this._helper.setScale(scale);
-    }
-
     public addAnchor(anchor: CurveAnchor): { setHandles: (position: Vector) => void; setPoint: (position: Vector) => void } {
-        const anchorIndex = this._target.addAnchor(anchor);
+        const anchorIndex = this.target.addAnchor(anchor);
 
         // Update helper graphic
-        this._helper.setInHandle(anchor.inHandle);
-        this._helper.setPoint(anchor.point);
-        this._helper.setOutHandle(anchor.outHandle);
+        this._helper.inHandle = anchor.inHandle;
+        this._helper.point = anchor.point;
+        this._helper.outHandle = anchor.outHandle;
 
         return {
             setHandles: position => {
                 anchor.inHandle = position.reflect(anchor.point);
                 anchor.outHandle = position;
-                this._target.setAnchor(anchorIndex, anchor);
-                this._helper.setInHandle(anchor.inHandle);
-                this._helper.setOutHandle(anchor.outHandle);
+                this.target.setAnchor(anchorIndex, anchor);
+                this._helper.inHandle = anchor.inHandle;
+                this._helper.outHandle = anchor.outHandle;
             },
             setPoint: position => {
                 anchor.point = position;
-                this._target.setAnchor(anchorIndex, anchor);
-                this._helper.setPoint(anchor.point);
+                this.target.setAnchor(anchorIndex, anchor);
+                this._helper.point = anchor.point;
             }
         };
     }

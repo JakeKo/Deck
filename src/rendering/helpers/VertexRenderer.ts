@@ -1,22 +1,23 @@
-import SVG from 'svg.js';
 import { decorateVertexEvents } from '@/events/decorators';
 import Vector from '@/utilities/Vector';
+import SVG from 'svg.js';
 import SlideRenderer from '../SlideRenderer';
-import { GraphicRenderer, GRAPHIC_TYPES, HelperRenderer, VERTEX_ROLES } from '../types';
+import { GRAPHIC_TYPES, IGraphicRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
 type VertexRendererArgs = {
     slide: SlideRenderer;
     scale: number;
     role: VERTEX_ROLES;
     center: Vector;
-    parent: GraphicRenderer;
+    parent: IGraphicRenderer;
 };
 
-class VertexRenderer implements HelperRenderer {
+class VertexRenderer implements IVertexRenderer {
+    public readonly type = GRAPHIC_TYPES.VERTEX;
     private _slide: SlideRenderer;
     private _svg: SVG.Ellipse | undefined;
     private _role: VERTEX_ROLES;
-    private _parent: GraphicRenderer;
+    private _parent: IGraphicRenderer;
     private _scale: number;
     private _width: number;
     private _height: number;
@@ -38,25 +39,31 @@ class VertexRenderer implements HelperRenderer {
         this._strokeWidth = 0;
     }
 
-    public getType(): GRAPHIC_TYPES {
-        return GRAPHIC_TYPES.VERTEX;
-    }
-
-    public isRendered(): boolean {
+    public get isRendered(): boolean {
         return this._svg !== undefined;
     }
 
-    public getRole(): VERTEX_ROLES {
+    public get role(): VERTEX_ROLES {
         return this._role;
     }
 
-    public getParent(): GraphicRenderer {
+    public get parent(): IGraphicRenderer {
         return this._parent;
+    }
+
+    public set center(center: Vector) {
+        this._center = center;
+        this._svg && this._svg.center(this._center.x, this._center.y);
+    }
+
+    public set scale(scale: number) {
+        this._scale = scale;
+        this._svg && this._svg.size(this._width * this._scale, this._height * this._scale);
     }
 
     public render(): void {
         // Silently fail if the SVG is already rendered
-        if (this.isRendered()) {
+        if (this.isRendered) {
             return;
         }
 
@@ -70,16 +77,6 @@ class VertexRenderer implements HelperRenderer {
     public unrender(): void {
         this._svg && this._svg.remove();
         this._svg = undefined;
-    }
-
-    public setCenter(center: Vector): void {
-        this._center = center;
-        this._svg && this._svg.center(this._center.x, this._center.y);
-    }
-
-    public setScale(scale: number): void {
-        this._scale = scale;
-        this._svg && this._svg.size(this._width * this._scale, this._height * this._scale);
     }
 }
 

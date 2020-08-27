@@ -10,7 +10,7 @@ export default (store: AppStore): EditorTool => {
         return function make(event) {
             const { slide, baseEvent } = event.detail;
             const maker = slide.makeVideoInteractive(resolvePosition(baseEvent, slide), video, width, height);
-            slide.broadcastSetGraphic(maker.getTarget());
+            slide.broadcastSetGraphic(maker.target);
 
             listen(SLIDE_EVENTS.MOUSEMOVE, update);
             listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
@@ -19,7 +19,7 @@ export default (store: AppStore): EditorTool => {
                 const { baseEvent } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
                 maker.resize(position, baseEvent.shiftKey, baseEvent.ctrlKey, baseEvent.altKey);
-                slide.broadcastSetGraphic(maker.getTarget());
+                slide.broadcastSetGraphic(maker.target);
             }
 
             function complete(): void {

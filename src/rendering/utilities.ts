@@ -1,26 +1,24 @@
 import Vector from '@/utilities/Vector';
 import { BoxRenderer, CanvasRenderer, RotatorRenderer, VertexRenderer } from './helpers';
 import SlideRenderer from './SlideRenderer';
-import { BoundingBox, BoundingBoxMutatorHelpers, GraphicRenderer, VERTEX_ROLES } from './types';
+import { BoundingBox, BoundingBoxMutatorHelpers, IGraphicRenderer, VERTEX_ROLES } from './types';
 
 export function renderBackdrop(slideRenderer: SlideRenderer, width: number, height: number): void {
     new CanvasRenderer({
         slide: slideRenderer,
         origin: Vector.zero,
-        width,
-        height
+        dimensions: new Vector(width, height)
     }).render();
 }
 
-export function makeBoxHelpers(target: GraphicRenderer, slide: SlideRenderer, scale: number): BoundingBoxMutatorHelpers {
-    const box = target.getBoundingBox();
+export function makeBoxHelpers(target: IGraphicRenderer, slide: SlideRenderer, scale: number): BoundingBoxMutatorHelpers {
+    const box = target.box;
     return {
         box: new BoxRenderer({
             slide: slide,
             scale: scale,
             origin: box.origin,
-            width: box.dimensions.x,
-            height: box.dimensions.y,
+            dimensions: box.dimensions,
             rotation: box.rotation
         }),
         rotator: new RotatorRenderer({
@@ -82,29 +80,29 @@ export function unrenderBoxHelpers(helpers: BoundingBoxMutatorHelpers): void {
 }
 
 export function scaleBoxHelpers(helpers: BoundingBoxMutatorHelpers, scale: number): void {
-    helpers.box.setScale(scale);
-    helpers.rotator.setScale(scale);
-    helpers.vertices[VERTEX_ROLES.TOP_LEFT].setScale(scale);
-    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].setScale(scale);
-    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].setScale(scale);
-    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].setScale(scale);
+    helpers.box.scale = scale;
+    helpers.rotator.scale = scale;
+    helpers.vertices[VERTEX_ROLES.TOP_LEFT].scale = scale;
+    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].scale = scale;
+    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].scale = scale;
+    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].scale = scale;
 }
 
 export function rotateBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
-    helpers.box.setRotation(box.rotation);
-    helpers.rotator.setRotation(box.rotation);
-    helpers.rotator.setCenter(box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5)));
-    helpers.vertices[VERTEX_ROLES.TOP_LEFT].setCenter(box.topLeft);
-    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].setCenter(box.topRight);
-    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].setCenter(box.bottomLeft);
-    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(box.bottomRight);
+    helpers.box.rotation = box.rotation;
+    helpers.rotator.rotation = box.rotation;
+    helpers.rotator.center = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
+    helpers.vertices[VERTEX_ROLES.TOP_LEFT].center = box.topLeft;
+    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].center = box.topRight;
+    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].center = box.bottomLeft;
+    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].center = box.bottomRight;
 }
 
 export function resizeBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
     helpers.box.setOriginAndDimensions(box.origin, box.dimensions);
-    helpers.rotator.setCenter(box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5)));
-    helpers.vertices[VERTEX_ROLES.TOP_LEFT].setCenter(box.topLeft);
-    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].setCenter(box.topRight);
-    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].setCenter(box.bottomLeft);
-    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(box.bottomRight);
+    helpers.rotator.center = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
+    helpers.vertices[VERTEX_ROLES.TOP_LEFT].center = box.topLeft;
+    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].center = box.topRight;
+    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].center = box.bottomLeft;
+    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].center = box.bottomRight;
 }
