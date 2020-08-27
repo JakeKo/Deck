@@ -1,13 +1,39 @@
-import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from '@/rendering/graphics';
-import SlideRenderer from '@/rendering/SlideRenderer';
-import { CurveAnchor, GraphicRenderer, GRAPHIC_TYPES } from '@/rendering/types';
-import { AppStore, CurveStoreModel, EllipseStoreModel, GraphicStoreModel, ImageStoreModel, RectangleStoreModel, TextboxStoreModel, VideoStoreModel } from '@/store/types';
+import {
+    CurveRenderer,
+    EllipseRenderer,
+    ImageRenderer,
+    RectangleRenderer,
+    TextboxRenderer,
+    VideoRenderer
+} from '@/rendering/graphics';
+import {
+    CurveAnchor,
+    GRAPHIC_TYPES,
+    ICurveRenderer,
+    IEllipseRenderer,
+    IGraphicRenderer,
+    IImageRenderer,
+    IRectangleRenderer,
+    ISlideRenderer,
+    ITextboxRenderer,
+    IVideoRenderer
+} from '@/rendering/types';
+import {
+    AppStore,
+    CurveStoreModel,
+    EllipseStoreModel,
+    GraphicStoreModel,
+    ImageStoreModel,
+    RectangleStoreModel,
+    TextboxStoreModel,
+    VideoStoreModel
+} from '@/store/types';
 import Vector from './Vector';
 
 export default class SlideStateManager {
     private _slideId: string;
     private _store: AppStore | undefined;
-    private _renderer: SlideRenderer | undefined;
+    private _renderer: ISlideRenderer | undefined;
 
     constructor(slideId: string) {
         this._slideId = slideId;
@@ -17,28 +43,29 @@ export default class SlideStateManager {
         this._store = store;
     }
 
-    public setRenderer(renderer: SlideRenderer): void {
+    public setRenderer(renderer: ISlideRenderer): void {
         this._renderer = renderer;
     }
 
-    public setGraphicFromRenderer(graphic: GraphicRenderer): void {
-        if (graphic.getType() === GRAPHIC_TYPES.CURVE) {
-            const storeModel = this._curveRendererToStoreModel(graphic as CurveRenderer);
+    public setGraphicFromRenderer(graphic: IGraphicRenderer): void {
+        if (graphic.type === GRAPHIC_TYPES.CURVE) {
+            const storeModel = this._curveRendererToStoreModel(graphic);
+            this._store && this._store.setGraphic(this._slideId,
+                storeModel);
+        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+            const storeModel = this._ellipseRendererToStoreModel(graphic);
             this._store && this._store.setGraphic(this._slideId, storeModel);
-        } else if (graphic.getType() === GRAPHIC_TYPES.ELLIPSE) {
-            const storeModel = this._ellipseRendererToStoreModel(graphic as EllipseRenderer);
+        } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
+            const storeModel = this._imageRendererToStoreModel(graphic);
             this._store && this._store.setGraphic(this._slideId, storeModel);
-        } else if (graphic.getType() === GRAPHIC_TYPES.IMAGE) {
-            const storeModel = this._imageRendererToStoreModel(graphic as ImageRenderer);
+        } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+            const storeModel = this._rectangleRendererToStoreModel(graphic);
             this._store && this._store.setGraphic(this._slideId, storeModel);
-        } else if (graphic.getType() === GRAPHIC_TYPES.RECTANGLE) {
-            const storeModel = this._rectangleRendererToStoreModel(graphic as RectangleRenderer);
+        } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
+            const storeModel = this._textboxRendererToStoreModel(graphic);
             this._store && this._store.setGraphic(this._slideId, storeModel);
-        } else if (graphic.getType() === GRAPHIC_TYPES.TEXTBOX) {
-            const storeModel = this._textboxRendererToStoreModel(graphic as TextboxRenderer);
-            this._store && this._store.setGraphic(this._slideId, storeModel);
-        } else if (graphic.getType() === GRAPHIC_TYPES.VIDEO) {
-            const storeModel = this._videoRendererToStoreModel(graphic as VideoRenderer);
+        } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
+            const storeModel = this._videoRendererToStoreModel(graphic);
             this._store && this._store.setGraphic(this._slideId, storeModel);
         }
     }
@@ -73,7 +100,7 @@ export default class SlideStateManager {
         this._renderer && this._renderer.removeGraphic(graphicId);
     }
 
-    private _curveStoreModelToRenderer(curve: CurveStoreModel): CurveRenderer {
+    private _curveStoreModelToRenderer(curve: CurveStoreModel): ICurveRenderer {
         if (this._renderer === undefined) {
             throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
         }
@@ -93,19 +120,19 @@ export default class SlideStateManager {
         });
     }
 
-    private _curveRendererToStoreModel(curve: CurveRenderer): CurveStoreModel {
+    private _curveRendererToStoreModel(curve: ICurveRenderer): CurveStoreModel {
         return {
-            id: curve.getId(),
+            id: curve.id,
             type: GRAPHIC_TYPES.CURVE,
-            points: curve.getAnchors().reduce<Vector[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []),
-            fillColor: curve.getFillColor(),
-            strokeColor: curve.getStrokeColor(),
-            strokeWidth: curve.getStrokeWidth(),
-            rotation: curve.getRotation()
+            points: curve.anchors.reduce<Vector[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []),
+            fillColor: curve.fillColor,
+            strokeColor: curve.strokeColor,
+            strokeWidth: curve.strokeWidth,
+            rotation: curve.rotation
         };
     }
 
-    private _ellipseStoreModelToRenderer(ellipse: EllipseStoreModel): EllipseRenderer {
+    private _ellipseStoreModelToRenderer(ellipse: EllipseStoreModel): IEllipseRenderer {
         if (this._renderer === undefined) {
             throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
         }
@@ -114,8 +141,7 @@ export default class SlideStateManager {
             id: ellipse.id,
             slide: this._renderer,
             center: ellipse.center,
-            width: ellipse.width,
-            height: ellipse.height,
+            dimensions: new Vector(ellipse.width, ellipse.height),
             fillColor: ellipse.fillColor,
             strokeColor: ellipse.strokeColor,
             strokeWidth: ellipse.strokeWidth,
@@ -123,21 +149,21 @@ export default class SlideStateManager {
         });
     }
 
-    private _ellipseRendererToStoreModel(ellipse: EllipseRenderer): EllipseStoreModel {
+    private _ellipseRendererToStoreModel(ellipse: IEllipseRenderer): EllipseStoreModel {
         return {
-            id: ellipse.getId(),
+            id: ellipse.id,
             type: GRAPHIC_TYPES.ELLIPSE,
-            center: ellipse.getCenter(),
-            width: ellipse.getWidth(),
-            height: ellipse.getHeight(),
-            fillColor: ellipse.getFillColor(),
-            strokeColor: ellipse.getStrokeColor(),
-            strokeWidth: ellipse.getStrokeWidth(),
-            rotation: ellipse.getRotation()
+            center: ellipse.center,
+            width: ellipse.dimensions.x,
+            height: ellipse.dimensions.y,
+            fillColor: ellipse.fillColor,
+            strokeColor: ellipse.strokeColor,
+            strokeWidth: ellipse.strokeWidth,
+            rotation: ellipse.rotation
         };
     }
 
-    private _imageStoreModelToRenderer(image: ImageStoreModel): ImageRenderer {
+    private _imageStoreModelToRenderer(image: ImageStoreModel): IImageRenderer {
         if (this._renderer === undefined) {
             throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
         }
@@ -147,29 +173,28 @@ export default class SlideStateManager {
             slide: this._renderer,
             origin: image.origin,
             source: image.source,
-            width: image.width,
-            height: image.height,
+            dimensions: new Vector(image.width, image.height),
             strokeColor: image.strokeColor,
             strokeWidth: image.strokeWidth,
             rotation: image.rotation
         });
     }
 
-    private _imageRendererToStoreModel(image: ImageRenderer): ImageStoreModel {
+    private _imageRendererToStoreModel(image: IImageRenderer): ImageStoreModel {
         return {
-            id: image.getId(),
+            id: image.id,
             type: GRAPHIC_TYPES.IMAGE,
-            source: image.getSource(),
-            origin: image.getOrigin(),
-            height: image.getHeight(),
-            width: image.getWidth(),
-            strokeColor: image.getStrokeColor(),
-            strokeWidth: image.getStrokeWidth(),
-            rotation: image.getRotation()
+            source: image.source,
+            origin: image.origin,
+            height: image.dimensions.y,
+            width: image.dimensions.x,
+            strokeColor: image.strokeColor,
+            strokeWidth: image.strokeWidth,
+            rotation: image.rotation
         };
     }
 
-    private _rectangleStoreModelToRenderer(rectangle: RectangleStoreModel): RectangleRenderer {
+    private _rectangleStoreModelToRenderer(rectangle: RectangleStoreModel): IRectangleRenderer {
         if (this._renderer === undefined) {
             throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
         }
@@ -178,8 +203,7 @@ export default class SlideStateManager {
             id: rectangle.id,
             slide: this._renderer,
             origin: rectangle.origin,
-            width: rectangle.width,
-            height: rectangle.height,
+            dimensions: new Vector(rectangle.width, rectangle.height),
             fillColor: rectangle.fillColor,
             strokeColor: rectangle.strokeColor,
             strokeWidth: rectangle.strokeWidth,
@@ -187,21 +211,21 @@ export default class SlideStateManager {
         });
     }
 
-    private _rectangleRendererToStoreModel(rectangle: RectangleRenderer): RectangleStoreModel {
+    private _rectangleRendererToStoreModel(rectangle: IRectangleRenderer): RectangleStoreModel {
         return {
-            id: rectangle.getId(),
+            id: rectangle.id,
             type: GRAPHIC_TYPES.RECTANGLE,
-            origin: rectangle.getOrigin(),
-            width: rectangle.getWidth(),
-            height: rectangle.getHeight(),
-            fillColor: rectangle.getFillColor(),
-            strokeColor: rectangle.getStrokeColor(),
-            strokeWidth: rectangle.getStrokeWidth(),
-            rotation: rectangle.getRotation()
+            origin: rectangle.origin,
+            width: rectangle.dimensions.x,
+            height: rectangle.dimensions.y,
+            fillColor: rectangle.fillColor,
+            strokeColor: rectangle.strokeColor,
+            strokeWidth: rectangle.strokeWidth,
+            rotation: rectangle.rotation
         };
     }
 
-    private _textboxStoreModelToRenderer(textbox: TextboxStoreModel): TextboxRenderer {
+    private _textboxStoreModelToRenderer(textbox: TextboxStoreModel): ITextboxRenderer {
         if (this._renderer === undefined) {
             throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
         }
@@ -211,31 +235,30 @@ export default class SlideStateManager {
             slide: this._renderer,
             text: textbox.text,
             origin: textbox.origin,
-            width: textbox.width,
-            height: textbox.height,
-            size: textbox.size,
-            weight: textbox.weight,
-            font: textbox.font,
+            dimensions: new Vector(textbox.width, textbox.height),
+            fontSize: textbox.size,
+            fontWeight: textbox.weight,
+            typeface: textbox.font,
             rotation: textbox.rotation
         });
     }
 
-    private _textboxRendererToStoreModel(textbox: TextboxRenderer): TextboxStoreModel {
+    private _textboxRendererToStoreModel(textbox: ITextboxRenderer): TextboxStoreModel {
         return {
-            id: textbox.getId(),
+            id: textbox.id,
             type: GRAPHIC_TYPES.TEXTBOX,
-            origin: textbox.getOrigin(),
-            text: textbox.getText(),
-            width: textbox.getWidth(),
-            height: textbox.getHeight(),
-            size: textbox.getSize(),
-            weight: textbox.getWeight(),
-            font: textbox.getFont(),
-            rotation: textbox.getRotation()
+            origin: textbox.origin,
+            text: textbox.text,
+            width: textbox.dimensions.x,
+            height: textbox.dimensions.y,
+            size: textbox.fontSize,
+            weight: textbox.fontWeight,
+            font: textbox.typeface,
+            rotation: textbox.rotation
         };
     }
 
-    private _videoStoreModelToRenderer(video: VideoStoreModel): VideoRenderer {
+    private _videoStoreModelToRenderer(video: VideoStoreModel): IVideoRenderer {
         const el = document.createElement('video');
         el.src = video.source;
         if (this._renderer === undefined) {
@@ -247,25 +270,24 @@ export default class SlideStateManager {
             slide: this._renderer,
             origin: video.origin,
             source: el,
-            width: video.width,
-            height: video.height,
+            dimensions: new Vector(video.width, video.height),
             strokeColor: video.strokeColor,
             strokeWidth: video.strokeWidth,
             rotation: video.rotation
         });
     }
 
-    private _videoRendererToStoreModel(video: VideoRenderer): VideoStoreModel {
+    private _videoRendererToStoreModel(video: IVideoRenderer): VideoStoreModel {
         return {
-            id: video.getId(),
+            id: video.id,
             type: GRAPHIC_TYPES.VIDEO,
-            source: video.getSource().src,
-            origin: video.getOrigin(),
-            height: video.getHeight(),
-            width: video.getWidth(),
-            strokeColor: video.getStrokeColor(),
-            strokeWidth: video.getStrokeWidth(),
-            rotation: video.getRotation()
+            source: video.source.src,
+            origin: video.origin,
+            height: video.dimensions.y,
+            width: video.dimensions.x,
+            strokeColor: video.strokeColor,
+            strokeWidth: video.strokeWidth,
+            rotation: video.rotation
         };
     }
 }

@@ -5,11 +5,11 @@ import { resolvePosition } from '../utilities';
 
 export function moveEllipse(event: EllipseMouseEvent): void {
     const { slide, baseEvent, target } = event.detail;
-    if (!baseEvent.ctrlKey && !slide.isFocused(target.getId())) {
-        slide.unfocusAllGraphics([target.getId()]);
+    if (!baseEvent.ctrlKey && !slide.isFocused(target.id)) {
+        slide.unfocusAllGraphics([target.id]);
     }
 
-    const mutator = slide.focusGraphic(target.getId()) as EllipseMutator;
+    const mutator = slide.focusGraphic(target.id) as EllipseMutator;
     const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide));
     slide.cursor = 'move';
     slide.cursorLock = true;
@@ -19,7 +19,7 @@ export function moveEllipse(event: EllipseMouseEvent): void {
 
     function move(event: SlideMouseEvent): void {
         moveListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
     }
 
     function complete(event: SlideMouseEvent): void {
@@ -33,14 +33,14 @@ export function moveEllipse(event: EllipseMouseEvent): void {
 export function hoverEllipse(event: EllipseMouseEvent): void {
     const { target, slide } = event.detail;
 
-    if (slide.isFocused(target.getId())) {
+    if (slide.isFocused(target.id)) {
         return;
     }
 
-    slide.markGraphic(target.getId());
+    slide.markGraphic(target.id);
 
     listenOnce(ELLIPSE_EVENTS.MOUSEOUT, unmark);
     function unmark(): void {
-        slide.unmarkGraphic(target.getId());
+        slide.unmarkGraphic(target.id);
     }
 }

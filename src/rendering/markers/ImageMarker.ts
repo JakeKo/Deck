@@ -1,36 +1,33 @@
-import { ImageRenderer } from '../graphics';
 import { RectangleOutlineRenderer } from '../helpers';
-import SlideRenderer from '../SlideRenderer';
-import { GraphicMarker } from '../types';
+import { IGraphicMarker, IImageRenderer, ISlideRenderer } from '../types';
 
 type ImageMarkerArgs = {
-    slide: SlideRenderer;
-    target: ImageRenderer;
+    slide: ISlideRenderer;
+    target: IImageRenderer;
     scale: number;
 };
 
-class ImageMarker implements GraphicMarker {
+class ImageMarker implements IGraphicMarker {
     public helper: RectangleOutlineRenderer;
 
     constructor(args: ImageMarkerArgs) {
         this.helper = new RectangleOutlineRenderer({
             slide: args.slide,
             scale: args.scale,
-            origin: args.target.getOrigin(),
-            width: args.target.getWidth(),
-            height: args.target.getHeight(),
-            rotation: args.target.getRotation()
+            origin: args.target.origin,
+            dimensions: args.target.dimensions,
+            rotation: args.target.rotation
         });
 
         this.helper.render();
     }
 
-    public unmark(): void {
-        this.helper.unrender();
+    public set scale(scale: number) {
+        this.helper.scale = scale;
     }
 
-    public setScale(scale: number): void {
-        this.helper.setScale(scale);
+    public unmark(): void {
+        this.helper.unrender();
     }
 }
 

@@ -40,8 +40,8 @@ While the current makers look pretty similar, there are some slight distinctions
 The generic `GraphicMaker` type and individual maker types are featured below.
 ```ts
 type GraphicMaker = {
+    target: GraphicRenderer;
     scale: number;
-    getTarget: () => GraphicRenderer;
     complete: () => void;
 }
 

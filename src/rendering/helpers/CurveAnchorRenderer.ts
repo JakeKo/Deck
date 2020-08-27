@@ -1,11 +1,10 @@
-import SVG from 'svg.js';
 import { decorateCurveAnchorEvents } from '@/events/decorators/curve_anchor';
 import Vector from '@/utilities/Vector';
-import SlideRenderer from '../SlideRenderer';
-import { CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, HelperRenderer } from '../types';
+import SVG from 'svg.js';
+import { CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, ICurveAnchorRenderer, ISlideRenderer } from '../types';
 
 type CurveAnchorRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     scale: number;
     inHandle: Vector;
     point: Vector;
@@ -14,8 +13,9 @@ type CurveAnchorRendererArgs = {
     index: number;
 };
 
-class CurveAnchorRenderer implements HelperRenderer {
-    private _slide: SlideRenderer;
+class CurveAnchorRenderer implements ICurveAnchorRenderer {
+    public readonly type = GRAPHIC_TYPES.CURVE_ANCHOR;
+    private _slide: ISlideRenderer;
     private _parentId: string;
     private _index: number;
     private _scale: number;
@@ -62,16 +62,51 @@ class CurveAnchorRenderer implements HelperRenderer {
         this._spanStrokeColor = '#400c8b';
     }
 
-    public getType(): GRAPHIC_TYPES {
-        return GRAPHIC_TYPES.CURVE_ANCHOR;
-    }
-
-    public isRendered(): boolean {
+    public get isRendered(): boolean {
         return this._pointSvg !== undefined;
     }
 
+    public set inHandle(inHandle: Vector) {
+        this._inHandle = inHandle;
+
+        const position = this._handlePosition(this._inHandle);
+        this._inHandleSvg && this._inHandleSvg.translate(position.x, position.y);
+        this._inHandleSpanSvg && this._inHandleSpanSvg.plot(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y);
+    }
+
+    public set point(point: Vector) {
+        this._point = point;
+
+        const position = this._pointPosition();
+        this._pointSvg && this._pointSvg.translate(position.x, position.y);
+    }
+
+    public set outHandle(outHandle: Vector) {
+        this._outHandle = outHandle;
+
+        const position = this._handlePosition(this._outHandle);
+        this._outHandleSvg && this._outHandleSvg.translate(position.x, position.y);
+        this._outHandleSpanSvg && this._outHandleSpanSvg.plot(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y);
+    }
+
+    public set scale(scale: number) {
+        this._scale = scale;
+
+        const handleDimensions = this._handleDimensions();
+        const inHandlePosition = this._handlePosition(this._inHandle);
+        const outHandlePosition = this._handlePosition(this._outHandle);
+        const pointDimensions = this._pointDimensions();
+        const pointPosition = this._pointPosition();
+
+        this._inHandleSpanSvg && this._inHandleSpanSvg.stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth * this._scale });
+        this._outHandleSpanSvg && this._outHandleSpanSvg.stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth * this._scale });
+        this._inHandleSvg && this._inHandleSvg.size(handleDimensions.x, handleDimensions.y).translate(inHandlePosition.x, inHandlePosition.y);
+        this._outHandleSvg && this._outHandleSvg.size(handleDimensions.x, handleDimensions.y).translate(outHandlePosition.x, outHandlePosition.y);
+        this._pointSvg && this._pointSvg.size(pointDimensions.x, pointDimensions.y).translate(pointPosition.x, pointPosition.y);
+    }
+
     public render(): void {
-        if (this.isRendered()) {
+        if (this.isRendered) {
             return;
         }
 
@@ -115,45 +150,6 @@ class CurveAnchorRenderer implements HelperRenderer {
         this._pointSvg = undefined;
         this._outHandleSvg = undefined;
         this._outHandleSpanSvg = undefined;
-    }
-
-    public setInHandle(inHandle: Vector): void {
-        this._inHandle = inHandle;
-
-        const position = this._handlePosition(this._inHandle);
-        this._inHandleSvg && this._inHandleSvg.translate(position.x, position.y);
-        this._inHandleSpanSvg && this._inHandleSpanSvg.plot(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y);
-    }
-
-    public setPoint(point: Vector): void {
-        this._point = point;
-
-        const position = this._pointPosition();
-        this._pointSvg && this._pointSvg.translate(position.x, position.y);
-    }
-
-    public setOutHandle(outHandle: Vector): void {
-        this._outHandle = outHandle;
-
-        const position = this._handlePosition(this._outHandle);
-        this._outHandleSvg && this._outHandleSvg.translate(position.x, position.y);
-        this._outHandleSpanSvg && this._outHandleSpanSvg.plot(this._point.x, this._point.y, this._outHandle.x, this._outHandle.y);
-    }
-
-    public setScale(scale: number): void {
-        this._scale = scale;
-
-        const handleDimensions = this._handleDimensions();
-        const inHandlePosition = this._handlePosition(this._inHandle);
-        const outHandlePosition = this._handlePosition(this._outHandle);
-        const pointDimensions = this._pointDimensions();
-        const pointPosition = this._pointPosition();
-
-        this._inHandleSpanSvg && this._inHandleSpanSvg.stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth * this._scale });
-        this._outHandleSpanSvg && this._outHandleSpanSvg.stroke({ color: this._spanStrokeColor, width: this._spanStrokeWidth * this._scale });
-        this._inHandleSvg && this._inHandleSvg.size(handleDimensions.x, handleDimensions.y).translate(inHandlePosition.x, inHandlePosition.y);
-        this._outHandleSvg && this._outHandleSvg.size(handleDimensions.x, handleDimensions.y).translate(outHandlePosition.x, outHandlePosition.y);
-        this._pointSvg && this._pointSvg.size(pointDimensions.x, pointDimensions.y).translate(pointPosition.x, pointPosition.y);
     }
 
     private _handleDimensions(): Vector {

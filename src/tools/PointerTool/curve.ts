@@ -5,11 +5,11 @@ import { resolvePosition } from '../utilities';
 
 export function moveCurve(event: CurveMouseEvent): void {
     const { slide, baseEvent, target } = event.detail;
-    if (!baseEvent.ctrlKey && !slide.isFocused(target.getId())) {
-        slide.unfocusAllGraphics([target.getId()]);
+    if (!baseEvent.ctrlKey && !slide.isFocused(target.id)) {
+        slide.unfocusAllGraphics([target.id]);
     }
 
-    const mutator = slide.focusGraphic(target.getId()) as CurveMutator;
+    const mutator = slide.focusGraphic(target.id) as CurveMutator;
     const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide));
     slide.cursor = 'move';
     slide.cursorLock = true;
@@ -19,7 +19,7 @@ export function moveCurve(event: CurveMouseEvent): void {
 
     function move(event: SlideMouseEvent): void {
         moveListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
     }
 
     function complete(event: SlideMouseEvent): void {
@@ -36,7 +36,7 @@ export function moveCurveAnchor(event: CurveAnchorMouseEvent, moveAnchor: (event
 
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
-    const handler = mutator.getAnchorHandler(index, role);
+    const anchorListener = mutator.anchorListener(index, role);
     slide.cursor = 'grabbing';
     slide.cursorLock = true;
 
@@ -44,9 +44,8 @@ export function moveCurveAnchor(event: CurveAnchorMouseEvent, moveAnchor: (event
     listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
 
     function move(event: SlideMouseEvent): void {
-        const { slide, baseEvent } = event.detail;
-        handler(resolvePosition(baseEvent, slide));
-        slide.broadcastSetGraphic(mutator.getTarget());
+        anchorListener(event);
+        slide.broadcastSetGraphic(mutator.target);
     }
 
     function complete(): void {
@@ -61,14 +60,14 @@ export function moveCurveAnchor(event: CurveAnchorMouseEvent, moveAnchor: (event
 export function hoverCurve(event: CurveMouseEvent): void {
     const { target, slide } = event.detail;
 
-    if (slide.isFocused(target.getId())) {
+    if (slide.isFocused(target.id)) {
         return;
     }
 
-    slide.markGraphic(target.getId());
+    slide.markGraphic(target.id);
 
     listenOnce(CURVE_EVENTS.MOUSEOUT, unmark);
     function unmark(): void {
-        slide.unmarkGraphic(target.getId());
+        slide.unmarkGraphic(target.id);
     }
 }

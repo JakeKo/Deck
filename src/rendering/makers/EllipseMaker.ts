@@ -1,26 +1,23 @@
+import { SlideMouseEvent } from '@/events/types';
+import { resolvePosition } from '@/tools/utilities';
 import { provideId } from '@/utilities/IdProvider';
 import { closestVector } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import { EllipseRenderer } from '../graphics';
 import { EllipseOutlineRenderer, VertexRenderer } from '../helpers';
-import SlideRenderer from '../SlideRenderer';
-import { GraphicMaker, VERTEX_ROLES } from '../types';
+import { IEllipseMaker, IEllipseOutlineRenderer, IEllipseRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
 type EllipseMakerArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     initialPosition: Vector;
     scale: number;
 };
 
-type EllipseMakerHelpers = { [key in VERTEX_ROLES]: VertexRenderer } & {
-    outline: EllipseOutlineRenderer;
-};
-
-class EllipseMaker implements GraphicMaker {
-    private _target: EllipseRenderer;
-    private _slide: SlideRenderer;
+class EllipseMaker implements IEllipseMaker {
+    public readonly target: IEllipseRenderer;
+    private _slide: ISlideRenderer;
     private _initialPosition: Vector;
-    private _helpers: EllipseMakerHelpers;
+    private _helpers: { [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IEllipseOutlineRenderer };
 
     constructor(args: EllipseMakerArgs) {
         this._slide = args.slide;
@@ -28,7 +25,7 @@ class EllipseMaker implements GraphicMaker {
 
         // TODO: Aggregate snap vectors here
         // Initialize primary graphic
-        this._target = new EllipseRenderer({
+        this.target = new EllipseRenderer({
             id: provideId(),
             slide: this._slide,
             center: this._initialPosition
@@ -38,44 +35,43 @@ class EllipseMaker implements GraphicMaker {
         this._helpers = {
             [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
                 slide: this._slide,
-                parent: this.getTarget(),
-                center: this._target.getCenter(),
+                parent: this.target,
+                center: this.target.center,
                 scale: args.scale,
                 role: VERTEX_ROLES.TOP_LEFT
             }),
             [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
                 slide: this._slide,
-                parent: this.getTarget(),
-                center: this._target.getCenter().add(new Vector(this._target.getWidth(), 0)),
+                parent: this.target,
+                center: this.target.center.add(new Vector(this.target.dimensions.x, 0)),
                 scale: args.scale,
                 role: VERTEX_ROLES.TOP_RIGHT
             }),
             [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
                 slide: this._slide,
-                parent: this.getTarget(),
-                center: this._target.getCenter().add(new Vector(0, this._target.getHeight())),
+                parent: this.target,
+                center: this.target.center.add(new Vector(0, this.target.dimensions.y)),
                 scale: args.scale,
                 role: VERTEX_ROLES.BOTTOM_LEFT
             }),
             [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
                 slide: this._slide,
-                parent: this.getTarget(),
-                center: this._target.getCenter().add(new Vector(this._target.getWidth(), this._target.getHeight())),
+                parent: this.target,
+                center: this.target.center.add(this.target.dimensions),
                 scale: args.scale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
             }),
             outline: new EllipseOutlineRenderer({
                 slide: this._slide,
-                center: this._target.getCenter(),
-                width: this._target.getWidth(),
-                height: this._target.getHeight(),
+                center: this.target.center,
+                dimensions: this.target.dimensions,
                 scale: args.scale,
-                rotation: this._target.getRotation()
+                rotation: this.target.rotation
             })
         };
 
         // Render primary graphic
-        this._target.render();
+        this.target.render();
 
         // Render helper graphics
         this._helpers[VERTEX_ROLES.TOP_LEFT].render();
@@ -85,12 +81,16 @@ class EllipseMaker implements GraphicMaker {
         this._helpers.outline.render();
     }
 
-    public getTarget(): EllipseRenderer {
-        return this._target;
+    public set scale(scale: number) {
+        this._helpers[VERTEX_ROLES.TOP_LEFT].scale = scale;
+        this._helpers[VERTEX_ROLES.TOP_RIGHT].scale = scale;
+        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].scale = scale;
+        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].scale = scale;
+        this._helpers.outline.scale = scale;
     }
 
     public complete(): void {
-        this._slide.setGraphic(this._target);
+        this._slide.setGraphic(this.target);
 
         // Remove helper graphics
         this._helpers[VERTEX_ROLES.TOP_LEFT].unrender();
@@ -100,43 +100,34 @@ class EllipseMaker implements GraphicMaker {
         this._helpers.outline.unrender();
     }
 
-    public setScale(scale: number): void {
-        this._helpers[VERTEX_ROLES.TOP_LEFT].setScale(scale);
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].setScale(scale);
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setScale(scale);
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setScale(scale);
-        this._helpers.outline.setScale(scale);
-    }
+    public resizeListener(): (event: SlideMouseEvent) => void {
+        return event => {
+            const { baseEvent, slide } = event.detail;
+            const position = resolvePosition(baseEvent, slide);
 
-    public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
-        // If shift is pressed, constrain to circle
-        const directions = [Vector.northeast, Vector.northwest, Vector.southeast, Vector.southwest];
-        const rawOffset = this._initialPosition.towards(position);
-        const offset = shift ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+            // If shift is pressed, constrain to circle
+            const directions = [Vector.northeast, Vector.northwest, Vector.southeast, Vector.southwest];
+            const rawOffset = this._initialPosition.towards(position);
+            const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
 
-        if (ctrl) {
-            const dimensions = offset.transform(Math.abs).scale(2);
-            this._target.setCenter(this._initialPosition);
-            this._target.setWidth(dimensions.x);
-            this._target.setHeight(dimensions.y);
-        } else {
-            const dimensions = offset.transform(Math.abs);
-            const originOffset = offset.scale(0.5);
-            this._target.setCenter(this._initialPosition.add(originOffset));
-            this._target.setWidth(dimensions.x);
-            this._target.setHeight(dimensions.y);
-        }
+            if (baseEvent.ctrlKey) {
+                this.target.center = this._initialPosition;
+                this.target.dimensions = offset.transform(Math.abs).scale(2);
+            } else {
+                this.target.center = this._initialPosition.add(offset.scale(0.5));
+                this.target.dimensions = offset.transform(Math.abs);
+            }
 
-        // Update helper graphics
-        const center = this._target.getCenter();
-        const radius = new Vector(this._target.getWidth(), this._target.getHeight()).scale(0.5);
-        this._helpers[VERTEX_ROLES.TOP_LEFT].setCenter(center.add(radius.scale(-1)));
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].setCenter(center.add(radius.signAs(Vector.southeast)));
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].setCenter(center.add(radius));
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].setCenter(center.add(radius.signAs(Vector.northwest)));
-        this._helpers.outline.setCenter(center);
-        this._helpers.outline.setWidth(this._target.getWidth());
-        this._helpers.outline.setHeight(this._target.getHeight());
+            // Update helper graphics
+            const center = this.target.center;
+            const radius = this.target.dimensions.scale(0.5);
+            this._helpers[VERTEX_ROLES.TOP_LEFT].center = center.add(radius.scale(-1));
+            this._helpers[VERTEX_ROLES.TOP_RIGHT].center = center.add(radius.signAs(Vector.southeast));
+            this._helpers[VERTEX_ROLES.BOTTOM_LEFT].center = center.add(radius);
+            this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = center.add(radius.signAs(Vector.northwest));
+            this._helpers.outline.center = center;
+            this._helpers.outline.dimensions = this.target.dimensions;
+        };
     }
 }
 

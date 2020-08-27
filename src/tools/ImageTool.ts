@@ -1,25 +1,26 @@
 import { SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
 import { listen, listenOnce, unlisten } from '@/events/utilities';
 import { AppStore } from '@/store/types';
+import Vector from '@/utilities/Vector';
 import { PointerTool } from '.';
 import { EditorTool, TOOL_NAMES } from './types';
 import { resolvePosition } from './utilities';
 
 export default (store: AppStore): EditorTool => {
-    function seedImage(image: string, width: number, height: number): (event: SlideMouseEvent) => void {
+    function seedImage(image: string, dimensions: Vector): (event: SlideMouseEvent) => void {
         return function make(event) {
             const { slide, baseEvent } = event.detail;
-            const maker = slide.makeImageInteractive(resolvePosition(baseEvent, slide), image, width, height);
-            slide.broadcastSetGraphic(maker.getTarget());
+            const maker = slide.makeImageInteractive(resolvePosition(baseEvent, slide), image, dimensions);
+            slide.broadcastSetGraphic(maker.target);
+
+            const resizeListener = maker.resizeListener();
 
             listen(SLIDE_EVENTS.MOUSEMOVE, update);
             listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
 
             function update(event: SlideMouseEvent): void {
-                const { baseEvent } = event.detail;
-                const position = resolvePosition(baseEvent, slide);
-                maker.resize(position, baseEvent.shiftKey, baseEvent.ctrlKey, baseEvent.altKey);
-                slide.broadcastSetGraphic(maker.getTarget());
+                resizeListener(event);
+                slide.broadcastSetGraphic(maker.target);
             }
 
             function complete(): void {
@@ -57,7 +58,7 @@ export default (store: AppStore): EditorTool => {
             });
 
             const image = await uploadImage;
-            make = seedImage(image.source, image.width, image.height);
+            make = seedImage(image.source, new Vector(image.width, image.height));
             listenOnce(SLIDE_EVENTS.MOUSEDOWN, make);
         },
         unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, make)
