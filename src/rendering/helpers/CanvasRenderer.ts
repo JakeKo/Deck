@@ -1,17 +1,16 @@
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { GRAPHIC_TYPES, ICanvasRenderer } from '../types';
+import { GRAPHIC_TYPES, ICanvasRenderer, ISlideRenderer } from '../types';
 
 type CanvasRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     origin: Vector;
     dimensions: Vector;
 };
 
 class CanvasRenderer implements ICanvasRenderer {
     public readonly type = GRAPHIC_TYPES.CANVAS;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Rect | undefined;
     private _origin: Vector;
     private _dimensions: Vector;

@@ -19,7 +19,7 @@ export function moveVideo(event: VideoMouseEvent): void {
 
     function move(event: SlideMouseEvent): void {
         moveListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
     }
 
     function complete(event: SlideMouseEvent): void {

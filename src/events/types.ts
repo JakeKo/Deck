@@ -1,4 +1,3 @@
-import SlideRenderer from '@/rendering/SlideRenderer';
 import {
     CURVE_ANCHOR_ROLES,
     ICurveRenderer,
@@ -7,6 +6,7 @@ import {
     IHelperRenderer,
     IImageRenderer,
     IRectangleRenderer,
+    ISlideRenderer,
     ITextboxRenderer,
     IVertexRenderer,
     IVideoRenderer
@@ -33,7 +33,7 @@ export enum SLIDE_EVENTS {
 export type SlideMouseEvent = CustomEvent<SlideMouseEventPayload>;
 export type SlideMouseEventPayload = {
     baseEvent: MouseEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: SLIDE_EVENTS;
     target: IGraphicRenderer | IHelperRenderer | undefined;
 };
@@ -41,7 +41,7 @@ export type SlideMouseEventPayload = {
 export type SlideKeyboardEvent = CustomEvent<SlideKeyboardEventPayload>;
 export type SlideKeyboardEventPayload = {
     baseEvent: KeyboardEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: SLIDE_EVENTS;
     target: IGraphicRenderer | undefined;
 };
@@ -63,7 +63,7 @@ export enum CURVE_EVENTS {
 export type CurveMouseEvent = CustomEvent<CurveMouseEventPayload>;
 export type CurveMouseEventPayload = {
     baseEvent: MouseEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: CURVE_EVENTS;
     target: ICurveRenderer;
 };
@@ -80,7 +80,7 @@ export enum CURVE_ANCHOR_EVENTS {
 export type CurveAnchorMouseEvent = CustomEvent<CurveAnchorMouseEventPayload>;
 export type CurveAnchorMouseEventPayload = {
     baseEvent: MouseEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: CURVE_ANCHOR_EVENTS;
     parentId: string;
     index: number;
@@ -99,7 +99,7 @@ export enum ELLIPSE_EVENTS {
 export type EllipseMouseEvent = CustomEvent<EllipseMouseEventPayload>;
 export type EllipseMouseEventPayload = {
     baseEvent: MouseEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: ELLIPSE_EVENTS;
     target: IEllipseRenderer;
 };
@@ -116,7 +116,7 @@ export enum IMAGE_EVENTS {
 export type ImageMouseEvent = CustomEvent<ImageMouseEventPayload>;
 export type ImageMouseEventPayload = {
     baseEvent: MouseEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: IMAGE_EVENTS;
     target: IImageRenderer;
 };
@@ -133,7 +133,7 @@ export enum RECTANGLE_EVENTS {
 export type RectangleMouseEvent = CustomEvent<RectangleMouseEventPayload>;
 export type RectangleMouseEventPayload = {
     baseEvent: MouseEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: RECTANGLE_EVENTS;
     target: IRectangleRenderer;
 };
@@ -150,7 +150,7 @@ export enum ROTATOR_EVENTS {
 export type RotatorMouseEvent = CustomEvent<RotatorMouseEventPayload>;
 export type RotatorMouseEventPayload = {
     baseEvent: MouseEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: ROTATOR_EVENTS;
     parentId: string;
 };
@@ -167,7 +167,7 @@ export enum TEXTBOX_EVENTS {
 export type TextboxMouseEvent = CustomEvent<TextboxMouseEventPayload>;
 export type TextboxMouseEventPayload = {
     baseEvent: MouseEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: TEXTBOX_EVENTS;
     target: ITextboxRenderer;
 };
@@ -184,7 +184,7 @@ export enum VIDEO_EVENTS {
 export type VideoMouseEvent = CustomEvent<VideoMouseEventPayload>;
 export type VideoMouseEventPayload = {
     baseEvent: MouseEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: VIDEO_EVENTS;
     target: IVideoRenderer;
 };
@@ -201,7 +201,7 @@ export enum VERTEX_EVENTS {
 export type VertexMouseEvent = CustomEvent<VertexMouseEventPayload>;
 export type VertexMouseEventPayload = {
     baseEvent: MouseEvent;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     type: VERTEX_EVENTS;
     graphic: IVertexRenderer;
 };

@@ -2,12 +2,11 @@ import { decorateEllipseEvents } from '@/events/decorators';
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { BoundingBox, GRAPHIC_TYPES, IEllipseRenderer } from '../types';
+import { BoundingBox, GRAPHIC_TYPES, IEllipseRenderer, ISlideRenderer } from '../types';
 
 type EllipseRendererArgs = {
     id: string;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     center?: Vector;
     dimensions?: Vector;
     fillColor?: string;
@@ -19,7 +18,7 @@ type EllipseRendererArgs = {
 class EllipseRenderer implements IEllipseRenderer {
     public readonly id: string;
     public readonly type = GRAPHIC_TYPES.ELLIPSE;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Ellipse | undefined;
     private _center: Vector;
     private _dimensions: Vector;

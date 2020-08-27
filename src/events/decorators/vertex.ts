@@ -1,14 +1,13 @@
-import SlideRenderer from '@/rendering/SlideRenderer';
-import { IVertexRenderer } from '@/rendering/types';
+import { ISlideRenderer, IVertexRenderer } from '@/rendering/types';
 import SVG from 'svg.js';
 import { SLIDE_EVENTS, VertexMouseEvent, VertexMouseEventPayload, VERTEX_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 
-function makeVertexMouseEvent(name: VERTEX_EVENTS, slide: SlideRenderer, graphic: IVertexRenderer, baseEvent: MouseEvent): VertexMouseEvent {
+function makeVertexMouseEvent(name: VERTEX_EVENTS, slide: ISlideRenderer, graphic: IVertexRenderer, baseEvent: MouseEvent): VertexMouseEvent {
     return new CustomEvent<VertexMouseEventPayload>(name, { detail: { type: name, slide, graphic, baseEvent } });
 }
 
-export function decorateVertexEvents(svg: SVG.Element, slide: SlideRenderer, graphic: IVertexRenderer): void {
+export function decorateVertexEvents(svg: SVG.Element, slide: ISlideRenderer, graphic: IVertexRenderer): void {
     svg.node.addEventListener('mouseup', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(makeVertexMouseEvent(VERTEX_EVENTS.MOUSEUP, slide, graphic, baseEvent));

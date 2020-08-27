@@ -1,13 +1,39 @@
-import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from '@/rendering/graphics';
-import SlideRenderer from '@/rendering/SlideRenderer';
-import { CurveAnchor, GRAPHIC_TYPES, ICurveRenderer, IEllipseRenderer, IGraphicRenderer, IImageRenderer, IRectangleRenderer, ITextboxRenderer, IVideoRenderer } from '@/rendering/types';
-import { AppStore, CurveStoreModel, EllipseStoreModel, GraphicStoreModel, ImageStoreModel, RectangleStoreModel, TextboxStoreModel, VideoStoreModel } from '@/store/types';
+import {
+    CurveRenderer,
+    EllipseRenderer,
+    ImageRenderer,
+    RectangleRenderer,
+    TextboxRenderer,
+    VideoRenderer
+} from '@/rendering/graphics';
+import {
+    CurveAnchor,
+    GRAPHIC_TYPES,
+    ICurveRenderer,
+    IEllipseRenderer,
+    IGraphicRenderer,
+    IImageRenderer,
+    IRectangleRenderer,
+    ISlideRenderer,
+    ITextboxRenderer,
+    IVideoRenderer
+} from '@/rendering/types';
+import {
+    AppStore,
+    CurveStoreModel,
+    EllipseStoreModel,
+    GraphicStoreModel,
+    ImageStoreModel,
+    RectangleStoreModel,
+    TextboxStoreModel,
+    VideoStoreModel
+} from '@/store/types';
 import Vector from './Vector';
 
 export default class SlideStateManager {
     private _slideId: string;
     private _store: AppStore | undefined;
-    private _renderer: SlideRenderer | undefined;
+    private _renderer: ISlideRenderer | undefined;
 
     constructor(slideId: string) {
         this._slideId = slideId;
@@ -17,14 +43,15 @@ export default class SlideStateManager {
         this._store = store;
     }
 
-    public setRenderer(renderer: SlideRenderer): void {
+    public setRenderer(renderer: ISlideRenderer): void {
         this._renderer = renderer;
     }
 
     public setGraphicFromRenderer(graphic: IGraphicRenderer): void {
         if (graphic.type === GRAPHIC_TYPES.CURVE) {
             const storeModel = this._curveRendererToStoreModel(graphic);
-            this._store && this._store.setGraphic(this._slideId, storeModel);
+            this._store && this._store.setGraphic(this._slideId,
+                storeModel);
         } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
             const storeModel = this._ellipseRendererToStoreModel(graphic);
             this._store && this._store.setGraphic(this._slideId, storeModel);

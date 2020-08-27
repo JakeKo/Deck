@@ -2,12 +2,11 @@ import { decorateVideoEvents } from '@/events/decorators';
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { BoundingBox, GRAPHIC_TYPES, IVideoRenderer } from '../types';
+import { BoundingBox, GRAPHIC_TYPES, ISlideRenderer, IVideoRenderer } from '../types';
 
 type VideoRendererArgs = {
     id: string;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     source: HTMLVideoElement;
     origin?: Vector;
     dimensions?: Vector;
@@ -20,7 +19,7 @@ class VideoRenderer implements IVideoRenderer {
     public readonly id: string;
     public readonly type = GRAPHIC_TYPES.VIDEO;
     public readonly source: HTMLVideoElement;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Element | undefined;
     private _origin: Vector;
     private _dimensions: Vector;

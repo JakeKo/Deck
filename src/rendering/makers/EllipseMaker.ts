@@ -1,26 +1,23 @@
+import { SlideMouseEvent } from '@/events/types';
+import { resolvePosition } from '@/tools/utilities';
 import { provideId } from '@/utilities/IdProvider';
 import { closestVector } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import { EllipseRenderer } from '../graphics';
 import { EllipseOutlineRenderer, VertexRenderer } from '../helpers';
-import SlideRenderer from '../SlideRenderer';
-import { GraphicMaker, IEllipseRenderer, VERTEX_ROLES } from '../types';
+import { IEllipseMaker, IEllipseOutlineRenderer, IEllipseRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
 type EllipseMakerArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     initialPosition: Vector;
     scale: number;
 };
 
-type EllipseMakerHelpers = { [key in VERTEX_ROLES]: VertexRenderer } & {
-    outline: EllipseOutlineRenderer;
-};
-
-class EllipseMaker implements GraphicMaker {
+class EllipseMaker implements IEllipseMaker {
     public readonly target: IEllipseRenderer;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _initialPosition: Vector;
-    private _helpers: EllipseMakerHelpers;
+    private _helpers: { [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IEllipseOutlineRenderer };
 
     constructor(args: EllipseMakerArgs) {
         this._slide = args.slide;
@@ -103,29 +100,34 @@ class EllipseMaker implements GraphicMaker {
         this._helpers.outline.unrender();
     }
 
-    public resize(position: Vector, shift: boolean, ctrl: boolean, alt: boolean): void {
-        // If shift is pressed, constrain to circle
-        const directions = [Vector.northeast, Vector.northwest, Vector.southeast, Vector.southwest];
-        const rawOffset = this._initialPosition.towards(position);
-        const offset = shift ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+    public resizeListener(): (event: SlideMouseEvent) => void {
+        return event => {
+            const { baseEvent, slide } = event.detail;
+            const position = resolvePosition(baseEvent, slide);
 
-        if (ctrl) {
-            this.target.center = this._initialPosition;
-            this.target.dimensions = offset.transform(Math.abs).scale(2);
-        } else {
-            this.target.center = this._initialPosition.add(offset.scale(0.5));
-            this.target.dimensions = offset.transform(Math.abs);
-        }
+            // If shift is pressed, constrain to circle
+            const directions = [Vector.northeast, Vector.northwest, Vector.southeast, Vector.southwest];
+            const rawOffset = this._initialPosition.towards(position);
+            const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
 
-        // Update helper graphics
-        const center = this.target.center;
-        const radius = this.target.dimensions.scale(0.5);
-        this._helpers[VERTEX_ROLES.TOP_LEFT].center = center.add(radius.scale(-1));
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].center = center.add(radius.signAs(Vector.southeast));
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].center = center.add(radius);
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = center.add(radius.signAs(Vector.northwest));
-        this._helpers.outline.center = center;
-        this._helpers.outline.dimensions = this.target.dimensions;
+            if (baseEvent.ctrlKey) {
+                this.target.center = this._initialPosition;
+                this.target.dimensions = offset.transform(Math.abs).scale(2);
+            } else {
+                this.target.center = this._initialPosition.add(offset.scale(0.5));
+                this.target.dimensions = offset.transform(Math.abs);
+            }
+
+            // Update helper graphics
+            const center = this.target.center;
+            const radius = this.target.dimensions.scale(0.5);
+            this._helpers[VERTEX_ROLES.TOP_LEFT].center = center.add(radius.scale(-1));
+            this._helpers[VERTEX_ROLES.TOP_RIGHT].center = center.add(radius.signAs(Vector.southeast));
+            this._helpers[VERTEX_ROLES.BOTTOM_LEFT].center = center.add(radius);
+            this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = center.add(radius.signAs(Vector.northwest));
+            this._helpers.outline.center = center;
+            this._helpers.outline.dimensions = this.target.dimensions;
+        };
     }
 }
 

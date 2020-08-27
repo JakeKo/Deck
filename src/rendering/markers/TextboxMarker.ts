@@ -1,14 +1,13 @@
 import { RectangleOutlineRenderer } from '../helpers';
-import SlideRenderer from '../SlideRenderer';
-import { GraphicMarker, ITextboxRenderer } from '../types';
+import { IGraphicMarker, ISlideRenderer, ITextboxRenderer } from '../types';
 
 type TextboxMarkerArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     target: ITextboxRenderer;
     scale: number;
 };
 
-class TextboxMarker implements GraphicMarker {
+class TextboxMarker implements IGraphicMarker {
     public helper: RectangleOutlineRenderer;
 
     constructor(args: TextboxMarkerArgs) {
@@ -23,12 +22,12 @@ class TextboxMarker implements GraphicMarker {
         this.helper.render();
     }
 
-    public unmark(): void {
-        this.helper.unrender();
+    public set scale(scale: number) {
+        this.helper.scale = scale;
     }
 
-    public setScale(scale: number): void {
-        this.helper.scale = scale;
+    public unmark(): void {
+        this.helper.unrender();
     }
 }
 

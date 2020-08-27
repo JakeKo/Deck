@@ -2,12 +2,11 @@ import { decorateImageEvents } from '@/events/decorators';
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { BoundingBox, GRAPHIC_TYPES, IImageRenderer } from '../types';
+import { BoundingBox, GRAPHIC_TYPES, IImageRenderer, ISlideRenderer } from '../types';
 
 type ImageRendererArgs = {
     id: string;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     source: string;
     origin?: Vector;
     dimensions?: Vector;
@@ -20,7 +19,7 @@ class ImageRenderer implements IImageRenderer {
     public readonly id: string;
     public readonly type = GRAPHIC_TYPES.IMAGE;
     public readonly source: string;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Image | undefined;
     private _origin: Vector;
     private _dimensions: Vector;

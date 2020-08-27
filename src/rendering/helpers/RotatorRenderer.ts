@@ -2,11 +2,10 @@ import { decorateRotateEvents } from '@/events/decorators/rotators';
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { GRAPHIC_TYPES, IGraphicRenderer, IRotatorRenderer } from '../types';
+import { GRAPHIC_TYPES, IGraphicRenderer, IRotatorRenderer, ISlideRenderer } from '../types';
 
 type RotatorRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     scale: number;
     center: Vector;
     parent: IGraphicRenderer;
@@ -15,7 +14,7 @@ type RotatorRendererArgs = {
 
 class RotatorRenderer implements IRotatorRenderer {
     public readonly type = GRAPHIC_TYPES.ROTATOR;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Rect | undefined;
     private _parent: IGraphicRenderer;
     private _scale: number;

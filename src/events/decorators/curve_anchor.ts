@@ -1,10 +1,9 @@
-import SlideRenderer from '@/rendering/SlideRenderer';
-import { CURVE_ANCHOR_ROLES, ICurveAnchorRenderer } from '@/rendering/types';
+import { CURVE_ANCHOR_ROLES, ICurveAnchorRenderer, ISlideRenderer } from '@/rendering/types';
 import SVG from 'svg.js';
 import { CurveAnchorMouseEvent, CurveAnchorMouseEventPayload, CURVE_ANCHOR_EVENTS, SLIDE_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 
-function makeCurveAnchorMouseEvent(name: CURVE_ANCHOR_EVENTS, slide: SlideRenderer, parentId: string, index: number, role: CURVE_ANCHOR_ROLES, baseEvent: MouseEvent): CurveAnchorMouseEvent {
+function makeCurveAnchorMouseEvent(name: CURVE_ANCHOR_EVENTS, slide: ISlideRenderer, parentId: string, index: number, role: CURVE_ANCHOR_ROLES, baseEvent: MouseEvent): CurveAnchorMouseEvent {
     return new CustomEvent<CurveAnchorMouseEventPayload>(name, {
         detail: {
             type: name,
@@ -17,7 +16,7 @@ function makeCurveAnchorMouseEvent(name: CURVE_ANCHOR_EVENTS, slide: SlideRender
     });
 }
 
-export function decorateCurveAnchorEvents(svg: SVG.Element, slide: SlideRenderer, graphic: ICurveAnchorRenderer, parentId: string, index: number, role: CURVE_ANCHOR_ROLES) {
+export function decorateCurveAnchorEvents(svg: SVG.Element, slide: ISlideRenderer, graphic: ICurveAnchorRenderer, parentId: string, index: number, role: CURVE_ANCHOR_ROLES) {
     svg.node.addEventListener('mouseup', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(makeCurveAnchorMouseEvent(CURVE_ANCHOR_EVENTS.MOUSEUP, slide, parentId, index, role, baseEvent));

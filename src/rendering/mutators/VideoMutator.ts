@@ -2,36 +2,46 @@ import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import { closestVector, mod } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
-import SlideRenderer from '../SlideRenderer';
-import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, IVideoRenderer, VERTEX_ROLES } from '../types';
-import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from '../utilities';
+import {
+    BoundingBoxMutatorHelpers,
+    GRAPHIC_TYPES,
+    ISlideRenderer,
+    IVideoMutator,
+    IVideoRenderer,
+    VERTEX_ROLES
+} from '../types';
+import {
+    makeBoxHelpers,
+    renderBoxHelpers,
+    resizeBoxHelpers,
+    rotateBoxHelpers,
+    scaleBoxHelpers,
+    unrenderBoxHelpers
+} from '../utilities';
 
 type VideoMutatorArgs = {
     target: IVideoRenderer;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     scale: number;
 };
 
-class VideoMutator implements GraphicMutator {
-    public target: IVideoRenderer;
-    public helpers: BoundingBoxMutatorHelpers;
+class VideoMutator implements IVideoMutator {
+    public readonly type = GRAPHIC_TYPES.VIDEO;
+    public readonly target: IVideoRenderer;
+    private _helpers: BoundingBoxMutatorHelpers;
 
     constructor(args: VideoMutatorArgs) {
         this.target = args.target;
 
         // Initialize helper targets
-        this.helpers = makeBoxHelpers(this.target, args.slide, args.scale);
+        this._helpers = makeBoxHelpers(this.target, args.slide, args.scale);
 
         // Render helper targets
-        renderBoxHelpers(this.helpers);
+        renderBoxHelpers(this._helpers);
     }
 
-    public getType(): GRAPHIC_TYPES {
-        return GRAPHIC_TYPES.VIDEO;
-    }
-
-    public getTarget(): IVideoRenderer {
-        return this.target;
+    public set scale(scale: number) {
+        scaleBoxHelpers(this._helpers, scale);
     }
 
     // TODO: Account for ctrl, alt, and snapping
@@ -87,7 +97,7 @@ class VideoMutator implements GraphicMutator {
             const theta = Math.atan2(offset.y, offset.x);
 
             this.target.rotation = mod(theta, Math.PI * 2);
-            rotateBoxHelpers(this.helpers, this.target.box);
+            rotateBoxHelpers(this._helpers, this.target.box);
         };
     }
 
@@ -109,18 +119,13 @@ class VideoMutator implements GraphicMutator {
     }
 
     // TODO: Include methods for other mutations
-
     public complete(): void {
         // Remove helper graphics
-        unrenderBoxHelpers(this.helpers);
-    }
-
-    public setScale(scale: number): void {
-        scaleBoxHelpers(this.helpers, scale);
+        unrenderBoxHelpers(this._helpers);
     }
 
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this.helpers, this.target.box);
+        resizeBoxHelpers(this._helpers, this.target.box);
     }
 }
 

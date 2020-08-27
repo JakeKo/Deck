@@ -4,11 +4,11 @@ import { listen } from '@/events/utilities';
 import { Viewbox } from '@/store/types';
 import SlideStateManager from '@/utilities/SlideStateManager';
 import Vector from '@/utilities/Vector';
-import * as SVG from 'svg.js';
+import SVG from 'svg.js';
 import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, VideoMaker } from './makers';
 import { CurveMarker, EllipseMarker, ImageMarker, RectangleMarker, TextboxMarker, VideoMarker } from './markers';
 import { CurveMutator, EllipseMutator, ImageMutator, RectangleMutator, TextboxMutator, VideoMutator } from './mutators';
-import { GraphicMaker, GraphicMarker, GraphicMutator, GRAPHIC_TYPES, IGraphicRenderer } from './types';
+import { GRAPHIC_TYPES, ICurveMaker, IEllipseMaker, IGraphicMaker, IGraphicMarker, IGraphicMutator, IGraphicRenderer, IImageMaker, IRectangleMaker, ISlideRenderer, ITextboxMaker, IVideoMaker } from './types';
 import { renderBackdrop } from './utilities';
 
 type SlideRendererArgs = {
@@ -19,39 +19,39 @@ type SlideRendererArgs = {
     zoom: number;
 };
 
-class SlideRenderer {
+class SlideRenderer implements ISlideRenderer {
+    public readonly canvas: SVG.Doc;
+    public readonly rawViewbox: Viewbox;
+    public zoom: number;
     private _stateManager: SlideStateManager;
-    private _canvas: SVG.Doc;
-    private _graphics: { [index: string]: IGraphicRenderer };
-    private _rawViewbox: Viewbox;
-    private _focusedGraphics: { [index: string]: GraphicMutator };
-    private _activeMakers: { [index: string]: GraphicMaker };
-    private _markedGraphics: { [key: string]: GraphicMarker };
-    private _zoom: number;
+    private _graphics: { [key: string]: IGraphicRenderer };
+    private _focusedGraphics: { [key: string]: IGraphicMutator };
+    private _activeMakers: { [key: string]: IGraphicMaker };
+    private _markedGraphics: { [key: string]: IGraphicMarker };
     private _defaultCursor = 'default';
     private _cursor: string;
     private _cursorLock = false;
 
     constructor(args: SlideRendererArgs) {
+        this.canvas = args.canvas;
+        this.rawViewbox = args.rawViewbox;
         this._stateManager = args.stateManager;
-        this._canvas = args.canvas;
         this._graphics = {};
-        this._rawViewbox = args.rawViewbox;
         this._focusedGraphics = {};
         this._activeMakers = {};
         this._markedGraphics = {};
-        this._zoom = args.zoom;
+        this.zoom = args.zoom;
         this._cursor = this._defaultCursor;
 
         renderBackdrop(this, args.croppedViewbox.width, args.croppedViewbox.height);
         decorateSlideEvents(this);
-        this._canvas.node.tabIndex = 0;
+        this.canvas.node.tabIndex = 0;
 
         listen(SLIDE_EVENTS.ZOOM, (event: SlideZoomEvent): void => {
-            this._zoom = event.detail.zoom;
-            Object.values(this._focusedGraphics).forEach(mutator => mutator.setScale(1 / this._zoom));
-            Object.values(this._activeMakers).forEach(maker => (maker.scale = 1 / this._zoom));
-            Object.values(this._markedGraphics).forEach(marker => marker.setScale(1 / this._zoom));
+            this.zoom = event.detail.zoom;
+            Object.values(this._focusedGraphics).forEach(mutator => (mutator.scale = 1 / this.zoom));
+            Object.values(this._activeMakers).forEach(maker => (maker.scale = 1 / this.zoom));
+            Object.values(this._markedGraphics).forEach(marker => (marker.scale = 1 / this.zoom));
         });
 
         listen(SLIDE_EVENTS.KEYDOWN, (event: SlideKeyboardEvent): void => {
@@ -61,25 +61,12 @@ class SlideRenderer {
         });
     }
 
-    public get canvas(): SVG.Doc {
-        return this._canvas;
-    }
-
-    public set canvas(canvas: SVG.Doc) {
-        this._canvas = canvas;
-    }
-
-    public get rawViewbox(): Viewbox {
-        return this._rawViewbox;
-    }
-
-    public get zoom(): number {
-        return this._zoom;
-    }
-
-    public get bounds(): { origin: Vector; height: number; width: number } {
-        const bounds = this._canvas.node.getBoundingClientRect() as DOMRect;
-        return { origin: new Vector(bounds.x, bounds.y), width: bounds.width, height: bounds.height };
+    public get bounds(): { origin: Vector; dimensions: Vector } {
+        const bounds = this.canvas.node.getBoundingClientRect() as DOMRect;
+        return {
+            origin: new Vector(bounds.x, bounds.y),
+            dimensions: new Vector(bounds.width, bounds.height)
+        };
     }
 
     public set cursor(cursor: string) {
@@ -88,69 +75,67 @@ class SlideRenderer {
         }
 
         this._cursor = cursor;
-        this._canvas.node.style.cursor = this._cursor;
+        this.canvas.node.style.cursor = this._cursor;
     }
 
     public set cursorLock(cursorLock: boolean) {
         this._cursorLock = cursorLock;
     }
 
-    public completeMaker(graphicId: string): void {
-        delete this._activeMakers[graphicId];
-    }
-
-    public makeCurveInteractive(initialPosition: Vector): CurveMaker {
+    public makeCurveInteractive(initialPosition: Vector): ICurveMaker {
         return this.activateMaker(new CurveMaker({
             slide: this,
             initialPosition,
-            scale: 1 / this._zoom
+            scale: 1 / this.zoom
         }));
     }
 
-    public makeEllipseInteractive(initialPosition: Vector): EllipseMaker {
+    public makeEllipseInteractive(initialPosition: Vector): IEllipseMaker {
         return this.activateMaker(new EllipseMaker({
             slide: this,
             initialPosition,
-            scale: 1 / this._zoom
+            scale: 1 / this.zoom
         }));
     }
 
-    public makeImageInteractive(initialPosition: Vector, source: string, width: number, height: number) {
+    public makeImageInteractive(initialPosition: Vector, source: string, dimensions: Vector): IImageMaker {
         return this.activateMaker(new ImageMaker({
             slide: this,
             initialPosition,
-            source: source,
-            width,
-            height,
-            scale: 1 / this._zoom
+            source,
+            dimensions,
+            scale: 1 / this.zoom
         }));
     }
 
-    public makeRectangleInteractive(initialPosition: Vector): RectangleMaker {
+    public makeRectangleInteractive(initialPosition: Vector): IRectangleMaker {
         return this.activateMaker(new RectangleMaker({
             slide: this,
             initialPosition,
-            scale: 1 / this._zoom
+            scale: 1 / this.zoom
         }));
     }
 
-    public makeTextboxInteractive(initialPosition: Vector): TextboxMaker {
+    public makeTextboxInteractive(initialPosition: Vector): ITextboxMaker {
         return this.activateMaker(new TextboxMaker({
             slide: this,
             initialPosition,
-            scale: 1 / this._zoom
+            scale: 1 / this.zoom
         }));
     }
 
-    public makeVideoInteractive(initialPosition: Vector, source: HTMLVideoElement, width: number, height: number): VideoMaker {
+    public makeVideoInteractive(initialPosition: Vector, source: HTMLVideoElement, dimensions: Vector): IVideoMaker {
         return this.activateMaker(new VideoMaker({
             slide: this,
             initialPosition,
             source,
-            width,
-            height,
-            scale: 1 / this._zoom
+            dimensions,
+            scale: 1 / this.zoom
         }));
+    }
+
+    public completeInteractiveMake(graphicId: string): void {
+        delete this._activeMakers[graphicId];
     }
 
     public getGraphic(graphicId: string): IGraphicRenderer {
@@ -184,7 +169,7 @@ class SlideRenderer {
         this._stateManager.removeGraphicFromRenderer(graphicId);
     }
 
-    public focusGraphic(graphicId: string): GraphicMutator {
+    public focusGraphic(graphicId: string): IGraphicMutator {
         if (this.isFocused(graphicId)) {
             return this._focusedGraphics[graphicId];
         }
@@ -197,17 +182,17 @@ class SlideRenderer {
         let mutator;
 
         if (graphic.type === GRAPHIC_TYPES.CURVE) {
-            mutator = new CurveMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+            mutator = new CurveMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
-            mutator = new EllipseMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+            mutator = new EllipseMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
-            mutator = new ImageMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+            mutator = new ImageMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
-            mutator = new RectangleMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+            mutator = new RectangleMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
-            mutator = new TextboxMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+            mutator = new TextboxMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
-            mutator = new VideoMutator({ slide: this, scale: 1 / this._zoom, target: graphic });
+            mutator = new VideoMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }
@@ -231,7 +216,7 @@ class SlideRenderer {
         return this._focusedGraphics[graphicId] !== undefined;
     }
 
-    public markGraphic(graphicId: string): GraphicMarker {
+    public markGraphic(graphicId: string): IGraphicMarker {
         if (this.isMarked(graphicId)) {
             return this._markedGraphics[graphicId];
         }
@@ -240,17 +225,17 @@ class SlideRenderer {
         let marker;
 
         if (graphic.type === GRAPHIC_TYPES.CURVE) {
-            marker = new CurveMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+            marker = new CurveMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
-            marker = new EllipseMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+            marker = new EllipseMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
-            marker = new ImageMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+            marker = new ImageMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
-            marker = new RectangleMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+            marker = new RectangleMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
-            marker = new TextboxMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+            marker = new TextboxMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
-            marker = new VideoMarker({ slide: this, scale: 1 / this._zoom, target: graphic });
+            marker = new VideoMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }
@@ -268,7 +253,7 @@ class SlideRenderer {
         return this._markedGraphics[graphicId] !== undefined;
     }
 
-    private activateMaker<T extends GraphicMaker>(maker: T): T {
+    private activateMaker<T extends IGraphicMaker>(maker: T): T {
         this._activeMakers[maker.target.id] = maker;
         return maker;
     }

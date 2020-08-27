@@ -1,12 +1,11 @@
 import { decorateTextboxEvents } from '@/events/decorators';
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
-import SlideRenderer from '../SlideRenderer';
-import { BoundingBox, GRAPHIC_TYPES, ITextboxRenderer } from '../types';
+import { BoundingBox, GRAPHIC_TYPES, ISlideRenderer, ITextboxRenderer } from '../types';
 
 type TextboxRendererArgs = {
     id: string;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     origin?: Vector;
     dimensions?: Vector;
     fontSize?: number;
@@ -19,7 +18,7 @@ type TextboxRendererArgs = {
 class TextboxRenderer implements ITextboxRenderer {
     public readonly id: string;
     public readonly type = GRAPHIC_TYPES.TEXTBOX;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVGForeignObjectElement | undefined;
     private _textbox: HTMLDivElement | undefined;
     private _origin: Vector;

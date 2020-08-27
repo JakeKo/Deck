@@ -2,12 +2,11 @@ import { decorateRectangleEvents } from '@/events/decorators';
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { BoundingBox, GRAPHIC_TYPES, IRectangleRenderer } from '../types';
+import { BoundingBox, GRAPHIC_TYPES, IRectangleRenderer, ISlideRenderer } from '../types';
 
 type RectangleRendererArgs = {
     id: string;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     origin?: Vector;
     dimensions?: Vector;
     fillColor?: string;
@@ -19,7 +18,7 @@ type RectangleRendererArgs = {
 class RectangleRenderer implements IRectangleRenderer {
     public readonly id: string;
     public readonly type = GRAPHIC_TYPES.RECTANGLE;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Rect | undefined;
     private _origin: Vector;
     private _dimensions: Vector;

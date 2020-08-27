@@ -12,15 +12,14 @@ export default (store: AppStore): EditorTool => {
         const maker = slide.makeCurveInteractive(initialPosition);
         slide.broadcastSetGraphic(maker.target);
 
-        let currentAnchor = maker.addAnchor({ inHandle: initialPosition, point: initialPosition, outHandle: initialPosition });
+        let anchorListeners = maker.anchorListeners({ inHandle: initialPosition, point: initialPosition, outHandle: initialPosition });
         setPoint();
 
         listen(SLIDE_EVENTS.KEYDOWN, complete);
 
         function movePoint(event: SlideMouseEvent): void {
-            const position = resolvePosition(event.detail.baseEvent, slide);
-            currentAnchor.setPoint(position);
-            currentAnchor.setHandles(position);
+            anchorListeners.setPoint(event);
+            anchorListeners.setHandles(event);
             slide.broadcastSetGraphic(maker.target);
         }
 
@@ -31,14 +30,13 @@ export default (store: AppStore): EditorTool => {
         }
 
         function moveHandles(event: SlideMouseEvent): void {
-            const position = resolvePosition(event.detail.baseEvent, slide);
-            currentAnchor.setHandles(position);
+            anchorListeners.setHandles(event);
             slide.broadcastSetGraphic(maker.target);
         }
 
         function setHandles(event: SlideMouseEvent): void {
             const position = resolvePosition(event.detail.baseEvent, slide);
-            currentAnchor = maker.addAnchor({ inHandle: position, point: position, outHandle: position });
+            anchorListeners = maker.anchorListeners({ inHandle: position, point: position, outHandle: position });
             slide.broadcastSetGraphic(maker.target);
 
             unlisten(SLIDE_EVENTS.MOUSEMOVE, moveHandles);

@@ -11,13 +11,13 @@ export default (store: AppStore): EditorTool => {
         const maker = slide.makeEllipseInteractive(resolvePosition(baseEvent, slide));
         slide.broadcastSetGraphic(maker.target);
 
+        const resizeListener = maker.resizeListener();
+
         listen(SLIDE_EVENTS.MOUSEMOVE, update);
         listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
 
         function update(event: SlideMouseEvent): void {
-            const { baseEvent } = event.detail;
-            const position = resolvePosition(baseEvent, slide);
-            maker.resize(position, baseEvent.shiftKey, baseEvent.ctrlKey, baseEvent.altKey);
+            resizeListener(event);
             slide.broadcastSetGraphic(maker.target);
         }
 

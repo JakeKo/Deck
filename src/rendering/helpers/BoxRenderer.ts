@@ -1,11 +1,10 @@
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { GRAPHIC_TYPES, IBoxRenderer } from '../types';
+import { GRAPHIC_TYPES, IBoxRenderer, ISlideRenderer } from '../types';
 
 type BoxRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     scale: number;
     origin: Vector;
     dimensions: Vector;
@@ -14,7 +13,7 @@ type BoxRendererArgs = {
 
 class BoxRenderer implements IBoxRenderer {
     public readonly type = GRAPHIC_TYPES.BOX;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Rect | undefined;
     private _origin: Vector;
     private _dimensions: Vector;

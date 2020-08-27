@@ -1,11 +1,10 @@
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { CurveAnchor, GRAPHIC_TYPES, ICurveOutlineRenderer } from '../types';
+import { CurveAnchor, GRAPHIC_TYPES, ICurveOutlineRenderer, ISlideRenderer } from '../types';
 
 type CurveOutlineRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     anchors: CurveAnchor[];
     scale: number;
     rotation: number;
@@ -13,7 +12,7 @@ type CurveOutlineRendererArgs = {
 
 class CurveOutlineRenderer implements ICurveOutlineRenderer {
     public readonly type = GRAPHIC_TYPES.CURVE_OUTLINE;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Path | undefined;
     private _anchors: CurveAnchor[];
     private _fillColor: string;

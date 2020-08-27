@@ -1,11 +1,10 @@
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { GRAPHIC_TYPES, IEllipseOutlineRenderer } from '../types';
+import { GRAPHIC_TYPES, IEllipseOutlineRenderer, ISlideRenderer } from '../types';
 
 type EllipseOutlineRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     scale: number;
     center: Vector;
     dimensions: Vector;
@@ -14,7 +13,7 @@ type EllipseOutlineRendererArgs = {
 
 class EllipseOutlineRenderer implements IEllipseOutlineRenderer {
     public readonly type = GRAPHIC_TYPES.ELLIPSE_OUTLINE;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Ellipse | undefined;
     private _scale: number;
     private _dimensions: Vector;

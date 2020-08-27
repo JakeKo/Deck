@@ -99,12 +99,12 @@ function moveVertex(event: VertexMouseEvent): void {
 
     function move(event: SlideMouseEvent): void {
         vertexListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
     }
 
     function complete(event: SlideMouseEvent): void {
         vertexListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
 
         slide.cursorLock = false;
         slide.cursor = 'grab';
@@ -128,12 +128,12 @@ function rotateGraphic(event: RotatorMouseEvent): void {
 
     function rotate(event: SlideMouseEvent): void {
         rotateListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
     }
 
     function complete(event: SlideMouseEvent): void {
         rotateListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
 
         slide.cursorLock = false;
         slide.cursor = 'grab';

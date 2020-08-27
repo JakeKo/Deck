@@ -1,11 +1,10 @@
 import { decorateVertexEvents } from '@/events/decorators';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { GRAPHIC_TYPES, IGraphicRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { GRAPHIC_TYPES, IGraphicRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
 type VertexRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     scale: number;
     role: VERTEX_ROLES;
     center: Vector;
@@ -14,7 +13,7 @@ type VertexRendererArgs = {
 
 class VertexRenderer implements IVertexRenderer {
     public readonly type = GRAPHIC_TYPES.VERTEX;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Ellipse | undefined;
     private _role: VERTEX_ROLES;
     private _parent: IGraphicRenderer;

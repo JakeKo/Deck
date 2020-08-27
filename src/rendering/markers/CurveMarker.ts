@@ -1,14 +1,13 @@
 import { CurveOutlineRenderer } from '../helpers';
-import SlideRenderer from '../SlideRenderer';
-import { GraphicMarker, ICurveRenderer } from '../types';
+import { ICurveRenderer, IGraphicMarker, ISlideRenderer } from '../types';
 
 type CurveMarkerArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     target: ICurveRenderer;
     scale: number;
 };
 
-class CurveMarker implements GraphicMarker {
+class CurveMarker implements IGraphicMarker {
     public helper: CurveOutlineRenderer;
 
     constructor(args: CurveMarkerArgs) {
@@ -22,12 +21,12 @@ class CurveMarker implements GraphicMarker {
         this.helper.render();
     }
 
-    public unmark(): void {
-        this.helper.unrender();
+    public set scale(scale: number) {
+        this.helper.scale = scale;
     }
 
-    public setScale(scale: number): void {
-        this.helper.scale = scale;
+    public unmark(): void {
+        this.helper.unrender();
     }
 }
 

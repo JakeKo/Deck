@@ -2,36 +2,46 @@ import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import { closestVector, mod } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
-import SlideRenderer from '../SlideRenderer';
-import { BoundingBoxMutatorHelpers, GraphicMutator, GRAPHIC_TYPES, IRectangleRenderer, VERTEX_ROLES } from '../types';
-import { makeBoxHelpers, renderBoxHelpers, resizeBoxHelpers, rotateBoxHelpers, scaleBoxHelpers, unrenderBoxHelpers } from '../utilities';
+import {
+    BoundingBoxMutatorHelpers,
+    GRAPHIC_TYPES,
+    IRectangleMutator,
+    IRectangleRenderer,
+    ISlideRenderer,
+    VERTEX_ROLES
+} from '../types';
+import {
+    makeBoxHelpers,
+    renderBoxHelpers,
+    resizeBoxHelpers,
+    rotateBoxHelpers,
+    scaleBoxHelpers,
+    unrenderBoxHelpers
+} from '../utilities';
 
 type RectangleMutatorArgs = {
     target: IRectangleRenderer;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     scale: number;
 };
 
-class RectangleMutator implements GraphicMutator {
-    public target: IRectangleRenderer;
-    public helpers: BoundingBoxMutatorHelpers;
+class RectangleMutator implements IRectangleMutator {
+    public readonly type = GRAPHIC_TYPES.RECTANGLE;
+    public readonly target: IRectangleRenderer;
+    private _helpers: BoundingBoxMutatorHelpers;
 
     constructor(args: RectangleMutatorArgs) {
         this.target = args.target;
 
         // Initialize helper graphics
-        this.helpers = makeBoxHelpers(this.target, args.slide, args.scale);
+        this._helpers = makeBoxHelpers(this.target, args.slide, args.scale);
 
         // Render helper graphics
-        renderBoxHelpers(this.helpers);
+        renderBoxHelpers(this._helpers);
     }
 
-    public getType(): GRAPHIC_TYPES {
-        return GRAPHIC_TYPES.RECTANGLE;
-    }
-
-    public getTarget(): IRectangleRenderer {
-        return this.target;
+    public set scale(scale: number) {
+        scaleBoxHelpers(this._helpers, scale);
     }
 
     // TODO: Account for ctrl, alt, and snapping
@@ -87,7 +97,7 @@ class RectangleMutator implements GraphicMutator {
             const theta = Math.atan2(offset.y, offset.x);
 
             this.target.rotation = mod(theta, Math.PI * 2);
-            rotateBoxHelpers(this.helpers, this.target.box);
+            rotateBoxHelpers(this._helpers, this.target.box);
         };
     }
 
@@ -112,15 +122,11 @@ class RectangleMutator implements GraphicMutator {
 
     public complete(): void {
         // Remove helper graphics
-        unrenderBoxHelpers(this.helpers);
-    }
-
-    public setScale(scale: number): void {
-        scaleBoxHelpers(this.helpers, scale);
+        unrenderBoxHelpers(this._helpers);
     }
 
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this.helpers, this.target.box);
+        resizeBoxHelpers(this._helpers, this.target.box);
     }
 }
 

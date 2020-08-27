@@ -19,7 +19,7 @@ export function moveTextbox(event: TextboxMouseEvent): void {
 
     function move(event: SlideMouseEvent): void {
         moveListener(event);
-        slide.broadcastSetGraphic(mutator.getTarget());
+        slide.broadcastSetGraphic(mutator.target);
     }
 
     function complete(event: SlideMouseEvent): void {

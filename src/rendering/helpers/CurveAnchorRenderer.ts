@@ -1,11 +1,10 @@
 import { decorateCurveAnchorEvents } from '@/events/decorators/curve_anchor';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, ICurveAnchorRenderer } from '../types';
+import { CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, ICurveAnchorRenderer, ISlideRenderer } from '../types';
 
 type CurveAnchorRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     scale: number;
     inHandle: Vector;
     point: Vector;
@@ -16,7 +15,7 @@ type CurveAnchorRendererArgs = {
 
 class CurveAnchorRenderer implements ICurveAnchorRenderer {
     public readonly type = GRAPHIC_TYPES.CURVE_ANCHOR;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _parentId: string;
     private _index: number;
     private _scale: number;

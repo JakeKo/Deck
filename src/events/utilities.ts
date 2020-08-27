@@ -1,5 +1,4 @@
-import SlideRenderer from '@/rendering/SlideRenderer';
-import { IGraphicRenderer, IHelperRenderer } from '@/rendering/types';
+import { IGraphicRenderer, IHelperRenderer, ISlideRenderer } from '@/rendering/types';
 import { DECK_EVENTS, SlideMouseEvent, SlideMouseEventPayload, SLIDE_EVENTS } from './types';
 
 export function listen(eventName: DECK_EVENTS, handler: (event: CustomEvent) => void): void {
@@ -18,6 +17,6 @@ export function dispatch(event: CustomEvent): void {
     document.dispatchEvent(event);
 }
 
-export function makeSlideMouseEvent(name: SLIDE_EVENTS, slide: SlideRenderer, target: IGraphicRenderer | IHelperRenderer | undefined, baseEvent: MouseEvent): SlideMouseEvent {
+export function makeSlideMouseEvent(name: SLIDE_EVENTS, slide: ISlideRenderer, target: IGraphicRenderer | IHelperRenderer | undefined, baseEvent: MouseEvent): SlideMouseEvent {
     return new CustomEvent<SlideMouseEventPayload>(name, { detail: { type: name, slide, target, baseEvent } });
 }

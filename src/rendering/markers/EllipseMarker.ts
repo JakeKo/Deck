@@ -1,14 +1,13 @@
 import { EllipseOutlineRenderer } from '../helpers';
-import SlideRenderer from '../SlideRenderer';
-import { GraphicMarker, IEllipseRenderer } from '../types';
+import { IEllipseRenderer, IGraphicMarker, ISlideRenderer } from '../types';
 
 type EllipseMarkerArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     target: IEllipseRenderer;
     scale: number;
 };
 
-class EllipseMarker implements GraphicMarker {
+class EllipseMarker implements IGraphicMarker {
     public helper: EllipseOutlineRenderer;
 
     constructor(args: EllipseMarkerArgs) {
@@ -23,12 +22,12 @@ class EllipseMarker implements GraphicMarker {
         this.helper.render();
     }
 
-    public unmark(): void {
-        this.helper.unrender();
+    public set scale(scale: number) {
+        this.helper.scale = scale;
     }
 
-    public setScale(scale: number): void {
-        this.helper.scale = scale;
+    public unmark(): void {
+        this.helper.unrender();
     }
 }
 

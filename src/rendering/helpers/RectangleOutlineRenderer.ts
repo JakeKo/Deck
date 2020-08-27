@@ -1,11 +1,10 @@
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { GRAPHIC_TYPES, IRectangleOutlineRenderer } from '../types';
+import { GRAPHIC_TYPES, IRectangleOutlineRenderer, ISlideRenderer } from '../types';
 
 type RectangleOutlineRendererArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     scale: number;
     origin: Vector;
     dimensions: Vector;
@@ -14,7 +13,7 @@ type RectangleOutlineRendererArgs = {
 
 class RectangleOutlineRenderer implements IRectangleOutlineRenderer {
     public readonly type = GRAPHIC_TYPES.RECTANGLE_OUTLINE;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Rect | undefined;
     private _origin: Vector;
     private _dimensions: Vector;

@@ -1,14 +1,13 @@
-import SlideRenderer from '@/rendering/SlideRenderer';
-import { IRotatorRenderer } from '@/rendering/types';
+import { IRotatorRenderer, ISlideRenderer } from '@/rendering/types';
 import SVG from 'svg.js';
 import { RotatorMouseEvent, RotatorMouseEventPayload, ROTATOR_EVENTS, SLIDE_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 
-function makeRotatorMouseEvent(name: ROTATOR_EVENTS, slide: SlideRenderer, parentId: string, baseEvent: MouseEvent): RotatorMouseEvent {
+function makeRotatorMouseEvent(name: ROTATOR_EVENTS, slide: ISlideRenderer, parentId: string, baseEvent: MouseEvent): RotatorMouseEvent {
     return new CustomEvent<RotatorMouseEventPayload>(name, { detail: { type: name, slide, parentId, baseEvent } });
 }
 
-export function decorateRotateEvents(svg: SVG.Element, slide: SlideRenderer, graphic: IRotatorRenderer): void {
+export function decorateRotateEvents(svg: SVG.Element, slide: ISlideRenderer, graphic: IRotatorRenderer): void {
     svg.node.addEventListener('mouseup', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(makeRotatorMouseEvent(ROTATOR_EVENTS.MOUSEUP, slide, graphic.parent.id, baseEvent));

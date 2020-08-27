@@ -1,20 +1,21 @@
+import { SlideMouseEvent } from '@/events/types';
+import { resolvePosition } from '@/tools/utilities';
 import { provideId } from '@/utilities/IdProvider';
 import Vector from '@/utilities/Vector';
 import { CurveRenderer } from '../graphics';
 import { CurveAnchorRenderer } from '../helpers';
-import SlideRenderer from '../SlideRenderer';
-import { CurveAnchor, GraphicMaker, ICurveRenderer } from '../types';
+import { CurveAnchor, ICurveAnchorRenderer, ICurveMaker, ICurveRenderer, ISlideRenderer } from '../types';
 
 type CurveMakerArgs = {
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     initialPosition: Vector;
     scale: number;
 };
 
-class CurveMaker implements GraphicMaker {
+class CurveMaker implements ICurveMaker {
     public readonly target: ICurveRenderer;
-    private _slide: SlideRenderer;
-    private _helper: CurveAnchorRenderer;
+    private _slide: ISlideRenderer;
+    private _helper: ICurveAnchorRenderer;
 
     constructor(args: CurveMakerArgs) {
         this._slide = args.slide;
@@ -57,7 +58,7 @@ class CurveMaker implements GraphicMaker {
         this._helper.unrender();
     }
 
-    public addAnchor(anchor: CurveAnchor): { setHandles: (position: Vector) => void; setPoint: (position: Vector) => void } {
+    public anchorListeners(anchor: CurveAnchor): { setPoint: (event: SlideMouseEvent) => void; setHandles: (event: SlideMouseEvent) => void } {
         const anchorIndex = this.target.addAnchor(anchor);
 
         // Update helper graphic
@@ -66,17 +67,21 @@ class CurveMaker implements GraphicMaker {
         this._helper.outHandle = anchor.outHandle;
 
         return {
-            setHandles: position => {
+            setPoint: event => {
+                const { baseEvent, slide } = event.detail;
+                const position = resolvePosition(baseEvent, slide);
+                anchor.point = position;
+                this.target.setAnchor(anchorIndex, anchor);
+                this._helper.point = anchor.point;
+            },
+            setHandles: event => {
+                const { baseEvent, slide } = event.detail;
+                const position = resolvePosition(baseEvent, slide);
                 anchor.inHandle = position.reflect(anchor.point);
                 anchor.outHandle = position;
                 this.target.setAnchor(anchorIndex, anchor);
                 this._helper.inHandle = anchor.inHandle;
                 this._helper.outHandle = anchor.outHandle;
-            },
-            setPoint: position => {
-                anchor.point = position;
-                this.target.setAnchor(anchorIndex, anchor);
-                this._helper.point = anchor.point;
             }
         };
     }

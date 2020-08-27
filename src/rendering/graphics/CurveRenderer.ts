@@ -2,12 +2,11 @@ import { decorateCurveEvents } from '@/events/decorators';
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import SlideRenderer from '../SlideRenderer';
-import { BoundingBox, CurveAnchor, GRAPHIC_TYPES, ICurveRenderer } from '../types';
+import { BoundingBox, CurveAnchor, GRAPHIC_TYPES, ICurveRenderer, ISlideRenderer } from '../types';
 
 type CurveRendererArgs = {
     id: string;
-    slide: SlideRenderer;
+    slide: ISlideRenderer;
     anchors?: CurveAnchor[];
     fillColor?: string;
     strokeColor?: string;
@@ -18,7 +17,7 @@ type CurveRendererArgs = {
 class CurveRenderer implements ICurveRenderer {
     public readonly id: string;
     public readonly type = GRAPHIC_TYPES.CURVE;
-    private _slide: SlideRenderer;
+    private _slide: ISlideRenderer;
     private _svg: SVG.Path | undefined;
     private _anchors: CurveAnchor[];
     private _fillColor: string;
