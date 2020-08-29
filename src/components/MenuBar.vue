@@ -1,5 +1,6 @@
 <template>
 <div ref='root' :style="style.menuBar">
+    <button :style='style.exportButton' @click='exportSlideDeck'>Export</button>
     <TitleField />
 </div>
 </template>
@@ -14,7 +15,7 @@ const MenuBar = defineComponent({
         TitleField
     },
     setup: () => {
-        const { root, baseStyle, baseTheme } = DeckComponent();
+        const { root, store, baseStyle, baseTheme } = DeckComponent();
         const style = reactive({
             menuBar: computed(() => ({
                 height: '28px',
@@ -23,13 +24,34 @@ const MenuBar = defineComponent({
                 borderBottom: `1px solid ${baseTheme.value.color.base.flush}`,
                 background: baseTheme.value.color.base.highest,
                 ...baseStyle.value.fontBody,
-                ...baseStyle.value.flexRowCC
+                ...baseStyle.value.flexRowCC,
+                position: 'relative'
+            })),
+            exportButton: computed(() => ({
+                height: '100%',
+                position: 'absolute',
+                left: '0'
             }))
         });
 
+        async function exportSlideDeck(): Promise<void> {
+            const json = JSON.stringify(store.slides.value.map(s => ({
+                id: s.id,
+                graphics: s.graphics
+            })));
+
+            const encodedJson = `data:text/json;charset=utf-8,${encodeURIComponent(json)}`;
+            const anchor = document.createElement('a');
+            anchor.setAttribute('href', encodedJson);
+            anchor.setAttribute('download', `${store.deckTitle.value ?? 'Untitled'}.json`);
+            anchor.click();
+            anchor.remove();
+        }
+
         return {
             root,
-            style
+            style,
+            exportSlideDeck
         };
     }
 });
