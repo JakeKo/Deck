@@ -30,7 +30,12 @@ const MenuBar = defineComponent({
             exportButton: computed(() => ({
                 height: '100%',
                 position: 'absolute',
-                left: '0'
+                left: '0',
+                border: 'none',
+                outline: 'none',
+                background: baseTheme.value.color.base.highest,
+                cursor: 'pointer',
+                ...baseStyle.value.fontBody
             }))
         });
 
