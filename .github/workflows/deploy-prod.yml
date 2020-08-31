@@ -1,0 +1,43 @@
+name: Deploy to Prod
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install, Lint, and Build
+      run: |
+        npm install
+        npm run lint
+        npm run build
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: deck
+        path: ./dist
+
+    - name: Deploy
+      uses: w9jds/firebase-action@master
+      with:
+        args: deploy --only hosting
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
