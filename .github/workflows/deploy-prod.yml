@@ -5,7 +5,7 @@ on:
     branches: [ master, Deploying ]
 
 jobs:
-  build:
+  deploy-prod:
     runs-on: ubuntu-latest
 
     strategy:
@@ -23,11 +23,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install, Lint, Test, and Build
+    - name: Install, Lint, and Build
       run: |
         npm install
         npm run lint
-        npm run test:unit
         npm run build
 
     - name: Upload Artifact
