@@ -3,7 +3,7 @@ name: Validate Active Development
 on: [push]
 
 jobs:
-  deploy-prod:
+  validate-dev:
     runs-on: ubuntu-latest
 
     strategy:
