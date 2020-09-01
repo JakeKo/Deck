@@ -1,5 +1,5 @@
 import { ICurveRenderer, IEllipseRenderer, IImageRenderer, IRectangleRenderer, ITextboxRenderer, IVideoRenderer, IGraphicRenderer, GRAPHIC_TYPES } from '@/rendering/types';
-import { CurveStoreModel, EllipseStoreModel, ImageStoreModel, RectangleStoreModel, TextboxStoreModel, VideoStoreModel, GraphicStoreModel } from '@/store/types';
+import { CurveStoreModel, EllipseStoreModel, ImageStoreModel, RectangleStoreModel, TextboxStoreModel, VideoStoreModel, GraphicStoreModel, Slide } from '@/store/types';
 import Vector from '../Vector';
 
 export function curveRendererToCurveStoreModel(curve: ICurveRenderer): CurveStoreModel {
@@ -117,4 +117,12 @@ export function graphicRendererToGraphicStoreModel(graphic: IGraphicRenderer): G
     if (graphic.type === GRAPHIC_TYPES.TEXTBOX) return textboxRendererToTextboxStoreModel(graphic);
     if (graphic.type === GRAPHIC_TYPES.VIDEO) return videoRendererToVideoStoreModel(graphic);
     throw new Error(`Unrecognized graphic type while parsing renderer: ${graphic}`);
+}
+
+export function jsonToSlides(json: string): { id: string; graphics: { [key: string]: GraphicStoreModel } }[] {
+    try {
+        return JSON.parse(json);
+    } catch (error) {
+        throw new Error(`Schema violation when parsing json into slides: ${json}`);
+    }
 }

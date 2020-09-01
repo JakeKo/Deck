@@ -34,7 +34,8 @@ export type AppGetters = {
 };
 
 export type AppMutations = {
-    addSlide: (index: number) => void;
+    addSlide: (index: number, slide?: Slide) => void;
+    removeAllSlides: () => void;
     setActiveSlide: (slideId: string) => void;
     setActiveTool: (tool: EditorTool) => void;
     setEditorZoom: (zoom: number) => void;

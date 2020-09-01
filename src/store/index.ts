@@ -50,14 +50,23 @@ function createStore(): AppStore {
     };
 
     const mutations: AppMutations = {
-        addSlide: index => {
+        addSlide: (index, slide) => {
             const slideId = provideId();
-            state.slides.splice(index, 0, {
+            state.slides.splice(index, 0, slide ?? {
                 id: slideId,
                 isActive: false,
                 graphics: {},
                 stateManager: new SlideStateManager(slideId)
             });
+        },
+        removeAllSlides: () => {
+            const activeSlide = getSlide(state, state.activeSlideId);
+            if (activeSlide !== undefined) {
+                activeSlide.isActive = false;
+                state.activeSlideId = '';
+            }
+
+            state.slides = [];
         },
         setActiveSlide: slideId => {
             const oldActiveSlide = getSlide(state, state.activeSlideId);

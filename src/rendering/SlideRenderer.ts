@@ -1,7 +1,7 @@
 import { decorateSlideEvents } from '@/events/decorators';
 import { SlideKeyboardEvent, SlideZoomEvent, SLIDE_EVENTS } from '@/events/types';
 import { listen } from '@/events/utilities';
-import { Viewbox } from '@/store/types';
+import { GraphicStoreModel, Viewbox } from '@/store/types';
 import SlideStateManager from '@/utilities/SlideStateManager';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
@@ -44,6 +44,7 @@ import {
     ITextboxMaker,
     IVideoMaker
 } from './types';
+import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;
@@ -51,7 +52,7 @@ type SlideRendererArgs = {
     rawViewbox: Viewbox;
     croppedViewbox: Viewbox;
     zoom: number;
-    graphics?: { [key: string]: IGraphicRenderer };
+    graphics?: { [key: string]: GraphicStoreModel };
 };
 
 class SlideRenderer implements ISlideRenderer {
@@ -81,7 +82,10 @@ class SlideRenderer implements ISlideRenderer {
         decorateSlideEvents(this);
         this.canvas.node.tabIndex = 0;
 
-        this._graphics = args.graphics ?? {};
+        this._graphics = args.graphics
+            ? Object.values(args.graphics).map(graphic => graphicStoreModelToGraphicRenderer(graphic, this))
+                .reduce((graphics, graphic) => ({ [graphic.id]: graphic, ...graphics }), {})
+            : {};
         Object.values(this._graphics).forEach(graphic => graphic.render());
 
         listen(SLIDE_EVENTS.ZOOM, (event: SlideZoomEvent): void => this._setZoom(event.detail.zoom));

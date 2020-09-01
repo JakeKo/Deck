@@ -40,7 +40,8 @@ const Slide = defineComponent({
                 canvas,
                 rawViewbox: viewbox,
                 croppedViewbox: store.croppedViewbox.value,
-                zoom: store.editorZoomLevel.value
+                zoom: store.editorZoomLevel.value,
+                graphics: props.slide.graphics
             });
 
             props.slide.stateManager.setStore(store);

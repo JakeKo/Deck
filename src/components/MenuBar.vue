@@ -10,6 +10,8 @@
 import DeckComponent from './generic/DeckComponent';
 import TitleField from './TitleField.vue';
 import { defineComponent, computed, reactive } from 'vue';
+import { jsonToSlides } from '@/utilities/parsing/storeModel';
+import SlideStateManager from '@/utilities/SlideStateManager';
 
 const MenuBar = defineComponent({
     components: {
@@ -60,7 +62,31 @@ const MenuBar = defineComponent({
         }
 
         async function importSlideDeck(): Promise<void> {
-            console.log('Importing slide deck...');
+            const reader = new FileReader();
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+
+            input.addEventListener('input', (): void => reader.readAsText(input.files ? input.files[0] : new Blob()));
+            reader.addEventListener('loadend', (): void => {
+                const slides = jsonToSlides(reader.result as string);
+
+                store.removeAllSlides();
+                slides.forEach((slide, index) => {
+                    store.addSlide(index, {
+                        id: slide.id,
+                        isActive: false,
+                        graphics: slide.graphics,
+                        stateManager: new SlideStateManager(slide.id)
+                    });
+                });
+
+                if (slides.length > 0) {
+                    store.setActiveSlide(slides[0].id);
+                }
+            });
+
+            input.click();
         }
 
         return {
