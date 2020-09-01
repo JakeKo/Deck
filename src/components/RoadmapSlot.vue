@@ -7,7 +7,7 @@
 
 <script lang='ts'>
 import DeckComponent from './generic/DeckComponent';
-import { defineComponent, computed, reactive, onMounted, ref } from 'vue';
+import { defineComponent, computed, reactive, onMounted, ref, onBeforeUnmount } from 'vue';
 
 const RoadmapSlot = defineComponent({
     props: {
@@ -42,10 +42,11 @@ const RoadmapSlot = defineComponent({
             return `${viewbox.x} ${viewbox.y} ${viewbox.width} ${viewbox.height}`;
         });
         const canvas = ref<SVGElement | undefined>(undefined);
+        let refreshInterval: number;
 
         // TODO: Determine how to ignore helper graphics when updating preview
         onMounted(() => {
-            setInterval(async() => {
+            refreshInterval = setInterval(async() => {
                 if (canvas.value === undefined) {
                     throw new Error('Canvas ref not specified.');
                 }
@@ -54,6 +55,8 @@ const RoadmapSlot = defineComponent({
                 canvas.value.innerHTML = source.innerHTML;
             }, 5000);
         });
+
+        onBeforeUnmount(() => clearInterval(refreshInterval));
 
         return {
             root,

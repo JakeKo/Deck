@@ -66,7 +66,7 @@ function createStore(): AppStore {
                 state.activeSlideId = '';
             }
 
-            state.slides = [];
+            state.slides.splice(0, state.slides.length);
         },
         setActiveSlide: slideId => {
             const oldActiveSlide = getSlide(state, state.activeSlideId);
