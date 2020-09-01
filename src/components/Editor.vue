@@ -3,9 +3,7 @@
     <SlidePlaceholder v-if='slides.length === 0' />
     <Slide v-for='slide in slides'
         :key='slide.id'
-        :id='slide.id'
-        :isActive='slide.isActive'
-        :stateManager='slide.stateManager'
+        :slide='slide'
     />
 </div>
 </template>

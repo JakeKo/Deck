@@ -1,5 +1,6 @@
 <template>
 <div ref='root' :style="style.menuBar">
+    <button :style='style.importButton' @click='importSlideDeck'>Import</button>
     <button :style='style.exportButton' @click='exportSlideDeck'>Export</button>
     <TitleField />
 </div>
@@ -24,13 +25,18 @@ const MenuBar = defineComponent({
                 borderBottom: `1px solid ${baseTheme.value.color.base.flush}`,
                 background: baseTheme.value.color.base.highest,
                 ...baseStyle.value.fontBody,
-                ...baseStyle.value.flexRowCC,
-                position: 'relative'
+                ...baseStyle.value.flexRowCC
+            })),
+            importButton: computed(() => ({
+                height: '100%',
+                border: 'none',
+                outline: 'none',
+                background: baseTheme.value.color.base.highest,
+                cursor: 'pointer',
+                ...baseStyle.value.fontBody
             })),
             exportButton: computed(() => ({
                 height: '100%',
-                position: 'absolute',
-                left: '0',
                 border: 'none',
                 outline: 'none',
                 background: baseTheme.value.color.base.highest,
@@ -53,10 +59,15 @@ const MenuBar = defineComponent({
             anchor.remove();
         }
 
+        async function importSlideDeck(): Promise<void> {
+            console.log('Importing slide deck...');
+        }
+
         return {
             root,
             style,
-            exportSlideDeck
+            exportSlideDeck,
+            importSlideDeck
         };
     }
 });
