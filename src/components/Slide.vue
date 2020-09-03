@@ -8,6 +8,7 @@ import SlideRenderer from '../rendering/SlideRenderer';
 import { Slide as SlideModel } from '@/store/types';
 import DeckComponent from './generic/DeckComponent';
 import { defineComponent, reactive, computed, onMounted, PropType } from 'vue';
+import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
 
 const Slide = defineComponent({
     props: {
@@ -35,18 +36,25 @@ const Slide = defineComponent({
 
             const viewbox = store.rawViewbox.value;
             const canvas = SVG(root.value.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
+
             const renderer = new SlideRenderer({
                 stateManager: props.slide.stateManager,
                 canvas,
                 rawViewbox: viewbox,
                 croppedViewbox: store.croppedViewbox.value,
-                zoom: store.editorZoomLevel.value,
-                graphics: props.slide.graphics
+                zoom: store.editorZoomLevel.value
             });
+
+            Object.values(props.slide.graphics)
+                .map(graphic => graphicStoreModelToGraphicRenderer(graphic, renderer))
+                .forEach(graphic => {
+                    console.log(graphic);
+                    renderer.setGraphic(graphic);
+                    renderer.getGraphic(graphic.id).render();
+                });
 
             props.slide.stateManager.setStore(store);
             props.slide.stateManager.setRenderer(renderer);
-            Object.values(props.slide.graphics).forEach(graphic => store.broadcastSetGraphic(props.slide.id, graphic));
         });
 
         return {

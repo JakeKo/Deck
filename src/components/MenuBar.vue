@@ -70,6 +70,7 @@ const MenuBar = defineComponent({
             input.addEventListener('input', (): void => reader.readAsText(input.files ? input.files[0] : new Blob()));
             reader.addEventListener('loadend', (): void => {
                 const slides = jsonToSlides(reader.result as string);
+                console.log(slides);
 
                 store.removeAllSlides();
                 slides.forEach((slide, index) => {

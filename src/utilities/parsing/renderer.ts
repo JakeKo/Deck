@@ -35,9 +35,9 @@ export function curveStoreModelToCurveRenderer(curve: CurveStoreModel, slide: IS
             id: curve.id,
             slide,
             anchors: curve.points.reduce<CurveAnchor[]>((anchors, _, index) => index % 3 === 0 ? [...anchors, {
-                inHandle: curve.points[index],
-                point: curve.points[index + 1],
-                outHandle: curve.points[index + 2]
+                inHandle: new Vector(curve.points[index].x, curve.points[index].y),
+                point: new Vector(curve.points[index + 1].x, curve.points[index + 1].y),
+                outHandle: new Vector(curve.points[index + 2].x, curve.points[index + 2].y)
             }] : anchors, []),
             fillColor: curve.fillColor,
             strokeColor: curve.strokeColor,
@@ -54,7 +54,7 @@ export function ellipseStoreModelToEllipseRenderer(ellipse: EllipseStoreModel, s
         return new EllipseRenderer({
             id: ellipse.id,
             slide,
-            center: ellipse.center,
+            center: new Vector(ellipse.center.x, ellipse.center.y),
             dimensions: new Vector(ellipse.width, ellipse.height),
             fillColor: ellipse.fillColor,
             strokeColor: ellipse.strokeColor,
@@ -71,7 +71,7 @@ export function imageStoreModelToImageRenderer(image: ImageStoreModel, slide: IS
         return new ImageRenderer({
             id: image.id,
             slide,
-            origin: image.origin,
+            origin: new Vector(image.origin.x, image.origin.y),
             source: image.source,
             dimensions: new Vector(image.width, image.height),
             strokeColor: image.strokeColor,
@@ -88,7 +88,7 @@ export function rectangleStoreModelToRectangleRenderer(rectangle: RectangleStore
         return new RectangleRenderer({
             id: rectangle.id,
             slide,
-            origin: rectangle.origin,
+            origin: new Vector(rectangle.origin.x, rectangle.origin.y),
             dimensions: new Vector(rectangle.width, rectangle.height),
             fillColor: rectangle.fillColor,
             strokeColor: rectangle.strokeColor,
@@ -106,7 +106,7 @@ export function textboxStoreModelToTextboxRenderer(textbox: TextboxStoreModel, s
             id: textbox.id,
             slide,
             text: textbox.text,
-            origin: textbox.origin,
+            origin: new Vector(textbox.origin.x, textbox.origin.y),
             dimensions: new Vector(textbox.width, textbox.height),
             fontSize: textbox.size,
             fontWeight: textbox.weight,
@@ -126,7 +126,7 @@ export function videoStoreModelToVideoRenderer(video: VideoStoreModel, slide: IS
         return new VideoRenderer({
             id: video.id,
             slide,
-            origin: video.origin,
+            origin: new Vector(video.origin.x, video.origin.y),
             source: el,
             dimensions: new Vector(video.width, video.height),
             strokeColor: video.strokeColor,

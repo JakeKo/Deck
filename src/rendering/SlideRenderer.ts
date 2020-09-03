@@ -177,6 +177,10 @@ class SlideRenderer implements ISlideRenderer {
         return this._graphics[graphicId];
     }
 
+    public getGraphics(): { [key: string]: IGraphicRenderer } {
+        return this._graphics;
+    }
+
     public setGraphic(graphic: IGraphicRenderer): void {
         this._graphics[graphic.id] = graphic;
     }

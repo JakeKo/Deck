@@ -94,7 +94,7 @@ const Editor = defineComponent({
             root,
             style,
             handleMouseWheel,
-            slides: store.slides.value
+            slides: store.slides
         };
     }
 });
