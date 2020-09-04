@@ -267,6 +267,7 @@ export type ISlideRenderer = {
     makeVideoInteractive: (initialPosition: Vector, source: HTMLVideoElement, dimension: Vector) => IVideoMaker;
     completeInteractiveMake: (graphicId: string) => void;
     getGraphic: (graphicId: string) => IGraphicRenderer;
+    getGraphics: () => { [key: string]: IGraphicRenderer };
     setGraphic: (graphic: IGraphicRenderer) => void;
     removeGraphic: (graphicId: string) => void;
     focusGraphic: (graphicId: string) => IGraphicMutator;

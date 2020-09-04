@@ -48,7 +48,7 @@ class EllipseRenderer implements IEllipseRenderer {
 
     public set center(origin: Vector) {
         this._center = origin;
-        this._svg && this._svg.rotate(0).translate(this._center.x, this._center.y).rotate(radToDeg(this._rotation));
+        this._svg && this._svg.rotate(0).center(this._center.x, this._center.y).rotate(radToDeg(this._rotation));
     }
 
     public get dimensions(): Vector {
@@ -147,7 +147,7 @@ class EllipseRenderer implements IEllipseRenderer {
 
         this._svg && this._svg
             .rotate(0)
-            .translate(this._center.x, this._center.y)
+            .center(this._center.x, this._center.y)
             .size(this._dimensions.x, this._dimensions.y)
             .rotate(radToDeg(this._rotation));
     }
@@ -159,7 +159,7 @@ class EllipseRenderer implements IEllipseRenderer {
         }
 
         this._svg = this._slide.canvas.ellipse(this._dimensions.x, this._dimensions.y)
-            .translate(this._center.x, this._center.y)
+            .center(this._center.x, this._center.y)
             .fill(this._fillColor)
             .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(radToDeg(this._rotation));
