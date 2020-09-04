@@ -31,7 +31,6 @@ export function moveEllipse(event: EllipseMouseEvent): void {
 }
 
 export function hoverEllipse(event: EllipseMouseEvent): void {
-    console.log(event);
     const { target, slide } = event.detail;
 
     if (slide.isFocused(target.id)) {

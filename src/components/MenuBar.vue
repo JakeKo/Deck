@@ -73,18 +73,21 @@ const MenuBar = defineComponent({
                 console.log(slides);
 
                 store.removeAllSlides();
-                slides.forEach((slide, index) => {
-                    store.addSlide(index, {
-                        id: slide.id,
-                        isActive: false,
-                        graphics: slide.graphics,
-                        stateManager: new SlideStateManager(slide.id)
-                    });
-                });
 
-                if (slides.length > 0) {
-                    store.setActiveSlide(slides[0].id);
-                }
+                setTimeout(() => {
+                    slides.forEach((slide, index) => {
+                        store.addSlide(index, {
+                            id: slide.id,
+                            isActive: false,
+                            graphics: slide.graphics,
+                            stateManager: new SlideStateManager(slide.id)
+                        });
+                    });
+
+                    if (slides.length > 0) {
+                        store.setActiveSlide(slides[0].id);
+                    }
+                }, 250);
             });
 
             input.click();

@@ -48,7 +48,6 @@ const Slide = defineComponent({
             Object.values(props.slide.graphics)
                 .map(graphic => graphicStoreModelToGraphicRenderer(graphic, renderer))
                 .forEach(graphic => {
-                    console.log(graphic);
                     renderer.setGraphic(graphic);
                     renderer.getGraphic(graphic.id).render();
                 });
