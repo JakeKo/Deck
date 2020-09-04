@@ -1,5 +1,22 @@
-import { ICurveRenderer, IEllipseRenderer, IImageRenderer, IRectangleRenderer, ITextboxRenderer, IVideoRenderer, IGraphicRenderer, GRAPHIC_TYPES } from '@/rendering/types';
-import { CurveStoreModel, EllipseStoreModel, ImageStoreModel, RectangleStoreModel, TextboxStoreModel, VideoStoreModel, GraphicStoreModel, Slide } from '@/store/types';
+import {
+    GRAPHIC_TYPES,
+    ICurveRenderer,
+    IEllipseRenderer,
+    IGraphicRenderer,
+    IImageRenderer,
+    IRectangleRenderer,
+    ITextboxRenderer,
+    IVideoRenderer
+} from '@/rendering/types';
+import {
+    CurveStoreModel,
+    EllipseStoreModel,
+    GraphicStoreModel,
+    ImageStoreModel,
+    RectangleStoreModel,
+    TextboxStoreModel,
+    VideoStoreModel
+} from '@/store/types';
 import Vector from '../Vector';
 
 export function curveRendererToCurveStoreModel(curve: ICurveRenderer): CurveStoreModel {
