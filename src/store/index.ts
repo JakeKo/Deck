@@ -59,6 +59,9 @@ function createStore(): AppStore {
                 stateManager: new SlideStateManager(slideId)
             });
         },
+        removeSlide: index => {
+            state.slides.splice(index, 1);
+        },
         removeAllSlides: () => {
             const activeSlide = getSlide(state, state.activeSlideId);
             if (activeSlide !== undefined) {

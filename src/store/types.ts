@@ -35,6 +35,7 @@ export type AppGetters = {
 
 export type AppMutations = {
     addSlide: (index: number, slide?: Slide) => void;
+    removeSlide: (index: number) => void;
     removeAllSlides: () => void;
     setActiveSlide: (slideId: string) => void;
     setActiveTool: (tool: EditorTool) => void;
