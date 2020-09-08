@@ -1,3 +1,3 @@
 export function provideId(): string {
-    return Date.now().valueOf().toString();
+    return Math.random().toString();
 }

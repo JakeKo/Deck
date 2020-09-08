@@ -77,7 +77,7 @@ export default class Vector {
     }
 
     public signAs(sign: Vector): Vector {
-        return new Vector(Math.sign(sign.x) * this.x, Math.sign(sign.y) * this.y);
+        return new Vector(Math.sign(sign.x) * Math.abs(this.x), Math.sign(sign.y) * Math.abs(this.y));
     }
 
     public rotate(theta: number): Vector {

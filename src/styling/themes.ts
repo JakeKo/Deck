@@ -2,6 +2,7 @@ import { THEMES, Theme } from './types';
 
 // Color Scheme Maker: https://noeldelgado.github.io/shadowlord
 const lightTheme: Theme = {
+    type: THEMES.LIGHT,
     color: {
         base: {
             highest: '#ffffff', // 100% tint

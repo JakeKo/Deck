@@ -21,7 +21,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install and Lint
+    - name: Install, Lint, and Test
       run: |
         npm install
         npm run lint
+        npm run test:unit
