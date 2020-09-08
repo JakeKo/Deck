@@ -1,14 +1,5 @@
-import Vector from '@/utilities/Vector';
-import { BoxRenderer, CanvasRenderer, RotatorRenderer, VertexRenderer } from './helpers';
+import { BoxRenderer, RotatorRenderer, VertexRenderer } from './helpers';
 import { BoundingBox, BoundingBoxMutatorHelpers, IGraphicRenderer, ISlideRenderer, VERTEX_ROLES } from './types';
-
-export function renderBackdrop(slideRenderer: ISlideRenderer, width: number, height: number): void {
-    new CanvasRenderer({
-        slide: slideRenderer,
-        origin: Vector.zero,
-        dimensions: new Vector(width, height)
-    }).render();
-}
 
 export function makeBoxHelpers(target: IGraphicRenderer, slide: ISlideRenderer, scale: number): BoundingBoxMutatorHelpers {
     const box = target.box;

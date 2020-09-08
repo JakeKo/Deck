@@ -1,15 +1,50 @@
 import { decorateSlideEvents } from '@/events/decorators';
 import { SlideKeyboardEvent, SlideZoomEvent, SLIDE_EVENTS } from '@/events/types';
 import { listen } from '@/events/utilities';
-import { Viewbox } from '@/store/types';
+import { GraphicStoreModel, Viewbox } from '@/store/types';
 import SlideStateManager from '@/utilities/SlideStateManager';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
-import { CurveMaker, EllipseMaker, ImageMaker, RectangleMaker, TextboxMaker, VideoMaker } from './makers';
-import { CurveMarker, EllipseMarker, ImageMarker, RectangleMarker, TextboxMarker, VideoMarker } from './markers';
-import { CurveMutator, EllipseMutator, ImageMutator, RectangleMutator, TextboxMutator, VideoMutator } from './mutators';
-import { GRAPHIC_TYPES, ICurveMaker, IEllipseMaker, IGraphicMaker, IGraphicMarker, IGraphicMutator, IGraphicRenderer, IImageMaker, IRectangleMaker, ISlideRenderer, ITextboxMaker, IVideoMaker } from './types';
-import { renderBackdrop } from './utilities';
+import { CanvasRenderer } from './helpers';
+import {
+    CurveMaker,
+    EllipseMaker,
+    ImageMaker,
+    RectangleMaker,
+    TextboxMaker,
+    VideoMaker
+} from './makers';
+import {
+    CurveMarker,
+    EllipseMarker,
+    ImageMarker,
+    RectangleMarker,
+    TextboxMarker,
+    VideoMarker
+} from './markers';
+import {
+    CurveMutator,
+    EllipseMutator,
+    ImageMutator,
+    RectangleMutator,
+    TextboxMutator,
+    VideoMutator
+} from './mutators';
+import {
+    GRAPHIC_TYPES,
+    ICurveMaker,
+    IEllipseMaker,
+    IGraphicMaker,
+    IGraphicMarker,
+    IGraphicMutator,
+    IGraphicRenderer,
+    IImageMaker,
+    IRectangleMaker,
+    ISlideRenderer,
+    ITextboxMaker,
+    IVideoMaker
+} from './types';
+import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;
@@ -17,6 +52,7 @@ type SlideRendererArgs = {
     rawViewbox: Viewbox;
     croppedViewbox: Viewbox;
     zoom: number;
+    graphics?: { [key: string]: GraphicStoreModel };
 };
 
 class SlideRenderer implements ISlideRenderer {
@@ -35,28 +71,27 @@ class SlideRenderer implements ISlideRenderer {
     constructor(args: SlideRendererArgs) {
         this.canvas = args.canvas;
         this.rawViewbox = args.rawViewbox;
+        this.zoom = args.zoom;
         this._stateManager = args.stateManager;
-        this._graphics = {};
         this._focusedGraphics = {};
         this._activeMakers = {};
         this._markedGraphics = {};
-        this.zoom = args.zoom;
         this._cursor = this._defaultCursor;
 
-        renderBackdrop(this, args.croppedViewbox.width, args.croppedViewbox.height);
+        this._renderBackdrop(new Vector(args.croppedViewbox.width, args.croppedViewbox.height));
         decorateSlideEvents(this);
         this.canvas.node.tabIndex = 0;
 
-        listen(SLIDE_EVENTS.ZOOM, (event: SlideZoomEvent): void => {
-            this.zoom = event.detail.zoom;
-            Object.values(this._focusedGraphics).forEach(mutator => (mutator.scale = 1 / this.zoom));
-            Object.values(this._activeMakers).forEach(maker => (maker.scale = 1 / this.zoom));
-            Object.values(this._markedGraphics).forEach(marker => (marker.scale = 1 / this.zoom));
-        });
+        this._graphics = args.graphics
+            ? Object.values(args.graphics).map(graphic => graphicStoreModelToGraphicRenderer(graphic, this))
+                .reduce((graphics, graphic) => ({ [graphic.id]: graphic, ...graphics }), {})
+            : {};
+        Object.values(this._graphics).forEach(graphic => graphic.render());
 
+        listen(SLIDE_EVENTS.ZOOM, (event: SlideZoomEvent): void => this._setZoom(event.detail.zoom));
         listen(SLIDE_EVENTS.KEYDOWN, (event: SlideKeyboardEvent): void => {
             if (['Backspace', 'Delete'].indexOf(event.detail.baseEvent.key) !== -1) {
-                Object.keys(this._focusedGraphics).forEach(graphicId => this.removeGraphic(graphicId));
+                this.removeGraphics(Object.keys(this._focusedGraphics));
             }
         });
     }
@@ -83,7 +118,7 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     public makeCurveInteractive(initialPosition: Vector): ICurveMaker {
-        return this.activateMaker(new CurveMaker({
+        return this._activateMaker(new CurveMaker({
             slide: this,
             initialPosition,
             scale: 1 / this.zoom
@@ -91,7 +126,7 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     public makeEllipseInteractive(initialPosition: Vector): IEllipseMaker {
-        return this.activateMaker(new EllipseMaker({
+        return this._activateMaker(new EllipseMaker({
             slide: this,
             initialPosition,
             scale: 1 / this.zoom
@@ -99,7 +134,7 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     public makeImageInteractive(initialPosition: Vector, source: string, dimensions: Vector): IImageMaker {
-        return this.activateMaker(new ImageMaker({
+        return this._activateMaker(new ImageMaker({
             slide: this,
             initialPosition,
             source,
@@ -109,7 +144,7 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     public makeRectangleInteractive(initialPosition: Vector): IRectangleMaker {
-        return this.activateMaker(new RectangleMaker({
+        return this._activateMaker(new RectangleMaker({
             slide: this,
             initialPosition,
             scale: 1 / this.zoom
@@ -117,7 +152,7 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     public makeTextboxInteractive(initialPosition: Vector): ITextboxMaker {
-        return this.activateMaker(new TextboxMaker({
+        return this._activateMaker(new TextboxMaker({
             slide: this,
             initialPosition,
             scale: 1 / this.zoom
@@ -125,7 +160,7 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     public makeVideoInteractive(initialPosition: Vector, source: HTMLVideoElement, dimensions: Vector): IVideoMaker {
-        return this.activateMaker(new VideoMaker({
+        return this._activateMaker(new VideoMaker({
             slide: this,
             initialPosition,
             source,
@@ -140,6 +175,10 @@ class SlideRenderer implements ISlideRenderer {
 
     public getGraphic(graphicId: string): IGraphicRenderer {
         return this._graphics[graphicId];
+    }
+
+    public getGraphics(): { [key: string]: IGraphicRenderer } {
+        return this._graphics;
     }
 
     public setGraphic(graphic: IGraphicRenderer): void {
@@ -159,6 +198,10 @@ class SlideRenderer implements ISlideRenderer {
 
         this._graphics[graphicId].unrender();
         delete this._graphics[graphicId];
+    }
+
+    public removeGraphics(graphicIds: string[]): void {
+        graphicIds.forEach(graphicId => this.removeGraphic(graphicId));
     }
 
     public broadcastSetGraphic(graphic: IGraphicRenderer): void {
@@ -253,9 +296,25 @@ class SlideRenderer implements ISlideRenderer {
         return this._markedGraphics[graphicId] !== undefined;
     }
 
-    private activateMaker<T extends IGraphicMaker>(maker: T): T {
+    private _activateMaker<T extends IGraphicMaker>(maker: T): T {
         this._activeMakers[maker.target.id] = maker;
         return maker;
+    }
+
+    // When the zoom on the slide has changed, we need to correct for it so helpers don't shrink and grow
+    private _setZoom(zoom: number): void {
+        this.zoom = zoom;
+        Object.values(this._focusedGraphics).forEach(mutator => (mutator.scale = 1 / this.zoom));
+        Object.values(this._activeMakers).forEach(maker => (maker.scale = 1 / this.zoom));
+        Object.values(this._markedGraphics).forEach(marker => (marker.scale = 1 / this.zoom));
+    }
+
+    private _renderBackdrop(dimensions: Vector): void {
+        new CanvasRenderer({
+            slide: this,
+            origin: Vector.zero,
+            dimensions
+        }).render();
     }
 }
 

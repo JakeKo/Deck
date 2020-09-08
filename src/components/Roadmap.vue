@@ -1,5 +1,5 @@
 <template>
-<div ref='root' :style="style.roadmap">
+<div ref='root' :style="style.roadmap" tabindex="0">
     <RoadmapSlot v-for='slide in roadmapSlides'
         :key='slide.id'
         :id='slide.id'
@@ -17,7 +17,7 @@
 <script lang='ts'>
 import RoadmapSlot from './RoadmapSlot.vue';
 import DeckComponent from './generic/DeckComponent';
-import { defineComponent, computed, reactive } from 'vue';
+import { defineComponent, computed, reactive, onMounted } from 'vue';
 
 const Roadmap = defineComponent({
     components: {
@@ -64,6 +64,21 @@ const Roadmap = defineComponent({
 
             store.setActiveSlide(store.lastSlide.value.id);
         }
+
+        onMounted(() => {
+            if (root.value === undefined) {
+                throw new Error('Root ref not specified.');
+            }
+
+            root.value.addEventListener('keydown', (event: KeyboardEvent): void => {
+                if (['Backspace', 'Delete'].indexOf(event.key) !== -1 && store.activeSlide.value !== undefined) {
+                    const activeSlide = store.activeSlide.value;
+                    if (activeSlide !== undefined) {
+                        store.removeSlide(roadmapSlides.value.findIndex(slide => slide.id === activeSlide.id));
+                    }
+                }
+            });
+        });
 
         return {
             root,
