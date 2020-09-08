@@ -13,6 +13,7 @@ type Typeface = {
 };
 
 export type Theme = {
+    type: string;
     color: {
         base: Palette;
         basecomp: Palette;
