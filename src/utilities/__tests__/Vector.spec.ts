@@ -147,7 +147,6 @@ describe('Vector', () => {
 
     it('can calculate the angle between two vectors (in radians)', () => {
         // Arrange
-        const epsilon = 1E-8;
         const vector1 = Vector.east;
         const vector2 = new Vector(5, 5);
         const vector3 = new Vector(-5, 5);
