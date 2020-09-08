@@ -23,10 +23,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install, Lint, and Build
+    - name: Install and Build
       run: |
         npm install
-        npm run lint
         npm run build
 
     - name: Upload Artifact
