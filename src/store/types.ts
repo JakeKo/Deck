@@ -38,6 +38,10 @@ export type AppMutations = {
     removeSlide: (index: number) => void;
     removeAllSlides: () => void;
     setActiveSlide: (slideId: string) => void;
+    focusGraphic: (slideId: string, graphicId: string) => void;
+    focusGraphicBulk: (slideId: string, graphicIds: string[]) => void;
+    unfocusGraphic: (slideId: string, graphicId: string) => void;
+    unfocusGraphicBulk: (slideId: string, graphicIds: string[]) => void;
     setActiveTool: (tool: EditorTool) => void;
     setEditorZoom: (zoom: number) => void;
     setDeckTitle: (deckTitle: string) => void;
@@ -60,7 +64,8 @@ export type Viewbox = {
 export type Slide = {
     id: string;
     isActive: boolean;
-    graphics: { [index: string]: GraphicStoreModel };
+    graphics: { [key: string]: GraphicStoreModel };
+    focusedGraphics: { [key: string]: GraphicStoreModel };
     stateManager: SlideStateManager;
 };
 

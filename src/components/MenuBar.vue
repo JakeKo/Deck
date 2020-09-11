@@ -77,6 +77,7 @@ const MenuBar = defineComponent({
                             id: slide.id,
                             isActive: false,
                             graphics: slide.graphics,
+                            focusedGraphics: {},
                             stateManager: new SlideStateManager(slide.id)
                         });
                     });

@@ -29,6 +29,14 @@ export default class SlideStateManager {
         this._store && this._store.removeGraphic(this._slideId, graphicId);
     }
 
+    public focusGraphicFromRenderer(graphicId: string): void {
+        this._store && this._store.focusGraphic(this._slideId, graphicId);
+    }
+
+    public unfocusGraphicFromRenderer(graphicId: string): void {
+        this._store && this._store.unfocusGraphic(this._slideId, graphicId);
+    }
+
     public setGraphicFromStore(graphic: GraphicStoreModel): void {
         if (this._renderer === undefined) {
             throw new Error('Cannot convert from store model to renderer with undefined slide renderer');
@@ -40,5 +48,13 @@ export default class SlideStateManager {
 
     public removeGraphicFromStore(graphicId: string): void {
         this._renderer && this._renderer.removeGraphic(graphicId);
+    }
+
+    public focusGraphicFromStore(graphicId: string): void {
+        this._renderer && this._renderer.focusGraphic(graphicId);
+    }
+
+    public unfocusGraphicFromStore(graphicId: string): void {
+        this._renderer && this._renderer.unfocusGraphic(graphicId);
     }
 }

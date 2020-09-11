@@ -56,6 +56,7 @@ function createStore(): AppStore {
                 id: slideId,
                 isActive: false,
                 graphics: {},
+                focusedGraphics: {},
                 stateManager: new SlideStateManager(slideId)
             });
         },
@@ -82,6 +83,38 @@ function createStore(): AppStore {
             const newActiveSlide = getSlide(state, state.activeSlideId);
             if (newActiveSlide !== undefined) {
                 newActiveSlide.isActive = true;
+            }
+        },
+        focusGraphic: (slideId, graphicId) => {
+            const slide = getSlide(state, slideId);
+            if (slide !== undefined && !slide.focusedGraphics[graphicId] && slide.graphics[graphicId]) {
+                slide.focusedGraphics[graphicId] = slide.graphics[graphicId];
+            }
+        },
+        focusGraphicBulk: (slideId, graphicIds) => {
+            const slide = getSlide(state, slideId);
+            if (slide !== undefined) {
+                graphicIds.forEach(graphicId => {
+                    if (!slide.focusedGraphics[graphicId] && slide.graphics[graphicId]) {
+                        slide.focusedGraphics[graphicId] = slide.graphics[graphicId];
+                    }
+                });
+            }
+        },
+        unfocusGraphic: (slideId, graphicId) => {
+            const slide = getSlide(state, slideId);
+            if (slide !== undefined && slide.focusedGraphics[graphicId]) {
+                delete slide.focusedGraphics[graphicId];
+            }
+        },
+        unfocusGraphicBulk: (slideId, graphicIds) => {
+            const slide = getSlide(state, slideId);
+            if (slide !== undefined) {
+                graphicIds.forEach(graphicId => {
+                    if (slide.focusedGraphics[graphicId]) {
+                        delete slide.focusedGraphics[graphicId];
+                    }
+                });
             }
         },
         setActiveTool: tool => {
