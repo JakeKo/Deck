@@ -22,19 +22,19 @@ export default class SlideStateManager {
 
     public setGraphicFromRenderer(graphic: IGraphicRenderer): void {
         const storeModel = graphicRendererToGraphicStoreModel(graphic);
-        this._store && this._store.setGraphic(this._slideId, storeModel);
+        this._store && this._store.mutations.setGraphic(this._slideId, storeModel);
     }
 
     public removeGraphicFromRenderer(graphicId: string): void {
-        this._store && this._store.removeGraphic(this._slideId, graphicId);
+        this._store && this._store.mutations.removeGraphic(this._slideId, graphicId);
     }
 
     public focusGraphicFromRenderer(graphicId: string): void {
-        this._store && this._store.focusGraphic(this._slideId, graphicId);
+        this._store && this._store.mutations.focusGraphic(this._slideId, graphicId);
     }
 
     public unfocusGraphicFromRenderer(graphicId: string): void {
-        this._store && this._store.unfocusGraphic(this._slideId, graphicId);
+        this._store && this._store.mutations.unfocusGraphic(this._slideId, graphicId);
     }
 
     public setGraphicFromStore(graphic: GraphicStoreModel): void {

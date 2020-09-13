@@ -16,7 +16,7 @@ const Tool = defineComponent({
     },
     setup: props => {
         const { root, store, baseStyle, baseTheme, isHovered } = DeckComponent();
-        const isActive = computed(() => store.activeToolName.value === props.name);
+        const isActive = computed(() => store.state.activeTool.name === props.name);
         const style = reactive({
             tool: computed(() => ({
                 ...baseStyle.value.flexColCC,

@@ -1,10 +1,12 @@
 <template>
     <div ref='root' :style='style.graphicEditor'>
-        <RectangleEditorForm />
+        <RectangleEditorForm v-if='rectangle !== undefined' :rectangle='rectangle' />
     </div>
 </template>
 
 <script lang='ts'>
+import { GRAPHIC_TYPES } from '@/rendering/types';
+import { RectangleStoreModel } from '@/store/types';
 import { computed, defineComponent, reactive } from 'vue';
 import DeckComponent from './generic/DeckComponent';
 import RectangleEditorForm from './graphicEditorForms/RectangleEditorForm.vue';
@@ -14,7 +16,7 @@ const GraphicEditor = defineComponent({
         RectangleEditorForm
     },
     setup: () => {
-        const { root, store, baseTheme } = DeckComponent();
+        const { root, store } = DeckComponent();
         const style = reactive({
             graphicEditor: computed(() => ({
                 height: '100%',
@@ -23,9 +25,20 @@ const GraphicEditor = defineComponent({
             }))
         });
 
+        const rectangle = computed(() => {
+            const focusedGraphics = store.state.activeSlide === undefined ? {} : store.state.activeSlide.focusedGraphics;
+            const keys = Object.keys(focusedGraphics);
+            if (keys.length === 1 && focusedGraphics[keys[0]].type === GRAPHIC_TYPES.RECTANGLE) {
+                return focusedGraphics[keys[0]] as RectangleStoreModel;
+            }
+
+            return undefined;
+        });
+
         return {
             root,
-            style
+            style,
+            rectangle
         };
     }
 });

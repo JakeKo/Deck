@@ -39,10 +39,11 @@ const Editor = defineComponent({
 
             const editorWidth = root.value.offsetWidth;
             const editorHeight = root.value.offsetHeight;
-            const slideWidth = store.croppedViewbox.value.width + 100;
-            const slideHeight = store.croppedViewbox.value.height + 100;
+            const slideWidth = store.state.editorViewbox.cropped.width + 100;
+            const slideHeight = store.state.editorViewbox.cropped.height + 100;
             return Math.min(editorWidth / slideWidth, editorHeight / slideHeight);
         });
+        const slides = computed(() => store.state.slides);
 
         // Set the zoom level, then center the view on the slide
         // Note: Editor zoom must be set manually to avoid scrolling before zooming
@@ -51,7 +52,7 @@ const Editor = defineComponent({
                 throw new Error('Root ref not specified.');
             }
 
-            store.setEditorZoom(defaultZoom.value);
+            store.mutations.setEditorZoom(defaultZoom.value);
             root.value.style.zoom = defaultZoom.value.toString();
             root.value.scrollTop = (root.value.scrollHeight - root.value.clientHeight) / 2;
             root.value.scrollLeft = (root.value.scrollWidth - root.value.clientWidth) / 2;
@@ -67,8 +68,8 @@ const Editor = defineComponent({
 
                 event.preventDefault();
                 const deltaZoom = event.deltaY < 0 ? 1.1 : 0.9;
-                const newZoom = store.editorZoomLevel.value * deltaZoom;
-                store.setEditorZoom(newZoom);
+                const newZoom = store.state.editorViewbox.zoom * deltaZoom;
+                store.mutations.setEditorZoom(newZoom);
                 root.value.style.zoom = newZoom.toString();
 
                 dispatch(new CustomEvent<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { detail: { zoom: newZoom } }));
@@ -85,7 +86,7 @@ const Editor = defineComponent({
 
         onMounted(reorientSlide);
         watchEffect(() => {
-            if (store.activeSlide.value !== undefined) {
+            if (store.state.activeSlide !== undefined) {
                 reorientSlide();
             }
         });
@@ -94,7 +95,7 @@ const Editor = defineComponent({
             root,
             style,
             handleMouseWheel,
-            slides: store.slides
+            slides
         };
     }
 });

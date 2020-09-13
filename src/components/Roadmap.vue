@@ -53,16 +53,17 @@ const Roadmap = defineComponent({
                 background: baseTheme.value.color.primary.flush
             }))
         });
-        const roadmapSlides = computed(() => store.roadmapSlides.value);
+        const roadmapSlides = computed(() => store.state.slides.map(s => ({ id: s.id, isActive: s.isActive })));
 
         function createNewSlide(): void {
-            store.addSlide(store.slides.value.length);
+            store.mutations.addSlide(store.state.slides.length);
 
-            if (store.lastSlide.value === undefined) {
+            const lastSlide = store.state.slides[store.state.slides.length - 1];
+            if (lastSlide === undefined) {
                 throw new Error('Failed to create new slide');
             }
 
-            store.setActiveSlide(store.lastSlide.value.id);
+            store.mutations.setActiveSlide(lastSlide.id);
         }
 
         onMounted(() => {
@@ -71,10 +72,10 @@ const Roadmap = defineComponent({
             }
 
             root.value.addEventListener('keydown', (event: KeyboardEvent): void => {
-                if (['Backspace', 'Delete'].indexOf(event.key) !== -1 && store.activeSlide.value !== undefined) {
-                    const activeSlide = store.activeSlide.value;
+                if (['Backspace', 'Delete'].indexOf(event.key) !== -1 && store.state.activeSlide !== undefined) {
+                    const activeSlide = store.state.activeSlide;
                     if (activeSlide !== undefined) {
-                        store.removeSlide(roadmapSlides.value.findIndex(slide => slide.id === activeSlide.id));
+                        store.mutations.removeSlide(roadmapSlides.value.findIndex(slide => slide.id === activeSlide.id));
                     }
                 }
             });

@@ -25,7 +25,7 @@ export default (store: AppStore): EditorTool => {
             maker.complete();
             unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
 
-            store.setActiveTool(PointerTool());
+            store.mutations.setActiveTool(PointerTool());
         }
     }
 

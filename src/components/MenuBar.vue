@@ -48,7 +48,7 @@ const MenuBar = defineComponent({
         });
 
         async function exportSlideDeck(): Promise<void> {
-            const json = JSON.stringify(store.slides.value.map(s => ({
+            const json = JSON.stringify(store.state.slides.map(s => ({
                 id: s.id,
                 graphics: s.graphics
             })));
@@ -56,7 +56,7 @@ const MenuBar = defineComponent({
             const encodedJson = `data:text/json;charset=utf-8,${encodeURIComponent(json)}`;
             const anchor = document.createElement('a');
             anchor.setAttribute('href', encodedJson);
-            anchor.setAttribute('download', `${store.deckTitle.value ?? 'Untitled'}.json`);
+            anchor.setAttribute('download', `${store.state.deckTitle ?? 'Untitled'}.json`);
             anchor.click();
             anchor.remove();
         }
@@ -70,10 +70,10 @@ const MenuBar = defineComponent({
             input.addEventListener('input', (): void => reader.readAsText(input.files ? input.files[0] : new Blob()));
             reader.addEventListener('loadend', (): void => {
                 const slides = jsonToSlides(reader.result as string);
-                store.removeAllSlides();
+                store.mutations.removeAllSlides();
                 setTimeout(() => {
                     slides.forEach((slide, index) => {
-                        store.addSlide(index, {
+                        store.mutations.addSlide(index, {
                             id: slide.id,
                             isActive: false,
                             graphics: slide.graphics,
@@ -83,7 +83,7 @@ const MenuBar = defineComponent({
                     });
 
                     if (slides.length > 0) {
-                        store.setActiveSlide(slides[0].id);
+                        store.mutations.setActiveSlide(slides[0].id);
                     }
                 }, 250);
             });

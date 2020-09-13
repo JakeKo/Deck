@@ -1,5 +1,5 @@
 <template>
-<div ref='root' :id='`slide_${slide.id}`' :style='style.slide'></div>
+<div ref='root' name='slide' :id='`slide_${slide.id}`' :style='style.slide'></div>
 </template>
 
 <script lang='ts'>
@@ -18,8 +18,8 @@ const Slide = defineComponent({
         const { root, store, baseStyle } = DeckComponent();
         const style = reactive({
             slide: computed(() => ({
-                minWidth: `${store.rawViewbox.value.width}px`,
-                minHeight: `${store.rawViewbox.value.height}px`,
+                minWidth: `${store.state.editorViewbox.raw.width}px`,
+                minHeight: `${store.state.editorViewbox.raw.height}px`,
                 ...baseStyle.value.flexRowCC,
                 display: props.slide.isActive ? 'flex' : 'none',
                 height: '100%',
@@ -34,15 +34,15 @@ const Slide = defineComponent({
                 throw new Error('Root ref not specified.');
             }
 
-            const viewbox = store.rawViewbox.value;
+            const viewbox = store.state.editorViewbox.raw;
             const canvas = SVG(root.value.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
 
             const renderer = new SlideRenderer({
                 stateManager: props.slide.stateManager,
                 canvas,
                 rawViewbox: viewbox,
-                croppedViewbox: store.croppedViewbox.value,
-                zoom: store.editorZoomLevel.value
+                croppedViewbox: store.state.editorViewbox.cropped,
+                zoom: store.state.editorViewbox.zoom
             });
 
             Object.values(props.slide.graphics)

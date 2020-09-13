@@ -1,7 +1,7 @@
 <template>
     <div ref='root' :style='style.rectangleEditorForm'>
         <label for='x'>X</label>
-        <input name='x' type='number' /><br />
+        <input name='x' type='number' v-model='x' /><br />
         <label for='y'>Y</label>
         <input name='y' type='number' /><br />
         <label for='width'>Width</label>
@@ -20,12 +20,17 @@
 </template>
 
 <script lang='ts'>
-import { computed, defineComponent, reactive } from 'vue';
+import { RectangleStoreModel } from '@/store/types';
+import Vector from '@/utilities/Vector';
+import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 
 const RectangleEditorForm = defineComponent({
-    setup: () => {
-        const { root, store, baseTheme } = DeckComponent();
+    props: {
+        target: { type: Object as PropType<RectangleStoreModel>, required: true }
+    },
+    setup: props => {
+        const { root, store } = DeckComponent();
         const style = reactive({
             rectangleEditorForm: computed(() => ({
                 height: '100%',
@@ -33,9 +38,24 @@ const RectangleEditorForm = defineComponent({
             }))
         });
 
+        const x = computed({
+            get: () => props.target.origin.x,
+            set: value => {
+                const activeSlide = store.state.activeSlide;
+                if (activeSlide === undefined) {
+                    throw new Error('Slide is undefined when setting property of graphic');
+                }
+
+                const graphic: RectangleStoreModel = { ...props.target, origin: new Vector(value, props.target.origin.y) };
+                store.mutations.setGraphic(activeSlide.id, graphic);
+                store.mutations.broadcastSetGraphic(activeSlide.id, graphic);
+            }
+        });
+
         return {
             root,
-            style
+            style,
+            x
         };
     }
 });

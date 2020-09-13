@@ -1,12 +1,12 @@
 import { GRAPHIC_TYPES } from '@/rendering/types';
-import { BaseStyles, Theme } from '@/styling/types';
-import { EditorTool, TOOL_NAMES } from '@/tools/types';
+import { Theme } from '@/styling/types';
+import { EditorTool } from '@/tools/types';
 import SlideStateManager from '@/utilities/SlideStateManager';
 import Vector from '@/utilities/Vector';
 import { ComputedRef } from 'vue';
 
 export type AppState = {
-    activeSlideId: string;
+    activeSlide: Slide | undefined;
     slides: Slide[];
     activeTool: EditorTool;
     deckTitle: string | undefined;
@@ -18,19 +18,9 @@ export type AppState = {
     };
 };
 
-export type AppStore = ComputedType<AppGetters> & AppMutations;
-
-export type AppGetters = {
-    slides: Slide[];
-    roadmapSlides: RoadmapSlide[];
-    lastSlide: Slide | undefined;
-    activeSlide: Slide | undefined;
-    activeToolName: TOOL_NAMES;
-    rawViewbox: Viewbox;
-    croppedViewbox: Viewbox;
-    editorZoomLevel: number;
-    deckTitle: string | undefined;
-    style: { theme: Theme; baseStyle: BaseStyles };
+export type AppStore = {
+    state: AppState;
+    mutations: AppMutations;
 };
 
 export type AppMutations = {

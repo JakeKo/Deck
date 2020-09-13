@@ -38,7 +38,7 @@ const RoadmapSlot = defineComponent({
             }))
         });
         const previewViewbox = computed(() => {
-            const viewbox = store.croppedViewbox.value;
+            const viewbox = store.state.editorViewbox.cropped;
             return `${viewbox.x} ${viewbox.y} ${viewbox.width} ${viewbox.height}`;
         });
         const canvas = ref<SVGElement | undefined>(undefined);
@@ -63,7 +63,7 @@ const RoadmapSlot = defineComponent({
             canvas,
             style,
             previewViewbox,
-            setActiveSlide: store.setActiveSlide
+            setActiveSlide: store.mutations.setActiveSlide
         };
     }
 });

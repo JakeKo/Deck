@@ -1,17 +1,15 @@
-import { getBaseStyles, themes } from '@/styling';
+import { themes } from '@/styling';
 import { THEMES } from '@/styling/types';
 import NullTool from '@/tools/NullTool';
 import { provideId } from '@/utilities/IdProvider';
 import SlideStateManager from '@/utilities/SlideStateManager';
-import { computed, inject, provide, reactive } from 'vue';
-import { AppGetters, AppMutations, AppState, AppStore, ComputedType, RoadmapSlide } from './types';
+import { inject, provide, reactive } from 'vue';
+import { AppMutations, AppState, AppStore } from './types';
 import { getSlide } from './utilities';
-
-const storeSymbol = Symbol('store');
 
 function createStore(): AppStore {
     const state = reactive<AppState>({
-        activeSlideId: '',
+        activeSlide: undefined,
         slides: [],
         activeTool: NullTool,
         deckTitle: undefined,
@@ -33,56 +31,41 @@ function createStore(): AppStore {
         }
     }) as AppState;
 
-    const getters: ComputedType<AppGetters> = {
-        slides: computed(() => state.slides),
-        roadmapSlides: computed(() => state.slides.map<RoadmapSlide>(s => s)),
-        lastSlide: computed(() => state.slides[state.slides.length - 1]),
-        activeSlide: computed(() => getSlide(state, state.activeSlideId)),
-        activeToolName: computed(() => state.activeTool.name),
-        rawViewbox: computed(() => state.editorViewbox.raw),
-        croppedViewbox: computed(() => state.editorViewbox.cropped),
-        editorZoomLevel: computed(() => state.editorViewbox.zoom),
-        deckTitle: computed(() => state.deckTitle),
-        style: computed(() => ({
-            theme: state.theme,
-            baseStyle: getBaseStyles(state.theme)
-        }))
-    };
-
     const mutations: AppMutations = {
         addSlide: (index, slide) => {
             const slideId = provideId();
-            state.slides.splice(index, 0, slide ?? {
-                id: slideId,
-                isActive: false,
-                graphics: {},
-                focusedGraphics: {},
-                stateManager: new SlideStateManager(slideId)
-            });
+            state.slides = [
+                ...state.slides.slice(0, index),
+                slide ?? {
+                    id: slideId,
+                    isActive: false,
+                    graphics: {},
+                    focusedGraphics: {},
+                    stateManager: new SlideStateManager(slideId)
+                },
+                ...state.slides.slice(index)
+            ];
         },
         removeSlide: index => {
             state.slides.splice(index, 1);
         },
         removeAllSlides: () => {
-            const activeSlide = getSlide(state, state.activeSlideId);
-            if (activeSlide !== undefined) {
-                activeSlide.isActive = false;
-                state.activeSlideId = '';
+            if (state.activeSlide !== undefined) {
+                state.activeSlide.isActive = false;
+                state.activeSlide = undefined;
             }
 
-            state.slides.splice(0, state.slides.length);
+            state.slides = [];
         },
         setActiveSlide: slideId => {
-            const oldActiveSlide = getSlide(state, state.activeSlideId);
-            if (oldActiveSlide !== undefined) {
-                oldActiveSlide.isActive = false;
+            if (state.activeSlide !== undefined) {
+                state.activeSlide.isActive = false;
             }
 
-            state.activeSlideId = slideId;
+            state.activeSlide = getSlide(state, slideId);
 
-            const newActiveSlide = getSlide(state, state.activeSlideId);
-            if (newActiveSlide !== undefined) {
-                newActiveSlide.isActive = true;
+            if (state.activeSlide !== undefined) {
+                state.activeSlide.isActive = true;
             }
         },
         focusGraphic: (slideId, graphicId) => {
@@ -158,10 +141,12 @@ function createStore(): AppStore {
     };
 
     return {
-        ...getters,
-        ...mutations
+        state,
+        mutations
     };
 }
+
+const storeSymbol = Symbol('store');
 
 function provideStore(): void {
     provide(storeSymbol, createStore());
