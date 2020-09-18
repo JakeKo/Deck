@@ -73,6 +73,7 @@ class RectangleMutator implements IRectangleMutator {
 
                 // Update rendering
                 this.target.setOriginAndDimensions(origin, dimensions);
+                slide.broadcastSetGraphic(this.target);
                 this._repositionBoxHelpers();
             };
         };
@@ -97,6 +98,7 @@ class RectangleMutator implements IRectangleMutator {
             const theta = Math.atan2(offset.y, offset.x);
 
             this.target.rotation = mod(theta, Math.PI * 2);
+            slide.broadcastSetGraphic(this.target);
             rotateBoxHelpers(this._helpers, this.target.box);
         };
     }

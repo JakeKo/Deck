@@ -113,8 +113,13 @@ function createStore(): AppStore {
         },
         setGraphic: (slideId, graphic) => {
             const slide = getSlide(state, slideId);
-            if (slide !== undefined) {
-                slide.graphics[graphic.id] = graphic;
+            if (slide === undefined) {
+                return;
+            }
+
+            slide.graphics[graphic.id] = graphic;
+            if (slide.focusedGraphics[graphic.id]) {
+                slide.focusedGraphics[graphic.id] = graphic;
             }
         },
         removeGraphic: (slideId, graphicId) => {
