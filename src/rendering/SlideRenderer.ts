@@ -241,11 +241,13 @@ class SlideRenderer implements ISlideRenderer {
         }
 
         this._focusedGraphics[graphicId] = mutator;
+        this._stateManager.focusGraphicFromRenderer(graphicId);
         return mutator;
     }
 
     public unfocusGraphic(graphicId: string): void {
         this.isFocused(graphicId) && this._focusedGraphics[graphicId].complete();
+        this._stateManager.unfocusGraphicFromRenderer(graphicId);
         delete this._focusedGraphics[graphicId];
     }
 
