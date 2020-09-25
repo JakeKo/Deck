@@ -1,6 +1,6 @@
 <template>
     <div ref='root' :style='style.graphicEditor'>
-        <RectangleEditorForm v-if='rectangle !== undefined' :target='rectangle' />
+        <RectangleEditorForm v-if='rectangle !== undefined' />
     </div>
 </template>
 

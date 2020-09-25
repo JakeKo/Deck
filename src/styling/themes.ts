@@ -27,15 +27,30 @@ const lightTheme: Theme = {
         }
     },
     text: {
+        title: {
+            size: '2rem',
+            weight: '400',
+            font: 'Roboto Slab'
+        },
+        header: {
+            size: '1.25rem',
+            weight: '400',
+            font: 'Roboto Slab'
+        },
         body: {
             size: '1rem',
             weight: '400',
-            font: 'sans-serif'
+            font: 'Open Sans'
         },
         label: {
             size: '0.75rem',
-            weight: '400',
-            font: 'sans-serif'
+            weight: '700',
+            font: 'Open Sans'
+        },
+        input: {
+            size: '0.875rem',
+            weight: '700',
+            font: 'Open Sans'
         }
     }
 };

@@ -1,17 +1,11 @@
 <template>
     <div ref='root' :style='style.rectangleEditorForm'>
-        <label for='x'>X</label>
-        <input name='x' type='number' v-model='x'/><br />
-        <label for='y'>Y</label>
-        <input name='y' type='number' v-model='y' /><br />
-        <label for='width'>Width</label>
-        <input name='width' type='number' v-model='width' /><br />
-        <label for='height'>Height</label>
-        <input name='height' type='number' v-model='height' /><br />
-        <label for='rotation'>Rotation</label>
-        <input name='rotation' type='number' v-model='rotation' /><br />
-        <label for='stroke-width'>Stroke Width</label>
-        <input name='stroke-width' type='number' v-model='strokeWidth' /><br />
+        <NumberField :name='"x"' :displayName='"X"' :value='x' />
+        <NumberField :name='"y"' :displayName='"Y"' :value='y' />
+        <NumberField :name='"w"' :displayName='"W"' :value='width' />
+        <NumberField :name='"h"' :displayName='"H"' :value='height' />
+        <NumberField :name='"r"' :displayName='"R"' :value='rotation' />
+        <NumberField :name='"s"' :displayName='"S"' :value='strokeWidth' />
         <label for='fill-color'>Fill Color</label>
         <input name='fill-color' type='text' v-model='fillColor' /><br />
         <label for='stroke-color'>Stroke Color</label>
@@ -24,8 +18,12 @@ import { RectangleStoreModel } from '@/store/types';
 import Vector from '@/utilities/Vector';
 import { computed, defineComponent, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
+import NumberField from '../generic/NumberField.vue';
 
 const RectangleEditorForm = defineComponent({
+    components: {
+        NumberField
+    },
     setup: () => {
         const { root, store } = DeckComponent();
         const style = reactive({

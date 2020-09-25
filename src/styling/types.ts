@@ -10,6 +10,7 @@ type Typeface = {
     size: string;
     weight: string;
     font: string;
+    textTransform?: string;
 };
 
 export type Theme = {
@@ -20,8 +21,11 @@ export type Theme = {
         primary: Palette;
     };
     text: {
+        title: Typeface;
+        header: Typeface;
         body: Typeface;
         label: Typeface;
+        input: Typeface;
     };
 };
 
@@ -146,12 +150,27 @@ export type BaseStyles = {
         width: '100vw';
         height: '100vh';
     };
+    fontTitle: {
+        fontFamily: string;
+        fontWeight: string;
+        fontSize: string;
+    };
+    fontHeader: {
+        fontFamily: string;
+        fontWeight: string;
+        fontSize: string;
+    };
     fontBody: {
         fontFamily: string;
         fontWeight: string;
         fontSize: string;
     };
     fontLabel: {
+        fontFamily: string;
+        fontWeight: string;
+        fontSize: string;
+    };
+    fontInput: {
         fontFamily: string;
         fontWeight: string;
         fontSize: string;

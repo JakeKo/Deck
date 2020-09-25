@@ -122,6 +122,16 @@ const getBaseStyles = (theme: Theme): BaseStyles => ({
         width: '100vw',
         height: '100vh'
     },
+    fontTitle: {
+        fontFamily: theme.text.title.font,
+        fontWeight: theme.text.title.weight,
+        fontSize: theme.text.title.size
+    },
+    fontHeader: {
+        fontFamily: theme.text.header.font,
+        fontWeight: theme.text.header.weight,
+        fontSize: theme.text.header.size
+    },
     fontBody: {
         fontFamily: theme.text.body.font,
         fontWeight: theme.text.body.weight,
@@ -131,6 +141,11 @@ const getBaseStyles = (theme: Theme): BaseStyles => ({
         fontFamily: theme.text.label.font,
         fontWeight: theme.text.label.weight,
         fontSize: theme.text.label.size
+    },
+    fontInput: {
+        fontFamily: theme.text.input.font,
+        fontWeight: theme.text.input.weight,
+        fontSize: theme.text.input.size
     }
 });
 
