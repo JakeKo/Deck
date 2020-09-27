@@ -1,7 +1,7 @@
 <template>
     <div ref='container' :style='style.container'>
-        <label :for='name' :style='style.label'>{{displayName}}</label>
-        <input :name='name' type='number' :value='value' @input='$emit("input", $event)' :style='style.field' ref='field' />
+        <label :for='name' :style='style.label'>{{label}}</label>
+        <input :name='name' type='number' v-model='inputValue' :style='style.field' ref='field' />
     </div>
 </template>
 
@@ -12,10 +12,10 @@ import { useFocus, useHover, useStyle } from './core';
 const NumberField = defineComponent({
     props: {
         name: { type: String, required: true },
-        displayName: { type: String, required: true },
+        label: { type: String, required: true },
         value: { type: Number, required: true }
     },
-    setup: props => {
+    setup: (props, { emit }) => {
         const { target: container, isHovered } = useHover();
         const { target: field, isFocused } = useFocus();
         const { baseTheme, baseStyle } = useStyle();
@@ -56,11 +56,19 @@ const NumberField = defineComponent({
             }))
         });
 
+        const inputValue = computed({
+            get: () => props.value,
+            set: value => {
+                emit('deck-input', value);
+                return value;
+            }
+        });
+
         return {
             container,
             field,
             style,
-            ...props
+            inputValue
         };
     }
 });

@@ -1,11 +1,11 @@
 <template>
     <div ref='root' :style='style.rectangleEditorForm'>
-        <NumberField :name='"x"' :displayName='"X"' :value='x' />
-        <NumberField :name='"y"' :displayName='"Y"' :value='y' />
-        <NumberField :name='"w"' :displayName='"W"' :value='width' />
-        <NumberField :name='"h"' :displayName='"H"' :value='height' />
-        <NumberField :name='"r"' :displayName='"R"' :value='rotation' />
-        <NumberField :name='"s"' :displayName='"S"' :value='strokeWidth' />
+        <NumberField :name='"x"' :label='"X"' :value='x' @deck-input='value => x = value' />
+        <NumberField :name='"y"' :label='"Y"' :value='y' @deck-input='value => y = value' />
+        <NumberField :name='"w"' :label='"W"' :value='width' @deck-input='value => width = value' />
+        <NumberField :name='"h"' :label='"H"' :value='height' @deck-input='value => height = value' />
+        <NumberField :name='"r"' :label='"R"' :value='rotation' @deck-input='value => rotation = value' />
+        <NumberField :name='"s"' :label='"S"' :value='strokeWidth' @deck-input='value => strokeWidth = value' />
         <label for='fill-color'>Fill Color</label>
         <input name='fill-color' type='text' v-model='fillColor' /><br />
         <label for='stroke-color'>Stroke Color</label>
