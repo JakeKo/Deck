@@ -16,7 +16,7 @@
 <script lang='ts'>
 import { RectangleStoreModel } from '@/store/types';
 import Vector from '@/utilities/Vector';
-import { computed, defineComponent, reactive } from 'vue';
+import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
 
@@ -24,7 +24,11 @@ const RectangleEditorForm = defineComponent({
     components: {
         NumberField
     },
-    setup: () => {
+    props: {
+        rectangle: { type: Object as PropType<RectangleStoreModel>, required: true },
+        slideId: { type: String, required: true }
+    },
+    setup: props => {
         const { root, store } = DeckComponent();
         const style = reactive({
             rectangleEditorForm: computed(() => ({
@@ -33,81 +37,68 @@ const RectangleEditorForm = defineComponent({
             }))
         });
 
-        const activeSlide = computed(() => {
-            const activeSlide = store.state.activeSlide;
-            if (activeSlide === undefined) {
-                throw new Error('Some serious shenanigans are afoot');
-            }
-
-            return activeSlide;
-        });
-        const rectangle = computed(() => {
-            const [key] = Object.keys(activeSlide.value.focusedGraphics);
-            return activeSlide.value.focusedGraphics[key] as RectangleStoreModel;
-        });
-
         const x = computed({
-            get: () => rectangle.value.origin.x,
+            get: () => props.rectangle.origin.x,
             set: value => {
-                const graphic: RectangleStoreModel = { ...rectangle.value, origin: new Vector(value, rectangle.value.origin.y) };
-                store.mutations.setGraphic(activeSlide.value.id, graphic);
-                store.mutations.broadcastSetGraphic(activeSlide.value.id, graphic);
+                const graphic: RectangleStoreModel = { ...props.rectangle, origin: new Vector(value, props.rectangle.origin.y) };
+                store.mutations.setGraphic(props.slideId, graphic);
+                store.mutations.broadcastSetX(props.slideId, graphic.id, value);
             }
         });
         const y = computed({
-            get: () => rectangle.value.origin.y,
+            get: () => props.rectangle.origin.y,
             set: value => {
-                const graphic: RectangleStoreModel = { ...rectangle.value, origin: new Vector(rectangle.value.origin.x, value) };
-                store.mutations.setGraphic(activeSlide.value.id, graphic);
-                store.mutations.broadcastSetGraphic(activeSlide.value.id, graphic);
+                const graphic: RectangleStoreModel = { ...props.rectangle, origin: new Vector(props.rectangle.origin.x, value) };
+                store.mutations.setGraphic(props.slideId, graphic);
+                store.mutations.broadcastSetY(props.slideId, graphic.id, value);
             }
         });
         const width = computed({
-            get: () => rectangle.value.width,
+            get: () => props.rectangle.width,
             set: value => {
-                const graphic: RectangleStoreModel = { ...rectangle.value, width: value };
-                store.mutations.setGraphic(activeSlide.value.id, graphic);
-                store.mutations.broadcastSetGraphic(activeSlide.value.id, graphic);
+                const graphic: RectangleStoreModel = { ...props.rectangle, width: value };
+                store.mutations.setGraphic(props.slideId, graphic);
+                store.mutations.broadcastSetWidth(props.slideId, graphic.id, value);
             }
         });
         const height = computed({
-            get: () => rectangle.value.height,
+            get: () => props.rectangle.height,
             set: value => {
-                const graphic: RectangleStoreModel = { ...rectangle.value, height: value };
-                store.mutations.setGraphic(activeSlide.value.id, graphic);
-                store.mutations.broadcastSetGraphic(activeSlide.value.id, graphic);
+                const graphic: RectangleStoreModel = { ...props.rectangle, height: value };
+                store.mutations.setGraphic(props.slideId, graphic);
+                store.mutations.broadcastSetHeight(props.slideId, graphic.id, value);
             }
         });
         const rotation = computed({
-            get: () => rectangle.value.rotation,
+            get: () => props.rectangle.rotation,
             set: value => {
-                const graphic: RectangleStoreModel = { ...rectangle.value, rotation: value };
-                store.mutations.setGraphic(activeSlide.value.id, graphic);
-                store.mutations.broadcastSetGraphic(activeSlide.value.id, graphic);
+                const graphic: RectangleStoreModel = { ...props.rectangle, rotation: value };
+                store.mutations.setGraphic(props.slideId, graphic);
+                store.mutations.broadcastSetRotation(props.slideId, graphic.id, value);
             }
         });
         const strokeWidth = computed({
-            get: () => rectangle.value.strokeWidth,
+            get: () => props.rectangle.strokeWidth,
             set: value => {
-                const graphic: RectangleStoreModel = { ...rectangle.value, strokeWidth: value };
-                store.mutations.setGraphic(activeSlide.value.id, graphic);
-                store.mutations.broadcastSetGraphic(activeSlide.value.id, graphic);
+                const graphic: RectangleStoreModel = { ...props.rectangle, strokeWidth: value };
+                store.mutations.setGraphic(props.slideId, graphic);
+                store.mutations.broadcastSetStrokeWidth(props.slideId, graphic.id, value);
             }
         });
         const fillColor = computed({
-            get: () => rectangle.value.fillColor,
+            get: () => props.rectangle.fillColor,
             set: value => {
-                const graphic: RectangleStoreModel = { ...rectangle.value, fillColor: value };
-                store.mutations.setGraphic(activeSlide.value.id, graphic);
-                store.mutations.broadcastSetGraphic(activeSlide.value.id, graphic);
+                const graphic: RectangleStoreModel = { ...props.rectangle, fillColor: value };
+                store.mutations.setGraphic(props.slideId, graphic);
+                store.mutations.broadcastSetFillColor(props.slideId, graphic.id, value);
             }
         });
         const strokeColor = computed({
-            get: () => rectangle.value.strokeColor,
+            get: () => props.rectangle.strokeColor,
             set: value => {
-                const graphic: RectangleStoreModel = { ...rectangle.value, strokeColor: value };
-                store.mutations.setGraphic(activeSlide.value.id, graphic);
-                store.mutations.broadcastSetGraphic(activeSlide.value.id, graphic);
+                const graphic: RectangleStoreModel = { ...props.rectangle, strokeColor: value };
+                store.mutations.setGraphic(props.slideId, graphic);
+                store.mutations.broadcastSetStrokeColor(props.slideId, graphic.id, value);
             }
         });
 

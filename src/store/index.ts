@@ -134,6 +134,38 @@ function createStore(): AppStore {
                 slide.stateManager.setGraphicFromStore(graphic);
             }
         },
+        broadcastSetX: (slideId, graphicId, x) => {
+            const slide = getSlide(state, slideId);
+            slide && slide.stateManager.setXFromStore(graphicId, x);
+        },
+        broadcastSetY: (slideId, graphicId, y) => {
+            const slide = getSlide(state, slideId);
+            slide && slide.stateManager.setYFromStore(graphicId, y);
+        },
+        broadcastSetFillColor: (slideId, graphicId, fillColor) => {
+            const slide = getSlide(state, slideId);
+            slide && slide.stateManager.setFillColorFromStore(graphicId, fillColor);
+        },
+        broadcastSetStrokeColor: (slideId, graphicId, strokeColor) => {
+            const slide = getSlide(state, slideId);
+            slide && slide.stateManager.setStrokeColorFromStore(graphicId, strokeColor);
+        },
+        broadcastSetStrokeWidth: (slideId, graphicId, strokeWidth) => {
+            const slide = getSlide(state, slideId);
+            slide && slide.stateManager.setStrokeWidthFromStore(graphicId, strokeWidth);
+        },
+        broadcastSetWidth: (slideId, graphicId, width) => {
+            const slide = getSlide(state, slideId);
+            slide && slide.stateManager.setWidthFromStore(graphicId, width);
+        },
+        broadcastSetHeight: (slideId, graphicId, height) => {
+            const slide = getSlide(state, slideId);
+            slide && slide.stateManager.setHeightFromStore(graphicId, height);
+        },
+        broadcastSetRotation: (slideId, graphicId, rotation) => {
+            const slide = getSlide(state, slideId);
+            slide && slide.stateManager.setRotationFromStore(graphicId, rotation);
+        },
         broadcastRemoveGraphic: (slideId, graphicId) => {
             const slide = getSlide(state, slideId);
             if (slide !== undefined) {

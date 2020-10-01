@@ -46,6 +46,38 @@ export default class SlideStateManager {
         this._renderer && this._renderer.setGraphic(renderer);
     }
 
+    public setXFromStore(graphicId: string, x: number): void {
+        this._renderer && this._renderer.setX(graphicId, x);
+    }
+
+    public setYFromStore(graphicId: string, y: number): void {
+        this._renderer && this._renderer.setY(graphicId, y);
+    }
+
+    public setFillColorFromStore(graphicId: string, fillColor: string): void {
+        this._renderer && this._renderer.setFillColor(graphicId, fillColor);
+    }
+
+    public setStrokeColorFromStore(graphicId: string, strokeColor: string): void {
+        this._renderer && this._renderer.setStrokeColor(graphicId, strokeColor);
+    }
+
+    public setStrokeWidthFromStore(graphicId: string, strokeWidth: number): void {
+        this._renderer && this._renderer.setStrokeWidth(graphicId, strokeWidth);
+    }
+
+    public setWidthFromStore(graphicId: string, width: number): void {
+        this._renderer && this._renderer.setWidth(graphicId, width);
+    }
+
+    public setHeightFromStore(graphicId: string, height: number): void {
+        this._renderer && this._renderer.setHeight(graphicId, height);
+    }
+
+    public setRotationFromStore(graphicId: string, rotation: number): void {
+        this._renderer && this._renderer.setRotation(graphicId, rotation);
+    }
+
     public removeGraphicFromStore(graphicId: string): void {
         this._renderer && this._renderer.removeGraphic(graphicId);
     }

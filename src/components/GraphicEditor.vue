@@ -1,6 +1,6 @@
 <template>
     <div ref='root' :style='style.graphicEditor'>
-        <RectangleEditorForm v-if='rectangle !== undefined' />
+        <RectangleEditorForm v-if='rectangle !== undefined' :rectangle='rectangle' :slideId='slideId' />
     </div>
 </template>
 
@@ -24,8 +24,10 @@ const GraphicEditor = defineComponent({
             }))
         });
 
+        const activeSlide = computed(() => store.state.activeSlide);
+        const slideId = computed(() => activeSlide.value?.id || '');
         const rectangle = computed(() => {
-            const focusedGraphics = store.state.activeSlide?.focusedGraphics;
+            const focusedGraphics = activeSlide.value?.focusedGraphics;
             if (focusedGraphics === undefined) {
                 return;
             }
@@ -44,7 +46,8 @@ const GraphicEditor = defineComponent({
         return {
             root,
             style,
-            rectangle
+            rectangle,
+            slideId
         };
     }
 });

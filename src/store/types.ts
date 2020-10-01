@@ -38,6 +38,14 @@ export type AppMutations = {
     setGraphic: (slideId: string, graphic: GraphicStoreModel) => void;
     removeGraphic: (slideId: string, graphicId: string) => void;
     broadcastSetGraphic: (slideId: string, graphic: GraphicStoreModel) => void;
+    broadcastSetX: (slideId: string, graphicId: string, x: number) => void;
+    broadcastSetY: (slideId: string, graphicId: string, y: number) => void;
+    broadcastSetFillColor: (slideId: string, graphicId: string, fillColor: string) => void;
+    broadcastSetStrokeColor: (slideId: string, graphicId: string, strokeColor: string) => void;
+    broadcastSetStrokeWidth: (slideId: string, graphicId: string, strokeWidth: number) => void;
+    broadcastSetWidth: (slideId: string, graphicId: string, width: number) => void;
+    broadcastSetHeight: (slideId: string, graphicId: string, height: number) => void;
+    broadcastSetRotation: (slideId: string, graphicId: string, rotation: number) => void;
     broadcastRemoveGraphic: (slideId: string, graphicId: string) => void;
     setTheme: (theme: Theme) => void;
 };

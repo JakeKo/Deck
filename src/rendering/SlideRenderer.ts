@@ -298,6 +298,103 @@ class SlideRenderer implements ISlideRenderer {
         return this._markedGraphics[graphicId] !== undefined;
     }
 
+    // SINGLE PROPERTY UPDATE METHODS
+    public setX(graphicId: string, x: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === GRAPHIC_TYPES.IMAGE ||
+            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
+            graphic.type === GRAPHIC_TYPES.TEXTBOX ||
+            graphic.type === GRAPHIC_TYPES.VIDEO) {
+            graphic.origin = new Vector(x, graphic.origin.y);
+        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+            graphic.center = new Vector(x, graphic.center.y);
+        } else {
+            console.warn(`Attempted to set property 'x' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setY(graphicId: string, y: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === GRAPHIC_TYPES.IMAGE ||
+            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
+            graphic.type === GRAPHIC_TYPES.TEXTBOX ||
+            graphic.type === GRAPHIC_TYPES.VIDEO) {
+            graphic.origin = new Vector(graphic.origin.x, y);
+        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+            graphic.center = new Vector(graphic.center.x, y);
+        } else {
+            console.warn(`Attempted to set property 'y' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setFillColor(graphicId: string, fillColor: string): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === GRAPHIC_TYPES.CURVE ||
+            graphic.type === GRAPHIC_TYPES.ELLIPSE ||
+            graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+            graphic.fillColor = fillColor;
+        } else {
+            console.warn(`Attempted to set property 'fillColor' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setStrokeColor(graphicId: string, strokeColor: string): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === GRAPHIC_TYPES.CURVE ||
+            graphic.type === GRAPHIC_TYPES.ELLIPSE ||
+            graphic.type === GRAPHIC_TYPES.IMAGE ||
+            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
+            graphic.type === GRAPHIC_TYPES.VIDEO) {
+            graphic.strokeColor = strokeColor;
+        } else {
+            console.warn(`Attempted to set property 'strokeColor' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setStrokeWidth(graphicId: string, strokeWidth: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === GRAPHIC_TYPES.CURVE ||
+            graphic.type === GRAPHIC_TYPES.ELLIPSE ||
+            graphic.type === GRAPHIC_TYPES.IMAGE ||
+            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
+            graphic.type === GRAPHIC_TYPES.VIDEO) {
+            graphic.strokeWidth = strokeWidth;
+        } else {
+            console.warn(`Attempted to set property 'strokeWidth' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setWidth(graphicId: string, width: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === GRAPHIC_TYPES.ELLIPSE ||
+            graphic.type === GRAPHIC_TYPES.IMAGE ||
+            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
+            graphic.type === GRAPHIC_TYPES.TEXTBOX ||
+            graphic.type === GRAPHIC_TYPES.VIDEO) {
+            graphic.dimensions = new Vector(width, graphic.dimensions.y);
+        } else {
+            console.warn(`Attempted to set property 'width' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setHeight(graphicId: string, height: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === GRAPHIC_TYPES.ELLIPSE ||
+            graphic.type === GRAPHIC_TYPES.IMAGE ||
+            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
+            graphic.type === GRAPHIC_TYPES.TEXTBOX ||
+            graphic.type === GRAPHIC_TYPES.VIDEO) {
+            graphic.dimensions = new Vector(graphic.dimensions.x, height);
+        } else {
+            console.warn(`Attempted to set property 'height' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setRotation(graphicId: string, rotation: number): void {
+        const graphic = this.getGraphic(graphicId);
+        graphic.rotation = rotation;
+    }
+
     private _activateMaker<T extends IGraphicMaker>(maker: T): T {
         this._activeMakers[maker.target.id] = maker;
         return maker;

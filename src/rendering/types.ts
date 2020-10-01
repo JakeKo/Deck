@@ -279,6 +279,14 @@ export type ISlideRenderer = {
     isMarked: (graphicId: string) => boolean;
     broadcastSetGraphic: (graphic: IGraphicRenderer) => void;
     broadcastRemoveGraphic: (graphicId: string) => void;
+    setX: (graphicId: string, x: number) => void;
+    setY: (graphicId: string, y: number) => void;
+    setFillColor: (graphicId: string, fillColor: string) => void;
+    setStrokeColor: (graphicId: string, strokeColor: string) => void;
+    setStrokeWidth: (graphicId: string, strokeWidth: number) => void;
+    setWidth: (graphicId: string, width: number) => void;
+    setHeight: (graphicId: string, height: number) => void;
+    setRotation: (graphicId: string, rotation: number) => void;
 };
 
 export type BoundingBoxMutatorHelpers = {
