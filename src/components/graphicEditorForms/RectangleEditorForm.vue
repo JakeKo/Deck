@@ -6,10 +6,8 @@
         <NumberField :name='"h"' :label='"H"' :value='height' @deck-input='value => height = value' />
         <NumberField :name='"r"' :label='"R"' :value='rotation' @deck-input='value => rotation = value' />
         <NumberField :name='"s"' :label='"S"' :value='strokeWidth' @deck-input='value => strokeWidth = value' />
-        <label for='fill-color'>Fill Color</label>
-        <input name='fill-color' type='text' v-model='fillColor' /><br />
-        <label for='stroke-color'>Stroke Color</label>
-        <input name='stroke-color' type='text' v-model='strokeColor' /><br />
+        <ColorField :name='"f"' :label='"F"' :value='fillColor' @deck-input='value => fillColor = value' />
+        <ColorField :name='"c"' :label='"C"' :value='strokeColor' @deck-input='value => strokeColor = value' />
     </div>
 </template>
 
@@ -19,10 +17,12 @@ import Vector from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
+import ColorField from '../generic/ColorField.vue';
 
 const RectangleEditorForm = defineComponent({
     components: {
-        NumberField
+        NumberField,
+        ColorField
     },
     props: {
         rectangle: { type: Object as PropType<RectangleStoreModel>, required: true },
@@ -40,65 +40,57 @@ const RectangleEditorForm = defineComponent({
         const x = computed({
             get: () => props.rectangle.origin.x,
             set: value => {
-                const graphic: RectangleStoreModel = { ...props.rectangle, origin: new Vector(value, props.rectangle.origin.y) };
-                store.mutations.setGraphic(props.slideId, graphic);
-                store.mutations.broadcastSetX(props.slideId, graphic.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new Vector(value, props.rectangle.origin.y) });
+                store.mutations.broadcastSetX(props.slideId, props.rectangle.id, value);
             }
         });
         const y = computed({
             get: () => props.rectangle.origin.y,
             set: value => {
-                const graphic: RectangleStoreModel = { ...props.rectangle, origin: new Vector(props.rectangle.origin.x, value) };
-                store.mutations.setGraphic(props.slideId, graphic);
-                store.mutations.broadcastSetY(props.slideId, graphic.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new Vector(props.rectangle.origin.x, value) });
+                store.mutations.broadcastSetY(props.slideId, props.rectangle.id, value);
             }
         });
         const width = computed({
             get: () => props.rectangle.width,
             set: value => {
-                const graphic: RectangleStoreModel = { ...props.rectangle, width: value };
-                store.mutations.setGraphic(props.slideId, graphic);
-                store.mutations.broadcastSetWidth(props.slideId, graphic.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, width: value });
+                store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, value);
             }
         });
         const height = computed({
             get: () => props.rectangle.height,
             set: value => {
-                const graphic: RectangleStoreModel = { ...props.rectangle, height: value };
-                store.mutations.setGraphic(props.slideId, graphic);
-                store.mutations.broadcastSetHeight(props.slideId, graphic.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, height: value });
+                store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, value);
             }
         });
         const rotation = computed({
             get: () => props.rectangle.rotation,
             set: value => {
-                const graphic: RectangleStoreModel = { ...props.rectangle, rotation: value };
-                store.mutations.setGraphic(props.slideId, graphic);
-                store.mutations.broadcastSetRotation(props.slideId, graphic.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, rotation: value });
+                store.mutations.broadcastSetRotation(props.slideId, props.rectangle.id, value);
             }
         });
         const strokeWidth = computed({
             get: () => props.rectangle.strokeWidth,
             set: value => {
-                const graphic: RectangleStoreModel = { ...props.rectangle, strokeWidth: value };
-                store.mutations.setGraphic(props.slideId, graphic);
-                store.mutations.broadcastSetStrokeWidth(props.slideId, graphic.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, strokeWidth: value });
+                store.mutations.broadcastSetStrokeWidth(props.slideId, props.rectangle.id, value);
             }
         });
         const fillColor = computed({
             get: () => props.rectangle.fillColor,
             set: value => {
-                const graphic: RectangleStoreModel = { ...props.rectangle, fillColor: value };
-                store.mutations.setGraphic(props.slideId, graphic);
-                store.mutations.broadcastSetFillColor(props.slideId, graphic.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, fillColor: value });
+                store.mutations.broadcastSetFillColor(props.slideId, props.rectangle.id, value);
             }
         });
         const strokeColor = computed({
             get: () => props.rectangle.strokeColor,
             set: value => {
-                const graphic: RectangleStoreModel = { ...props.rectangle, strokeColor: value };
-                store.mutations.setGraphic(props.slideId, graphic);
-                store.mutations.broadcastSetStrokeColor(props.slideId, graphic.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, strokeColor: value });
+                store.mutations.broadcastSetStrokeColor(props.slideId, props.rectangle.id, value);
             }
         });
 

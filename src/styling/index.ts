@@ -146,6 +146,31 @@ const getBaseStyles = (theme: Theme): BaseStyles => ({
         fontFamily: theme.text.input.font,
         fontWeight: theme.text.input.weight,
         fontSize: theme.text.input.size
+    },
+    cardFlush: {
+        boxShadow: 'none',
+        borderRadius: '4px',
+        margin: '4px 0'
+    },
+    cardHigh: {
+        boxShadow: `0 0 4px 0 ${theme.color.base.lowest}`,
+        borderRadius: '4px',
+        margin: '4px 0'
+    },
+    cardHigher: {
+        boxShadow: `0 0 8px 0 ${theme.color.base.lowest}`,
+        borderRadius: '4px',
+        margin: '4px 0'
+    },
+    cardHighest: {
+        boxShadow: `0 0 12px 0 ${theme.color.base.lowest}`,
+        borderRadius: '4px',
+        margin: '4px 0'
+    },
+    field: {
+        border: 'none',
+        outline: 'none',
+        padding: '4px 8px'
     }
 });
 

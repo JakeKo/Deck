@@ -175,6 +175,31 @@ export type BaseStyles = {
         fontWeight: string;
         fontSize: string;
     };
+    cardFlush: {
+        boxShadow: string;
+        borderRadius: string;
+        margin: string;
+    };
+    cardHigh: {
+        boxShadow: string;
+        borderRadius: string;
+        margin: string;
+    };
+    cardHigher: {
+        boxShadow: string;
+        borderRadius: string;
+        margin: string;
+    };
+    cardHighest: {
+        boxShadow: string;
+        borderRadius: string;
+        margin: string;
+    };
+    field: {
+        border: string;
+        outline: string;
+        padding: string;
+    };
 };
 
 export enum THEMES {

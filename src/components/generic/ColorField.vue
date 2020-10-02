@@ -1,7 +1,7 @@
 <template>
     <div ref='container' :style='style.container'>
         <label :for='name' :style='style.label'>{{label}}</label>
-        <input :name='name' type='number' v-model='inputValue' :style='style.field' ref='field' />
+        <input :name='name' type='text' v-model='inputValue' :style='style.field' ref='field' />
     </div>
 </template>
 
@@ -9,11 +9,11 @@
 import { computed, defineComponent, reactive } from 'vue';
 import { useFocus, useHover, useStyle } from './core';
 
-const NumberField = defineComponent({
+const ColorField = defineComponent({
     props: {
         name: { type: String, required: true },
         label: { type: String, required: true },
-        value: { type: Number, required: true }
+        value: { type: String, required: true }
     },
     setup: (props, { emit }) => {
         const { target: container, isHovered } = useHover();
@@ -66,13 +66,5 @@ const NumberField = defineComponent({
     }
 });
 
-export default NumberField;
+export default ColorField;
 </script>
-
-<style scoped>
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-</style>
