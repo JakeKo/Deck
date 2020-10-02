@@ -120,7 +120,42 @@ class RectangleMutator implements IRectangleMutator {
         };
     }
 
-    // TODO: Include methods for other mutations
+    public setX(x: number): void {
+        this.target.origin = new Vector(x, this.target.origin.y);
+        this._repositionBoxHelpers();
+    }
+
+    public setY(y: number): void {
+        this.target.origin = new Vector(this.target.origin.x, y);
+        this._repositionBoxHelpers();
+    }
+
+    public setWidth(width: number): void {
+        this.target.dimensions = new Vector(width, this.target.dimensions.y);
+        this._repositionBoxHelpers();
+    }
+
+    public setHeight(height: number): void {
+        this.target.dimensions = new Vector(this.target.dimensions.x, height);
+        this._repositionBoxHelpers();
+    }
+
+    public setRotation(rotation: number): void {
+        this.target.rotation = rotation;
+        this._repositionBoxHelpers();
+    }
+
+    public setFillColor(fillColor: string): void {
+        this.target.fillColor = fillColor;
+    }
+
+    public setStrokeColor(strokeColor: string): void {
+        this.target.strokeColor = strokeColor;
+    }
+
+    public setStrokeWidth(strokeWidth: number): void {
+        this.target.strokeWidth = strokeWidth;
+    }
 
     public complete(): void {
         // Remove helper graphics

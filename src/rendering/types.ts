@@ -225,31 +225,70 @@ export type ICurveMutator = BaseGraphicMutator & {
     readonly type: GRAPHIC_TYPES.CURVE;
     readonly target: ICurveRenderer;
     anchorListener: (index: number, role: CURVE_ANCHOR_ROLES) => (event: SlideMouseEvent) => void;
+    setRotation: (rotation: number) => void;
+    setFillColor: (fillColor: string) => void;
+    setStrokeColor: (strokeColor: string) => void;
+    setStrokeWidth: (strokeWidth: number) => void;
 };
 
 export type IEllipseMutator = BaseGraphicMutator & {
     readonly type: GRAPHIC_TYPES.ELLIPSE;
     readonly target: IEllipseRenderer;
+    setX: (x: number) => void;
+    setY: (y: number) => void;
+    setWidth: (width: number) => void;
+    setHeight: (height: number) => void;
+    setRotation: (rotation: number) => void;
+    setFillColor: (fillColor: string) => void;
+    setStrokeColor: (strokeColor: string) => void;
+    setStrokeWidth: (strokeWidth: number) => void;
 };
 
 export type IImageMutator = BaseGraphicMutator & {
     readonly type: GRAPHIC_TYPES.IMAGE;
     readonly target: IImageRenderer;
+    setX: (x: number) => void;
+    setY: (y: number) => void;
+    setWidth: (width: number) => void;
+    setHeight: (height: number) => void;
+    setRotation: (rotation: number) => void;
+    setStrokeColor: (strokeColor: string) => void;
+    setStrokeWidth: (strokeWidth: number) => void;
 };
 
 export type IRectangleMutator = BaseGraphicMutator & {
     readonly type: GRAPHIC_TYPES.RECTANGLE;
     readonly target: IRectangleRenderer;
+    setX: (x: number) => void;
+    setY: (y: number) => void;
+    setWidth: (width: number) => void;
+    setHeight: (height: number) => void;
+    setRotation: (rotation: number) => void;
+    setFillColor: (fillColor: string) => void;
+    setStrokeColor: (strokeColor: string) => void;
+    setStrokeWidth: (strokeWidth: number) => void;
 };
 
 export type ITextboxMutator = BaseGraphicMutator & {
     readonly type: GRAPHIC_TYPES.TEXTBOX;
     readonly target: ITextboxRenderer;
+    setX: (x: number) => void;
+    setY: (y: number) => void;
+    setWidth: (width: number) => void;
+    setHeight: (height: number) => void;
+    setRotation: (rotation: number) => void;
 };
 
 export type IVideoMutator = BaseGraphicMutator & {
     readonly type: GRAPHIC_TYPES.VIDEO;
     readonly target: IVideoRenderer;
+    setX: (x: number) => void;
+    setY: (y: number) => void;
+    setWidth: (width: number) => void;
+    setHeight: (height: number) => void;
+    setRotation: (rotation: number) => void;
+    setStrokeColor: (strokeColor: string) => void;
+    setStrokeWidth: (strokeWidth: number) => void;
 };
 
 export type ISlideRenderer = {

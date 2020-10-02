@@ -45,6 +45,7 @@ import {
     IVideoMaker
 } from './types';
 import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
+const { CURVE, ELLIPSE, IMAGE, RECTANGLE, TEXTBOX, VIDEO } = GRAPHIC_TYPES;
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;
@@ -224,17 +225,17 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         let mutator;
 
-        if (graphic.type === GRAPHIC_TYPES.CURVE) {
+        if (graphic.type === CURVE) {
             mutator = new CurveMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+        } else if (graphic.type === ELLIPSE) {
             mutator = new EllipseMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
+        } else if (graphic.type === IMAGE) {
             mutator = new ImageMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+        } else if (graphic.type === RECTANGLE) {
             mutator = new RectangleMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
+        } else if (graphic.type === TEXTBOX) {
             mutator = new TextboxMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
+        } else if (graphic.type === VIDEO) {
             mutator = new VideoMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
@@ -269,17 +270,17 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         let marker;
 
-        if (graphic.type === GRAPHIC_TYPES.CURVE) {
+        if (graphic.type === CURVE) {
             marker = new CurveMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+        } else if (graphic.type === ELLIPSE) {
             marker = new EllipseMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
+        } else if (graphic.type === IMAGE) {
             marker = new ImageMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+        } else if (graphic.type === RECTANGLE) {
             marker = new RectangleMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
+        } else if (graphic.type === TEXTBOX) {
             marker = new TextboxMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
+        } else if (graphic.type === VIDEO) {
             marker = new VideoMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
@@ -301,13 +302,18 @@ class SlideRenderer implements ISlideRenderer {
     // SINGLE PROPERTY UPDATE METHODS
     public setX(graphicId: string, x: number): void {
         const graphic = this.getGraphic(graphicId);
-        if (graphic.type === GRAPHIC_TYPES.IMAGE ||
-            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
-            graphic.type === GRAPHIC_TYPES.TEXTBOX ||
-            graphic.type === GRAPHIC_TYPES.VIDEO) {
-            graphic.origin = new Vector(x, graphic.origin.y);
-        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
-            graphic.center = new Vector(x, graphic.center.y);
+        if (graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setX(x);
+            } else {
+                graphic.origin = new Vector(x, graphic.origin.y);
+            }
+        } else if (graphic.type === ELLIPSE) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as EllipseMutator).setX(x);
+            } else {
+                graphic.center = new Vector(x, graphic.center.y);
+            }
         } else {
             console.warn(`Attempted to set property 'x' of graphic with type '${graphic.type}'`);
         }
@@ -315,13 +321,18 @@ class SlideRenderer implements ISlideRenderer {
 
     public setY(graphicId: string, y: number): void {
         const graphic = this.getGraphic(graphicId);
-        if (graphic.type === GRAPHIC_TYPES.IMAGE ||
-            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
-            graphic.type === GRAPHIC_TYPES.TEXTBOX ||
-            graphic.type === GRAPHIC_TYPES.VIDEO) {
-            graphic.origin = new Vector(graphic.origin.x, y);
-        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
-            graphic.center = new Vector(graphic.center.x, y);
+        if (graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setY(y);
+            } else {
+                graphic.origin = new Vector(graphic.origin.x, y);
+            }
+        } else if (graphic.type === ELLIPSE) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as EllipseMutator).setY(y);
+            } else {
+                graphic.center = new Vector(graphic.center.x, y);
+            }
         } else {
             console.warn(`Attempted to set property 'y' of graphic with type '${graphic.type}'`);
         }
@@ -329,10 +340,12 @@ class SlideRenderer implements ISlideRenderer {
 
     public setFillColor(graphicId: string, fillColor: string): void {
         const graphic = this.getGraphic(graphicId);
-        if (graphic.type === GRAPHIC_TYPES.CURVE ||
-            graphic.type === GRAPHIC_TYPES.ELLIPSE ||
-            graphic.type === GRAPHIC_TYPES.RECTANGLE) {
-            graphic.fillColor = fillColor;
+        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | RectangleMutator).setFillColor(fillColor);
+            } else {
+                graphic.fillColor = fillColor;
+            }
         } else {
             console.warn(`Attempted to set property 'fillColor' of graphic with type '${graphic.type}'`);
         }
@@ -340,12 +353,12 @@ class SlideRenderer implements ISlideRenderer {
 
     public setStrokeColor(graphicId: string, strokeColor: string): void {
         const graphic = this.getGraphic(graphicId);
-        if (graphic.type === GRAPHIC_TYPES.CURVE ||
-            graphic.type === GRAPHIC_TYPES.ELLIPSE ||
-            graphic.type === GRAPHIC_TYPES.IMAGE ||
-            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
-            graphic.type === GRAPHIC_TYPES.VIDEO) {
-            graphic.strokeColor = strokeColor;
+        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | ImageMutator | RectangleMutator | VideoMutator).setStrokeColor(strokeColor);
+            } else {
+                graphic.strokeColor = strokeColor;
+            }
         } else {
             console.warn(`Attempted to set property 'strokeColor' of graphic with type '${graphic.type}'`);
         }
@@ -353,12 +366,12 @@ class SlideRenderer implements ISlideRenderer {
 
     public setStrokeWidth(graphicId: string, strokeWidth: number): void {
         const graphic = this.getGraphic(graphicId);
-        if (graphic.type === GRAPHIC_TYPES.CURVE ||
-            graphic.type === GRAPHIC_TYPES.ELLIPSE ||
-            graphic.type === GRAPHIC_TYPES.IMAGE ||
-            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
-            graphic.type === GRAPHIC_TYPES.VIDEO) {
-            graphic.strokeWidth = strokeWidth;
+        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | ImageMutator | RectangleMutator | VideoMutator).setStrokeWidth(strokeWidth);
+            } else {
+                graphic.strokeWidth = strokeWidth;
+            }
         } else {
             console.warn(`Attempted to set property 'strokeWidth' of graphic with type '${graphic.type}'`);
         }
@@ -366,12 +379,12 @@ class SlideRenderer implements ISlideRenderer {
 
     public setWidth(graphicId: string, width: number): void {
         const graphic = this.getGraphic(graphicId);
-        if (graphic.type === GRAPHIC_TYPES.ELLIPSE ||
-            graphic.type === GRAPHIC_TYPES.IMAGE ||
-            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
-            graphic.type === GRAPHIC_TYPES.TEXTBOX ||
-            graphic.type === GRAPHIC_TYPES.VIDEO) {
-            graphic.dimensions = new Vector(width, graphic.dimensions.y);
+        if (graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as EllipseMutator | ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setWidth(width);
+            } else {
+                graphic.dimensions = new Vector(width, graphic.dimensions.y);
+            }
         } else {
             console.warn(`Attempted to set property 'width' of graphic with type '${graphic.type}'`);
         }
@@ -379,12 +392,12 @@ class SlideRenderer implements ISlideRenderer {
 
     public setHeight(graphicId: string, height: number): void {
         const graphic = this.getGraphic(graphicId);
-        if (graphic.type === GRAPHIC_TYPES.ELLIPSE ||
-            graphic.type === GRAPHIC_TYPES.IMAGE ||
-            graphic.type === GRAPHIC_TYPES.RECTANGLE ||
-            graphic.type === GRAPHIC_TYPES.TEXTBOX ||
-            graphic.type === GRAPHIC_TYPES.VIDEO) {
-            graphic.dimensions = new Vector(graphic.dimensions.x, height);
+        if (graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as EllipseMutator | ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setHeight(height);
+            } else {
+                graphic.dimensions = new Vector(graphic.dimensions.x, height);
+            }
         } else {
             console.warn(`Attempted to set property 'height' of graphic with type '${graphic.type}'`);
         }
@@ -392,7 +405,11 @@ class SlideRenderer implements ISlideRenderer {
 
     public setRotation(graphicId: string, rotation: number): void {
         const graphic = this.getGraphic(graphicId);
-        graphic.rotation = rotation;
+        if (this.isFocused(graphicId)) {
+            this._focusedGraphics[graphicId].setRotation(rotation);
+        } else {
+            graphic.rotation = rotation;
+        }
     }
 
     private _activateMaker<T extends IGraphicMaker>(maker: T): T {
