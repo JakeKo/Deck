@@ -37,6 +37,7 @@ const ToggleField = defineComponent({
             label: computed(() => ({
                 height: '100%',
                 width: '100%',
+                cursor: 'pointer',
                 color: inputValue.value ? baseTheme.value.color.base.highest : baseTheme.value.color.primary.flush,
                 ...baseStyle.value.fontLabel,
                 ...baseStyle.value.flexRowCC

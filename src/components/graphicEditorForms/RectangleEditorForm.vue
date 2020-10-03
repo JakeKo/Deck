@@ -2,8 +2,8 @@
     <div ref='root' :style='style.rectangleEditorForm'>
         <NumberField :name='"x"' :label='"X"' :value='x' @deck-input='value => x = value' />
         <NumberField :name='"y"' :label='"Y"' :value='y' @deck-input='value => y = value' />
-        <NumberField :name='"w"' :label='"W"' :value='width' @deck-input='value => width = value' />
-        <NumberField :name='"h"' :label='"H"' :value='height' @deck-input='value => height = value' />
+        <NumberField :name='"w"' :label='"W"' :value='width' @deck-input='value => width = value' :min='0' />
+        <NumberField :name='"h"' :label='"H"' :value='height' @deck-input='value => height = value' :min='0' />
         <ToggleField :name='"l"' :label='"L"' :value='lockAspectRatio' @deck-input='value => lockAspectRatio = value' />
         <NumberField :name='"r"' :label='"R"' :value='rotation' @deck-input='value => rotation = value' />
         <NumberField :name='"s"' :label='"S"' :value='strokeWidth' @deck-input='value => strokeWidth = value' />

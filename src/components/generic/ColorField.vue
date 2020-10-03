@@ -52,7 +52,7 @@ const ColorField = defineComponent({
         const inputValue = computed({
             get: () => props.value,
             set: value => {
-                if (/^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value) || value === 'none') {
+                if (/^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value) || value === 'none' || value === 'transparent') {
                     emit('deck-input', value);
                     return value;
                 }

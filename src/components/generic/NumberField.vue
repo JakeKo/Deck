@@ -1,7 +1,7 @@
 <template>
     <div ref='container' :style='style.container'>
         <label :for='name' :style='style.label'>{{label}}</label>
-        <input :name='name' type='number' v-model='inputValue' :style='style.field' ref='field' />
+        <input :name='name' type='number' v-model='inputValue' :style='style.field' ref='field' :min='min' :max='max' />
     </div>
 </template>
 
@@ -13,7 +13,9 @@ const NumberField = defineComponent({
     props: {
         name: { type: String, required: true },
         label: { type: String, required: true },
-        value: { type: Number, required: true }
+        value: { type: Number, required: true },
+        min: { type: Number, required: false },
+        max: { type: Number, required: false }
     },
     setup: (props, { emit }) => {
         const { target: container, isHovered } = useHover();
@@ -51,9 +53,11 @@ const NumberField = defineComponent({
 
         const inputValue = computed({
             get: () => props.value,
-            set: value => {
-                emit('deck-input', value);
-                return value;
+            set: (value: number | '') => {
+                if (value !== '' && (props.min && props.min > value) && (props.max && props.max < value)) {
+                    emit('deck-input', value);
+                    return value;
+                }
             }
         });
 
