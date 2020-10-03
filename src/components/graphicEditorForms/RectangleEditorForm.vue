@@ -4,6 +4,7 @@
         <NumberField :name='"y"' :label='"Y"' :value='y' @deck-input='value => y = value' />
         <NumberField :name='"w"' :label='"W"' :value='width' @deck-input='value => width = value' />
         <NumberField :name='"h"' :label='"H"' :value='height' @deck-input='value => height = value' />
+        <ToggleField :name='"l"' :label='"L"' :value='lockAspectRatio' @deck-input='value => lockAspectRatio = value' />
         <NumberField :name='"r"' :label='"R"' :value='rotation' @deck-input='value => rotation = value' />
         <NumberField :name='"s"' :label='"S"' :value='strokeWidth' @deck-input='value => strokeWidth = value' />
         <ColorField :name='"f"' :label='"F"' :value='fillColor' @deck-input='value => fillColor = value' />
@@ -14,15 +15,17 @@
 <script lang='ts'>
 import { RectangleStoreModel } from '@/store/types';
 import Vector from '@/utilities/Vector';
-import { computed, defineComponent, PropType, reactive } from 'vue';
+import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
 import ColorField from '../generic/ColorField.vue';
+import ToggleField from '../generic/ToggleField.vue';
 
 const RectangleEditorForm = defineComponent({
     components: {
         NumberField,
-        ColorField
+        ColorField,
+        ToggleField
     },
     props: {
         rectangle: { type: Object as PropType<RectangleStoreModel>, required: true },
@@ -37,6 +40,7 @@ const RectangleEditorForm = defineComponent({
             }))
         });
 
+        const lockAspectRatio = ref(false);
         const x = computed({
             get: () => props.rectangle.origin.x,
             set: value => {
@@ -54,15 +58,29 @@ const RectangleEditorForm = defineComponent({
         const width = computed({
             get: () => props.rectangle.width,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, width: value });
-                store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, value);
+                if (lockAspectRatio.value) {
+                    const height = value * props.rectangle.height / props.rectangle.width;
+                    store.mutations.setGraphic(props.slideId, { ...props.rectangle, width: value, height });
+                    store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, value);
+                    store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, height);
+                } else {
+                    store.mutations.setGraphic(props.slideId, { ...props.rectangle, width: value });
+                    store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, value);
+                }
             }
         });
         const height = computed({
             get: () => props.rectangle.height,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, height: value });
-                store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, value);
+                if (lockAspectRatio.value) {
+                    const width = value * props.rectangle.width / props.rectangle.height;
+                    store.mutations.setGraphic(props.slideId, { ...props.rectangle, width, height: value });
+                    store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, width);
+                    store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, value);
+                } else {
+                    store.mutations.setGraphic(props.slideId, { ...props.rectangle, height: value });
+                    store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, value);
+                }
             }
         });
         const rotation = computed({
@@ -97,6 +115,7 @@ const RectangleEditorForm = defineComponent({
         return {
             root,
             style,
+            lockAspectRatio,
             x,
             y,
             width,
