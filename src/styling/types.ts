@@ -199,6 +199,7 @@ export type BaseStyles = {
         border: string;
         outline: string;
         padding: string;
+        boxSizing: string;
     };
 };
 

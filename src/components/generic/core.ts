@@ -1,6 +1,6 @@
 import { getBaseStyles, themes } from '@/styling';
 import { BaseStyles, Theme } from '@/styling/types';
-import { onMounted, Ref, ref } from 'vue';
+import { computed, onMounted, Ref, ref } from 'vue';
 
 function useHover(): { target: Ref<Element | undefined>; isHovered: Ref<boolean> } {
     const target = ref<Element | undefined>(undefined);
@@ -44,7 +44,7 @@ function useFocus(): { target: Ref<Element | undefined>; isFocused: Ref<boolean>
 
 function useStyle(): { baseTheme: Ref<Theme>; baseStyle: Ref<BaseStyles> } {
     const baseTheme = ref(themes.light);
-    const baseStyle = ref(getBaseStyles(baseTheme.value));
+    const baseStyle = computed(() => getBaseStyles(baseTheme.value));
 
     return {
         baseTheme,

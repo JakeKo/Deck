@@ -1,6 +1,7 @@
 <template>
     <div ref='root' :style='style.graphicEditor'>
         <RectangleEditorForm v-if='rectangle !== undefined' :rectangle='rectangle' :slideId='slideId' />
+        <CurveEditorForm v-if='curve !== undefined' :curve='curve' :slideId='slideId' />
     </div>
 </template>
 
@@ -9,10 +10,12 @@ import { GRAPHIC_TYPES } from '@/rendering/types';
 import { computed, defineComponent, reactive } from 'vue';
 import DeckComponent from './generic/DeckComponent';
 import RectangleEditorForm from './graphicEditorForms/RectangleEditorForm.vue';
+import CurveEditorForm from './graphicEditorForms/CurveEditorForm.vue';
 
 const GraphicEditor = defineComponent({
     components: {
-        RectangleEditorForm
+        RectangleEditorForm,
+        CurveEditorForm
     },
     setup: () => {
         const { root, store } = DeckComponent();
@@ -26,7 +29,7 @@ const GraphicEditor = defineComponent({
 
         const activeSlide = computed(() => store.state.activeSlide);
         const slideId = computed(() => activeSlide.value?.id || '');
-        const rectangle = computed(() => {
+        const focusedGraphic = computed(() => {
             const focusedGraphics = activeSlide.value?.focusedGraphics;
             if (focusedGraphics === undefined) {
                 return;
@@ -37,9 +40,18 @@ const GraphicEditor = defineComponent({
                 return;
             }
 
-            const focusedGraphic = focusedGraphics[key];
-            if (focusedGraphic.type === GRAPHIC_TYPES.RECTANGLE) {
-                return focusedGraphic;
+            return focusedGraphics[key];
+        });
+        const rectangle = computed(() => {
+            const graphic = focusedGraphic.value;
+            if (graphic && graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+                return graphic;
+            }
+        });
+        const curve = computed(() => {
+            const graphic = focusedGraphic.value;
+            if (graphic && graphic.type === GRAPHIC_TYPES.CURVE) {
+                return graphic;
             }
         });
 
@@ -47,6 +59,7 @@ const GraphicEditor = defineComponent({
             root,
             style,
             rectangle,
+            curve,
             slideId
         };
     }

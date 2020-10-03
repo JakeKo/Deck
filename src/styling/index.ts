@@ -170,7 +170,8 @@ const getBaseStyles = (theme: Theme): BaseStyles => ({
     field: {
         border: 'none',
         outline: 'none',
-        padding: '4px 8px'
+        padding: '4px 8px',
+        boxSizing: 'border-box'
     }
 });
 
