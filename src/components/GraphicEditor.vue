@@ -1,7 +1,8 @@
 <template>
     <div ref='root' :style='style.graphicEditor'>
-        <RectangleEditorForm v-if='rectangle !== undefined' :rectangle='rectangle' :slideId='slideId' />
         <CurveEditorForm v-if='curve !== undefined' :curve='curve' :slideId='slideId' />
+        <EllipseEditorForm v-if='ellipse !== undefined' :ellipse='ellipse' :slideId='slideId' />
+        <RectangleEditorForm v-if='rectangle !== undefined' :rectangle='rectangle' :slideId='slideId' />
     </div>
 </template>
 
@@ -9,13 +10,15 @@
 import { GRAPHIC_TYPES } from '@/rendering/types';
 import { computed, defineComponent, reactive } from 'vue';
 import DeckComponent from './generic/DeckComponent';
-import RectangleEditorForm from './graphicEditorForms/RectangleEditorForm.vue';
 import CurveEditorForm from './graphicEditorForms/CurveEditorForm.vue';
+import EllipseEditorForm from './graphicEditorForms/EllipseEditorForm.vue';
+import RectangleEditorForm from './graphicEditorForms/RectangleEditorForm.vue';
 
 const GraphicEditor = defineComponent({
     components: {
-        RectangleEditorForm,
-        CurveEditorForm
+        CurveEditorForm,
+        EllipseEditorForm,
+        RectangleEditorForm
     },
     setup: () => {
         const { root, store } = DeckComponent();
@@ -42,15 +45,22 @@ const GraphicEditor = defineComponent({
 
             return focusedGraphics[key];
         });
-        const rectangle = computed(() => {
-            const graphic = focusedGraphic.value;
-            if (graphic && graphic.type === GRAPHIC_TYPES.RECTANGLE) {
-                return graphic;
-            }
-        });
+
         const curve = computed(() => {
             const graphic = focusedGraphic.value;
             if (graphic && graphic.type === GRAPHIC_TYPES.CURVE) {
+                return graphic;
+            }
+        });
+        const ellipse = computed(() => {
+            const graphic = focusedGraphic.value;
+            if (graphic && graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+                return graphic;
+            }
+        });
+        const rectangle = computed(() => {
+            const graphic = focusedGraphic.value;
+            if (graphic && graphic.type === GRAPHIC_TYPES.RECTANGLE) {
                 return graphic;
             }
         });
@@ -58,8 +68,9 @@ const GraphicEditor = defineComponent({
         return {
             root,
             style,
-            rectangle,
             curve,
+            ellipse,
+            rectangle,
             slideId
         };
     }
