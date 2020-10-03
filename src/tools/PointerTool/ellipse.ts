@@ -24,6 +24,7 @@ export function moveEllipse(event: EllipseMouseEvent): void {
 
     function complete(event: SlideMouseEvent): void {
         moveListener(event);
+        slide.broadcastSetGraphic(mutator.target);
         slide.cursorLock = false;
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);

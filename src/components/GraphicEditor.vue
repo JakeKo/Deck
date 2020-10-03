@@ -2,6 +2,7 @@
     <div ref='root' :style='style.graphicEditor'>
         <CurveEditorForm v-if='curve !== undefined' :curve='curve' :slideId='slideId' />
         <EllipseEditorForm v-if='ellipse !== undefined' :ellipse='ellipse' :slideId='slideId' />
+        <ImageEditorForm v-if='image !== undefined' :image='image' :slideId='slideId' />
         <RectangleEditorForm v-if='rectangle !== undefined' :rectangle='rectangle' :slideId='slideId' />
     </div>
 </template>
@@ -12,12 +13,14 @@ import { computed, defineComponent, reactive } from 'vue';
 import DeckComponent from './generic/DeckComponent';
 import CurveEditorForm from './graphicEditorForms/CurveEditorForm.vue';
 import EllipseEditorForm from './graphicEditorForms/EllipseEditorForm.vue';
+import ImageEditorForm from './graphicEditorForms/ImageEditorForm.vue';
 import RectangleEditorForm from './graphicEditorForms/RectangleEditorForm.vue';
 
 const GraphicEditor = defineComponent({
     components: {
         CurveEditorForm,
         EllipseEditorForm,
+        ImageEditorForm,
         RectangleEditorForm
     },
     setup: () => {
@@ -58,6 +61,12 @@ const GraphicEditor = defineComponent({
                 return graphic;
             }
         });
+        const image = computed(() => {
+            const graphic = focusedGraphic.value;
+            if (graphic && graphic.type === GRAPHIC_TYPES.IMAGE) {
+                return graphic;
+            }
+        });
         const rectangle = computed(() => {
             const graphic = focusedGraphic.value;
             if (graphic && graphic.type === GRAPHIC_TYPES.RECTANGLE) {
@@ -70,6 +79,7 @@ const GraphicEditor = defineComponent({
             style,
             curve,
             ellipse,
+            image,
             rectangle,
             slideId
         };
