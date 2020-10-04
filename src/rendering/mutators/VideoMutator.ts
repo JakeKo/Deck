@@ -144,7 +144,7 @@ class VideoMutator implements IVideoMutator {
 
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
-        this._repositionBoxHelpers();
+        rotateBoxHelpers(this._helpers, this.target.box);
     }
 
     public setStrokeColor(strokeColor: string): void {

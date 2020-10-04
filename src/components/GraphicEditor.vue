@@ -4,6 +4,7 @@
         <EllipseEditorForm v-if='ellipse !== undefined' :ellipse='ellipse' :slideId='slideId' />
         <ImageEditorForm v-if='image !== undefined' :image='image' :slideId='slideId' />
         <RectangleEditorForm v-if='rectangle !== undefined' :rectangle='rectangle' :slideId='slideId' />
+        <TextboxEditorForm v-if='textbox !== undefined' :textbox='textbox' :slideId='slideId' />
     </div>
 </template>
 
@@ -15,13 +16,15 @@ import CurveEditorForm from './graphicEditorForms/CurveEditorForm.vue';
 import EllipseEditorForm from './graphicEditorForms/EllipseEditorForm.vue';
 import ImageEditorForm from './graphicEditorForms/ImageEditorForm.vue';
 import RectangleEditorForm from './graphicEditorForms/RectangleEditorForm.vue';
+import TextboxEditorForm from './graphicEditorForms/TextboxEditorForm.vue';
 
 const GraphicEditor = defineComponent({
     components: {
         CurveEditorForm,
         EllipseEditorForm,
         ImageEditorForm,
-        RectangleEditorForm
+        RectangleEditorForm,
+        TextboxEditorForm
     },
     setup: () => {
         const { root, store } = DeckComponent();
@@ -73,6 +76,12 @@ const GraphicEditor = defineComponent({
                 return graphic;
             }
         });
+        const textbox = computed(() => {
+            const graphic = focusedGraphic.value;
+            if (graphic && graphic.type === GRAPHIC_TYPES.TEXTBOX) {
+                return graphic;
+            }
+        });
 
         return {
             root,
@@ -81,6 +90,7 @@ const GraphicEditor = defineComponent({
             ellipse,
             image,
             rectangle,
+            textbox,
             slideId
         };
     }

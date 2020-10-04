@@ -142,7 +142,7 @@ class RectangleMutator implements IRectangleMutator {
 
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
-        this._repositionBoxHelpers();
+        rotateBoxHelpers(this._helpers, this.target.box);
     }
 
     public setFillColor(fillColor: string): void {

@@ -140,7 +140,7 @@ class TextboxMutator implements ITextboxMutator {
 
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
-        this._repositionBoxHelpers();
+        rotateBoxHelpers(this._helpers, this.target.box);
     }
 
     // TODO: Include mutations for other properties
