@@ -353,9 +353,9 @@ class SlideRenderer implements ISlideRenderer {
 
     public setStrokeColor(graphicId: string, strokeColor: string): void {
         const graphic = this.getGraphic(graphicId);
-        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
+        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | ImageMutator | RectangleMutator | VideoMutator).setStrokeColor(strokeColor);
+                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | RectangleMutator | VideoMutator).setStrokeColor(strokeColor);
             } else {
                 graphic.strokeColor = strokeColor;
             }
@@ -366,9 +366,9 @@ class SlideRenderer implements ISlideRenderer {
 
     public setStrokeWidth(graphicId: string, strokeWidth: number): void {
         const graphic = this.getGraphic(graphicId);
-        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
+        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | ImageMutator | RectangleMutator | VideoMutator).setStrokeWidth(strokeWidth);
+                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | RectangleMutator | VideoMutator).setStrokeWidth(strokeWidth);
             } else {
                 graphic.strokeWidth = strokeWidth;
             }

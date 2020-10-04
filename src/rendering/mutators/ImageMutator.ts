@@ -147,14 +147,6 @@ class ImageMutator implements IImageMutator {
         this._repositionBoxHelpers();
     }
 
-    public setStrokeColor(strokeColor: string): void {
-        this.target.strokeColor = strokeColor;
-    }
-
-    public setStrokeWidth(strokeWidth: number): void {
-        this.target.strokeWidth = strokeWidth;
-    }
-
     public complete(): void {
         // Remove helper graphics
         unrenderBoxHelpers(this._helpers);

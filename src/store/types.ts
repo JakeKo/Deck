@@ -103,8 +103,6 @@ export type ImageStoreModel = {
     origin: Vector;
     width: number;
     height: number;
-    strokeColor: string;
-    strokeWidth: number;
     rotation: number;
 };
 

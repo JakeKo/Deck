@@ -46,8 +46,6 @@ export type IImageRenderer = BaseGraphicRenderer & {
     readonly source: string;
     origin: Vector;
     dimensions: Vector;
-    strokeColor: string;
-    strokeWidth: number;
     setOriginAndDimensions: (origin: Vector, dimensions: Vector) => void;
 };
 
@@ -252,8 +250,6 @@ export type IImageMutator = BaseGraphicMutator & {
     setWidth: (width: number) => void;
     setHeight: (height: number) => void;
     setRotation: (rotation: number) => void;
-    setStrokeColor: (strokeColor: string) => void;
-    setStrokeWidth: (strokeWidth: number) => void;
 };
 
 export type IRectangleMutator = BaseGraphicMutator & {

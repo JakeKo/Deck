@@ -5,8 +5,6 @@
         <NumberField :name='"w"' :label='"W"' :value='width' @deck-input='value => width = value' :min='0' />
         <NumberField :name='"h"' :label='"H"' :value='height' @deck-input='value => height = value' :min='0' />
         <NumberField :name='"r"' :label='"R"' :value='rotation' @deck-input='value => rotation = value' />
-        <NumberField :name='"s"' :label='"S"' :value='strokeWidth' @deck-input='value => strokeWidth = value' />
-        <ColorField :name='"c"' :label='"C"' :value='strokeColor' @deck-input='value => strokeColor = value' />
     </div>
 </template>
 
@@ -16,12 +14,10 @@ import Vector from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
-import ColorField from '../generic/ColorField.vue';
 
 const ImageEditorForm = defineComponent({
     components: {
-        NumberField,
-        ColorField
+        NumberField
     },
     props: {
         image: { type: Object as PropType<ImageStoreModel>, required: true },
@@ -75,20 +71,6 @@ const ImageEditorForm = defineComponent({
                 store.mutations.broadcastSetRotation(props.slideId, props.image.id, value);
             }
         });
-        const strokeWidth = computed({
-            get: () => props.image.strokeWidth,
-            set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.image, strokeWidth: value });
-                store.mutations.broadcastSetStrokeWidth(props.slideId, props.image.id, value);
-            }
-        });
-        const strokeColor = computed({
-            get: () => props.image.strokeColor,
-            set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.image, strokeColor: value });
-                store.mutations.broadcastSetStrokeColor(props.slideId, props.image.id, value);
-            }
-        });
 
         return {
             root,
@@ -97,9 +79,7 @@ const ImageEditorForm = defineComponent({
             y,
             width,
             height,
-            rotation,
-            strokeWidth,
-            strokeColor
+            rotation
         };
     }
 });
