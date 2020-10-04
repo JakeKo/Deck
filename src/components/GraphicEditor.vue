@@ -5,6 +5,7 @@
         <ImageEditorForm v-if='image !== undefined' :image='image' :slideId='slideId' />
         <RectangleEditorForm v-if='rectangle !== undefined' :rectangle='rectangle' :slideId='slideId' />
         <TextboxEditorForm v-if='textbox !== undefined' :textbox='textbox' :slideId='slideId' />
+        <VideoEditorForm v-if='video !== undefined' :video='video' :slideId='slideId' />
     </div>
 </template>
 
@@ -17,6 +18,7 @@ import EllipseEditorForm from './graphicEditorForms/EllipseEditorForm.vue';
 import ImageEditorForm from './graphicEditorForms/ImageEditorForm.vue';
 import RectangleEditorForm from './graphicEditorForms/RectangleEditorForm.vue';
 import TextboxEditorForm from './graphicEditorForms/TextboxEditorForm.vue';
+import VideoEditorForm from './graphicEditorForms/VideoEditorForm.vue';
 
 const GraphicEditor = defineComponent({
     components: {
@@ -24,7 +26,8 @@ const GraphicEditor = defineComponent({
         EllipseEditorForm,
         ImageEditorForm,
         RectangleEditorForm,
-        TextboxEditorForm
+        TextboxEditorForm,
+        VideoEditorForm
     },
     setup: () => {
         const { root, store } = DeckComponent();
@@ -82,6 +85,12 @@ const GraphicEditor = defineComponent({
                 return graphic;
             }
         });
+        const video = computed(() => {
+            const graphic = focusedGraphic.value;
+            if (graphic && graphic.type === GRAPHIC_TYPES.VIDEO) {
+                return graphic;
+            }
+        });
 
         return {
             root,
@@ -91,6 +100,7 @@ const GraphicEditor = defineComponent({
             image,
             rectangle,
             textbox,
+            video,
             slideId
         };
     }
