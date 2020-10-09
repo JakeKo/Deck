@@ -1,15 +1,49 @@
 <template>
     <div ref='root' :style='style.videoEditorForm'>
-        <NumberField :name='"x"' :label='"X"' :value='x' @deck-input='value => x = value' />
-        <NumberField :name='"y"' :label='"Y"' :value='y' @deck-input='value => y = value' />
-        <NumberField :name='"w"' :label='"W"' :value='width' @deck-input='value => width = value' :min='0' />
-        <NumberField :name='"h"' :label='"H"' :value='height' @deck-input='value => height = value' :min='0' />
-        <NumberField :name='"r"' :label='"R"' :value='rotation' @deck-input='value => rotation = value' />
+        <div :style='style.row'>
+            <NumberField
+                :name='"x"'
+                :labelText='"X"'
+                :value='x'
+                @deck-input='value => x = value'
+            />
+            <NumberField
+                :name='"y"'
+                :labelText='"Y"'
+                :value='y'
+                @deck-input='value => y = value'
+            />
+        </div>
+        <div :style='style.row'>
+            <NumberField
+                :name='"width"'
+                :labelText='"W"'
+                :value='width'
+                @deck-input='value => width = value'
+                :min='0'
+            />
+            <NumberField
+                :name='"height"'
+                :labelText='"H"'
+                :value='height'
+                @deck-input='value => height = value'
+                :min='0'
+            />
+        </div>
+        <div :style='style.row'>
+            <NumberField
+                :name='"rotation"'
+                :labelIcon='"fas fa-sync-alt"'
+                :value='rotation'
+                @deck-input='value => rotation = value'
+            />
+        </div>
     </div>
 </template>
 
 <script lang='ts'>
 import { VideoStoreModel } from '@/store/types';
+import { degToRad, radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
@@ -24,11 +58,17 @@ const VideoEditorForm = defineComponent({
         slideId: { type: String, required: true }
     },
     setup: props => {
-        const { root, store } = DeckComponent();
+        const { root, store, baseStyle } = DeckComponent();
         const style = reactive({
             videoEditorForm: computed(() => ({
                 height: '100%',
                 width: '100%'
+            })),
+            row: computed(() => ({
+                ...baseStyle.value.flexRow
+            })),
+            column: computed(() => ({
+                ...baseStyle.value.flexCol
             }))
         });
 
@@ -65,10 +105,10 @@ const VideoEditorForm = defineComponent({
             }
         });
         const rotation = computed({
-            get: () => props.video.rotation,
+            get: () => radToDeg(props.video.rotation),
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.video, rotation: value });
-                store.mutations.broadcastSetRotation(props.slideId, props.video.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.video, rotation: degToRad(value) });
+                store.mutations.broadcastSetRotation(props.slideId, props.video.id, degToRad(value));
             }
         });
 

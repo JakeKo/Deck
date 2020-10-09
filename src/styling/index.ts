@@ -150,22 +150,22 @@ const getBaseStyles = (theme: Theme): BaseStyles => ({
     cardFlush: {
         boxShadow: 'none',
         borderRadius: '4px',
-        margin: '4px 0'
+        margin: '4px'
     },
     cardHigh: {
         boxShadow: `0 0 4px 0 ${theme.color.base.lowest}`,
         borderRadius: '4px',
-        margin: '4px 0'
+        margin: '4px'
     },
     cardHigher: {
         boxShadow: `0 0 8px 0 ${theme.color.base.lowest}`,
         borderRadius: '4px',
-        margin: '4px 0'
+        margin: '4px'
     },
     cardHighest: {
         boxShadow: `0 0 12px 0 ${theme.color.base.lowest}`,
         borderRadius: '4px',
-        margin: '4px 0'
+        margin: '4px'
     },
     field: {
         border: 'none',

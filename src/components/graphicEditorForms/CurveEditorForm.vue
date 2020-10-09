@@ -1,9 +1,35 @@
 <template>
     <div ref='root' :style='style.curveEditorForm'>
-        <NumberField :name='"r"' :label='"R"' :value='rotation' @deck-input='value => rotation = value' />
-        <NumberField :name='"s"' :label='"S"' :value='strokeWidth' @deck-input='value => strokeWidth = value' />
-        <ColorField :name='"f"' :label='"F"' :value='fillColor' @deck-input='value => fillColor = value' />
-        <ColorField :name='"c"' :label='"C"' :value='strokeColor' @deck-input='value => strokeColor = value' />
+        <div :style='style.row'>
+            <div :style='style.column'>
+                <NumberField
+                    :name='"rotation"'
+                    :labelIcon='"fas fa-sync-alt"'
+                    :value='rotation'
+                    @deck-input='value => rotation = value'
+                />
+                <ColorField
+                    :name='"fill-color"'
+                    :labelText='"FILL"'
+                    :value='fillColor'
+                    @deck-input='value => fillColor = value'
+                />
+            </div>
+            <div :style='style.column'>
+                <NumberField
+                    :name='"stroke-width"'
+                    :labelIcon='"fas fa-grip-lines"'
+                    :value='strokeWidth'
+                    @deck-input='value => strokeWidth = value'
+                />
+                <ColorField
+                    :name='"stroke-color"'
+                    :labelText='"STROKE"'
+                    :value='strokeColor'
+                    @deck-input='value => strokeColor = value'
+                />
+            </div>
+        </div>
     </div>
 </template>
 
@@ -13,6 +39,7 @@ import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
 import ColorField from '../generic/ColorField.vue';
+import { degToRad, radToDeg } from '@/utilities/utilities';
 
 const CurveEditorForm = defineComponent({
     components: {
@@ -24,19 +51,25 @@ const CurveEditorForm = defineComponent({
         slideId: { type: String, required: true }
     },
     setup: props => {
-        const { root, store } = DeckComponent();
+        const { root, store, baseStyle } = DeckComponent();
         const style = reactive({
             curveEditorForm: computed(() => ({
                 height: '100%',
                 width: '100%'
+            })),
+            row: computed(() => ({
+                ...baseStyle.value.flexRow
+            })),
+            column: computed(() => ({
+                ...baseStyle.value.flexCol
             }))
         });
 
         const rotation = computed({
-            get: () => props.curve.rotation,
+            get: () => radToDeg(props.curve.rotation),
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.curve, rotation: value });
-                store.mutations.broadcastSetRotation(props.slideId, props.curve.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.curve, rotation: degToRad(value) });
+                store.mutations.broadcastSetRotation(props.slideId, props.curve.id, degToRad(value));
             }
         });
         const strokeWidth = computed({

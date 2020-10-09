@@ -1,14 +1,72 @@
 <template>
     <div ref='root' :style='style.rectangleEditorForm'>
-        <NumberField :name='"x"' :label='"X"' :value='x' @deck-input='value => x = value' />
-        <NumberField :name='"y"' :label='"Y"' :value='y' @deck-input='value => y = value' />
-        <NumberField :name='"w"' :label='"W"' :value='width' @deck-input='value => width = value' :min='0' />
-        <NumberField :name='"h"' :label='"H"' :value='height' @deck-input='value => height = value' :min='0' />
-        <ToggleField :name='"l"' :label='"L"' :value='lockAspectRatio' @deck-input='value => lockAspectRatio = value' />
-        <NumberField :name='"r"' :label='"R"' :value='rotation' @deck-input='value => rotation = value' />
-        <NumberField :name='"s"' :label='"S"' :value='strokeWidth' @deck-input='value => strokeWidth = value' />
-        <ColorField :name='"f"' :label='"F"' :value='fillColor' @deck-input='value => fillColor = value' />
-        <ColorField :name='"c"' :label='"C"' :value='strokeColor' @deck-input='value => strokeColor = value' />
+        <div :style='style.row'>
+            <NumberField
+                :name='"x"'
+                :labelText='"X"'
+                :value='x'
+                @deck-input='value => x = value'
+            />
+            <NumberField
+                :name='"y"'
+                :labelText='"Y"'
+                :value='y'
+                @deck-input='value => y = value'
+            />
+        </div>
+        <div :style='style.row'>
+            <NumberField
+                :name='"width"'
+                :labelText='"W"'
+                :value='width'
+                @deck-input='value => width = value'
+                :min='0'
+            />
+            <NumberField
+                :name='"height"'
+                :labelText='"H"'
+                :value='height'
+                @deck-input='value => height = value'
+                :min='0'
+            />
+            <ToggleField
+                :name='"lock-aspect-ratio"'
+                :labelIconOn='"fas fa-link"'
+                :labelIconOff='"fas fa-unlink"'
+                :value='lockAspectRatio'
+                @deck-input='value => lockAspectRatio = value'
+            />
+        </div>
+        <div :style='style.row'>
+            <div :style='style.column'>
+                <NumberField
+                    :name='"rotation"'
+                    :labelIcon='"fas fa-sync-alt"'
+                    :value='rotation'
+                    @deck-input='value => rotation = value'
+                />
+                <ColorField
+                    :name='"fill-color"'
+                    :labelText='"FILL"'
+                    :value='fillColor'
+                    @deck-input='value => fillColor = value'
+                />
+            </div>
+            <div :style='style.column'>
+                <NumberField
+                    :name='"stroke-width"'
+                    :labelIcon='"fas fa-grip-lines"'
+                    :value='strokeWidth'
+                    @deck-input='value => strokeWidth = value'
+                />
+                <ColorField
+                    :name='"stroke-color"'
+                    :labelText='"STROKE"'
+                    :value='strokeColor'
+                    @deck-input='value => strokeColor = value'
+                />
+            </div>
+        </div>
     </div>
 </template>
 
@@ -20,6 +78,7 @@ import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
 import ColorField from '../generic/ColorField.vue';
 import ToggleField from '../generic/ToggleField.vue';
+import { degToRad, radToDeg } from '@/utilities/utilities';
 
 const RectangleEditorForm = defineComponent({
     components: {
@@ -32,11 +91,17 @@ const RectangleEditorForm = defineComponent({
         slideId: { type: String, required: true }
     },
     setup: props => {
-        const { root, store } = DeckComponent();
+        const { root, store, baseStyle } = DeckComponent();
         const style = reactive({
             rectangleEditorForm: computed(() => ({
-                height: '100%',
-                width: '100%'
+                boxSizing: 'border-box',
+                padding: '4px'
+            })),
+            row: computed(() => ({
+                ...baseStyle.value.flexRow
+            })),
+            column: computed(() => ({
+                ...baseStyle.value.flexCol
             }))
         });
 
@@ -84,10 +149,10 @@ const RectangleEditorForm = defineComponent({
             }
         });
         const rotation = computed({
-            get: () => props.rectangle.rotation,
+            get: () => radToDeg(props.rectangle.rotation),
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, rotation: value });
-                store.mutations.broadcastSetRotation(props.slideId, props.rectangle.id, value);
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, rotation: degToRad(value) });
+                store.mutations.broadcastSetRotation(props.slideId, props.rectangle.id, degToRad(value));
             }
         });
         const strokeWidth = computed({
