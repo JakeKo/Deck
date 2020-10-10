@@ -1,7 +1,7 @@
 import * as IdProvider from '../IdProvider';
 
 describe('IdProvider', () => {
-    it('generates unique ids', async () => {
+    it('generates unique ids', async() => {
         // Arrange
 
         // Act
