@@ -56,7 +56,7 @@ export default (store: AppStore): EditorTool => {
             unlisten(SLIDE_EVENTS.MOUSEUP, setHandles);
             unlisten(SLIDE_EVENTS.KEYDOWN, complete);
 
-            store.setActiveTool(PointerTool());
+            store.mutations.setActiveTool(PointerTool());
         }
     }
 

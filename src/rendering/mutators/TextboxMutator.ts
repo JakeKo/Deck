@@ -118,7 +118,32 @@ class TextboxMutator implements ITextboxMutator {
         };
     }
 
-    // TODO: Include methods for other mutations
+    public setX(x: number): void {
+        this.target.origin = new Vector(x, this.target.origin.y);
+        this._repositionBoxHelpers();
+    }
+
+    public setY(y: number): void {
+        this.target.origin = new Vector(this.target.origin.x, y);
+        this._repositionBoxHelpers();
+    }
+
+    public setWidth(width: number): void {
+        this.target.dimensions = new Vector(width, this.target.dimensions.y);
+        this._repositionBoxHelpers();
+    }
+
+    public setHeight(height: number): void {
+        this.target.dimensions = new Vector(this.target.dimensions.x, height);
+        this._repositionBoxHelpers();
+    }
+
+    public setRotation(rotation: number): void {
+        this.target.rotation = rotation;
+        rotateBoxHelpers(this._helpers, this.target.box);
+    }
+
+    // TODO: Include mutations for other properties
 
     public complete(): void {
         // Remove helper graphics

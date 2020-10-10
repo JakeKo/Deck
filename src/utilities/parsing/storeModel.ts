@@ -62,8 +62,6 @@ export function imageRendererToImageStoreModel(image: IImageRenderer): ImageStor
             origin: image.origin,
             height: image.dimensions.y,
             width: image.dimensions.x,
-            strokeColor: image.strokeColor,
-            strokeWidth: image.strokeWidth,
             rotation: image.rotation
         };
     } catch (error) {

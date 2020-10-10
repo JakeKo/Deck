@@ -7,6 +7,7 @@
             <Editor />
             <Roadmap />
         </div>
+        <GraphicEditor />
     </div>
 </div>
 </template>
@@ -16,6 +17,7 @@ import MenuBar from './components/MenuBar.vue';
 import Toolbox from './components/Toolbox.vue';
 import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
+import GraphicEditor from './components/GraphicEditor.vue';
 import { PointerTool } from './tools';
 import DeckComponent from './components/generic/DeckComponent';
 import { provideStore } from './store';
@@ -27,7 +29,8 @@ const App = defineComponent({
         MenuBar,
         Toolbox,
         Editor,
-        Roadmap
+        Roadmap,
+        GraphicEditor
     },
     setup: () => {
         provideStore();
@@ -53,7 +56,7 @@ const App = defineComponent({
             }))
         });
 
-        store.setActiveTool(PointerTool());
+        store.mutations.setActiveTool(PointerTool());
 
         return {
             root,

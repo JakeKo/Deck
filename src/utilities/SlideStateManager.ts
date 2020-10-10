@@ -22,11 +22,19 @@ export default class SlideStateManager {
 
     public setGraphicFromRenderer(graphic: IGraphicRenderer): void {
         const storeModel = graphicRendererToGraphicStoreModel(graphic);
-        this._store && this._store.setGraphic(this._slideId, storeModel);
+        this._store && this._store.mutations.setGraphic(this._slideId, storeModel);
     }
 
     public removeGraphicFromRenderer(graphicId: string): void {
-        this._store && this._store.removeGraphic(this._slideId, graphicId);
+        this._store && this._store.mutations.removeGraphic(this._slideId, graphicId);
+    }
+
+    public focusGraphicFromRenderer(graphicId: string): void {
+        this._store && this._store.mutations.focusGraphic(this._slideId, graphicId);
+    }
+
+    public unfocusGraphicFromRenderer(graphicId: string): void {
+        this._store && this._store.mutations.unfocusGraphic(this._slideId, graphicId);
     }
 
     public setGraphicFromStore(graphic: GraphicStoreModel): void {
@@ -38,7 +46,47 @@ export default class SlideStateManager {
         this._renderer && this._renderer.setGraphic(renderer);
     }
 
+    public setXFromStore(graphicId: string, x: number): void {
+        this._renderer && this._renderer.setX(graphicId, x);
+    }
+
+    public setYFromStore(graphicId: string, y: number): void {
+        this._renderer && this._renderer.setY(graphicId, y);
+    }
+
+    public setFillColorFromStore(graphicId: string, fillColor: string): void {
+        this._renderer && this._renderer.setFillColor(graphicId, fillColor);
+    }
+
+    public setStrokeColorFromStore(graphicId: string, strokeColor: string): void {
+        this._renderer && this._renderer.setStrokeColor(graphicId, strokeColor);
+    }
+
+    public setStrokeWidthFromStore(graphicId: string, strokeWidth: number): void {
+        this._renderer && this._renderer.setStrokeWidth(graphicId, strokeWidth);
+    }
+
+    public setWidthFromStore(graphicId: string, width: number): void {
+        this._renderer && this._renderer.setWidth(graphicId, width);
+    }
+
+    public setHeightFromStore(graphicId: string, height: number): void {
+        this._renderer && this._renderer.setHeight(graphicId, height);
+    }
+
+    public setRotationFromStore(graphicId: string, rotation: number): void {
+        this._renderer && this._renderer.setRotation(graphicId, rotation);
+    }
+
     public removeGraphicFromStore(graphicId: string): void {
         this._renderer && this._renderer.removeGraphic(graphicId);
+    }
+
+    public focusGraphicFromStore(graphicId: string): void {
+        this._renderer && this._renderer.focusGraphic(graphicId);
+    }
+
+    public unfocusGraphicFromStore(graphicId: string): void {
+        this._renderer && this._renderer.unfocusGraphic(graphicId);
     }
 }

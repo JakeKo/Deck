@@ -10,8 +10,6 @@ type ImageRendererArgs = {
     source: string;
     origin?: Vector;
     dimensions?: Vector;
-    strokeColor?: string;
-    strokeWidth?: number;
     rotation?: number;
 };
 
@@ -23,8 +21,6 @@ class ImageRenderer implements IImageRenderer {
     private _svg: SVG.Image | undefined;
     private _origin: Vector;
     private _dimensions: Vector;
-    private _strokeColor: string;
-    private _strokeWidth: number;
     private _rotation: number;
 
     constructor(args: ImageRendererArgs) {
@@ -33,8 +29,6 @@ class ImageRenderer implements IImageRenderer {
         this._slide = args.slide;
         this._origin = args.origin || Vector.zero;
         this._dimensions = args.dimensions || Vector.zero;
-        this._strokeColor = args.strokeColor || 'none';
-        this._strokeWidth = args.strokeWidth || 0;
         this._rotation = args.rotation || 0;
     }
 
@@ -58,24 +52,6 @@ class ImageRenderer implements IImageRenderer {
     public set dimensions(dimensions: Vector) {
         this._dimensions = dimensions;
         this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
-    }
-
-    public get strokeColor(): string {
-        return this._strokeColor;
-    }
-
-    public set strokeColor(strokeColor: string) {
-        this._strokeColor = strokeColor;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
-    }
-
-    public get strokeWidth(): number {
-        return this._strokeWidth;
-    }
-
-    public set strokeWidth(strokeWidth: number) {
-        this._strokeWidth = strokeWidth;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
     }
 
     public get rotation(): number {
@@ -150,7 +126,6 @@ class ImageRenderer implements IImageRenderer {
 
         this._svg = this._slide.canvas.image(this.source, this._dimensions.x, this._dimensions.y)
             .translate(this._origin.x, this._origin.y)
-            .stroke({ color: this._strokeColor, width: this._strokeWidth })
             .rotate(radToDeg(this._rotation));
         decorateImageEvents(this._svg, this._slide, this);
     }

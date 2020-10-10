@@ -175,6 +175,23 @@ class CurveMutator implements ICurveMutator {
         }[role];
     }
 
+    public setRotation(rotation: number): void {
+        this.target.rotation = rotation;
+        rotateBoxHelpers(this._helpers, this.target.box);
+    }
+
+    public setFillColor(fillColor: string): void {
+        this.target.fillColor = fillColor;
+    }
+
+    public setStrokeColor(strokeColor: string): void {
+        this.target.strokeColor = strokeColor;
+    }
+
+    public setStrokeWidth(strokeWidth: number): void {
+        this.target.strokeWidth = strokeWidth;
+    }
+
     public complete(): void {
         this._helpers.anchors.forEach(helper => helper.unrender());
         unrenderBoxHelpers(this._helpers);

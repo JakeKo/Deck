@@ -117,7 +117,42 @@ class EllipseMutator implements IEllipseMutator {
         };
     }
 
-    // TODO: Include methods for other mutations
+    public setX(x: number): void {
+        this.target.center = new Vector(x, this.target.center.y);
+        this._repositionBoxHelpers();
+    }
+
+    public setY(y: number): void {
+        this.target.center = new Vector(this.target.center.x, y);
+        this._repositionBoxHelpers();
+    }
+
+    public setWidth(width: number): void {
+        this.target.dimensions = new Vector(width, this.target.dimensions.y);
+        this._repositionBoxHelpers();
+    }
+
+    public setHeight(height: number): void {
+        this.target.dimensions = new Vector(this.target.dimensions.x, height);
+        this._repositionBoxHelpers();
+    }
+
+    public setRotation(rotation: number): void {
+        this.target.rotation = rotation;
+        rotateBoxHelpers(this._helpers, this.target.box);
+    }
+
+    public setFillColor(fillColor: string): void {
+        this.target.fillColor = fillColor;
+    }
+
+    public setStrokeColor(strokeColor: string): void {
+        this.target.strokeColor = strokeColor;
+    }
+
+    public setStrokeWidth(strokeWidth: number): void {
+        this.target.strokeWidth = strokeWidth;
+    }
 
     public complete(): void {
         // Remove helper graphics

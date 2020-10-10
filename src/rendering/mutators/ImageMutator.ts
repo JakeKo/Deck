@@ -118,7 +118,35 @@ class ImageMutator implements IImageMutator {
         };
     }
 
-    // TODO: Include methods for other mutations
+    public setX(x: number): void {
+        this.target.origin = new Vector(x, this.target.origin.y);
+        this._repositionBoxHelpers();
+    }
+
+    public setY(y: number): void {
+        this.target.origin = new Vector(this.target.origin.x, y);
+        this._repositionBoxHelpers();
+    }
+
+    public setWidth(width: number): void {
+        // When the width changes, we preserve aspect ratio
+        const heightToWidth = this.target.dimensions.y / this.target.dimensions.x;
+        this.target.dimensions = new Vector(width, width * heightToWidth);
+        this._repositionBoxHelpers();
+    }
+
+    public setHeight(height: number): void {
+        // When the height changes, we preserve aspect ratio
+        const widthToHeight = this.target.dimensions.x / this.target.dimensions.y;
+        this.target.dimensions = new Vector(height * widthToHeight, height);
+        this._repositionBoxHelpers();
+    }
+
+    public setRotation(rotation: number): void {
+        this.target.rotation = rotation;
+        rotateBoxHelpers(this._helpers, this.target.box);
+    }
+
     public complete(): void {
         // Remove helper graphics
         unrenderBoxHelpers(this._helpers);

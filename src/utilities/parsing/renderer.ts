@@ -74,8 +74,6 @@ export function imageStoreModelToImageRenderer(image: ImageStoreModel, slide: IS
             origin: new Vector(image.origin.x, image.origin.y),
             source: image.source,
             dimensions: new Vector(image.width, image.height),
-            strokeColor: image.strokeColor,
-            strokeWidth: image.strokeWidth,
             rotation: image.rotation
         });
     } catch (error) {

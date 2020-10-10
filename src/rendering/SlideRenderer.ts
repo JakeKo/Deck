@@ -45,6 +45,7 @@ import {
     IVideoMaker
 } from './types';
 import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
+const { CURVE, ELLIPSE, IMAGE, RECTANGLE, TEXTBOX, VIDEO } = GRAPHIC_TYPES;
 
 type SlideRendererArgs = {
     stateManager: SlideStateManager;
@@ -224,28 +225,30 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         let mutator;
 
-        if (graphic.type === GRAPHIC_TYPES.CURVE) {
+        if (graphic.type === CURVE) {
             mutator = new CurveMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+        } else if (graphic.type === ELLIPSE) {
             mutator = new EllipseMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
+        } else if (graphic.type === IMAGE) {
             mutator = new ImageMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+        } else if (graphic.type === RECTANGLE) {
             mutator = new RectangleMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
+        } else if (graphic.type === TEXTBOX) {
             mutator = new TextboxMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
+        } else if (graphic.type === VIDEO) {
             mutator = new VideoMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }
 
         this._focusedGraphics[graphicId] = mutator;
+        this._stateManager.focusGraphicFromRenderer(graphicId);
         return mutator;
     }
 
     public unfocusGraphic(graphicId: string): void {
         this.isFocused(graphicId) && this._focusedGraphics[graphicId].complete();
+        this._stateManager.unfocusGraphicFromRenderer(graphicId);
         delete this._focusedGraphics[graphicId];
     }
 
@@ -267,17 +270,17 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         let marker;
 
-        if (graphic.type === GRAPHIC_TYPES.CURVE) {
+        if (graphic.type === CURVE) {
             marker = new CurveMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.ELLIPSE) {
+        } else if (graphic.type === ELLIPSE) {
             marker = new EllipseMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.IMAGE) {
+        } else if (graphic.type === IMAGE) {
             marker = new ImageMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.RECTANGLE) {
+        } else if (graphic.type === RECTANGLE) {
             marker = new RectangleMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.TEXTBOX) {
+        } else if (graphic.type === TEXTBOX) {
             marker = new TextboxMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
-        } else if (graphic.type === GRAPHIC_TYPES.VIDEO) {
+        } else if (graphic.type === VIDEO) {
             marker = new VideoMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
@@ -294,6 +297,119 @@ class SlideRenderer implements ISlideRenderer {
 
     public isMarked(graphicId: string): boolean {
         return this._markedGraphics[graphicId] !== undefined;
+    }
+
+    // SINGLE PROPERTY UPDATE METHODS
+    public setX(graphicId: string, x: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setX(x);
+            } else {
+                graphic.origin = new Vector(x, graphic.origin.y);
+            }
+        } else if (graphic.type === ELLIPSE) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as EllipseMutator).setX(x);
+            } else {
+                graphic.center = new Vector(x, graphic.center.y);
+            }
+        } else {
+            console.warn(`Attempted to set property 'x' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setY(graphicId: string, y: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setY(y);
+            } else {
+                graphic.origin = new Vector(graphic.origin.x, y);
+            }
+        } else if (graphic.type === ELLIPSE) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as EllipseMutator).setY(y);
+            } else {
+                graphic.center = new Vector(graphic.center.x, y);
+            }
+        } else {
+            console.warn(`Attempted to set property 'y' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setFillColor(graphicId: string, fillColor: string): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | RectangleMutator).setFillColor(fillColor);
+            } else {
+                graphic.fillColor = fillColor;
+            }
+        } else {
+            console.warn(`Attempted to set property 'fillColor' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setStrokeColor(graphicId: string, strokeColor: string): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | RectangleMutator | VideoMutator).setStrokeColor(strokeColor);
+            } else {
+                graphic.strokeColor = strokeColor;
+            }
+        } else {
+            console.warn(`Attempted to set property 'strokeColor' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setStrokeWidth(graphicId: string, strokeWidth: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | RectangleMutator | VideoMutator).setStrokeWidth(strokeWidth);
+            } else {
+                graphic.strokeWidth = strokeWidth;
+            }
+        } else {
+            console.warn(`Attempted to set property 'strokeWidth' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setWidth(graphicId: string, width: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as EllipseMutator | ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setWidth(width);
+            } else {
+                graphic.dimensions = new Vector(width, graphic.dimensions.y);
+            }
+        } else {
+            console.warn(`Attempted to set property 'width' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setHeight(graphicId: string, height: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as EllipseMutator | ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setHeight(height);
+            } else {
+                graphic.dimensions = new Vector(graphic.dimensions.x, height);
+            }
+        } else {
+            console.warn(`Attempted to set property 'height' of graphic with type '${graphic.type}'`);
+        }
+    }
+
+    public setRotation(graphicId: string, rotation: number): void {
+        const graphic = this.getGraphic(graphicId);
+        if (this.isFocused(graphicId)) {
+            this._focusedGraphics[graphicId].setRotation(rotation);
+        } else {
+            graphic.rotation = rotation;
+        }
     }
 
     private _activateMaker<T extends IGraphicMaker>(maker: T): T {
