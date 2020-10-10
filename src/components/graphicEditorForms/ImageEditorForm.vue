@@ -61,8 +61,8 @@ const ImageEditorForm = defineComponent({
         const { root, store, baseStyle } = DeckComponent();
         const style = reactive({
             imageEditorForm: computed(() => ({
-                height: '100%',
-                width: '100%'
+                boxSizing: 'border-box',
+                padding: '4px'
             })),
             row: computed(() => ({
                 ...baseStyle.value.flexRow

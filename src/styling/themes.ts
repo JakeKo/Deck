@@ -19,11 +19,11 @@ const lightTheme: Theme = {
             lowest: '#000000' // 100% tint
         },
         primary: {
-            highest: '#7955ae', // 30% tint
-            higher: '#532497', // 10% tint
-            flush: '#400c8b', // base
-            lower: '#3a0b7d', // 10% shade
-            lowest: '#2d0861' // 30% shade
+            highest: '#8766b6', // 30% tint
+            higher: '#643aa1', // 10% tint
+            flush: '#532497', // base
+            lower: '#4b2088', // 10% shade
+            lowest: '#3a196a' // 30% shade
         }
     },
     text: {
