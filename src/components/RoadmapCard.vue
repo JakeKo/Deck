@@ -1,7 +1,13 @@
 <template>
-<div ref='root' :style='style.roadmapSlot' @click='() => setActiveSlide(id)'>
+<div v-if='!isAddSlideCard' ref='root' :style='style.roadmapSlot' @click='() => setActiveSlide(id)'>
     <div :style="style.slideTopic">Topic</div>
     <svg ref='canvas' :viewBox="previewViewbox" :style="style.slidePreview" />
+</div>
+<div v-else ref='root' :style='style.roadmapSlot' @click='createNewSlide'>
+    <div :style="style.slideTopic">Add Slide</div>
+    <div :style="style.addSlidePreview">
+        <i class='fas fa-plus' />
+    </div>
 </div>
 </template>
 
@@ -13,7 +19,8 @@ import { useStore } from '@/store';
 const RoadmapCard = defineComponent({
     props: {
         id: { type: String, required: true },
-        isActive: { type: Boolean, required: true }
+        isActive: { type: Boolean, required: true },
+        isAddSlideCard: { type: Boolean, required: true }
     },
     setup: props => {
         const { target: root, isHovered } = useHover();
@@ -40,7 +47,18 @@ const RoadmapCard = defineComponent({
             slidePreview: computed(() => ({
                 height: '45px',
                 width: '80px',
+                boxSizing: 'border-box',
+                transition: '0.25s',
+                border: props.isActive ? `1px solid ${baseTheme.value.color.basecomp.flush}` : 'none',
                 ...baseStyle.value.cardHigher
+            })),
+            addSlidePreview: computed(() => ({
+                height: '45px',
+                width: '80px',
+                ...baseStyle.value.cardHigher,
+                ...baseStyle.value.flexRowCC,
+                color: baseTheme.value.color.base.highest,
+                background: baseTheme.value.color.primary.flush
             }))
         });
         const previewViewbox = computed(() => {
@@ -53,7 +71,7 @@ const RoadmapCard = defineComponent({
         // TODO: Determine how to ignore helper graphics when updating preview
         async function refresh() {
             if (canvas.value === undefined) {
-                throw new Error('Canvas ref not specified.');
+                return;
             }
 
             const source = document.querySelector(`#slide_${props.id} svg`) as SVGElement;
@@ -67,12 +85,24 @@ const RoadmapCard = defineComponent({
 
         onBeforeUnmount(() => clearInterval(refreshInterval));
 
+        function createNewSlide(): void {
+            store.mutations.addSlide(store.state.slides.length);
+
+            const lastSlide = store.state.slides[store.state.slides.length - 1];
+            if (lastSlide === undefined) {
+                throw new Error('Failed to create new slide');
+            }
+
+            store.mutations.setActiveSlide(lastSlide.id);
+        }
+
         return {
             root,
             canvas,
             style,
             previewViewbox,
-            setActiveSlide: store.mutations.setActiveSlide
+            setActiveSlide: store.mutations.setActiveSlide,
+            createNewSlide
         };
     }
 });
