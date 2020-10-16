@@ -1,6 +1,6 @@
 <template>
 <div ref='root' :style="style.roadmap" tabindex="0">
-    <RoadmapSlot v-for='slide in roadmapSlides'
+    <RoadmapCard v-for='slide in roadmapSlides'
         :key='slide.id'
         :id='slide.id'
         :isActive='slide.isActive'
@@ -15,13 +15,13 @@
 </template>
 
 <script lang='ts'>
-import RoadmapSlot from './RoadmapSlot.vue';
+import RoadmapCard from './RoadmapCard.vue';
 import DeckComponent from './generic/DeckComponent';
 import { defineComponent, computed, reactive, onMounted } from 'vue';
 
 const Roadmap = defineComponent({
     components: {
-        RoadmapSlot
+        RoadmapCard
     },
     setup: () => {
         const { root, store, baseStyle, baseTheme } = DeckComponent();

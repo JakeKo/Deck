@@ -6,35 +6,41 @@
 </template>
 
 <script lang='ts'>
-import DeckComponent from './generic/DeckComponent';
 import { defineComponent, computed, reactive, onMounted, ref, onBeforeUnmount } from 'vue';
+import { useHover, useStyle } from './generic/core';
+import { useStore } from '@/store';
 
-const RoadmapSlot = defineComponent({
+const RoadmapCard = defineComponent({
     props: {
         id: { type: String, required: true },
         isActive: { type: Boolean, required: true }
     },
     setup: props => {
-        const { root, store, baseStyle, baseTheme } = DeckComponent();
+        const { target: root, isHovered } = useHover();
+        const { baseStyle, baseTheme } = useStyle();
+        const store = useStore();
+
         const style = reactive({
             roadmapSlot: computed(() => ({
                 height: '100%',
-                padding: '8px',
+                cursor: 'pointer',
+                padding: '4px',
                 boxSizing: 'border-box',
-                ...baseStyle.value.flexColCC,
-                justifyContent: 'space-between',
-                cursor: 'pointer'
+                transition: '0.25s',
+                ...baseStyle.value.flexCol,
+                background: isHovered.value
+                    ? baseTheme.value.color.base.higher
+                    : baseTheme.value.color.base.highest
             })),
             slideTopic: computed(() => ({
-                ...baseStyle.value.fontBody
+                ...baseStyle.value.fontLabel,
+                width: '100%',
+                textAlign: 'center'
             })),
             slidePreview: computed(() => ({
                 height: '45px',
                 width: '80px',
-                border: props.isActive
-                    ? `2px solid ${baseTheme.value.color.primary.flush}`
-                    : `2px solid ${baseTheme.value.color.base.flush}`,
-                boxSizing: 'border-box'
+                ...baseStyle.value.cardHigher
             }))
         });
         const previewViewbox = computed(() => {
@@ -45,15 +51,18 @@ const RoadmapSlot = defineComponent({
         let refreshInterval: number;
 
         // TODO: Determine how to ignore helper graphics when updating preview
-        onMounted(() => {
-            refreshInterval = setInterval(async() => {
-                if (canvas.value === undefined) {
-                    throw new Error('Canvas ref not specified.');
-                }
+        async function refresh() {
+            if (canvas.value === undefined) {
+                throw new Error('Canvas ref not specified.');
+            }
 
-                const source = document.querySelector(`#slide_${props.id} svg`) as SVGElement;
-                canvas.value.innerHTML = source.innerHTML;
-            }, 5000);
+            const source = document.querySelector(`#slide_${props.id} svg`) as SVGElement;
+            canvas.value.innerHTML = source.innerHTML;
+        }
+
+        onMounted(() => {
+            refresh();
+            refreshInterval = setInterval(refresh, 5000);
         });
 
         onBeforeUnmount(() => clearInterval(refreshInterval));
@@ -68,5 +77,5 @@ const RoadmapSlot = defineComponent({
     }
 });
 
-export default RoadmapSlot;
+export default RoadmapCard;
 </script>
