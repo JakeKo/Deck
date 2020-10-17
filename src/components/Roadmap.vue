@@ -1,23 +1,25 @@
 <template>
 <div ref='root' :style="style.roadmap" tabindex="0" @mousewheel='handleMouseWheel'>
-    <RoadmapCard v-for='slide in roadmapSlides'
+    <component v-for='slide in roadmapSlides'
+        :is='"StandardRoadmapCard"'
         :key='slide.id'
         :id='slide.id'
         :isActive='slide.isActive'
-        :isAddSlideCard='false'
     />
-    <RoadmapCard :id='"0"' :isActive='false' :isAddSlideCard='true' />
+    <AddSlideRoadmapCard />
 </div>
 </template>
 
 <script lang='ts'>
-import RoadmapCard from './RoadmapCard.vue';
+import StandardRoadmapCard from './RoadmapCards/StandardRoadmapCard.vue';
+import AddSlideRoadmapCard from './RoadmapCards/AddSlideRoadmapCard.vue';
 import DeckComponent from './generic/DeckComponent';
 import { defineComponent, computed, reactive, onMounted } from 'vue';
 
 const Roadmap = defineComponent({
     components: {
-        RoadmapCard
+        StandardRoadmapCard,
+        AddSlideRoadmapCard
     },
     setup: () => {
         const { root, store, baseStyle, baseTheme } = DeckComponent();
@@ -51,6 +53,10 @@ const Roadmap = defineComponent({
         function handleMouseWheel(event: WheelEvent): void {
             if (root.value === undefined) {
                 throw new Error('Root ref not specified.');
+            }
+
+            if (event.deltaY === 0) {
+                return;
             }
 
             event.preventDefault();

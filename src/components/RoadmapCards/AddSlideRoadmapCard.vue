@@ -1,0 +1,67 @@
+<template>
+<div ref='root' :style='style.roadmapSlot' @mousedown='addSlide'>
+    <div :style="style.slideTopic">Add Slide</div>
+    <div :style="style.addSlidePreview">
+        <i class='fas fa-plus' />
+    </div>
+</div>
+</template>
+
+<script lang='ts'>
+import { defineComponent, computed, reactive } from 'vue';
+import { useHover, useStyle } from '../generic/core';
+import { useStore } from '@/store';
+
+const StandardRoadmapCard = defineComponent({
+    setup: () => {
+        const { target: root, isHovered } = useHover();
+        const { baseStyle, baseTheme } = useStyle();
+        const store = useStore();
+
+        const style = reactive({
+            roadmapSlot: computed(() => ({
+                height: '100%',
+                cursor: 'pointer',
+                width: '96px',
+                transition: '0.25s',
+                ...baseStyle.value.flexColCC,
+                background: isHovered.value
+                    ? baseTheme.value.color.base.higher
+                    : baseTheme.value.color.base.highest
+            })),
+            slideTopic: computed(() => ({
+                ...baseStyle.value.fontLabel,
+                width: '100%',
+                textAlign: 'center'
+            })),
+            addSlidePreview: computed(() => ({
+                height: '45px',
+                width: '80px',
+                ...baseStyle.value.cardHigher,
+                ...baseStyle.value.flexRowCC,
+                color: baseTheme.value.color.base.highest,
+                background: baseTheme.value.color.primary.flush
+            }))
+        });
+
+        function addSlide(): void {
+            store.mutations.addSlide(store.state.slides.length);
+
+            const lastSlide = store.state.slides[store.state.slides.length - 1];
+            if (lastSlide === undefined) {
+                throw new Error('Failed to create new slide');
+            }
+
+            store.mutations.setActiveSlide(lastSlide.id);
+        }
+
+        return {
+            root,
+            style,
+            addSlide
+        };
+    }
+});
+
+export default StandardRoadmapCard;
+</script>
