@@ -1,5 +1,5 @@
 <template>
-<div ref='root' :style='style.roadmapSlot' @mousedown='() => setActiveSlide(id)'>
+<div ref='root' :style='style.roadmapSlot' @mousedown='handleMouseDown' @mouseover='handleMouseOver'>
     <div :style='style.slideTopic'>Topic</div>
     <svg ref='canvas' :viewBox='previewViewbox' :style='style.slidePreview' />
 </div>
@@ -9,13 +9,15 @@
 import { defineComponent, computed, reactive, onMounted, ref, onBeforeUnmount } from 'vue';
 import { useHover, useStyle } from '../generic/core';
 import { useStore } from '@/store';
+import { listenOnce } from '@/events/utilities';
 
 const StandardRoadmapCard = defineComponent({
     props: {
         id: { type: String, required: true },
         isActive: { type: Boolean, required: true }
     },
-    setup: props => {
+    emits: ['deck-roadmap-card-mousedown', 'deck-roadmap-card-mousedownhold', 'deck-roadmap-card-mouseover'],
+    setup: (props, { emit }) => {
         const { target: root, isHovered } = useHover();
         const { baseStyle, baseTheme } = useStyle();
         const store = useStore();
@@ -69,12 +71,24 @@ const StandardRoadmapCard = defineComponent({
 
         onBeforeUnmount(() => clearInterval(refreshInterval));
 
+        function handleMouseDown(): void {
+            emit('deck-roadmap-card-mousedown', props.id);
+
+            const holdDetector = setTimeout(() => emit('deck-roadmap-card-mousedownhold', props.id), 250);
+            listenOnce('mouseup', () => clearInterval(holdDetector));
+        }
+
+        function handleMouseOver(): void {
+            emit('deck-roadmap-card-mouseover');
+        }
+
         return {
             root,
             canvas,
             style,
             previewViewbox,
-            setActiveSlide: store.mutations.setActiveSlide
+            handleMouseDown,
+            handleMouseOver
         };
     }
 });

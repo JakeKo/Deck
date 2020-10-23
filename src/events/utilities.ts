@@ -1,15 +1,15 @@
 import { IGraphicRenderer, IHelperRenderer, ISlideRenderer } from '@/rendering/types';
 import { DECK_EVENTS, SlideMouseEvent, SlideMouseEventPayload, SLIDE_EVENTS } from './types';
 
-export function listen(eventName: DECK_EVENTS, handler: (event: CustomEvent) => void): void {
+export function listen(eventName: DECK_EVENTS | string, handler: (event: CustomEvent) => void): void {
     document.addEventListener(eventName, handler as EventListener);
 }
 
-export function listenOnce(eventName: DECK_EVENTS, handler: (event: CustomEvent) => void): void {
+export function listenOnce(eventName: DECK_EVENTS | string, handler: (event: CustomEvent) => void): void {
     document.addEventListener(eventName, handler as EventListener, { once: true });
 }
 
-export function unlisten(eventName: DECK_EVENTS, handler: (event: CustomEvent) => void): void {
+export function unlisten(eventName: DECK_EVENTS | string, handler: (event: CustomEvent) => void): void {
     document.removeEventListener(eventName, handler as EventListener);
 }
 

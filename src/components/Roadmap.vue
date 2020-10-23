@@ -1,11 +1,16 @@
 <template>
-<div ref='root' :style="style.roadmap" tabindex="0" @mousewheel='handleMouseWheel'>
-    <component v-for='slide in roadmapSlides'
-        :is='"StandardRoadmapCard"'
-        :key='slide.id'
-        :id='slide.id'
-        :isActive='slide.isActive'
-    />
+<div ref='root' :style='style.roadmap' tabindex='0' @mousewheel='handleMouseWheel'>
+    <div v-for='(slide, index) in roadmapSlides' :key='slide.id'>
+        <PlaceholderRoadmapCard v-if='isReorderingSlides && placementIndex === index' />
+        <StandardRoadmapCard
+            v-else
+            :id='slide.id'
+            :isActive='slide.isActive'
+            @deck-roadmap-card-mousedown='setActiveSlide'
+            @deck-roadmap-card-mousedownhold='beginReorderingSlides'
+            @deck-roadmap-card-mouseover='placementIndex = index'
+        />
+    </div>
     <AddSlideRoadmapCard />
 </div>
 </template>
@@ -13,16 +18,20 @@
 <script lang='ts'>
 import StandardRoadmapCard from './RoadmapCards/StandardRoadmapCard.vue';
 import AddSlideRoadmapCard from './RoadmapCards/AddSlideRoadmapCard.vue';
+import PlaceholderRoadmapCard from './RoadmapCards/PlaceholderRoadmapCard.vue';
 import DeckComponent from './generic/DeckComponent';
-import { defineComponent, computed, reactive, onMounted } from 'vue';
+import { defineComponent, computed, reactive, onMounted, ref } from 'vue';
+import { useStyle } from './generic/core';
 
 const Roadmap = defineComponent({
     components: {
         StandardRoadmapCard,
-        AddSlideRoadmapCard
+        AddSlideRoadmapCard,
+        PlaceholderRoadmapCard
     },
     setup: () => {
-        const { root, store, baseStyle, baseTheme } = DeckComponent();
+        const { root, store } = DeckComponent();
+        const { baseStyle, baseTheme } = useStyle();
         const style = reactive({
             roadmap: computed(() => ({
                 boxSizing: 'border-box',
@@ -33,8 +42,8 @@ const Roadmap = defineComponent({
                 overflowX: 'scroll'
             }))
         });
-        const roadmapSlides = computed(() => store.state.slides.map(s => ({ id: s.id, isActive: s.isActive })));
 
+        const roadmapSlides = computed(() => store.state.slides.map(s => ({ id: s.id, isActive: s.isActive })));
         onMounted(() => {
             if (root.value === undefined) {
                 throw new Error('Root ref not specified.');
@@ -63,11 +72,22 @@ const Roadmap = defineComponent({
             root.value.scrollLeft += event.deltaY / 5;
         }
 
+        const isReorderingSlides = ref<boolean>(false);
+        const placementIndex = ref<number>(0);
+        function beginReorderingSlides(): void {
+            isReorderingSlides.value = true;
+            document.addEventListener('mouseup', () => (isReorderingSlides.value = false), { once: true });
+        }
+
         return {
             root,
             style,
             roadmapSlides,
-            handleMouseWheel
+            handleMouseWheel,
+            placementIndex,
+            setActiveSlide: store.mutations.setActiveSlide,
+            beginReorderingSlides,
+            isReorderingSlides
         };
     }
 });

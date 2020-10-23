@@ -24,6 +24,7 @@ const StandardRoadmapCard = defineComponent({
                 cursor: 'pointer',
                 width: '96px',
                 transition: '0.25s',
+                flexShrink: '0',
                 ...baseStyle.value.flexColCC,
                 background: isHovered.value
                     ? baseTheme.value.color.base.higher
