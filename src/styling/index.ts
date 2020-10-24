@@ -148,8 +148,6 @@ const getBaseStyles = (theme: Theme): BaseStyles => ({
         fontSize: theme.text.input.size
     },
     cardFlush: {
-        boxShadow: 'none',
-        borderRadius: '4px',
         margin: '4px'
     },
     cardHigh: {

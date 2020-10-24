@@ -1,30 +1,32 @@
 <template>
-<div ref='root' :style="style.roadmap" tabindex="0">
-    <RoadmapSlot v-for='slide in roadmapSlides'
-        :key='slide.id'
-        :id='slide.id'
-        :isActive='slide.isActive'
-    />
-    <div :style="style.addSlideSlot" @click='createNewSlide'>
-        <div :style="style.addSlideLabel">Add Slide</div>
-        <div :style="style.addSlideButton">
-            <i class='fas fa-plus' />
-        </div>
+<div ref='root' :style='style.roadmap' tabindex='0' @mousewheel='handleMouseWheel'>
+    <div v-for='(slide, index) in roadmapSlides' :key='slide.id' :ref='refRoadmapCard'>
+        <StandardRoadmapCard
+            :id='slide.id'
+            :isActive='slide.isActive'
+            @deck-roadmap-card-mousedown='setActiveSlide'
+            @deck-roadmap-card-mousedownhold='beginReorderingSlides(index)'
+        />
     </div>
+    <AddSlideRoadmapCard />
 </div>
 </template>
 
 <script lang='ts'>
-import RoadmapSlot from './RoadmapSlot.vue';
+import StandardRoadmapCard from './RoadmapCards/StandardRoadmapCard.vue';
+import AddSlideRoadmapCard from './RoadmapCards/AddSlideRoadmapCard.vue';
 import DeckComponent from './generic/DeckComponent';
-import { defineComponent, computed, reactive, onMounted } from 'vue';
+import { defineComponent, computed, reactive, onMounted, ref, onBeforeUpdate } from 'vue';
+import { useStyle } from './generic/core';
 
 const Roadmap = defineComponent({
     components: {
-        RoadmapSlot
+        StandardRoadmapCard,
+        AddSlideRoadmapCard
     },
     setup: () => {
-        const { root, store, baseStyle, baseTheme } = DeckComponent();
+        const { root, store } = DeckComponent();
+        const { baseStyle, baseTheme } = useStyle();
         const style = reactive({
             roadmap: computed(() => ({
                 boxSizing: 'border-box',
@@ -33,39 +35,10 @@ const Roadmap = defineComponent({
                 ...baseStyle.value.flexRow,
                 flexShrink: '0',
                 overflowX: 'scroll'
-            })),
-            addSlideSlot: computed(() => ({
-                height: '100%',
-                padding: '8px',
-                boxSizing: 'border-box',
-                ...baseStyle.value.flexColCC,
-                justifyContent: 'space-between',
-                cursor: 'pointer'
-            })),
-            addSlideLabel: computed(() => ({
-                ...baseStyle.value.fontBody
-            })),
-            addSlideButton: computed(() => ({
-                height: '45px',
-                width: '80px',
-                ...baseStyle.value.flexRowCC,
-                color: baseTheme.value.color.base.highest,
-                background: baseTheme.value.color.primary.flush
             }))
         });
+
         const roadmapSlides = computed(() => store.state.slides.map(s => ({ id: s.id, isActive: s.isActive })));
-
-        function createNewSlide(): void {
-            store.mutations.addSlide(store.state.slides.length);
-
-            const lastSlide = store.state.slides[store.state.slides.length - 1];
-            if (lastSlide === undefined) {
-                throw new Error('Failed to create new slide');
-            }
-
-            store.mutations.setActiveSlide(lastSlide.id);
-        }
-
         onMounted(() => {
             if (root.value === undefined) {
                 throw new Error('Root ref not specified.');
@@ -81,11 +54,70 @@ const Roadmap = defineComponent({
             });
         });
 
+        function handleMouseWheel(event: WheelEvent): void {
+            if (root.value === undefined) {
+                throw new Error('Root ref not specified.');
+            }
+
+            if (event.deltaY === 0) {
+                return;
+            }
+
+            event.preventDefault();
+            root.value.scrollLeft += event.deltaY / 5;
+        }
+
+        const roadmapCards = ref<HTMLElement[]>([]);
+        onBeforeUpdate(() => (roadmapCards.value = []));
+        function refRoadmapCard(element: HTMLElement): void {
+            roadmapCards.value.push(element);
+        }
+
+        function beginReorderingSlides(index: number): void {
+            const sourceIndex = index;
+            let targetIndex = index;
+
+            // Calculate the centers of each roadmap card so we may determine when the user is hovering over each
+            const borders: number[] = roadmapCards.value
+                .map(element => element.getBoundingClientRect())
+                .map(box => box.x + box.width / 2);
+
+            document.addEventListener('mousemove', move);
+            document.addEventListener('mouseup', end, { once: true });
+
+            function move(event: MouseEvent): void {
+                event.preventDefault();
+
+                // Calculate newTargetIndex by determining the center the user is closest to
+                // This essentially detects when a user is hovering over a roadmap card
+                const diffs = borders.map(border => Math.abs(border - event.clientX));
+                const minDiff = Math.min(...diffs);
+                const newTargetIndex = diffs.indexOf(minDiff);
+
+                // Don't bother moving slides if the user isn't hovering over a new roadmap card
+                if (newTargetIndex === targetIndex) {
+                    return;
+                }
+
+                // Undo previous move, then move the slide to the new location
+                store.mutations.moveSlide(targetIndex, sourceIndex);
+                targetIndex = newTargetIndex;
+                store.mutations.moveSlide(sourceIndex, targetIndex);
+            }
+
+            function end(): void {
+                document.removeEventListener('mousemove', move);
+            }
+        }
+
         return {
             root,
             style,
-            createNewSlide,
-            roadmapSlides
+            roadmapSlides,
+            handleMouseWheel,
+            setActiveSlide: store.mutations.setActiveSlide,
+            beginReorderingSlides,
+            refRoadmapCard
         };
     }
 });

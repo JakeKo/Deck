@@ -176,8 +176,6 @@ export type BaseStyles = {
         fontSize: string;
     };
     cardFlush: {
-        boxShadow: string;
-        borderRadius: string;
         margin: string;
     };
     cardHigh: {

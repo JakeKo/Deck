@@ -11,7 +11,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "reinstall": "rm -rf ./node_modules && npm i"
   },
   "dependencies": {
     "core-js": "^3.6.5",
