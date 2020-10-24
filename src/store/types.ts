@@ -27,6 +27,7 @@ export type AppMutations = {
     addSlide: (index: number, slide?: Slide) => void;
     removeSlide: (index: number) => void;
     removeAllSlides: () => void;
+    moveSlide: (source: number, target: number) => void;
     setActiveSlide: (slideId: string) => void;
     focusGraphic: (slideId: string, graphicId: string) => void;
     focusGraphicBulk: (slideId: string, graphicIds: string[]) => void;

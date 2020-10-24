@@ -1,14 +1,11 @@
 <template>
 <div ref='root' :style='style.roadmap' tabindex='0' @mousewheel='handleMouseWheel'>
-    <div v-for='(slide, index) in roadmapSlides' :key='slide.id'>
-        <PlaceholderRoadmapCard v-if='isReorderingSlides && placementIndex === index' />
+    <div v-for='(slide, index) in roadmapSlides' :key='slide.id' :ref='refRoadmapCard'>
         <StandardRoadmapCard
-            v-else
             :id='slide.id'
             :isActive='slide.isActive'
             @deck-roadmap-card-mousedown='setActiveSlide'
-            @deck-roadmap-card-mousedownhold='beginReorderingSlides'
-            @deck-roadmap-card-mouseover='placementIndex = index'
+            @deck-roadmap-card-mousedownhold='beginReorderingSlides(index)'
         />
     </div>
     <AddSlideRoadmapCard />
@@ -18,16 +15,14 @@
 <script lang='ts'>
 import StandardRoadmapCard from './RoadmapCards/StandardRoadmapCard.vue';
 import AddSlideRoadmapCard from './RoadmapCards/AddSlideRoadmapCard.vue';
-import PlaceholderRoadmapCard from './RoadmapCards/PlaceholderRoadmapCard.vue';
 import DeckComponent from './generic/DeckComponent';
-import { defineComponent, computed, reactive, onMounted, ref } from 'vue';
+import { defineComponent, computed, reactive, onMounted, ref, onBeforeUpdate } from 'vue';
 import { useStyle } from './generic/core';
 
 const Roadmap = defineComponent({
     components: {
         StandardRoadmapCard,
-        AddSlideRoadmapCard,
-        PlaceholderRoadmapCard
+        AddSlideRoadmapCard
     },
     setup: () => {
         const { root, store } = DeckComponent();
@@ -72,11 +67,47 @@ const Roadmap = defineComponent({
             root.value.scrollLeft += event.deltaY / 5;
         }
 
-        const isReorderingSlides = ref<boolean>(false);
-        const placementIndex = ref<number>(0);
-        function beginReorderingSlides(): void {
-            isReorderingSlides.value = true;
-            document.addEventListener('mouseup', () => (isReorderingSlides.value = false), { once: true });
+        const roadmapCards = ref<HTMLElement[]>([]);
+        onBeforeUpdate(() => (roadmapCards.value = []));
+        function refRoadmapCard(element: HTMLElement): void {
+            roadmapCards.value.push(element);
+        }
+
+        function beginReorderingSlides(index: number): void {
+            const sourceIndex = index;
+            let targetIndex = index;
+
+            // Calculate the centers of each roadmap card so we may determine when the user is hovering over each
+            const borders: number[] = roadmapCards.value
+                .map(element => element.getBoundingClientRect())
+                .map(box => box.x + box.width / 2);
+
+            document.addEventListener('mousemove', move);
+            document.addEventListener('mouseup', end, { once: true });
+
+            function move(event: MouseEvent): void {
+                event.preventDefault();
+
+                // Calculate newTargetIndex by determining the center the user is closest to
+                // This essentially detects when a user is hovering over a roadmap card
+                const diffs = borders.map(border => Math.abs(border - event.clientX));
+                const minDiff = Math.min(...diffs);
+                const newTargetIndex = diffs.indexOf(minDiff);
+
+                // Don't bother moving slides if the user isn't hovering over a new roadmap card
+                if (newTargetIndex === targetIndex) {
+                    return;
+                }
+
+                // Undo previous move, then move the slide to the new location
+                store.mutations.moveSlide(targetIndex, sourceIndex);
+                targetIndex = newTargetIndex;
+                store.mutations.moveSlide(sourceIndex, targetIndex);
+            }
+
+            function end(): void {
+                document.removeEventListener('mousemove', move);
+            }
         }
 
         return {
@@ -84,10 +115,9 @@ const Roadmap = defineComponent({
             style,
             roadmapSlides,
             handleMouseWheel,
-            placementIndex,
             setActiveSlide: store.mutations.setActiveSlide,
             beginReorderingSlides,
-            isReorderingSlides
+            refRoadmapCard
         };
     }
 });

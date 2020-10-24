@@ -57,6 +57,10 @@ function createStore(): AppStore {
 
             state.slides = [];
         },
+        moveSlide: (sourceIndex, targetIndex) => {
+            const [sourceSlide] = state.slides.splice(sourceIndex, 1);
+            state.slides.splice(targetIndex, 0, sourceSlide);
+        },
         setActiveSlide: slideId => {
             if (state.activeSlide !== undefined) {
                 state.activeSlide.isActive = false;

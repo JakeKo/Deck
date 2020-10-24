@@ -1,5 +1,5 @@
 <template>
-<div ref='root' :style='style.roadmapSlot' @mousedown='addSlide'>
+<div :style='style.roadmapSlot' @mousedown='addSlide'>
     <div :style="style.slideTopic">Add Slide</div>
     <div :style="style.addSlidePreview">
         <i class='fas fa-plus' />
@@ -9,12 +9,11 @@
 
 <script lang='ts'>
 import { defineComponent, computed, reactive } from 'vue';
-import { useHover, useStyle } from '../generic/core';
+import { useStyle } from '../generic/core';
 import { useStore } from '@/store';
 
 const StandardRoadmapCard = defineComponent({
     setup: () => {
-        const { target: root, isHovered } = useHover();
         const { baseStyle, baseTheme } = useStyle();
         const store = useStore();
 
@@ -26,9 +25,7 @@ const StandardRoadmapCard = defineComponent({
                 transition: '0.25s',
                 flexShrink: '0',
                 ...baseStyle.value.flexColCC,
-                background: isHovered.value
-                    ? baseTheme.value.color.base.higher
-                    : baseTheme.value.color.base.highest
+                background: baseTheme.value.color.base.highest
             })),
             slideTopic: computed(() => ({
                 ...baseStyle.value.fontLabel,
@@ -57,7 +54,6 @@ const StandardRoadmapCard = defineComponent({
         }
 
         return {
-            root,
             style,
             addSlide
         };
