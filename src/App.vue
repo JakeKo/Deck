@@ -1,5 +1,5 @@
 <template>
-<div ref='root' :style='style.app'>
+<div :style='style.app'>
     <MenuBar />
     <div :style='style.interface'>
         <Toolbox />
@@ -19,10 +19,10 @@ import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
 import GraphicEditor from './components/GraphicEditor.vue';
 import { PointerTool } from './tools';
-import DeckComponent from './components/generic/DeckComponent';
-import { provideStore } from './store';
-import { defineComponent, computed, readonly } from 'vue';
+import { createStore } from './store';
+import { defineComponent, computed, readonly, provide } from 'vue';
 import './styling/application.css';
+import { useStyle } from './components/generic/core';
 
 const App = defineComponent({
     components: {
@@ -33,9 +33,7 @@ const App = defineComponent({
         GraphicEditor
     },
     setup: () => {
-        provideStore();
-        const { root, store, baseStyle } = DeckComponent();
-
+        const { baseStyle } = useStyle();
         const style = readonly({
             app: computed(() => ({
                 ...baseStyle.value.fullScreen,
@@ -56,10 +54,11 @@ const App = defineComponent({
             }))
         });
 
+        const store = createStore();
         store.mutations.setActiveTool(PointerTool());
+        provide('store', store);
 
         return {
-            root,
             style
         };
     }

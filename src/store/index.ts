@@ -3,7 +3,7 @@ import { THEMES } from '@/styling/types';
 import NullTool from '@/tools/NullTool';
 import { provideId } from '@/utilities/IdProvider';
 import SlideStateManager from '@/utilities/SlideStateManager';
-import { inject, provide, reactive } from 'vue';
+import { inject, reactive } from 'vue';
 import { AppMutations, AppState, AppStore } from './types';
 import { getSlide } from './utilities';
 
@@ -187,14 +187,8 @@ function createStore(): AppStore {
     };
 }
 
-const storeSymbol = Symbol('store');
-
-function provideStore(): void {
-    provide(storeSymbol, createStore());
-}
-
 function useStore(): AppStore {
-    const store = inject<AppStore>(storeSymbol);
+    const store = inject<AppStore>('store');
     if (store === undefined) {
         throw new Error('Failed to load store');
     }
@@ -202,4 +196,4 @@ function useStore(): AppStore {
     return store;
 }
 
-export { provideStore, useStore };
+export { useStore, createStore };
