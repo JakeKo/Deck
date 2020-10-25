@@ -18,7 +18,8 @@ module.exports = {
         semi: ['error', 'always'],
         'space-before-function-paren': ['error', 'never'],
         'no-use-before-define': ['error', { functions: false, classes: false }],
-        '@typescript-eslint/no-use-before-define': ['error', { functions: false, classes: false }]
+        '@typescript-eslint/no-use-before-define': ['error', { functions: false, classes: false }],
+        'vue/experimental-script-setup-vars': 0
     },
     overrides: [
         {

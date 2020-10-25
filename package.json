@@ -19,11 +19,9 @@
     "register-service-worker": "^1.7.1",
     "svg.js": "^2.7.1",
     "ts-jest": "^26.2.0",
-    "vue": "^3.0.0-0",
-    "vue-class-component": "^8.0.0-0",
-    "vue-property-decorator": "^9.0.0",
-    "vuex": "^4.0.0-0",
-    "vuex-class": "^0.3.2"
+    "vue": "^3.0.2",
+    "vue-class-component": "^8.0.0-beta.4",
+    "vue-property-decorator": "^9.0.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
