@@ -1,5 +1,4 @@
 import { ISlideRenderer, IVideoRenderer } from '@/rendering/types';
-import SVG from 'svg.js';
 import { SLIDE_EVENTS, VideoMouseEvent, VideoMouseEventPayload, VIDEO_EVENTS } from '../types';
 import { dispatch, makeSlideMouseEvent } from '../utilities';
 
@@ -7,7 +6,7 @@ function makeVideoMouseEvent(name: VIDEO_EVENTS, slide: ISlideRenderer, target: 
     return new CustomEvent<VideoMouseEventPayload>(name, { detail: { type: name, slide, target, baseEvent } });
 }
 
-export function decorateVideoEvents(svg: SVG.Element, slide: ISlideRenderer, graphic: IVideoRenderer) {
+export function decorateVideoEvents(svg: { node: SVGForeignObjectElement}, slide: ISlideRenderer, graphic: IVideoRenderer) {
     svg.node.addEventListener('mouseup', baseEvent => {
         baseEvent.stopPropagation();
         dispatch(makeVideoMouseEvent(VIDEO_EVENTS.MOUSEUP, slide, graphic, baseEvent));

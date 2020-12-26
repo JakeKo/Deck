@@ -160,7 +160,7 @@ class SlideRenderer implements ISlideRenderer {
         }));
     }
 
-    public makeVideoInteractive(initialPosition: Vector, source: HTMLVideoElement, dimensions: Vector): IVideoMaker {
+    public makeVideoInteractive(initialPosition: Vector, source: string, dimensions: Vector): IVideoMaker {
         return this._activateMaker(new VideoMaker({
             slide: this,
             initialPosition,

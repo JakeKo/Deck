@@ -72,7 +72,7 @@ export type ITextboxRenderer = BaseGraphicRenderer & {
 
 export type IVideoRenderer = BaseGraphicRenderer & {
     readonly type: GRAPHIC_TYPES.VIDEO;
-    readonly source: HTMLVideoElement;
+    readonly source: string;
     origin: Vector;
     dimensions: Vector;
     strokeColor: string;
@@ -299,7 +299,7 @@ export type ISlideRenderer = {
     makeImageInteractive: (initialPosition: Vector, source: string, dimensions: Vector) => IImageMaker;
     makeRectangleInteractive: (initialPosition: Vector) => IRectangleMaker;
     makeTextboxInteractive: (initialPosition: Vector) => ITextboxMaker;
-    makeVideoInteractive: (initialPosition: Vector, source: HTMLVideoElement, dimension: Vector) => IVideoMaker;
+    makeVideoInteractive: (initialPosition: Vector, source: string, dimension: Vector) => IVideoMaker;
     completeInteractiveMake: (graphicId: string) => void;
     getGraphic: (graphicId: string) => IGraphicRenderer;
     getGraphics: () => { [key: string]: IGraphicRenderer };

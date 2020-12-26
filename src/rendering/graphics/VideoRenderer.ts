@@ -1,13 +1,15 @@
 import { decorateVideoEvents } from '@/events/decorators';
+import { provideId } from '@/utilities/IdProvider';
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
+import YouTubeIframeLoader from 'youtube-iframe';
 import { BoundingBox, GRAPHIC_TYPES, ISlideRenderer, IVideoRenderer } from '../types';
 
 type VideoRendererArgs = {
     id: string;
     slide: ISlideRenderer;
-    source: HTMLVideoElement;
+    source: string;
     origin?: Vector;
     dimensions?: Vector;
     strokeColor?: string;
@@ -18,9 +20,9 @@ type VideoRendererArgs = {
 class VideoRenderer implements IVideoRenderer {
     public readonly id: string;
     public readonly type = GRAPHIC_TYPES.VIDEO;
-    public readonly source: HTMLVideoElement;
+    public readonly source: string;
     private _slide: ISlideRenderer;
-    private _svg: SVG.Element | undefined;
+    private _svg: { node: SVGForeignObjectElement } | undefined;
     private _origin: Vector;
     private _dimensions: Vector;
     private _strokeColor: string;
@@ -48,7 +50,8 @@ class VideoRenderer implements IVideoRenderer {
 
     public set origin(origin: Vector) {
         this._origin = origin;
-        this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(radToDeg(this._rotation));
+        this._svg && this._svg.node.setAttribute('x', this._origin.x.toString());
+        this._svg && this._svg.node.setAttribute('y', this._origin.y.toString());
     }
 
     public get dimensions(): Vector {
@@ -57,7 +60,8 @@ class VideoRenderer implements IVideoRenderer {
 
     public set dimensions(dimensions: Vector) {
         this._dimensions = dimensions;
-        this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
+        this._svg && this._svg.node.setAttribute('width', this._dimensions.x.toString());
+        this._svg && this._svg.node.setAttribute('height', this._dimensions.y.toString());
     }
 
     public get strokeColor(): string {
@@ -66,7 +70,9 @@ class VideoRenderer implements IVideoRenderer {
 
     public set strokeColor(strokeColor: string) {
         this._strokeColor = strokeColor;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        if (this._svg) {
+            this._svg.node.style.stroke = this._strokeColor;
+        }
     }
 
     public get strokeWidth(): number {
@@ -75,7 +81,9 @@ class VideoRenderer implements IVideoRenderer {
 
     public set strokeWidth(strokeWidth: number) {
         this._strokeWidth = strokeWidth;
-        this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        if (this._svg) {
+            this._svg.node.style.strokeWidth = `${this._strokeWidth.toString()}px`;
+        }
     }
 
     public get rotation(): number {
@@ -84,7 +92,9 @@ class VideoRenderer implements IVideoRenderer {
 
     public set rotation(rotation: number) {
         this._rotation = rotation;
-        this._svg && this._svg.rotate(radToDeg(this._rotation));
+        if (this._svg) {
+            this._svg.node.style.transform = `rotate(${radToDeg(this._rotation)}deg)`;
+        }
     }
 
     public get box(): BoundingBox {
@@ -135,11 +145,10 @@ class VideoRenderer implements IVideoRenderer {
         this._origin = origin;
         this._dimensions = dimensions;
 
-        this._svg && this._svg
-            .rotate(0)
-            .translate(this._origin.x, this._origin.y)
-            .size(this._dimensions.x, this._dimensions.y)
-            .rotate(radToDeg(this._rotation));
+        this._svg && this._svg.node.setAttribute('x', this._origin.x.toString());
+        this._svg && this._svg.node.setAttribute('y', this._origin.y.toString());
+        this._svg && this._svg.node.setAttribute('width', this._dimensions.x.toString());
+        this._svg && this._svg.node.setAttribute('height', this._dimensions.y.toString());
     }
 
     public render(): void {
@@ -148,22 +157,36 @@ class VideoRenderer implements IVideoRenderer {
             return;
         }
 
-        const foreignObject = SVG.create('foreignObject') as HTMLElement;
-        foreignObject.appendChild(this.source);
+        const foreignObject = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+        const div = document.createElement('div');
+        const id = div.id = provideId();
+        foreignObject.appendChild(div);
 
-        this._svg = (foreignObject as any as SVG.Element)
-            .translate(this._origin.x, this._origin.y)
-            .size(this._dimensions.x, this._dimensions.y)
-            .stroke({ color: this._strokeColor, width: this._strokeWidth })
-            .rotate(radToDeg(this._rotation));
+        this._dimensions = new Vector(480, 270);
+        YouTubeIframeLoader.load(YT => new YT.Player(id, {
+            width: this._dimensions.x.toString(),
+            height: this._dimensions.y.toString(),
+            videoId: 'tLqhRvBbtcg'
+        }));
 
-        this._slide.canvas.add(this._svg);
+        foreignObject.setAttribute('x', this._origin.x.toString());
+        foreignObject.setAttribute('y', this._origin.y.toString());
+        foreignObject.setAttribute('width', this._dimensions.x.toString());
+        foreignObject.setAttribute('height', this._dimensions.y.toString());
+        foreignObject.style.stroke = this._strokeColor;
+        foreignObject.style.strokeWidth = `${this._strokeWidth.toString()}px`;
+        foreignObject.style.transform = `rotate(${radToDeg(this._rotation)}deg)`;
+        this._svg = { node: foreignObject };
+
+        this._slide.canvas.add(this._svg as any as SVG.Element);
         decorateVideoEvents(this._svg, this._slide, this);
     }
 
     public unrender(): void {
-        this._svg && this._svg.remove();
-        this._svg = undefined;
+        if (this._svg) {
+            this._slide.canvas.node.removeChild(this._svg.node);
+            this._svg = undefined;
+        }
     }
 }
 

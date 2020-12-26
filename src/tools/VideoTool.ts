@@ -7,10 +7,10 @@ import { EditorTool, TOOL_NAMES } from './types';
 import { resolvePosition } from './utilities';
 
 export default (store: AppStore): EditorTool => {
-    function seedVideo(video: HTMLVideoElement, dimensions: Vector): (event: SlideMouseEvent) => void {
+    function seedVideo(videoSource: string, dimensions: Vector): (event: SlideMouseEvent) => void {
         return function make(event) {
             const { slide, baseEvent } = event.detail;
-            const maker = slide.makeVideoInteractive(resolvePosition(baseEvent, slide), video, dimensions);
+            const maker = slide.makeVideoInteractive(resolvePosition(baseEvent, slide), videoSource, dimensions);
             slide.broadcastSetGraphic(maker.target);
 
             const resizeListener = maker.resizeListener();
@@ -36,24 +36,15 @@ export default (store: AppStore): EditorTool => {
     return {
         name: TOOL_NAMES.VIDEO,
         mount: async() => {
-            const uploadVideo = new Promise<{ source: HTMLVideoElement; width: number; height: number }>(resolve => {
-                const reader = new FileReader();
-                const input = document.createElement('input');
-                input.type = 'file';
-
-                input.addEventListener('input', (): void => reader.readAsDataURL(input.files ? input.files[0] : new Blob()));
-                reader.addEventListener('loadend', (): void => {
-                    // Wait for the video width and height to be determined
-                    const video = document.createElement('video');
-                    video.src = reader.result as string;
-                    video.addEventListener('load', (): void => resolve({
-                        source: video,
-                        width: video.width,
-                        height: video.height
-                    }));
-                });
-
-                input.click();
+            const uploadVideo = new Promise<{ source: string; width: number; height: number }>(resolve => {
+                const videoLink = prompt('YouTube link:');
+                if (videoLink !== null) {
+                    resolve({
+                        source: videoLink,
+                        width: 480,
+                        height: 270
+                    });
+                }
             });
 
             const video = await uploadVideo;

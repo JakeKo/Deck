@@ -111,7 +111,7 @@ export function videoRendererToVideoStoreModel(video: IVideoRenderer): VideoStor
         return {
             id: video.id,
             type: video.type,
-            source: video.source.src,
+            source: video.source,
             origin: video.origin,
             height: video.dimensions.y,
             width: video.dimensions.x,
