@@ -3,7 +3,6 @@ import { Theme } from '@/styling/types';
 import { EditorTool } from '@/tools/types';
 import SlideStateManager from '@/utilities/SlideStateManager';
 import Vector from '@/utilities/Vector';
-import { ComputedRef } from 'vue';
 
 export type AppState = {
     activeSlide: Slide | undefined;
@@ -11,6 +10,7 @@ export type AppState = {
     activeTool: EditorTool;
     deckTitle: string | undefined;
     theme: Theme;
+    showPresentation: boolean;
     editorViewbox: {
         zoom: number;
         raw: Viewbox;
@@ -49,9 +49,8 @@ export type AppMutations = {
     broadcastSetRotation: (slideId: string, graphicId: string, rotation: number) => void;
     broadcastRemoveGraphic: (slideId: string, graphicId: string) => void;
     setTheme: (theme: Theme) => void;
+    setShowPresentation: (showPresentation: boolean) => void;
 };
-
-export type ComputedType<T> = { [K in keyof T]: ComputedRef<T[K]> };
 
 export type Viewbox = {
     x: number;

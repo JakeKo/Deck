@@ -14,6 +14,7 @@ function createStore(): AppStore {
         activeTool: NullTool,
         deckTitle: undefined,
         theme: themes[THEMES.LIGHT],
+        showPresentation: false,
         editorViewbox: {
             zoom: 1,
             raw: {
@@ -178,6 +179,9 @@ function createStore(): AppStore {
         },
         setTheme: theme => {
             state.theme = theme;
+        },
+        setShowPresentation: showPresentation => {
+            state.showPresentation = showPresentation;
         }
     };
 

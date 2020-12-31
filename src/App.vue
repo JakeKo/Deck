@@ -1,7 +1,8 @@
 <template>
 <div :style='style.app'>
-    <MenuBar />
-    <div :style='style.interface'>
+    <PresentationLayer v-if='showPresentation' />
+    <MenuBar v-if='!showPresentation' />
+    <div :style='style.interface' v-if='!showPresentation'>
         <Toolbox />
         <div :style='style.workspace'>
             <Editor />
@@ -17,6 +18,7 @@ import MenuBar from './components/MenuBar.vue';
 import Toolbox from './components/Toolbox.vue';
 import Editor from './components/Editor.vue';
 import Roadmap from './components/Roadmap.vue';
+import PresentationLayer from './components/Presentation/PresentationLayer.vue';
 import GraphicEditor from './components/GraphicEditor.vue';
 import { PointerTool } from './tools';
 import { createStore } from './store';
@@ -30,7 +32,8 @@ const App = defineComponent({
         Toolbox,
         Editor,
         Roadmap,
-        GraphicEditor
+        GraphicEditor,
+        PresentationLayer
     },
     setup: () => {
         const { baseStyle } = useStyle();
@@ -58,8 +61,11 @@ const App = defineComponent({
         store.mutations.setActiveTool(PointerTool());
         provide('store', store);
 
+        const showPresentation = computed(() => store.state.showPresentation);
+
         return {
-            style
+            style,
+            showPresentation
         };
     }
 });

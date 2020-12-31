@@ -3,6 +3,7 @@
     <button :style='style.importButton' @click='importSlideDeck'>Import</button>
     <button :style='style.exportButton' @click='exportSlideDeck'>Export</button>
     <TitleField />
+    <button :style='style.exportButton' @click='showPresentation'>Present</button>
 </div>
 </template>
 
@@ -91,11 +92,16 @@ const MenuBar = defineComponent({
             input.click();
         }
 
+        function showPresentation(): void {
+            store.mutations.setShowPresentation(true);
+        }
+
         return {
             root,
             style,
             exportSlideDeck,
-            importSlideDeck
+            importSlideDeck,
+            showPresentation
         };
     }
 });
