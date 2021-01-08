@@ -1,21 +1,28 @@
 <template>
-<div ref='root' :style='style.presentationLayer'>
+<div :style='style.presentationLayer'>
     <div ref='exitButtonContainer' :style='style.exitButtonContainer'>
         <button @click='hidePresentation' :style='style.exitButton' v-if='isContainerHovered'>
             <i :style='style.exitButtonIcon' class='fas fa-times' />
         </button>
     </div>
+    <PresentationSlide v-for='slide in slides' :key='slide.id' :slide='slide' />
 </div>
 </template>
 
 <script lang='ts'>
-import DeckComponent from '../generic/DeckComponent';
 import { defineComponent, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
+import { useHover, useStyle } from '../generic/core';
+import { useStore } from '@/store';
+import PresentationSlide from './PresentationSlide.vue';
 
 const PresentationLayer = defineComponent({
+    components: {
+        PresentationSlide
+    },
     setup: () => {
-        const { root, store, baseTheme, baseStyle } = DeckComponent();
-        const { root: exitButtonContainer, isHovered: isContainerHovered } = DeckComponent();
+        const store = useStore();
+        const { baseTheme, baseStyle } = useStyle();
+        const { target: exitButtonContainer, isHovered: isContainerHovered } = useHover();
         const style = reactive({
             presentationLayer: computed(() => ({
                 ...baseStyle.value.fullScreen,
@@ -60,11 +67,11 @@ const PresentationLayer = defineComponent({
         onBeforeUnmount(() => document.removeEventListener('keydown', hideOnEsc));
 
         return {
-            root,
             style,
             exitButtonContainer,
             isContainerHovered,
-            hidePresentation
+            hidePresentation,
+            slides: store.state.slides
         };
     }
 });

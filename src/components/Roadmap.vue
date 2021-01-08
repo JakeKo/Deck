@@ -1,5 +1,5 @@
 <template>
-<div ref='root' :style='style.roadmap' tabindex='0' @mousewheel='handleMouseWheel'>
+<div ref='root' :style='style.roadmap' tabindex='0' @mousewheel.passive='handleMouseWheel'>
     <div v-for='(slide, index) in roadmapSlides' :key='slide.id' :ref='refRoadmapCard'>
         <StandardRoadmapCard
             :id='slide.id'
