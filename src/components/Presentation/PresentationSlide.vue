@@ -3,6 +3,7 @@
     <SvgRect v-for='r in rectangles' :key='r.id' :rectangle='r' />
     <SvgEllipse v-for='e in ellipses' :key='e.id' :ellipse='e' />
     <SvgPath v-for='c in curves' :key='c.id' :curve='c' />
+    <SvgImage v-for='i in images' :key='i.id' :image='i' />
 </svg>
 </template>
 
@@ -14,12 +15,14 @@ import { GRAPHIC_TYPES } from '@/rendering/types';
 import SvgRect from './PresentationGraphics/SvgRect.vue';
 import SvgEllipse from './PresentationGraphics/SvgEllipse.vue';
 import SvgPath from './PresentationGraphics/SvgPath.vue';
+import SvgImage from './PresentationGraphics/SvgImage.vue';
 
 const PresentationSlide = defineComponent({
     components: {
         SvgRect,
         SvgEllipse,
-        SvgPath
+        SvgPath,
+        SvgImage
     },
     props: {
         slide: { type: Object as PropType<SlideModel>, required: true }
@@ -36,12 +39,14 @@ const PresentationSlide = defineComponent({
         const rectangles = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.RECTANGLE));
         const ellipses = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.ELLIPSE));
         const curves = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.CURVE));
+        const images = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.IMAGE));
 
         return {
             style,
             rectangles,
             ellipses,
-            curves
+            curves,
+            images
         };
     }
 });

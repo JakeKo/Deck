@@ -13,7 +13,7 @@
 import { defineComponent, PropType } from 'vue';
 import { RectangleStoreModel } from '@/store/types';
 
-const PresentationSlide = defineComponent({
+const SvgRect = defineComponent({
     props: {
         rectangle: { type: Object as PropType<RectangleStoreModel>, required: true }
     },
@@ -36,5 +36,5 @@ const PresentationSlide = defineComponent({
     }
 });
 
-export default PresentationSlide;
+export default SvgRect;
 </script>

@@ -13,7 +13,7 @@
 import { defineComponent, PropType } from 'vue';
 import { EllipseStoreModel } from '@/store/types';
 
-const PresentationSlide = defineComponent({
+const SvgEllipse = defineComponent({
     props: {
         ellipse: { type: Object as PropType<EllipseStoreModel>, required: true }
     },
@@ -36,5 +36,5 @@ const PresentationSlide = defineComponent({
     }
 });
 
-export default PresentationSlide;
+export default SvgEllipse;
 </script>
