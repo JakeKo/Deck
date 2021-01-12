@@ -22,21 +22,21 @@ import { VideoStoreModel } from '@/store/types';
 
 const SvgVideo = defineComponent({
     props: {
-        video: { type: Object as PropType<VideoStoreModel>, required: true }
+        target: { type: Object as PropType<VideoStoreModel>, required: true }
     },
     setup: props => {
         const style: { [key: string]: string } = {
-            transform: `rotate(${props.video.rotation}rad)`
+            transform: `rotate(${props.target.rotation}rad)`
         };
 
         return {
-            source: props.video.source,
-            x: props.video.origin.x,
-            y: props.video.origin.y,
-            width: props.video.width,
-            height: props.video.height,
+            source: props.target.source,
+            x: props.target.origin.x,
+            y: props.target.origin.y,
+            width: props.target.width,
+            height: props.target.height,
             style: Object.keys(style).map(key => `${key}:${style[key]}`).join(';'),
-            transformOrigin: `${props.video.origin.x + props.video.width / 2}px ${props.video.origin.y + props.video.height / 2}px`
+            transformOrigin: `${props.target.origin.x + props.target.width / 2}px ${props.target.origin.y + props.target.height / 2}px`
         };
     }
 });

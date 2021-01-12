@@ -14,20 +14,20 @@ import { CurveStoreModel } from '@/store/types';
 
 const SvgPath = defineComponent({
     props: {
-        curve: { type: Object as PropType<CurveStoreModel>, required: true }
+        target: { type: Object as PropType<CurveStoreModel>, required: true }
     },
     setup: props => {
         const style: { [key: string]: string } = {
-            transform: `rotate(${props.curve.rotation}rad)`
+            transform: `rotate(${props.target.rotation}rad)`
         };
 
-        const [origin, ...points] = props.curve.points.slice(1, -1);
+        const [origin, ...points] = props.target.points.slice(1, -1);
 
         return {
             d: `M ${origin.x},${origin.y} ${points.map(({ x, y }, i) => `${i % 3 === 0 ? ' C' : ''} ${x},${y}`)}`,
-            stroke: props.curve.strokeColor,
-            fill: props.curve.fillColor,
-            strokeWidth: props.curve.strokeWidth.toString(),
+            stroke: props.target.strokeColor,
+            fill: props.target.fillColor,
+            strokeWidth: props.target.strokeWidth.toString(),
             style
         };
     }

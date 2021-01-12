@@ -1,10 +1,6 @@
 <template>
 <svg :style='style.presentationSlide'>
-    <SvgRect v-for='r in rectangles' :key='r.id' :rectangle='r' />
-    <SvgEllipse v-for='e in ellipses' :key='e.id' :ellipse='e' />
-    <SvgPath v-for='c in curves' :key='c.id' :curve='c' />
-    <SvgImage v-for='i in images' :key='i.id' :image='i' />
-    <SvgVideo v-for='v in videos' :key='v.id' :videos='v' />
+    <component v-for='g in graphics' :key='g.graphic.id' :target='g.graphic' :is='g.component' />
 </svg>
 </template>
 
@@ -13,11 +9,7 @@ import { computed, defineComponent, PropType, reactive } from 'vue';
 import { useStyle } from '../generic/core';
 import { Slide as SlideModel } from '@/store/types';
 import { GRAPHIC_TYPES } from '@/rendering/types';
-import SvgRect from './PresentationGraphics/SvgRect.vue';
-import SvgEllipse from './PresentationGraphics/SvgEllipse.vue';
-import SvgPath from './PresentationGraphics/SvgPath.vue';
-import SvgImage from './PresentationGraphics/SvgImage.vue';
-import SvgVideo from './PresentationGraphics/SvgVideo.vue';
+import { SvgRect, SvgEllipse, SvgPath, SvgImage, SvgVideo } from './PresentationGraphics';
 
 const PresentationSlide = defineComponent({
     components: {
@@ -39,19 +31,21 @@ const PresentationSlide = defineComponent({
             }))
         });
 
-        const rectangles = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.RECTANGLE));
-        const ellipses = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.ELLIPSE));
-        const curves = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.CURVE));
-        const images = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.IMAGE));
-        const videos = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.VIDEO));
+        // Create a map of components that can be rendered and the component used to render them
+        const graphicComponentMap: { [key: string]: string } = {
+            [GRAPHIC_TYPES.CURVE]: 'SvgPath',
+            [GRAPHIC_TYPES.ELLIPSE]: 'SvgEllipse',
+            [GRAPHIC_TYPES.IMAGE]: 'SvgImage',
+            [GRAPHIC_TYPES.RECTANGLE]: 'SvgRect',
+            [GRAPHIC_TYPES.VIDEO]: 'SvgVideo'
+        };
+        const graphics = computed(() => Object.values(props.slide.graphics)
+            .filter(g => Object.keys(graphicComponentMap).includes(g.type))
+            .map(g => ({ graphic: g, component: graphicComponentMap[g.type] })));
 
         return {
             style,
-            rectangles,
-            ellipses,
-            curves,
-            images,
-            videos
+            graphics
         };
     }
 });

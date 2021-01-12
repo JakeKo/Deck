@@ -16,21 +16,21 @@ import { ImageStoreModel } from '@/store/types';
 
 const SvgImage = defineComponent({
     props: {
-        image: { type: Object as PropType<ImageStoreModel>, required: true }
+        target: { type: Object as PropType<ImageStoreModel>, required: true }
     },
     setup: props => {
         const style: { [key: string]: string } = {
-            transform: `rotate(${props.image.rotation}rad)`
+            transform: `rotate(${props.target.rotation}rad)`
         };
 
         return {
-            href: props.image.source,
-            x: props.image.origin.x,
-            y: props.image.origin.y,
-            width: props.image.width,
-            height: props.image.height,
+            href: props.target.source,
+            x: props.target.origin.x,
+            y: props.target.origin.y,
+            width: props.target.width,
+            height: props.target.height,
             style: Object.keys(style).map(key => `${key}:${style[key]}`).join(';'),
-            transformOrigin: `${props.image.origin.x + props.image.width / 2}px ${props.image.origin.y + props.image.height / 2}px`
+            transformOrigin: `${props.target.origin.x + props.target.width / 2}px ${props.target.origin.y + props.target.height / 2}px`
         };
     }
 });

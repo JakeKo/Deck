@@ -15,23 +15,23 @@ import { EllipseStoreModel } from '@/store/types';
 
 const SvgEllipse = defineComponent({
     props: {
-        ellipse: { type: Object as PropType<EllipseStoreModel>, required: true }
+        target: { type: Object as PropType<EllipseStoreModel>, required: true }
     },
     setup: props => {
         const style: { [key: string]: string } = {
-            fill: props.ellipse.fillColor,
-            'stroke-width': props.ellipse.strokeWidth.toString(),
-            stroke: props.ellipse.strokeColor,
-            transform: `rotate(${props.ellipse.rotation}rad)`
+            fill: props.target.fillColor,
+            'stroke-width': props.target.strokeWidth.toString(),
+            stroke: props.target.strokeColor,
+            transform: `rotate(${props.target.rotation}rad)`
         };
 
         return {
-            cx: props.ellipse.center.x,
-            cy: props.ellipse.center.y,
-            rx: props.ellipse.width / 2,
-            ry: props.ellipse.height / 2,
+            cx: props.target.center.x,
+            cy: props.target.center.y,
+            rx: props.target.width / 2,
+            ry: props.target.height / 2,
             style: Object.keys(style).map(key => `${key}:${style[key]}`).join(';'),
-            transformOrigin: `${props.ellipse.center.x + props.ellipse.width / 2}px ${props.ellipse.center.y + props.ellipse.height / 2}px`
+            transformOrigin: `${props.target.center.x + props.target.width / 2}px ${props.target.center.y + props.target.height / 2}px`
         };
     }
 });
