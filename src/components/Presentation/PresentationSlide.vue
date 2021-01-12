@@ -4,6 +4,7 @@
     <SvgEllipse v-for='e in ellipses' :key='e.id' :ellipse='e' />
     <SvgPath v-for='c in curves' :key='c.id' :curve='c' />
     <SvgImage v-for='i in images' :key='i.id' :image='i' />
+    <SvgVideo v-for='v in videos' :key='v.id' :videos='v' />
 </svg>
 </template>
 
@@ -16,13 +17,15 @@ import SvgRect from './PresentationGraphics/SvgRect.vue';
 import SvgEllipse from './PresentationGraphics/SvgEllipse.vue';
 import SvgPath from './PresentationGraphics/SvgPath.vue';
 import SvgImage from './PresentationGraphics/SvgImage.vue';
+import SvgVideo from './PresentationGraphics/SvgVideo.vue';
 
 const PresentationSlide = defineComponent({
     components: {
         SvgRect,
         SvgEllipse,
         SvgPath,
-        SvgImage
+        SvgImage,
+        SvgVideo
     },
     props: {
         slide: { type: Object as PropType<SlideModel>, required: true }
@@ -40,13 +43,15 @@ const PresentationSlide = defineComponent({
         const ellipses = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.ELLIPSE));
         const curves = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.CURVE));
         const images = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.IMAGE));
+        const videos = computed(() => Object.values(props.slide.graphics).filter(g => g.type === GRAPHIC_TYPES.VIDEO));
 
         return {
             style,
             rectangles,
             ellipses,
             curves,
-            images
+            images,
+            videos
         };
     }
 });
