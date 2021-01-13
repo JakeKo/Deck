@@ -5,15 +5,16 @@
             <i :style='style.exitButtonIcon' class='fas fa-times' />
         </button>
     </div>
-    <PresentationSlide v-for='slide in slides' :key='slide.id' :slide='slide' />
+    <PresentationSlide :slide='slide' />
 </div>
 </template>
 
 <script lang='ts'>
-import { defineComponent, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
+import { defineComponent, reactive, computed, onMounted, onBeforeUnmount, ref } from 'vue';
 import { useHover, useStyle } from '../generic/core';
 import { useStore } from '@/store';
 import PresentationSlide from './PresentationSlide.vue';
+import { mod } from '@/utilities/utilities';
 
 const PresentationLayer = defineComponent({
     components: {
@@ -66,12 +67,25 @@ const PresentationLayer = defineComponent({
         onMounted(() => document.addEventListener('keydown', hideOnEsc));
         onBeforeUnmount(() => document.removeEventListener('keydown', hideOnEsc));
 
+        const activeSlideIndex = ref(0);
+        const slide = computed(() => store.state.slides[activeSlideIndex.value]);
+        function changeSlide(event: KeyboardEvent): void {
+            if (event.code === 'ArrowLeft') {
+                activeSlideIndex.value = mod(activeSlideIndex.value - 1, store.state.slides.length);
+            } else if (event.code === 'ArrowRight') {
+                activeSlideIndex.value = mod(activeSlideIndex.value + 1, store.state.slides.length);
+            }
+        }
+
+        onMounted(() => document.addEventListener('keydown', changeSlide));
+        onBeforeUnmount(() => document.removeEventListener('keydown', changeSlide));
+
         return {
             style,
             exitButtonContainer,
             isContainerHovered,
             hidePresentation,
-            slides: store.state.slides
+            slide
         };
     }
 });

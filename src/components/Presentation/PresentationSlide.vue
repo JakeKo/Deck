@@ -27,8 +27,7 @@ const PresentationSlide = defineComponent({
         const { baseStyle } = useStyle();
         const style = reactive({
             presentationSlide: computed(() => ({
-                ...baseStyle.value.fullScreen,
-                display: props.slide.isActive ? 'initial' : 'none'
+                ...baseStyle.value.fullScreen
             }))
         });
 
