@@ -9,7 +9,7 @@ import { computed, defineComponent, PropType, reactive } from 'vue';
 import { useStyle } from '../generic/core';
 import { Slide as SlideModel } from '@/store/types';
 import { GRAPHIC_TYPES } from '@/rendering/types';
-import { SvgRect, SvgEllipse, SvgPath, SvgImage, SvgVideo } from './PresentationGraphics';
+import { SvgRect, SvgEllipse, SvgPath, SvgImage, SvgTextbox, SvgVideo } from './PresentationGraphics';
 
 const PresentationSlide = defineComponent({
     components: {
@@ -17,6 +17,7 @@ const PresentationSlide = defineComponent({
         SvgEllipse,
         SvgPath,
         SvgImage,
+        SvgTextbox,
         SvgVideo
     },
     props: {
@@ -37,6 +38,7 @@ const PresentationSlide = defineComponent({
             [GRAPHIC_TYPES.ELLIPSE]: 'SvgEllipse',
             [GRAPHIC_TYPES.IMAGE]: 'SvgImage',
             [GRAPHIC_TYPES.RECTANGLE]: 'SvgRect',
+            [GRAPHIC_TYPES.TEXTBOX]: 'SvgTextbox',
             [GRAPHIC_TYPES.VIDEO]: 'SvgVideo'
         };
         const graphics = computed(() => Object.values(props.slide.graphics)
