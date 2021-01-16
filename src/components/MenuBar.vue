@@ -93,6 +93,12 @@ const MenuBar = defineComponent({
         }
 
         function showPresentation(): void {
+            // Don't swap to presentation view if there are no slides to present
+            // TODO: Indicate to user that they should add a slide
+            if (store.state.slides.length === 0) {
+                return;
+            }
+
             store.mutations.setShowPresentation(true);
         }
 

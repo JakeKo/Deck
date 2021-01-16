@@ -27,7 +27,8 @@ const PresentationLayer = defineComponent({
         const style = reactive({
             presentationLayer: computed(() => ({
                 ...baseStyle.value.fullScreen,
-                backgroundColor: baseTheme.value.color.base.highest
+                backgroundColor: baseTheme.value.color.basecomp.lowest,
+                ...baseStyle.value.flexColCC
             })),
             exitButtonContainer: computed(() => ({
                 position: 'absolute',
