@@ -21,6 +21,7 @@ class VideoRenderer implements IVideoRenderer {
     public readonly id: string;
     public readonly type = GRAPHIC_TYPES.VIDEO;
     public readonly source: string;
+    private _iframeId: string | undefined;
     private _slide: ISlideRenderer;
     private _svg: { node: SVGForeignObjectElement } | undefined;
     private _origin: Vector;
@@ -62,6 +63,12 @@ class VideoRenderer implements IVideoRenderer {
         this._dimensions = dimensions;
         this._svg && this._svg.node.setAttribute('width', this._dimensions.x.toString());
         this._svg && this._svg.node.setAttribute('height', this._dimensions.y.toString());
+
+        const iframe = document.getElementById(this._iframeId || '');
+        if (this._svg && iframe) {
+            iframe.setAttribute('width', this._dimensions.x.toString());
+            iframe.setAttribute('height', this._dimensions.y.toString());
+        }
     }
 
     public get strokeColor(): string {
@@ -159,14 +166,14 @@ class VideoRenderer implements IVideoRenderer {
 
         const foreignObject = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
         const div = document.createElement('div');
-        const id = div.id = provideId();
+        this._iframeId = div.id = provideId();
         foreignObject.appendChild(div);
 
         this._dimensions = new Vector(480, 270);
-        YouTubeIframeLoader.load(YT => new YT.Player(id, {
+        YouTubeIframeLoader.load(YT => new YT.Player(this._iframeId, {
             width: this._dimensions.x.toString(),
             height: this._dimensions.y.toString(),
-            videoId: 'tLqhRvBbtcg'
+            videoId: this.source.split('v=')[1]
         }));
 
         foreignObject.setAttribute('x', this._origin.x.toString());
@@ -186,6 +193,7 @@ class VideoRenderer implements IVideoRenderer {
         if (this._svg) {
             this._slide.canvas.node.removeChild(this._svg.node);
             this._svg = undefined;
+            this._iframeId = undefined;
         }
     }
 }
