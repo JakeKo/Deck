@@ -1,5 +1,5 @@
 <template>
-<div ref='root' :style="style.editor" @mousewheel.passive='handleMouseWheel'>
+<div ref='root' :style="style.editor" @mousewheel='handleMouseWheel'>
     <SlidePlaceholder v-if='slides.length === 0' />
     <Slide v-for='slide in slides'
         :key='slide.id'
@@ -47,7 +47,13 @@ const Editor = defineComponent({
 
         // Set the zoom level, then center the view on the slide
         // Note: Editor zoom must be set manually to avoid scrolling before zooming
-        function reorientSlide(): void {
+        async function reorientSlide(): Promise<void> {
+            // For some reason, when returning from presentation view, root here is not quite defined in time
+            // Spotty fix: just wait a wee bit
+            if (root.value === undefined) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
             if (root.value === undefined) {
                 throw new Error('Root ref not specified.');
             }
