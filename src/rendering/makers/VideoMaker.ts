@@ -11,7 +11,7 @@ type VideoMakerArgs = {
     slide: ISlideRenderer;
     initialPosition: Vector;
     scale: number;
-    source: HTMLVideoElement;
+    source: string;
     dimensions: Vector;
 };
 

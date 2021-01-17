@@ -118,14 +118,11 @@ export function textboxStoreModelToTextboxRenderer(textbox: TextboxStoreModel, s
 
 export function videoStoreModelToVideoRenderer(video: VideoStoreModel, slide: ISlideRenderer): IVideoRenderer {
     try {
-        const el = document.createElement('video');
-        el.src = video.source;
-
         return new VideoRenderer({
             id: video.id,
             slide,
             origin: new Vector(video.origin.x, video.origin.y),
-            source: el,
+            source: video.source,
             dimensions: new Vector(video.width, video.height),
             strokeColor: video.strokeColor,
             strokeWidth: video.strokeWidth,
