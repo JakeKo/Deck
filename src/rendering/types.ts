@@ -14,7 +14,8 @@ type BaseGraphicRenderer = {
     readonly id: string;
     readonly isRendered: boolean;
     rotation: number;
-    readonly box: BoundingBox;
+    readonly staticBox: BoundingBox;
+    readonly transformedBox: BoundingBox;
     render: () => void;
     unrender: () => void;
 };

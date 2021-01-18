@@ -58,7 +58,7 @@ class CurveMutator implements ICurveMutator {
 
     // TODO: Account for ctrl, alt, and snapping
     public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
-        const box = this.target.box;
+        const box = this.target.transformedBox;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
@@ -106,7 +106,7 @@ class CurveMutator implements ICurveMutator {
     }
 
     public rotateListener(): (event: SlideMouseEvent) => void {
-        const { center } = this.target.box;
+        const { center } = this.target.transformedBox;
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
@@ -117,7 +117,7 @@ class CurveMutator implements ICurveMutator {
             const theta = Math.atan2(offset.y, offset.x);
 
             this.target.rotation = mod(theta, Math.PI * 2);
-            rotateBoxHelpers(this._helpers, this.target.box);
+            rotateBoxHelpers(this._helpers, this.target.transformedBox);
         };
     }
 
@@ -177,7 +177,7 @@ class CurveMutator implements ICurveMutator {
 
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
-        rotateBoxHelpers(this._helpers, this.target.box);
+        rotateBoxHelpers(this._helpers, this.target.transformedBox);
     }
 
     public setFillColor(fillColor: string): void {
@@ -203,7 +203,7 @@ class CurveMutator implements ICurveMutator {
         this._helpers.anchors[index].point = anchor.point;
         this._helpers.anchors[index].outHandle = anchor.outHandle;
 
-        resizeBoxHelpers(this._helpers, this.target.box);
+        resizeBoxHelpers(this._helpers, this.target.transformedBox);
     }
 
     private _repositionCurveAnchors(): void {
@@ -214,7 +214,7 @@ class CurveMutator implements ICurveMutator {
             this._helpers.anchors[index].outHandle = anchor.outHandle;
         });
 
-        resizeBoxHelpers(this._helpers, this.target.box);
+        resizeBoxHelpers(this._helpers, this.target.transformedBox);
     }
 }
 

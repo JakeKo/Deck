@@ -4,16 +4,6 @@ import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { BoundingBox, CurveAnchor, GRAPHIC_TYPES, ICurveRenderer, ISlideRenderer } from '../types';
 
-type CurveRendererArgs = {
-    id: string;
-    slide: ISlideRenderer;
-    anchors?: CurveAnchor[];
-    fillColor?: string;
-    strokeColor?: string;
-    strokeWidth?: number;
-    rotation?: number;
-};
-
 class CurveRenderer implements ICurveRenderer {
     public readonly id: string;
     public readonly type = GRAPHIC_TYPES.CURVE;
@@ -25,7 +15,15 @@ class CurveRenderer implements ICurveRenderer {
     private _strokeWidth: number;
     private _rotation: number;
 
-    constructor(args: CurveRendererArgs) {
+    constructor(args: {
+        id: string;
+        slide: ISlideRenderer;
+        anchors?: CurveAnchor[];
+        fillColor?: string;
+        strokeColor?: string;
+        strokeWidth?: number;
+        rotation?: number;
+    }) {
         this.id = args.id;
         this._slide = args.slide;
         this._anchors = args.anchors || [];
@@ -84,7 +82,7 @@ class CurveRenderer implements ICurveRenderer {
         this._svg && this._svg.rotate(radToDeg(this._rotation));
     }
 
-    public get box(): BoundingBox {
+    public get staticBox(): BoundingBox {
         if (this._svg === undefined) {
             return {
                 origin: Vector.zero,
@@ -96,37 +94,44 @@ class CurveRenderer implements ICurveRenderer {
                 bottomRight: Vector.zero,
                 rotation: 0
             };
-        } else {
-            const bbox = this._svg.bbox();
-            const preRotateBox: BoundingBox = {
-                origin: new Vector(bbox.x, bbox.y),
-                center: new Vector(bbox.x, bbox.y).add(new Vector(bbox.width, bbox.height).scale(0.5)),
-                dimensions: new Vector(bbox.width, bbox.height),
-                topLeft: new Vector(bbox.x, bbox.y),
-                topRight: new Vector(bbox.x + bbox.width, bbox.y),
-                bottomLeft: new Vector(bbox.x, bbox.y + bbox.height),
-                bottomRight: new Vector(bbox.x + bbox.width, bbox.y + bbox.height),
-                rotation: this._rotation
-            };
-
-            const corners = {
-                topLeft: preRotateBox.center.towards(preRotateBox.topLeft),
-                topRight: preRotateBox.center.towards(preRotateBox.topRight),
-                bottomLeft: preRotateBox.center.towards(preRotateBox.bottomLeft),
-                bottomRight: preRotateBox.center.towards(preRotateBox.bottomRight)
-            };
-
-            return {
-                origin: preRotateBox.origin,
-                center: preRotateBox.center,
-                dimensions: preRotateBox.dimensions,
-                topLeft: preRotateBox.center.add(corners.topLeft.rotate(corners.topLeft.theta(Vector.east) + preRotateBox.rotation)),
-                topRight: preRotateBox.center.add(corners.topRight.rotate(corners.topRight.theta(Vector.east) + preRotateBox.rotation)),
-                bottomLeft: preRotateBox.center.add(corners.bottomLeft.rotate(corners.bottomLeft.theta(Vector.east) + preRotateBox.rotation)),
-                bottomRight: preRotateBox.center.add(corners.bottomRight.rotate(corners.bottomRight.theta(Vector.east) + preRotateBox.rotation)),
-                rotation: preRotateBox.rotation
-            };
         }
+
+        const bbox = this._svg.bbox();
+        return {
+            origin: new Vector(bbox.x, bbox.y),
+            center: new Vector(bbox.x, bbox.y).add(new Vector(bbox.width, bbox.height).scale(0.5)),
+            dimensions: new Vector(bbox.width, bbox.height),
+            topLeft: new Vector(bbox.x, bbox.y),
+            topRight: new Vector(bbox.x + bbox.width, bbox.y),
+            bottomLeft: new Vector(bbox.x, bbox.y + bbox.height),
+            bottomRight: new Vector(bbox.x + bbox.width, bbox.y + bbox.height),
+            rotation: this._rotation
+        };
+    }
+
+    public get transformedBox(): BoundingBox {
+        if (this._svg === undefined) {
+            return this.staticBox;
+        }
+
+        const staticBox = this.staticBox;
+        const corners = {
+            topLeft: staticBox.center.towards(staticBox.topLeft),
+            topRight: staticBox.center.towards(staticBox.topRight),
+            bottomLeft: staticBox.center.towards(staticBox.bottomLeft),
+            bottomRight: staticBox.center.towards(staticBox.bottomRight)
+        };
+
+        return {
+            origin: staticBox.origin,
+            center: staticBox.center,
+            dimensions: staticBox.dimensions,
+            topLeft: staticBox.center.add(corners.topLeft.rotateMore(staticBox.rotation)),
+            topRight: staticBox.center.add(corners.topRight.rotateMore(staticBox.rotation)),
+            bottomLeft: staticBox.center.add(corners.bottomLeft.rotateMore(staticBox.rotation)),
+            bottomRight: staticBox.center.add(corners.bottomRight.rotateMore(staticBox.rotation)),
+            rotation: staticBox.rotation
+        };
     }
 
     public getAnchor(index: number): CurveAnchor {

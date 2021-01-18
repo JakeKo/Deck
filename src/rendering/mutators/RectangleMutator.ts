@@ -46,7 +46,7 @@ class RectangleMutator implements IRectangleMutator {
 
     // TODO: Account for ctrl, alt, and snapping
     public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
-        const box = this.target.box;
+        const box = this.target.transformedBox;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
@@ -87,7 +87,7 @@ class RectangleMutator implements IRectangleMutator {
     }
 
     public rotateListener(): (event: SlideMouseEvent) => void {
-        const { center } = this.target.box;
+        const { center } = this.target.transformedBox;
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
@@ -99,7 +99,7 @@ class RectangleMutator implements IRectangleMutator {
 
             this.target.rotation = mod(theta, Math.PI * 2);
             slide.broadcastSetGraphic(this.target);
-            rotateBoxHelpers(this._helpers, this.target.box);
+            rotateBoxHelpers(this._helpers, this.target.transformedBox);
         };
     }
 
@@ -142,7 +142,7 @@ class RectangleMutator implements IRectangleMutator {
 
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
-        rotateBoxHelpers(this._helpers, this.target.box);
+        rotateBoxHelpers(this._helpers, this.target.transformedBox);
     }
 
     public setFillColor(fillColor: string): void {
@@ -163,7 +163,7 @@ class RectangleMutator implements IRectangleMutator {
     }
 
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this._helpers, this.target.box);
+        resizeBoxHelpers(this._helpers, this.target.transformedBox);
     }
 }
 

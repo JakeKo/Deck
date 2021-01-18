@@ -4,17 +4,6 @@ import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { BoundingBox, GRAPHIC_TYPES, IEllipseRenderer, ISlideRenderer } from '../types';
 
-type EllipseRendererArgs = {
-    id: string;
-    slide: ISlideRenderer;
-    center?: Vector;
-    dimensions?: Vector;
-    fillColor?: string;
-    strokeColor?: string;
-    strokeWidth?: number;
-    rotation?: number;
-};
-
 class EllipseRenderer implements IEllipseRenderer {
     public readonly id: string;
     public readonly type = GRAPHIC_TYPES.ELLIPSE;
@@ -27,7 +16,16 @@ class EllipseRenderer implements IEllipseRenderer {
     private _strokeWidth: number;
     private _rotation: number;
 
-    constructor(args: EllipseRendererArgs) {
+    constructor(args: {
+        id: string;
+        slide: ISlideRenderer;
+        center?: Vector;
+        dimensions?: Vector;
+        fillColor?: string;
+        strokeColor?: string;
+        strokeWidth?: number;
+        rotation?: number;
+    }) {
         this.id = args.id;
         this._slide = args.slide;
         this._center = args.center || Vector.zero;
@@ -96,8 +94,8 @@ class EllipseRenderer implements IEllipseRenderer {
         this._svg && this._svg.rotate(radToDeg(this._rotation));
     }
 
-    public get box(): BoundingBox {
-        if (this._svg === undefined) {
+    public get staticBox(): BoundingBox {
+        if (!this.isRendered) {
             return {
                 origin: Vector.zero,
                 center: Vector.zero,
@@ -108,37 +106,44 @@ class EllipseRenderer implements IEllipseRenderer {
                 bottomRight: Vector.zero,
                 rotation: 0
             };
-        } else {
-            const radius = this._dimensions.scale(0.5);
-            const preRotateBox: BoundingBox = {
-                origin: this._center.add(radius.scale(-1)),
-                center: this._center,
-                dimensions: this._dimensions,
-                topLeft: this._center.add(radius.scale(-1)),
-                topRight: this._center.add(radius.signAs(Vector.southeast)),
-                bottomLeft: this._center.add(radius.signAs(Vector.northwest)),
-                bottomRight: this._center.add(radius),
-                rotation: this._rotation
-            };
-
-            const corners = {
-                topLeft: preRotateBox.center.towards(preRotateBox.topLeft),
-                topRight: preRotateBox.center.towards(preRotateBox.topRight),
-                bottomLeft: preRotateBox.center.towards(preRotateBox.bottomLeft),
-                bottomRight: preRotateBox.center.towards(preRotateBox.bottomRight)
-            };
-
-            return {
-                origin: preRotateBox.origin,
-                center: preRotateBox.center,
-                dimensions: preRotateBox.dimensions,
-                topLeft: preRotateBox.center.add(corners.topLeft.rotate(corners.topLeft.theta(Vector.east) + preRotateBox.rotation)),
-                topRight: preRotateBox.center.add(corners.topRight.rotate(corners.topRight.theta(Vector.east) + preRotateBox.rotation)),
-                bottomLeft: preRotateBox.center.add(corners.bottomLeft.rotate(corners.bottomLeft.theta(Vector.east) + preRotateBox.rotation)),
-                bottomRight: preRotateBox.center.add(corners.bottomRight.rotate(corners.bottomRight.theta(Vector.east) + preRotateBox.rotation)),
-                rotation: preRotateBox.rotation
-            };
         }
+
+        const radius = this._dimensions.scale(0.5);
+        return {
+            origin: this._center.add(radius.scale(-1)),
+            center: this._center,
+            dimensions: this._dimensions,
+            topLeft: this._center.add(radius.scale(-1)),
+            topRight: this._center.add(radius.signAs(Vector.southeast)),
+            bottomLeft: this._center.add(radius.signAs(Vector.northwest)),
+            bottomRight: this._center.add(radius),
+            rotation: this._rotation
+        };
+    }
+
+    public get transformedBox(): BoundingBox {
+        if (!this.isRendered) {
+            return this.staticBox;
+        }
+
+        const staticBox = this.staticBox;
+        const corners = {
+            topLeft: staticBox.center.towards(staticBox.topLeft),
+            topRight: staticBox.center.towards(staticBox.topRight),
+            bottomLeft: staticBox.center.towards(staticBox.bottomLeft),
+            bottomRight: staticBox.center.towards(staticBox.bottomRight)
+        };
+
+        return {
+            origin: staticBox.origin,
+            center: staticBox.center,
+            dimensions: staticBox.dimensions,
+            topLeft: staticBox.center.add(corners.topLeft.rotateMore(staticBox.rotation)),
+            topRight: staticBox.center.add(corners.topRight.rotateMore(staticBox.rotation)),
+            bottomLeft: staticBox.center.add(corners.bottomLeft.rotateMore(staticBox.rotation)),
+            bottomRight: staticBox.center.add(corners.bottomRight.rotateMore(staticBox.rotation)),
+            rotation: staticBox.rotation
+        };
     }
 
     public setCenterAndDimensions(center: Vector, dimensions: Vector): void {

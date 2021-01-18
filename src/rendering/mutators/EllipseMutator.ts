@@ -46,7 +46,7 @@ class EllipseMutator implements IEllipseMutator {
 
     // TODO: Account for ctrl, alt, and snapping
     public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
-        const box = this.target.box;
+        const box = this.target.transformedBox;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
@@ -85,7 +85,7 @@ class EllipseMutator implements IEllipseMutator {
     }
 
     public rotateListener(): (event: SlideMouseEvent) => void {
-        const { center } = this.target.box;
+        const { center } = this.target.transformedBox;
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
@@ -96,7 +96,7 @@ class EllipseMutator implements IEllipseMutator {
             const theta = Math.atan2(offset.y, offset.x);
 
             this.target.rotation = mod(theta, Math.PI * 2);
-            rotateBoxHelpers(this._helpers, this.target.box);
+            rotateBoxHelpers(this._helpers, this.target.transformedBox);
         };
     }
 
@@ -139,7 +139,7 @@ class EllipseMutator implements IEllipseMutator {
 
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
-        rotateBoxHelpers(this._helpers, this.target.box);
+        rotateBoxHelpers(this._helpers, this.target.transformedBox);
     }
 
     public setFillColor(fillColor: string): void {
@@ -160,7 +160,7 @@ class EllipseMutator implements IEllipseMutator {
     }
 
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this._helpers, this.target.box);
+        resizeBoxHelpers(this._helpers, this.target.transformedBox);
     }
 }
 

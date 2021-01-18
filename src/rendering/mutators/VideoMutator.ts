@@ -46,7 +46,7 @@ class VideoMutator implements IVideoMutator {
 
     // TODO: Account for ctrl, alt, and snapping
     public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
-        const box = this.target.box;
+        const box = this.target.transformedBox;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
@@ -86,7 +86,7 @@ class VideoMutator implements IVideoMutator {
     }
 
     public rotateListener(): (event: SlideMouseEvent) => void {
-        const { center } = this.target.box;
+        const { center } = this.target.transformedBox;
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
@@ -97,7 +97,7 @@ class VideoMutator implements IVideoMutator {
             const theta = Math.atan2(offset.y, offset.x);
 
             this.target.rotation = mod(theta, Math.PI * 2);
-            rotateBoxHelpers(this._helpers, this.target.box);
+            rotateBoxHelpers(this._helpers, this.target.transformedBox);
         };
     }
 
@@ -144,7 +144,7 @@ class VideoMutator implements IVideoMutator {
 
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
-        rotateBoxHelpers(this._helpers, this.target.box);
+        rotateBoxHelpers(this._helpers, this.target.transformedBox);
     }
 
     public setStrokeColor(strokeColor: string): void {
@@ -161,7 +161,7 @@ class VideoMutator implements IVideoMutator {
     }
 
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this._helpers, this.target.box);
+        resizeBoxHelpers(this._helpers, this.target.transformedBox);
     }
 }
 
