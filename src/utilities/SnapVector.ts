@@ -1,12 +1,10 @@
 import Vector from './Vector';
 
 export default class SnapVector {
-    public graphicId: string;
     public origin: Vector;
     public direction: Vector;
 
-    constructor(graphicId: string, origin: Vector, direction: Vector = Vector.zero) {
-        this.graphicId = graphicId;
+    constructor(origin: Vector, direction: Vector = Vector.zero) {
         this.origin = origin;
         this.direction = direction.normalized;
     }

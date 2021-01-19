@@ -2,7 +2,7 @@ import { BoxRenderer, RotatorRenderer, VertexRenderer } from './helpers';
 import { BoundingBox, BoundingBoxMutatorHelpers, IGraphicRenderer, ISlideRenderer, VERTEX_ROLES } from './types';
 
 export function makeBoxHelpers(target: IGraphicRenderer, slide: ISlideRenderer, scale: number): BoundingBoxMutatorHelpers {
-    const box = target.box;
+    const box = target.transformedBox;
     return {
         box: new BoxRenderer({
             slide: slide,

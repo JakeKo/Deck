@@ -46,7 +46,7 @@ class TextboxMutator implements ITextboxMutator {
 
     // TODO: Account for ctrl, alt, and snapping
     public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
-        const box = this.target.box;
+        const box = this.target.transformedBox;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(Vector.northwest),
@@ -86,7 +86,7 @@ class TextboxMutator implements ITextboxMutator {
     }
 
     public rotateListener(): (event: SlideMouseEvent) => void {
-        const { center } = this.target.box;
+        const { center } = this.target.transformedBox;
         const directions = [...Vector.cardinals, ...Vector.intermediates];
 
         return event => {
@@ -97,7 +97,7 @@ class TextboxMutator implements ITextboxMutator {
             const theta = Math.atan2(offset.y, offset.x);
 
             this.target.rotation = mod(theta, Math.PI * 2);
-            rotateBoxHelpers(this._helpers, this.target.box);
+            rotateBoxHelpers(this._helpers, this.target.transformedBox);
         };
     }
 
@@ -140,7 +140,7 @@ class TextboxMutator implements ITextboxMutator {
 
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
-        rotateBoxHelpers(this._helpers, this.target.box);
+        rotateBoxHelpers(this._helpers, this.target.transformedBox);
     }
 
     // TODO: Include mutations for other properties
@@ -151,7 +151,7 @@ class TextboxMutator implements ITextboxMutator {
     }
 
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this._helpers, this.target.box);
+        resizeBoxHelpers(this._helpers, this.target.transformedBox);
     }
 }
 
