@@ -1,5 +1,6 @@
 import { SlideMouseEvent } from '@/events/types';
 import { Viewbox } from '@/store/types';
+import SnapVector from '@/utilities/SnapVector';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
 
@@ -16,6 +17,9 @@ type BaseGraphicRenderer = {
     rotation: number;
     readonly staticBox: BoundingBox;
     readonly transformedBox: BoundingBox;
+    readonly pullPoints: Vector[];
+    readonly staticSnapVectors: SnapVector[];
+    readonly transformedSnapVectors: SnapVector[];
     render: () => void;
     unrender: () => void;
 };

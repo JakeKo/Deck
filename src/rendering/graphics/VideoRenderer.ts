@@ -1,5 +1,6 @@
 import { decorateVideoEvents } from '@/events/decorators';
 import { provideId } from '@/utilities/IdProvider';
+import SnapVector from '@/utilities/SnapVector';
 import { radToDeg } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import SVG from 'svg.js';
@@ -22,7 +23,7 @@ class VideoRenderer implements IVideoRenderer {
     constructor(args: {
         id: string;
         slide: ISlideRenderer;
-        source: HTMLVideoElement;
+        source: string;
         origin?: Vector;
         dimensions?: Vector;
         strokeColor?: string;
@@ -147,6 +148,43 @@ class VideoRenderer implements IVideoRenderer {
             bottomRight: staticBox.center.add(corners.bottomRight.rotateMore(staticBox.rotation)),
             rotation: staticBox.rotation
         };
+    }
+
+    // Get the points by which a graphic can be pulled to snap to existing snap vectors
+    // These points are based on the transformed shape (unlike snap vectors which distinquish static and transformed)
+    public get pullPoints(): Vector[] {
+        const box = this.transformedBox;
+        return [
+            box.topLeft.add(box.topLeft.towards(box.topRight).scale(0.5)),
+            box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5)),
+            box.bottomRight.add(box.bottomRight.towards(box.bottomLeft).scale(0.5)),
+            box.bottomLeft.add(box.bottomLeft.towards(box.topLeft).scale(0.5))
+        ];
+    }
+
+    public get staticSnapVectors(): SnapVector[] {
+        const box = this.staticBox;
+        return [
+            new SnapVector(box.center, Vector.north),
+            new SnapVector(box.center, Vector.east)
+        ];
+    }
+
+    public get transformedSnapVectors(): SnapVector[] {
+        const box = this.transformedBox;
+        const topCenter = box.topLeft.add(box.topLeft.towards(box.topRight).scale(0.5));
+        const leftCenter = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
+        const bottomCenter = box.bottomRight.add(box.bottomRight.towards(box.bottomLeft).scale(0.5));
+        const rightCenter = box.bottomLeft.add(box.bottomLeft.towards(box.topLeft).scale(0.5));
+
+        return [
+            new SnapVector(topCenter, Vector.east.rotateMore(box.rotation)),
+            new SnapVector(leftCenter, Vector.north.rotateMore(box.rotation)),
+            new SnapVector(bottomCenter, Vector.east.rotateMore(box.rotation)),
+            new SnapVector(rightCenter, Vector.north.rotateMore(box.rotation)),
+            new SnapVector(box.center, Vector.east.rotateMore(-box.rotation)),
+            new SnapVector(box.center, Vector.north.rotateMore(-box.rotation))
+        ];
     }
 
     public setOriginAndDimensions(origin: Vector, dimensions: Vector): void {
