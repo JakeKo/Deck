@@ -10,7 +10,7 @@ export function moveCurve(event: CurveMouseEvent): void {
     }
 
     const mutator = slide.focusGraphic(target.id) as CurveMutator;
-    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide));
+    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide), slide.getSnapVectors([target.id]));
     slide.cursor = 'move';
     slide.cursorLock = true;
 

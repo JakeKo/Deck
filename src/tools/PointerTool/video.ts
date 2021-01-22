@@ -10,7 +10,7 @@ export function moveVideo(event: VideoMouseEvent): void {
     }
 
     const mutator = slide.focusGraphic(target.id) as VideoMutator;
-    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide));
+    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide), slide.getSnapVectors([target.id]));
     slide.cursor = 'move';
     slide.cursorLock = true;
 

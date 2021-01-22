@@ -1,5 +1,6 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
+import SnapVector from '@/utilities/SnapVector';
 import { closestVector, mod } from '@/utilities/utilities';
 import Vector from '@/utilities/Vector';
 import {
@@ -11,6 +12,7 @@ import {
     VERTEX_ROLES
 } from '../types';
 import {
+    calculateMove,
     makeBoxHelpers,
     renderBoxHelpers,
     resizeBoxHelpers,
@@ -101,17 +103,18 @@ class TextboxMutator implements ITextboxMutator {
         };
     }
 
-    // TODO: Account for alt and snapping
-    public moveListener(initialPosition: Vector): (event: SlideMouseEvent) => void {
+    public moveListener(initialPosition: Vector, snapVectors: SnapVector[]): (event: SlideMouseEvent) => void {
         const initialOrigin = this.target.origin;
-        const offset = initialPosition.towards(initialOrigin);
-        const directions = [...Vector.cardinals, ...Vector.intermediates];
+        const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));
 
         return event => {
-            const { slide, baseEvent } = event.detail;
-            const rawMove = initialOrigin.towards(resolvePosition(baseEvent, slide).add(offset));
-            const moveDirection = (baseEvent.shiftKey ? closestVector(rawMove, directions) : rawMove).normalized;
-            const move = rawMove.projectOn(moveDirection);
+            const move = calculateMove({
+                initialOrigin,
+                initialPosition,
+                mouseEvent: event,
+                snapVectors,
+                relativePullPoints
+            });
 
             this.target.origin = initialOrigin.add(move);
             this._repositionBoxHelpers();

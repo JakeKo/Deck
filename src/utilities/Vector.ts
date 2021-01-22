@@ -87,4 +87,15 @@ export default class Vector {
     public rotateMore(theta: number): Vector {
         return this.rotate(mod(this.theta(Vector.east) + theta, Math.PI * 2));
     }
+
+    public isPerpendicular(vector: Vector, epsilon = 0): boolean {
+        return this.dot(vector) <= epsilon;
+    }
+
+    public isParallel(vector: Vector, epsilon = 0): boolean {
+        const slope = vector.normalized;
+        const inverseSlope = slope.scale(-1);
+        return (Math.abs(this.normalized.x - slope.x) <= epsilon && Math.abs(this.normalized.y - slope.y) <= epsilon) ||
+            (Math.abs(this.normalized.x - inverseSlope.x) <= epsilon && Math.abs(this.normalized.y - inverseSlope.y) <= epsilon);
+    }
 }

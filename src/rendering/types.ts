@@ -220,7 +220,7 @@ type BaseGraphicMutator = {
     scale: number;
     vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => void;
     rotateListener: () => (event: SlideMouseEvent) => void;
-    moveListener: (initialPosition: Vector) => (event: SlideMouseEvent) => void;
+    moveListener: (initialPosition: Vector, snapVectors: SnapVector[]) => (event: SlideMouseEvent) => void;
     complete: () => void;
 };
 
@@ -299,6 +299,7 @@ export type ISlideRenderer = {
     readonly bounds: { origin: Vector; dimensions: Vector };
     cursor: string;
     cursorLock: boolean;
+    getSnapVectors: (exclude: string[]) => SnapVector[];
     makeCurveInteractive: (initialPosition: Vector) => ICurveMaker;
     makeEllipseInteractive: (initialPosition: Vector) => IEllipseMaker;
     makeImageInteractive: (initialPosition: Vector, source: string, dimensions: Vector) => IImageMaker;
