@@ -1,3 +1,8 @@
+import { SlideMouseEvent } from '@/events/types';
+import { resolvePosition } from '@/tools/utilities';
+import SnapVector from '@/utilities/SnapVector';
+import { closestVector } from '@/utilities/utilities';
+import Vector from '@/utilities/Vector';
 import { BoxRenderer, RotatorRenderer, VertexRenderer } from './helpers';
 import { BoundingBox, BoundingBoxMutatorHelpers, IGraphicRenderer, ISlideRenderer, VERTEX_ROLES } from './types';
 
@@ -95,4 +100,58 @@ export function resizeBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: Boundi
     helpers.vertices[VERTEX_ROLES.TOP_RIGHT].center = box.topRight;
     helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].center = box.bottomLeft;
     helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].center = box.bottomRight;
+}
+
+export function calculateMove({
+    initialOrigin,
+    initialPosition,
+    mouseEvent,
+    snapVectors,
+    relativePullPoints
+}: {
+    initialOrigin: Vector;
+    initialPosition: Vector;
+    mouseEvent: SlideMouseEvent;
+    snapVectors: SnapVector[];
+    relativePullPoints: Vector[];
+}): Vector {
+    const { baseEvent, slide } = mouseEvent.detail;
+    const position = resolvePosition(baseEvent, slide);
+    const directions = [...Vector.cardinals, ...Vector.intermediates];
+    const offset = initialPosition.towards(initialOrigin);
+
+    let snapShift = Vector.zero;
+    if (!baseEvent.altKey) {
+        const pullPoints = relativePullPoints.map(p => position.add(p));
+        const snapShifts = pullPoints.map(p => snapVectors.map(s => ({ pullPoint: p, snapVector: s, distance: s.distanceFromVector(p) })))
+            .reduce((all, some) => [...all, ...some], [])
+            .filter(s => s.distance < 25)
+            .sort((a, b) => {
+                if (a.distance < b.distance) return -1;
+                else if (a.distance === b.distance) return 0;
+                else return 1;
+            })
+            .map(shift => shift.pullPoint.towards(shift.snapVector.getClosestPoint(shift.pullPoint)));
+
+        // TODO: Search for next closest perpendicular move (not just the second move)
+        snapShift = snapShifts.length > 0
+            ? snapShifts.length > 1
+                ? snapShifts[0].isPerpendicular(snapShifts[1], 1E-6)
+                    ? snapShifts[0].add(snapShifts[1])
+                    : snapShifts[0]
+                : snapShifts[0]
+            : Vector.zero;
+    }
+
+    const rawMove = initialOrigin.towards(position.add(offset));
+
+    // TODO: Handle case where moveDirection and snapShift are neither parallel nor perpendicular
+    if (baseEvent.shiftKey) {
+        const moveDirection = closestVector(rawMove, directions);
+        const initialMove = rawMove.projectOn(moveDirection);
+        const snapMove = snapShift.isParallel(moveDirection) ? snapShift : Vector.zero;
+        return initialMove.add(snapMove);
+    }
+
+    return rawMove.add(snapShift);
 }

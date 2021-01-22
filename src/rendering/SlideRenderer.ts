@@ -45,6 +45,7 @@ import {
     IVideoMaker
 } from './types';
 import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
+import SnapVector from '@/utilities/SnapVector';
 const { CURVE, ELLIPSE, IMAGE, RECTANGLE, TEXTBOX, VIDEO } = GRAPHIC_TYPES;
 
 type SlideRendererArgs = {
@@ -68,6 +69,7 @@ class SlideRenderer implements ISlideRenderer {
     private _defaultCursor = 'default';
     private _cursor: string;
     private _cursorLock = false;
+    private _snapVectors: SnapVector[];
 
     constructor(args: SlideRendererArgs) {
         this.canvas = args.canvas;
@@ -78,6 +80,14 @@ class SlideRenderer implements ISlideRenderer {
         this._activeMakers = {};
         this._markedGraphics = {};
         this._cursor = this._defaultCursor;
+        this._snapVectors = [
+            new SnapVector(new Vector(args.croppedViewbox.width / 2, 0), Vector.east),
+            new SnapVector(new Vector(args.croppedViewbox.width, args.croppedViewbox.height / 2), Vector.north),
+            new SnapVector(new Vector(args.croppedViewbox.width / 2, args.croppedViewbox.height), Vector.west),
+            new SnapVector(new Vector(0, args.croppedViewbox.height / 2), Vector.south),
+            new SnapVector(new Vector(args.croppedViewbox.width / 2, args.croppedViewbox.height / 2), Vector.north),
+            new SnapVector(new Vector(args.croppedViewbox.width / 2, args.croppedViewbox.height / 2), Vector.east)
+        ];
 
         this._renderBackdrop(new Vector(args.croppedViewbox.width, args.croppedViewbox.height));
         decorateSlideEvents(this);
@@ -116,6 +126,16 @@ class SlideRenderer implements ISlideRenderer {
 
     public set cursorLock(cursorLock: boolean) {
         this._cursorLock = cursorLock;
+    }
+
+    public getSnapVectors(exclude: string[]): SnapVector[] {
+        return [
+            ...this._snapVectors,
+            ...Object.values(this._graphics)
+                .filter(g => !exclude.includes(g.id))
+                .map(g => [...g.staticSnapVectors, ...g.transformedSnapVectors])
+                .reduce((all, some) => [...all, ...some], [])
+        ];
     }
 
     public makeCurveInteractive(initialPosition: Vector): ICurveMaker {
