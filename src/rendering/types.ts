@@ -151,6 +151,11 @@ export type IRotatorRenderer = BaseHelperRenderer & {
     rotation: number;
 };
 
+export type ISnapVectorRenderer = BaseHelperRenderer & {
+    readonly type: GRAPHIC_TYPES.SNAP_VECTOR;
+    snapVector: SnapVector;
+}
+
 export type IVertexRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.VERTEX;
     readonly role: VERTEX_ROLES;
@@ -365,6 +370,7 @@ export enum GRAPHIC_TYPES {
     RECTANGLE = 'rectangle',
     RECTANGLE_OUTLINE = 'rectangle-outline',
     ROTATOR = 'rotator',
+    SNAP_VECTOR = 'snap-vector',
     TEXTBOX = 'textbox',
     VERTEX = 'vertex',
     VIDEO = 'video'
