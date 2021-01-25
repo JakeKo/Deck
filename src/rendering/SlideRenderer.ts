@@ -46,16 +46,9 @@ import {
 } from './types';
 import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
 import SnapVector from '@/utilities/SnapVector';
-const { CURVE, ELLIPSE, IMAGE, RECTANGLE, TEXTBOX, VIDEO } = GRAPHIC_TYPES;
+import SnapVectorRenderer from './helpers/SnapVectorRenderer';
 
-type SlideRendererArgs = {
-    stateManager: SlideStateManager;
-    canvas: SVG.Doc;
-    rawViewbox: Viewbox;
-    croppedViewbox: Viewbox;
-    zoom: number;
-    graphics?: { [key: string]: GraphicStoreModel };
-};
+const { CURVE, ELLIPSE, IMAGE, RECTANGLE, TEXTBOX, VIDEO } = GRAPHIC_TYPES;
 
 class SlideRenderer implements ISlideRenderer {
     public readonly canvas: SVG.Doc;
@@ -70,8 +63,16 @@ class SlideRenderer implements ISlideRenderer {
     private _cursor: string;
     private _cursorLock = false;
     private _snapVectors: SnapVector[];
+    private _renderedSnapVectors: { [key: string]: SnapVectorRenderer };
 
-    constructor(args: SlideRendererArgs) {
+    constructor(args: {
+        stateManager: SlideStateManager;
+        canvas: SVG.Doc;
+        rawViewbox: Viewbox;
+        croppedViewbox: Viewbox;
+        zoom: number;
+        graphics?: { [key: string]: GraphicStoreModel };
+    }) {
         this.canvas = args.canvas;
         this.rawViewbox = args.rawViewbox;
         this.zoom = args.zoom;
@@ -88,6 +89,7 @@ class SlideRenderer implements ISlideRenderer {
             new SnapVector(new Vector(args.croppedViewbox.width / 2, args.croppedViewbox.height / 2), Vector.north),
             new SnapVector(new Vector(args.croppedViewbox.width / 2, args.croppedViewbox.height / 2), Vector.east)
         ];
+        this._renderedSnapVectors = {};
 
         this._renderBackdrop(new Vector(args.croppedViewbox.width, args.croppedViewbox.height));
         decorateSlideEvents(this);
@@ -136,6 +138,23 @@ class SlideRenderer implements ISlideRenderer {
                 .map(g => [...g.staticSnapVectors, ...g.transformedSnapVectors])
                 .reduce((all, some) => [...all, ...some], [])
         ];
+    }
+
+    public renderSnapVectors(snapVectors: { [key: string]: SnapVector }): void {
+        Object.keys(snapVectors).forEach(key => {
+            if (this._renderedSnapVectors[key] === undefined) {
+                const renderer = new SnapVectorRenderer({ slide: this, snapVector: snapVectors[key] });
+                renderer.render();
+                this._renderedSnapVectors[key] = renderer;
+            } else {
+                this._renderedSnapVectors[key].snapVector = snapVectors[key];
+            }
+        });
+    }
+
+    public unrenderAllSnapVectors(): void {
+        Object.values(this._renderedSnapVectors).forEach(renderer => renderer.unrender());
+        this._renderedSnapVectors = {};
     }
 
     public makeCurveInteractive(initialPosition: Vector): ICurveMaker {

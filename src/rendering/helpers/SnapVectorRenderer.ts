@@ -22,12 +22,12 @@ class SnapVectorRenderer implements ISnapVectorRenderer {
     public get isRendered(): boolean {
         return this._line !== undefined && this._point !== undefined;
     }
-    
+
     public set snapVector(snapVector: SnapVector) {
         this._snapVector = snapVector;
 
-        const first = this._snapVector.origin.add(this._snapVector.direction.scale(1000));
-        const second = this._snapVector.origin.add(this._snapVector.direction.scale(-1000));
+        const first = this._snapVector.origin.add(this._snapVector.direction.scale(250));
+        const second = this._snapVector.origin.add(this._snapVector.direction.scale(-250));
         this._line && this._line.setAttribute('x1', first.x.toString());
         this._line && this._line.setAttribute('y1', first.x.toString());
         this._line && this._line.setAttribute('x2', second.x.toString());
@@ -43,13 +43,13 @@ class SnapVectorRenderer implements ISnapVectorRenderer {
             return;
         }
 
-        const first = this._snapVector.origin.add(this._snapVector.direction.scale(1000));
-        const second = this._snapVector.origin.add(this._snapVector.direction.scale(-1000));
+        const first = this._snapVector.origin.add(this._snapVector.direction.scale(250));
+        const second = this._snapVector.origin.add(this._snapVector.direction.scale(-250));
         this._line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         this._line.setAttribute('x1', first.x.toString());
-        this._line.setAttribute('y1', first.x.toString());
+        this._line.setAttribute('y1', first.y.toString());
         this._line.setAttribute('x2', second.x.toString());
-        this._line.setAttribute('y2', second.x.toString());
+        this._line.setAttribute('y2', second.y.toString());
         this._line.setAttribute('stroke', this._color);
         this._line.setAttribute('stroke-width', this._lineWidth.toString());
 
