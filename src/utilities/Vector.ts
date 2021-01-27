@@ -95,7 +95,9 @@ export default class Vector {
     public isParallel(vector: Vector, epsilon = 0): boolean {
         const slope = vector.normalized;
         const inverseSlope = slope.scale(-1);
-        return (Math.abs(this.normalized.x - slope.x) <= epsilon && Math.abs(this.normalized.y - slope.y) <= epsilon) ||
+        return (this.x === 0 && this.y === 0) ||
+            (vector.x === 0 && vector.y === 0) ||
+            (Math.abs(this.normalized.x - slope.x) <= epsilon && Math.abs(this.normalized.y - slope.y) <= epsilon) ||
             (Math.abs(this.normalized.x - inverseSlope.x) <= epsilon && Math.abs(this.normalized.y - inverseSlope.y) <= epsilon);
     }
 }

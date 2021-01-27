@@ -24,7 +24,9 @@ export function moveTextbox(event: TextboxMouseEvent): void {
 
     function complete(event: SlideMouseEvent): void {
         moveListener(event);
+        slide.broadcastSetGraphic(mutator.target);
         slide.cursorLock = false;
+        slide.unrenderAllSnapVectors();
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, moveTextbox);
     }

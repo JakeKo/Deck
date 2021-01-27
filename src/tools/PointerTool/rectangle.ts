@@ -24,7 +24,9 @@ export function moveRectangle(event: RectangleMouseEvent): void {
 
     function complete(event: SlideMouseEvent): void {
         moveListener(event);
+        slide.broadcastSetGraphic(mutator.target);
         slide.cursorLock = false;
+        slide.unrenderAllSnapVectors();
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
     }

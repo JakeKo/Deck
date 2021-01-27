@@ -117,41 +117,39 @@ export function calculateMove({
 }): Vector {
     const { baseEvent, slide } = mouseEvent.detail;
     const position = resolvePosition(baseEvent, slide);
-    const directions = [...Vector.cardinals, ...Vector.intermediates];
-    const offset = initialPosition.towards(initialOrigin);
+    const rawMove = initialOrigin.towards(position.add(initialPosition.towards(initialOrigin)));
+    const moveDirection = baseEvent.shiftKey ? closestVector(rawMove, [...Vector.cardinals, ...Vector.intermediates]) : Vector.zero;
 
-    let snapShift = Vector.zero;
+    const snapPulls: { shift: Vector; snapVector: SnapVector }[] = [];
     if (!baseEvent.altKey) {
         const pullPoints = relativePullPoints.map(p => position.add(p));
-        const snapShifts = pullPoints.map(p => snapVectors.map(s => ({ pullPoint: p, snapVector: s, distance: s.distanceFromVector(p) })))
+        const pullOptions = pullPoints.map(p => snapVectors.map(s => ({ shift: p.towards(s.getClosestPoint(p)), snapVector: s })))
             .reduce((all, some) => [...all, ...some], [])
-            .filter(s => s.distance < 25)
+            .filter(s => s.shift.magnitude < 25 && s.shift.isParallel(moveDirection))
             .sort((a, b) => {
-                if (a.distance < b.distance) return -1;
-                else if (a.distance === b.distance) return 0;
+                if (a.shift.magnitude < b.shift.magnitude) return -1;
+                else if (a.shift.magnitude === b.shift.magnitude) return 0;
                 else return 1;
-            })
-            .map(shift => shift.pullPoint.towards(shift.snapVector.getClosestPoint(shift.pullPoint)));
+            });
 
-        // TODO: Search for next closest perpendicular move (not just the second move)
-        snapShift = snapShifts.length > 0
-            ? snapShifts.length > 1
-                ? snapShifts[0].isPerpendicular(snapShifts[1], 1E-6)
-                    ? snapShifts[0].add(snapShifts[1])
-                    : snapShifts[0]
-                : snapShifts[0]
-            : Vector.zero;
+        if (pullOptions.length >= 1) {
+            const [firstShift, ...otherShifts] = pullOptions;
+            snapPulls.push(firstShift);
+
+            // Find the next closest shift that is perpendicular to the first shift (if there is one)
+            for (const shift of otherShifts) {
+                if (firstShift.shift.isPerpendicular(shift.shift)) {
+                    snapPulls.push(shift);
+                    break;
+                }
+            }
+        }
     }
 
-    const rawMove = initialOrigin.towards(position.add(offset));
+    const finalSnapPull = snapPulls.reduce((finalPull, pull) => finalPull.add(pull.shift), Vector.zero);
+    slide.unrenderAllSnapVectors();
+    slide.renderSnapVectors(snapPulls.reduce((pulls, pull) => ({ ...pulls, [Math.random().toString()]: pull.snapVector }), {}));
 
     // TODO: Handle case where moveDirection and snapShift are neither parallel nor perpendicular
-    if (baseEvent.shiftKey) {
-        const moveDirection = closestVector(rawMove, directions);
-        const initialMove = rawMove.projectOn(moveDirection);
-        const snapMove = snapShift.isParallel(moveDirection) ? snapShift : Vector.zero;
-        return initialMove.add(snapMove);
-    }
-
-    return rawMove.add(snapShift);
+    return (baseEvent.shiftKey ? rawMove.projectOn(moveDirection) : rawMove).add(finalSnapPull);
 }

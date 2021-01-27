@@ -27,6 +27,11 @@ class CanvasRenderer implements ICanvasRenderer {
         return this._svg !== undefined;
     }
 
+    public set scale(_: number) {
+        // eslint-disable-next-line no-useless-return
+        return;
+    }
+
     public render(): void {
         // Silently fail if the SVG is already rendered
         if (this.isRendered) {
