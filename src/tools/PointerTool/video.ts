@@ -24,7 +24,9 @@ export function moveVideo(event: VideoMouseEvent): void {
 
     function complete(event: SlideMouseEvent): void {
         moveListener(event);
+        slide.broadcastSetGraphic(mutator.target);
         slide.cursorLock = false;
+        slide.unrenderAllSnapVectors();
         unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
         listenOnce(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
     }

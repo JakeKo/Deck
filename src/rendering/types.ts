@@ -97,6 +97,7 @@ export type IHelperRenderer = IBoxRenderer
 type BaseHelperRenderer = {
     readonly type: GRAPHIC_TYPES;
     readonly isRendered: boolean;
+    scale: number;
     render: () => void;
     unrender: () => void;
 };
@@ -106,7 +107,6 @@ export type IBoxRenderer = BaseHelperRenderer & {
     origin: Vector;
     dimensions: Vector;
     rotation: number;
-    scale: number;
     setOriginAndDimensions: (origin: Vector, dimensions: Vector) => void;
 };
 
@@ -116,7 +116,6 @@ export type ICanvasRenderer = BaseHelperRenderer & {
 
 export type ICurveAnchorRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.CURVE_ANCHOR;
-    scale: number;
     inHandle: Vector;
     point: Vector;
     outHandle: Vector;
@@ -124,14 +123,12 @@ export type ICurveAnchorRenderer = BaseHelperRenderer & {
 
 export type ICurveOutlineRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.CURVE_OUTLINE;
-    scale: number;
 };
 
 export type IEllipseOutlineRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.ELLIPSE_OUTLINE;
     center: Vector;
     dimensions: Vector;
-    scale: number;
     setCenterAndDimensions: (center: Vector, dimensions: Vector) => void;
 };
 
@@ -139,7 +136,6 @@ export type IRectangleOutlineRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.RECTANGLE_OUTLINE;
     origin: Vector;
     dimensions: Vector;
-    scale: number;
     setOriginAndDimensions: (origin: Vector, dimensions: Vector) => void;
 };
 
@@ -147,7 +143,6 @@ export type IRotatorRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.ROTATOR;
     readonly parent: IGraphicRenderer;
     center: Vector;
-    scale: number;
     rotation: number;
 };
 
@@ -161,7 +156,6 @@ export type IVertexRenderer = BaseHelperRenderer & {
     readonly role: VERTEX_ROLES;
     readonly parent: IGraphicRenderer;
     center: Vector;
-    scale: number;
 }
 
 export type IGraphicMaker = ICurveMaker

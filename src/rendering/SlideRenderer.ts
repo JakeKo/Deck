@@ -143,7 +143,7 @@ class SlideRenderer implements ISlideRenderer {
     public renderSnapVectors(snapVectors: { [key: string]: SnapVector }): void {
         Object.keys(snapVectors).forEach(key => {
             if (this._renderedSnapVectors[key] === undefined) {
-                const renderer = new SnapVectorRenderer({ slide: this, snapVector: snapVectors[key] });
+                const renderer = new SnapVectorRenderer({ slide: this, snapVector: snapVectors[key], scale: 1 / this.zoom });
                 renderer.render();
                 this._renderedSnapVectors[key] = renderer;
             } else {
@@ -462,6 +462,7 @@ class SlideRenderer implements ISlideRenderer {
         Object.values(this._focusedGraphics).forEach(mutator => (mutator.scale = 1 / this.zoom));
         Object.values(this._activeMakers).forEach(maker => (maker.scale = 1 / this.zoom));
         Object.values(this._markedGraphics).forEach(marker => (marker.scale = 1 / this.zoom));
+        Object.values(this._renderedSnapVectors).forEach(snapVector => (snapVector.scale = 1 / this.zoom));
     }
 
     private _renderBackdrop(dimensions: Vector): void {
