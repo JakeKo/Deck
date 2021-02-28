@@ -45,7 +45,7 @@ class BoxRenderer implements IBoxRenderer {
 
     public set dimensions(dimensions: Vector) {
         this._dimensions = dimensions;
-        this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
+        this._svg && this._svg.rotate(0).size(this._dimensions.x, this._dimensions.y).rotate(radToDeg(this._rotation));
     }
 
     public set scale(scale: number) {

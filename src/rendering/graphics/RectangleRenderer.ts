@@ -56,7 +56,7 @@ class RectangleRenderer implements IRectangleRenderer {
 
     public set dimensions(dimensions: Vector) {
         this._dimensions = dimensions;
-        this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
+        this._svg && this._svg.rotate(0).size(this._dimensions.x, this._dimensions.y).rotate(radToDeg(this._rotation));
     }
 
     public get fillColor(): string {
@@ -96,25 +96,26 @@ class RectangleRenderer implements IRectangleRenderer {
     }
 
     public get staticBox(): BoundingBox {
-        return this.isRendered ? {
-            origin: this._origin,
-            center: this._origin.add(this._dimensions.scale(0.5)),
-            dimensions: this._dimensions,
-            topLeft: this._origin,
-            topRight: this._origin.add(new Vector(this._dimensions.x, 0)),
-            bottomLeft: this._origin.add(new Vector(0, this._dimensions.y)),
-            bottomRight: this._origin.add(this._dimensions),
-            rotation: this._rotation
-        } : {
-            origin: Vector.zero,
-            center: Vector.zero,
-            dimensions: Vector.zero,
-            topLeft: Vector.zero,
-            topRight: Vector.zero,
-            bottomLeft: Vector.zero,
-            bottomRight: Vector.zero,
-            rotation: 0
-        };
+        return this.isRendered
+            ? {
+                origin: this._origin,
+                center: this._origin.add(this._dimensions.scale(0.5)),
+                dimensions: this._dimensions,
+                topLeft: this._origin,
+                topRight: this._origin.add(new Vector(this._dimensions.x, 0)),
+                bottomLeft: this._origin.add(new Vector(0, this._dimensions.y)),
+                bottomRight: this._origin.add(this._dimensions),
+                rotation: this._rotation
+            } : {
+                origin: Vector.zero,
+                center: Vector.zero,
+                dimensions: Vector.zero,
+                topLeft: Vector.zero,
+                topRight: Vector.zero,
+                bottomLeft: Vector.zero,
+                bottomRight: Vector.zero,
+                rotation: 0
+            };
     }
 
     public get transformedBox(): BoundingBox {
