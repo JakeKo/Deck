@@ -2,7 +2,7 @@ import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import SnapVector from '@/utilities/SnapVector';
 import { closestVector, mod } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { CurveAnchorRenderer } from '../helpers';
 import {
     BoundingBoxMutatorHelpers,
@@ -63,17 +63,17 @@ class CurveMutator implements ICurveMutator {
         const box = this.target.transformedBox;
         const directions = [
             box.dimensions,
-            box.dimensions.signAs(Vector.northwest),
-            box.dimensions.signAs(Vector.southwest),
-            box.dimensions.signAs(Vector.southeast)
-        ].map(direction => direction.rotateMore(box.rotation));
+            box.dimensions.signAs(V.northwest),
+            box.dimensions.signAs(V.southwest),
+            box.dimensions.signAs(V.southeast)
+        ].map(direction => direction.rotate(box.rotation));
 
         // 1. Resolve the slide-relative mouse position
         // 2. Create a vector which represents how to change the respective corner
         // 3. Constrain the vector (to maintain aspect ratio) if shift is pressed
         // 4. Unrotate the corner vector to correct for graphic rotation
         // 5. Use the post-shift corner vector and corrected corner vector to update props
-        const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
+        const makeListener = (oppositeCorner: V): (event: SlideMouseEvent) => void => {
             const anchorOffsets = this.target.anchors.map<CurveAnchor>(anchor => ({
                 inHandle: oppositeCorner.towards(anchor.inHandle).abs,
                 point: oppositeCorner.towards(anchor.point).abs,
@@ -85,15 +85,15 @@ class CurveMutator implements ICurveMutator {
                 const position = resolvePosition(baseEvent, slide);
                 const rawCornerVector = oppositeCorner.towards(position);
                 const cornerVector = baseEvent.shiftKey ? rawCornerVector.projectOn(closestVector(rawCornerVector, directions)) : rawCornerVector;
-                const correctedCornerVector = cornerVector.rotateMore(-box.rotation);
+                const correctedCornerVector = cornerVector.rotate(-box.rotation);
 
-                const scale = new Vector(correctedCornerVector.x / box.dimensions.x, correctedCornerVector.y / box.dimensions.y);
+                const scale = new V(correctedCornerVector.x / box.dimensions.x, correctedCornerVector.y / box.dimensions.y);
 
                 // Update rendering
                 this.target.anchors = anchorOffsets.map<CurveAnchor>(anchor => ({
-                    inHandle: new Vector(anchor.inHandle.x * scale.x, anchor.inHandle.y * scale.y).add(oppositeCorner),
-                    point: new Vector(anchor.point.x * scale.x, anchor.point.y * scale.y).add(oppositeCorner),
-                    outHandle: new Vector(anchor.outHandle.x * scale.x, anchor.outHandle.y * scale.y).add(oppositeCorner)
+                    inHandle: new V(anchor.inHandle.x * scale.x, anchor.inHandle.y * scale.y).add(oppositeCorner),
+                    point: new V(anchor.point.x * scale.x, anchor.point.y * scale.y).add(oppositeCorner),
+                    outHandle: new V(anchor.outHandle.x * scale.x, anchor.outHandle.y * scale.y).add(oppositeCorner)
                 }));
                 this._repositionCurveAnchors();
             };
@@ -109,7 +109,7 @@ class CurveMutator implements ICurveMutator {
 
     public rotateListener(): (event: SlideMouseEvent) => void {
         const { center } = this.target.transformedBox;
-        const directions = [...Vector.cardinals, ...Vector.intermediates];
+        const directions = [...V.cardinals, ...V.intermediates];
 
         return event => {
             const { slide, baseEvent } = event.detail;
@@ -123,7 +123,7 @@ class CurveMutator implements ICurveMutator {
         };
     }
 
-    public moveListener(initialPosition: Vector, snapVectors: SnapVector[]): (event: SlideMouseEvent) => void {
+    public moveListener(initialPosition: V, snapVectors: SnapVector[]): (event: SlideMouseEvent) => void {
         const initialOrigin = this.target.getAnchor(0).point;
         const initialAnchors = this.target.anchors;
         const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));

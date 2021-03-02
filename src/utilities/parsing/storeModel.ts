@@ -17,14 +17,14 @@ import {
     TextboxStoreModel,
     VideoStoreModel
 } from '@/store/types';
-import Vector from '../Vector';
+import V from '../Vector';
 
 export function curveRendererToCurveStoreModel(curve: ICurveRenderer): CurveStoreModel {
     try {
         return {
             id: curve.id,
             type: curve.type,
-            points: curve.anchors.reduce<Vector[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []),
+            points: curve.anchors.reduce<V[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []),
             fillColor: curve.fillColor,
             strokeColor: curve.strokeColor,
             strokeWidth: curve.strokeWidth,

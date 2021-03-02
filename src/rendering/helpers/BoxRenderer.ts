@@ -1,13 +1,13 @@
 import { radToDeg } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { GRAPHIC_TYPES, IBoxRenderer, ISlideRenderer } from '../types';
 
 type BoxRendererArgs = {
     slide: ISlideRenderer;
     scale: number;
-    origin: Vector;
-    dimensions: Vector;
+    origin: V;
+    dimensions: V;
     rotation: number;
 };
 
@@ -15,8 +15,8 @@ class BoxRenderer implements IBoxRenderer {
     public readonly type = GRAPHIC_TYPES.BOX;
     private _slide: ISlideRenderer;
     private _svg: SVG.Rect | undefined;
-    private _origin: Vector;
-    private _dimensions: Vector;
+    private _origin: V;
+    private _dimensions: V;
     private _scale: number;
     private _fillColor: string;
     private _strokeColor: string;
@@ -38,12 +38,12 @@ class BoxRenderer implements IBoxRenderer {
         return this._svg !== undefined;
     }
 
-    public set origin(origin: Vector) {
+    public set origin(origin: V) {
         this._origin = origin;
         this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(radToDeg(this._rotation));
     }
 
-    public set dimensions(dimensions: Vector) {
+    public set dimensions(dimensions: V) {
         this._dimensions = dimensions;
         this._svg && this._svg.rotate(0).size(this._dimensions.x, this._dimensions.y).rotate(radToDeg(this._rotation));
     }
@@ -58,7 +58,7 @@ class BoxRenderer implements IBoxRenderer {
         this._svg && this._svg.rotate(radToDeg(this._rotation));
     }
 
-    public setOriginAndDimensions(origin: Vector, dimensions: Vector): void {
+    public setOriginAndDimensions(origin: V, dimensions: V): void {
         this._origin = origin;
         this._dimensions = dimensions;
 

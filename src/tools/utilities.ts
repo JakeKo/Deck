@@ -1,10 +1,10 @@
 import { ISlideRenderer } from '@/rendering/types';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 
-export function resolvePosition(event: MouseEvent, slide: ISlideRenderer): Vector {
-    return new Vector(event.pageX, event.pageY)
+export function resolvePosition(event: MouseEvent, slide: ISlideRenderer): V {
+    return new V(event.pageX, event.pageY)
         .scale(1 / slide.zoom)
         .add(slide.bounds.origin.scale(-1))
-        .add(new Vector(slide.rawViewbox.x, slide.rawViewbox.y))
-        .transform(Math.round);
+        .add(new V(slide.rawViewbox.x, slide.rawViewbox.y))
+        .apply(Math.round);
 }

@@ -2,7 +2,7 @@ import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import SnapVector from '@/utilities/SnapVector';
 import { closestVector } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { BoxRenderer, RotatorRenderer, VertexRenderer } from './helpers';
 import { BoundingBox, BoundingBoxMutatorHelpers, IGraphicRenderer, ISlideRenderer, VERTEX_ROLES } from './types';
 
@@ -109,18 +109,18 @@ export function calculateMove({
     snapVectors,
     relativePullPoints
 }: {
-    initialOrigin: Vector;
-    initialPosition: Vector;
+    initialOrigin: V;
+    initialPosition: V;
     mouseEvent: SlideMouseEvent;
     snapVectors: SnapVector[];
-    relativePullPoints: Vector[];
-}): Vector {
+    relativePullPoints: V[];
+}): V {
     const { baseEvent, slide } = mouseEvent.detail;
     const position = resolvePosition(baseEvent, slide);
     const rawMove = initialOrigin.towards(position.add(initialPosition.towards(initialOrigin)));
-    const moveDirection = baseEvent.shiftKey ? closestVector(rawMove, [...Vector.cardinals, ...Vector.intermediates]) : Vector.zero;
+    const moveDirection = baseEvent.shiftKey ? closestVector(rawMove, [...V.cardinals, ...V.intermediates]) : V.zero;
 
-    const snapPulls: { shift: Vector; snapVector: SnapVector }[] = [];
+    const snapPulls: { shift: V; snapVector: SnapVector }[] = [];
     if (!baseEvent.altKey) {
         const pullPoints = relativePullPoints.map(p => position.add(p));
         const pullOptions = pullPoints.map(p => snapVectors.map(s => ({ shift: p.towards(s.getClosestPoint(p)), snapVector: s })))
@@ -146,7 +146,7 @@ export function calculateMove({
         }
     }
 
-    const finalSnapPull = snapPulls.reduce((finalPull, pull) => finalPull.add(pull.shift), Vector.zero);
+    const finalSnapPull = snapPulls.reduce((finalPull, pull) => finalPull.add(pull.shift), V.zero);
     slide.unrenderAllSnapVectors();
     slide.renderSnapVectors(snapPulls.reduce((pulls, pull) => ({ ...pulls, [Math.random().toString()]: pull.snapVector }), {}));
 

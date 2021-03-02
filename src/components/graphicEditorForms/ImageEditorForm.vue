@@ -44,7 +44,7 @@
 <script lang='ts'>
 import { ImageStoreModel } from '@/store/types';
 import { degToRad, radToDeg } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
@@ -75,14 +75,14 @@ const ImageEditorForm = defineComponent({
         const x = computed({
             get: () => props.image.origin.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.image, origin: new Vector(value, props.image.origin.y) });
+                store.mutations.setGraphic(props.slideId, { ...props.image, origin: new V(value, props.image.origin.y) });
                 store.mutations.broadcastSetX(props.slideId, props.image.id, value);
             }
         });
         const y = computed({
             get: () => props.image.origin.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.image, origin: new Vector(props.image.origin.x, value) });
+                store.mutations.setGraphic(props.slideId, { ...props.image, origin: new V(props.image.origin.x, value) });
                 store.mutations.broadcastSetY(props.slideId, props.image.id, value);
             }
         });

@@ -1,13 +1,13 @@
-import Vector from '../Vector';
+import V from '../Vector';
 
 describe('Vector', () => {
     it('can calculate magnitude', () => {
         // Arrange
-        const vector1 = new Vector(0, 0);
-        const vector2 = new Vector(2, 3);
-        const vector3 = new Vector(-4, 1);
-        const vector4 = new Vector(-5, -10);
-        const vector5 = new Vector(3, -2);
+        const vector1 = new V(0, 0);
+        const vector2 = new V(2, 3);
+        const vector3 = new V(-4, 1);
+        const vector4 = new V(-5, -10);
+        const vector5 = new V(3, -2);
         const expectedMagnitude1 = 0;
         const expectedMagnitude2 = Math.sqrt(13);
         const expectedMagnitude3 = Math.sqrt(17);
@@ -31,16 +31,16 @@ describe('Vector', () => {
 
     it('can normalize vectors', () => {
         // Arrange
-        const vector1 = new Vector(0, 0);
-        const vector2 = new Vector(2, 3);
-        const vector3 = new Vector(-4, 1);
-        const vector4 = new Vector(-5, -10);
-        const vector5 = new Vector(3, -2);
-        const expectedNormal1 = new Vector(0, 0);
-        const expectedNormal2 = new Vector(2 / Math.sqrt(13), 3 / Math.sqrt(13));
-        const expectedNormal3 = new Vector(-4 / Math.sqrt(17), 1 / Math.sqrt(17));
-        const expectedNormal4 = new Vector(-1 / Math.sqrt(5), -2 / Math.sqrt(5));
-        const expectedNormal5 = new Vector(3 / Math.sqrt(13), -2 / Math.sqrt(13));
+        const vector1 = new V(0, 0);
+        const vector2 = new V(2, 3);
+        const vector3 = new V(-4, 1);
+        const vector4 = new V(-5, -10);
+        const vector5 = new V(3, -2);
+        const expectedNormal1 = new V(0, 0);
+        const expectedNormal2 = new V(2 / Math.sqrt(13), 3 / Math.sqrt(13));
+        const expectedNormal3 = new V(-4 / Math.sqrt(17), 1 / Math.sqrt(17));
+        const expectedNormal4 = new V(-1 / Math.sqrt(5), -2 / Math.sqrt(5));
+        const expectedNormal5 = new V(3 / Math.sqrt(13), -2 / Math.sqrt(13));
 
         // Act
         const actualNormal1 = vector1.normalized;
@@ -59,11 +59,11 @@ describe('Vector', () => {
 
     it('can convert vectors to arrays', () => {
         // Arrange
-        const vector1 = new Vector(0, 0);
-        const vector2 = new Vector(2, 3);
-        const vector3 = new Vector(-4, 1);
-        const vector4 = new Vector(-5, -10);
-        const vector5 = new Vector(3, -2);
+        const vector1 = new V(0, 0);
+        const vector2 = new V(2, 3);
+        const vector3 = new V(-4, 1);
+        const vector4 = new V(-5, -10);
+        const vector5 = new V(3, -2);
         const expectedArray1 = [0, 0];
         const expectedArray2 = [2, 3];
         const expectedArray3 = [-4, 1];
@@ -87,11 +87,11 @@ describe('Vector', () => {
 
     it('can take the absolute value of vectos', () => {
         // Arrange
-        const vector1 = Vector.northeast;
-        const vector2 = Vector.northwest;
-        const vector3 = Vector.southwest;
-        const vector4 = Vector.southeast;
-        const expected = Vector.northeast;
+        const vector1 = V.northeast;
+        const vector2 = V.northwest;
+        const vector3 = V.southwest;
+        const vector4 = V.southeast;
+        const expected = V.northeast;
 
         // Act
         const actual1 = vector1.abs;
@@ -108,9 +108,9 @@ describe('Vector', () => {
 
     it('can calculate the sum of two vectors', () => {
         // Arrange
-        const vector1 = new Vector(-3, 4);
-        const vector2 = new Vector(2, 3);
-        const expectedSum = new Vector(-1, 7);
+        const vector1 = new V(-3, 4);
+        const vector2 = new V(2, 3);
+        const expectedSum = new V(-1, 7);
 
         // Act
         const actualSum = vector1.add(vector2);
@@ -121,9 +121,9 @@ describe('Vector', () => {
 
     it('can calculate the difference between two vectors', () => {
         // Arrange
-        const vector1 = new Vector(-3, 4);
-        const vector2 = new Vector(2, 3);
-        const expectedDifference = new Vector(-5, 1);
+        const vector1 = new V(-3, 4);
+        const vector2 = new V(2, 3);
+        const expectedDifference = new V(-5, 1);
 
         // Act
         const actualDifference = vector2.towards(vector1);
@@ -134,8 +134,8 @@ describe('Vector', () => {
 
     it('can calculate the dot product of two vectors', () => {
         // Arrange
-        const vector1 = new Vector(-3, 4);
-        const vector2 = new Vector(2, 3);
+        const vector1 = new V(-3, 4);
+        const vector2 = new V(2, 3);
         const expectedDotProduct = 6;
 
         // Act
@@ -147,11 +147,11 @@ describe('Vector', () => {
 
     it('can calculate the angle between two vectors (in radians)', () => {
         // Arrange
-        const vector1 = Vector.east;
-        const vector2 = new Vector(5, 5);
-        const vector3 = new Vector(-5, 5);
-        const vector4 = new Vector(-5, -5);
-        const vector5 = new Vector(5, -5);
+        const vector1 = V.east;
+        const vector2 = new V(5, 5);
+        const vector3 = new V(-5, 5);
+        const vector4 = new V(-5, -5);
+        const vector5 = new V(5, -5);
         const expectedAngle1 = Math.PI * 1 / 4;
         const expectedAngle2 = Math.PI * 3 / 4;
         const expectedAngle3 = Math.PI * 5 / 4;
@@ -175,9 +175,9 @@ describe('Vector', () => {
 
     it('can calculate the projection of one vector onto another', () => {
         // Arrange
-        const vector1 = new Vector(2, 0);
-        const vector2 = new Vector(5, 5);
-        const expectedProjection = new Vector(5, 0);
+        const vector1 = new V(2, 0);
+        const vector2 = new V(5, 5);
+        const expectedProjection = new V(5, 0);
 
         // Act
         const actualProjection = vector2.projectOn(vector1);
@@ -188,9 +188,9 @@ describe('Vector', () => {
 
     it('can scale vectors', () => {
         // Arrange
-        const vector = new Vector(2, -3);
+        const vector = new V(2, -3);
         const scalar = 3;
-        const expectedScaledVector = new Vector(6, -9);
+        const expectedScaledVector = new V(6, -9);
 
         // Act
         const actualScaledVector = vector.scale(scalar);
@@ -201,8 +201,8 @@ describe('Vector', () => {
 
     it('can reflect a vector over itself', () => {
         // Arrange
-        const vector = new Vector(2, -3);
-        const expectedReflectedVector = new Vector(2, -3);
+        const vector = new V(2, -3);
+        const expectedReflectedVector = new V(2, -3);
 
         // Act
         const actualReflectedVector = vector.reflect();
@@ -213,9 +213,9 @@ describe('Vector', () => {
 
     it('can reflect a vector over an arbitrary origin vector', () => {
         // Arrange
-        const vector = new Vector(2, -3);
-        const origin = new Vector(-1, 2);
-        const expectedReflectedVector = new Vector(-4, 7);
+        const vector = new V(2, -3);
+        const origin = new V(-1, 2);
+        const expectedReflectedVector = new V(-4, 7);
 
         // Act
         const actualReflectedVector = vector.reflect(origin);
@@ -226,9 +226,9 @@ describe('Vector', () => {
 
     it('can check for equal vectors', () => {
         // Arrange
-        const vector1 = new Vector(2, -3);
-        const vector2 = new Vector(2, -3);
-        const vector3 = new Vector(-1, 5);
+        const vector1 = new V(2, -3);
+        const vector2 = new V(2, -3);
+        const vector3 = new V(-1, 5);
 
         // Act
         const firstEqual = vector1.equals(vector2);
@@ -241,43 +241,26 @@ describe('Vector', () => {
 
     it('can sign vectors', () => {
         // Arrange
-        const v = Vector.southwest;
-        const expected = Vector.northeast;
+        const v = V.southwest;
+        const expected = V.northeast;
 
         // Act
-        const actual = v.signAs(new Vector(2, 7));
+        const actual = v.signAs(new V(2, 7));
 
         // Assert
         expect(actual).toEqual(expected);
     });
 
-    it('can rotate vectors', () => {
+    it('can append rotation to vectors', () => {
         // Arrange
-        const v1 = Vector.east;
-        const v2 = Vector.south;
-        const expected = Vector.northeast;
+        const v1 = V.east;
+        const v2 = V.southwest;
+        const expected1 = V.northeast;
+        const expected2 = V.south;
 
         // Act
         const actual1 = v1.rotate(Math.PI / 4);
         const actual2 = v2.rotate(Math.PI / 4);
-
-        // Assert
-        expect(actual1.x).toBeCloseTo(expected.x, 5);
-        expect(actual1.y).toBeCloseTo(expected.y, 5);
-        expect(actual2.x).toBeCloseTo(expected.x, 5);
-        expect(actual2.y).toBeCloseTo(expected.y, 5);
-    });
-
-    it('can append rotation to vectors', () => {
-        // Arrange
-        const v1 = Vector.east;
-        const v2 = Vector.southwest;
-        const expected1 = Vector.northeast;
-        const expected2 = Vector.south;
-
-        // Act
-        const actual1 = v1.rotateMore(Math.PI / 4);
-        const actual2 = v2.rotateMore(Math.PI / 4);
 
         // Assert
         expect(actual1.x).toBeCloseTo(expected1.x, 5);

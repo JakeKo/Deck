@@ -51,7 +51,7 @@
 <script lang='ts'>
 import { TextboxStoreModel } from '@/store/types';
 import { degToRad, radToDeg } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
@@ -85,14 +85,14 @@ const TextboxEditorForm = defineComponent({
         const x = computed({
             get: () => props.textbox.origin.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.textbox, origin: new Vector(value, props.textbox.origin.y) });
+                store.mutations.setGraphic(props.slideId, { ...props.textbox, origin: new V(value, props.textbox.origin.y) });
                 store.mutations.broadcastSetX(props.slideId, props.textbox.id, value);
             }
         });
         const y = computed({
             get: () => props.textbox.origin.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.textbox, origin: new Vector(props.textbox.origin.x, value) });
+                store.mutations.setGraphic(props.slideId, { ...props.textbox, origin: new V(props.textbox.origin.x, value) });
                 store.mutations.broadcastSetY(props.slideId, props.textbox.id, value);
             }
         });

@@ -1,14 +1,14 @@
 import { decorateCurveAnchorEvents } from '@/events/decorators/curve_anchor';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, ICurveAnchorRenderer, ISlideRenderer } from '../types';
 
 type CurveAnchorRendererArgs = {
     slide: ISlideRenderer;
     scale: number;
-    inHandle: Vector;
-    point: Vector;
-    outHandle: Vector;
+    inHandle: V;
+    point: V;
+    outHandle: V;
     parentId: string;
     index: number;
 };
@@ -19,9 +19,9 @@ class CurveAnchorRenderer implements ICurveAnchorRenderer {
     private _parentId: string;
     private _index: number;
     private _scale: number;
-    private _inHandle: Vector;
-    private _point: Vector;
-    private _outHandle: Vector;
+    private _inHandle: V;
+    private _point: V;
+    private _outHandle: V;
     private _inHandleSvg: SVG.Rect | undefined;
     private _inHandleSpanSvg: SVG.Line | undefined;
     private _pointSvg: SVG.Ellipse | undefined;
@@ -66,7 +66,7 @@ class CurveAnchorRenderer implements ICurveAnchorRenderer {
         return this._pointSvg !== undefined;
     }
 
-    public set inHandle(inHandle: Vector) {
+    public set inHandle(inHandle: V) {
         this._inHandle = inHandle;
 
         const position = this._handlePosition(this._inHandle);
@@ -74,14 +74,14 @@ class CurveAnchorRenderer implements ICurveAnchorRenderer {
         this._inHandleSpanSvg && this._inHandleSpanSvg.plot(this._point.x, this._point.y, this._inHandle.x, this._inHandle.y);
     }
 
-    public set point(point: Vector) {
+    public set point(point: V) {
         this._point = point;
 
         const position = this._pointPosition();
         this._pointSvg && this._pointSvg.translate(position.x, position.y);
     }
 
-    public set outHandle(outHandle: Vector) {
+    public set outHandle(outHandle: V) {
         this._outHandle = outHandle;
 
         const position = this._handlePosition(this._outHandle);
@@ -152,22 +152,22 @@ class CurveAnchorRenderer implements ICurveAnchorRenderer {
         this._outHandleSpanSvg = undefined;
     }
 
-    private _handleDimensions(): Vector {
-        return new Vector(this._handleWidth * this._scale, this._handleHeight * this._scale);
+    private _handleDimensions(): V {
+        return new V(this._handleWidth, this._handleHeight).scale(this._scale);
     }
 
-    private _handlePosition(origin: Vector): Vector {
+    private _handlePosition(origin: V): V {
         const dimensions = this._handleDimensions();
-        return new Vector(origin.x - dimensions.x / 2, origin.y - dimensions.y / 2);
+        return origin.add(dimensions.scale(-0.5));
     }
 
-    private _pointDimensions(): Vector {
-        return new Vector(this._pointWidth * this._scale, this._pointHeight * this._scale);
+    private _pointDimensions(): V {
+        return new V(this._pointWidth, this._pointHeight).scale(this._scale);
     }
 
-    private _pointPosition(): Vector {
+    private _pointPosition(): V {
         const dimensions = this._pointDimensions();
-        return new Vector(this._point.x - dimensions.x / 2, this._point.y - dimensions.y / 2);
+        return this._point.add(dimensions.scale(-0.5));
     }
 }
 

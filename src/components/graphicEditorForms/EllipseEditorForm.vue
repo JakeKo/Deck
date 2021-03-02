@@ -72,7 +72,7 @@
 
 <script lang='ts'>
 import { EllipseStoreModel } from '@/store/types';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
@@ -109,14 +109,14 @@ const EllipseEditorForm = defineComponent({
         const x = computed({
             get: () => props.ellipse.center.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.ellipse, center: new Vector(value, props.ellipse.center.y) });
+                store.mutations.setGraphic(props.slideId, { ...props.ellipse, center: new V(value, props.ellipse.center.y) });
                 store.mutations.broadcastSetX(props.slideId, props.ellipse.id, value);
             }
         });
         const y = computed({
             get: () => props.ellipse.center.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.ellipse, center: new Vector(props.ellipse.center.x, value) });
+                store.mutations.setGraphic(props.slideId, { ...props.ellipse, center: new V(props.ellipse.center.x, value) });
                 store.mutations.broadcastSetY(props.slideId, props.ellipse.id, value);
             }
         });

@@ -1,7 +1,7 @@
 import { SlideMouseEvent } from '@/events/types';
 import { Viewbox } from '@/store/types';
 import SnapVector from '@/utilities/SnapVector';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 
 export type IGraphicRenderer = ICurveRenderer
@@ -17,7 +17,7 @@ type BaseGraphicRenderer = {
     rotation: number;
     readonly staticBox: BoundingBox;
     readonly transformedBox: BoundingBox;
-    readonly pullPoints: Vector[];
+    readonly pullPoints: V[];
     readonly staticSnapVectors: SnapVector[];
     readonly transformedSnapVectors: SnapVector[];
     render: () => void;
@@ -38,51 +38,51 @@ export type ICurveRenderer = BaseGraphicRenderer & {
 
 export type IEllipseRenderer = BaseGraphicRenderer & {
     readonly type: GRAPHIC_TYPES.ELLIPSE;
-    center: Vector;
-    dimensions: Vector;
+    center: V;
+    dimensions: V;
     fillColor: string;
     strokeColor: string;
     strokeWidth: number;
-    setCenterAndDimensions: (center: Vector, dimensions: Vector) => void;
+    setCenterAndDimensions: (center: V, dimensions: V) => void;
 };
 
 export type IImageRenderer = BaseGraphicRenderer & {
     readonly type: GRAPHIC_TYPES.IMAGE;
     readonly source: string;
-    origin: Vector;
-    dimensions: Vector;
-    setOriginAndDimensions: (origin: Vector, dimensions: Vector) => void;
+    origin: V;
+    dimensions: V;
+    setOriginAndDimensions: (origin: V, dimensions: V) => void;
 };
 
 export type IRectangleRenderer = BaseGraphicRenderer & {
     readonly type: GRAPHIC_TYPES.RECTANGLE;
-    origin: Vector;
-    dimensions: Vector;
+    origin: V;
+    dimensions: V;
     fillColor: string;
     strokeColor: string;
     strokeWidth: number;
-    setOriginAndDimensions: (origin: Vector, dimensions: Vector) => void;
+    setOriginAndDimensions: (origin: V, dimensions: V) => void;
 };
 
 export type ITextboxRenderer = BaseGraphicRenderer & {
     readonly type: GRAPHIC_TYPES.TEXTBOX;
-    origin: Vector;
-    dimensions: Vector;
+    origin: V;
+    dimensions: V;
     text: string;
     fontSize: number;
     fontWeight: string;
     typeface: string;
-    setOriginAndDimensions: (origin: Vector, dimensions: Vector) => void;
+    setOriginAndDimensions: (origin: V, dimensions: V) => void;
 };
 
 export type IVideoRenderer = BaseGraphicRenderer & {
     readonly type: GRAPHIC_TYPES.VIDEO;
     readonly source: string;
-    origin: Vector;
-    dimensions: Vector;
+    origin: V;
+    dimensions: V;
     strokeColor: string;
     strokeWidth: number;
-    setOriginAndDimensions: (origin: Vector, dimensions: Vector) => void;
+    setOriginAndDimensions: (origin: V, dimensions: V) => void;
 };
 
 export type IHelperRenderer = IBoxRenderer
@@ -104,10 +104,10 @@ type BaseHelperRenderer = {
 
 export type IBoxRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.BOX;
-    origin: Vector;
-    dimensions: Vector;
+    origin: V;
+    dimensions: V;
     rotation: number;
-    setOriginAndDimensions: (origin: Vector, dimensions: Vector) => void;
+    setOriginAndDimensions: (origin: V, dimensions: V) => void;
 };
 
 export type ICanvasRenderer = BaseHelperRenderer & {
@@ -116,9 +116,9 @@ export type ICanvasRenderer = BaseHelperRenderer & {
 
 export type ICurveAnchorRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.CURVE_ANCHOR;
-    inHandle: Vector;
-    point: Vector;
-    outHandle: Vector;
+    inHandle: V;
+    point: V;
+    outHandle: V;
 };
 
 export type ICurveOutlineRenderer = BaseHelperRenderer & {
@@ -127,22 +127,22 @@ export type ICurveOutlineRenderer = BaseHelperRenderer & {
 
 export type IEllipseOutlineRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.ELLIPSE_OUTLINE;
-    center: Vector;
-    dimensions: Vector;
-    setCenterAndDimensions: (center: Vector, dimensions: Vector) => void;
+    center: V;
+    dimensions: V;
+    setCenterAndDimensions: (center: V, dimensions: V) => void;
 };
 
 export type IRectangleOutlineRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.RECTANGLE_OUTLINE;
-    origin: Vector;
-    dimensions: Vector;
-    setOriginAndDimensions: (origin: Vector, dimensions: Vector) => void;
+    origin: V;
+    dimensions: V;
+    setOriginAndDimensions: (origin: V, dimensions: V) => void;
 };
 
 export type IRotatorRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.ROTATOR;
     readonly parent: IGraphicRenderer;
-    center: Vector;
+    center: V;
     rotation: number;
 };
 
@@ -155,7 +155,7 @@ export type IVertexRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.VERTEX;
     readonly role: VERTEX_ROLES;
     readonly parent: IGraphicRenderer;
-    center: Vector;
+    center: V;
 }
 
 export type IGraphicMaker = ICurveMaker
@@ -219,7 +219,7 @@ type BaseGraphicMutator = {
     scale: number;
     vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => void;
     rotateListener: () => (event: SlideMouseEvent) => void;
-    moveListener: (initialPosition: Vector, snapVectors: SnapVector[]) => (event: SlideMouseEvent) => void;
+    moveListener: (initialPosition: V, snapVectors: SnapVector[]) => (event: SlideMouseEvent) => void;
     complete: () => void;
 };
 
@@ -295,18 +295,18 @@ export type ISlideRenderer = {
     readonly canvas: SVG.Doc;
     readonly rawViewbox: Viewbox;
     readonly zoom: number;
-    readonly bounds: { origin: Vector; dimensions: Vector };
+    readonly bounds: { origin: V; dimensions: V };
     cursor: string;
     cursorLock: boolean;
     getSnapVectors: (exclude: string[]) => SnapVector[];
     renderSnapVectors: (snapVectors: { [key: string]: SnapVector }) => void;
     unrenderAllSnapVectors: () => void;
-    makeCurveInteractive: (initialPosition: Vector) => ICurveMaker;
-    makeEllipseInteractive: (initialPosition: Vector) => IEllipseMaker;
-    makeImageInteractive: (initialPosition: Vector, source: string, dimensions: Vector) => IImageMaker;
-    makeRectangleInteractive: (initialPosition: Vector) => IRectangleMaker;
-    makeTextboxInteractive: (initialPosition: Vector) => ITextboxMaker;
-    makeVideoInteractive: (initialPosition: Vector, source: string, dimension: Vector) => IVideoMaker;
+    makeCurveInteractive: (initialPosition: V) => ICurveMaker;
+    makeEllipseInteractive: (initialPosition: V) => IEllipseMaker;
+    makeImageInteractive: (initialPosition: V, source: string, dimensions: V) => IImageMaker;
+    makeRectangleInteractive: (initialPosition: V) => IRectangleMaker;
+    makeTextboxInteractive: (initialPosition: V) => ITextboxMaker;
+    makeVideoInteractive: (initialPosition: V, source: string, dimension: V) => IVideoMaker;
     completeInteractiveMake: (graphicId: string) => void;
     getGraphic: (graphicId: string) => IGraphicRenderer;
     getGraphics: () => { [key: string]: IGraphicRenderer };
@@ -338,20 +338,20 @@ export type BoundingBoxMutatorHelpers = {
 };
 
 export type BoundingBox = {
-    origin: Vector;
-    center: Vector;
-    dimensions: Vector;
-    topLeft: Vector;
-    topRight: Vector;
-    bottomLeft: Vector;
-    bottomRight: Vector;
+    origin: V;
+    center: V;
+    dimensions: V;
+    topLeft: V;
+    topRight: V;
+    bottomLeft: V;
+    bottomRight: V;
     rotation: number;
 };
 
 export type CurveAnchor = {
-    inHandle: Vector;
-    point: Vector;
-    outHandle: Vector;
+    inHandle: V;
+    point: V;
+    outHandle: V;
 };
 
 export enum GRAPHIC_TYPES {

@@ -3,7 +3,7 @@ import { SlideKeyboardEvent, SlideZoomEvent, SLIDE_EVENTS } from '@/events/types
 import { listen } from '@/events/utilities';
 import { GraphicStoreModel, Viewbox } from '@/store/types';
 import SlideStateManager from '@/utilities/SlideStateManager';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { CanvasRenderer } from './helpers';
 import {
@@ -82,16 +82,16 @@ class SlideRenderer implements ISlideRenderer {
         this._markedGraphics = {};
         this._cursor = this._defaultCursor;
         this._snapVectors = [
-            new SnapVector(new Vector(args.croppedViewbox.width / 2, 0), Vector.east),
-            new SnapVector(new Vector(args.croppedViewbox.width, args.croppedViewbox.height / 2), Vector.north),
-            new SnapVector(new Vector(args.croppedViewbox.width / 2, args.croppedViewbox.height), Vector.west),
-            new SnapVector(new Vector(0, args.croppedViewbox.height / 2), Vector.south),
-            new SnapVector(new Vector(args.croppedViewbox.width / 2, args.croppedViewbox.height / 2), Vector.north),
-            new SnapVector(new Vector(args.croppedViewbox.width / 2, args.croppedViewbox.height / 2), Vector.east)
+            new SnapVector(new V(args.croppedViewbox.width / 2, 0), V.east),
+            new SnapVector(new V(args.croppedViewbox.width, args.croppedViewbox.height / 2), V.north),
+            new SnapVector(new V(args.croppedViewbox.width / 2, args.croppedViewbox.height), V.west),
+            new SnapVector(new V(0, args.croppedViewbox.height / 2), V.south),
+            new SnapVector(new V(args.croppedViewbox.width / 2, args.croppedViewbox.height / 2), V.north),
+            new SnapVector(new V(args.croppedViewbox.width / 2, args.croppedViewbox.height / 2), V.east)
         ];
         this._renderedSnapVectors = {};
 
-        this._renderBackdrop(new Vector(args.croppedViewbox.width, args.croppedViewbox.height));
+        this._renderBackdrop(new V(args.croppedViewbox.width, args.croppedViewbox.height));
         decorateSlideEvents(this);
         this.canvas.node.tabIndex = 0;
 
@@ -109,11 +109,11 @@ class SlideRenderer implements ISlideRenderer {
         });
     }
 
-    public get bounds(): { origin: Vector; dimensions: Vector } {
+    public get bounds(): { origin: V; dimensions: V } {
         const bounds = this.canvas.node.getBoundingClientRect() as DOMRect;
         return {
-            origin: new Vector(bounds.x, bounds.y),
-            dimensions: new Vector(bounds.width, bounds.height)
+            origin: new V(bounds.x, bounds.y),
+            dimensions: new V(bounds.width, bounds.height)
         };
     }
 
@@ -157,7 +157,7 @@ class SlideRenderer implements ISlideRenderer {
         this._renderedSnapVectors = {};
     }
 
-    public makeCurveInteractive(initialPosition: Vector): ICurveMaker {
+    public makeCurveInteractive(initialPosition: V): ICurveMaker {
         return this._activateMaker(new CurveMaker({
             slide: this,
             initialPosition,
@@ -165,7 +165,7 @@ class SlideRenderer implements ISlideRenderer {
         }));
     }
 
-    public makeEllipseInteractive(initialPosition: Vector): IEllipseMaker {
+    public makeEllipseInteractive(initialPosition: V): IEllipseMaker {
         return this._activateMaker(new EllipseMaker({
             slide: this,
             initialPosition,
@@ -173,7 +173,7 @@ class SlideRenderer implements ISlideRenderer {
         }));
     }
 
-    public makeImageInteractive(initialPosition: Vector, source: string, dimensions: Vector): IImageMaker {
+    public makeImageInteractive(initialPosition: V, source: string, dimensions: V): IImageMaker {
         return this._activateMaker(new ImageMaker({
             slide: this,
             initialPosition,
@@ -183,7 +183,7 @@ class SlideRenderer implements ISlideRenderer {
         }));
     }
 
-    public makeRectangleInteractive(initialPosition: Vector): IRectangleMaker {
+    public makeRectangleInteractive(initialPosition: V): IRectangleMaker {
         return this._activateMaker(new RectangleMaker({
             slide: this,
             initialPosition,
@@ -191,7 +191,7 @@ class SlideRenderer implements ISlideRenderer {
         }));
     }
 
-    public makeTextboxInteractive(initialPosition: Vector): ITextboxMaker {
+    public makeTextboxInteractive(initialPosition: V): ITextboxMaker {
         return this._activateMaker(new TextboxMaker({
             slide: this,
             initialPosition,
@@ -199,7 +199,7 @@ class SlideRenderer implements ISlideRenderer {
         }));
     }
 
-    public makeVideoInteractive(initialPosition: Vector, source: string, dimensions: Vector): IVideoMaker {
+    public makeVideoInteractive(initialPosition: V, source: string, dimensions: V): IVideoMaker {
         return this._activateMaker(new VideoMaker({
             slide: this,
             initialPosition,
@@ -345,13 +345,13 @@ class SlideRenderer implements ISlideRenderer {
             if (this.isFocused(graphicId)) {
                 (this._focusedGraphics[graphicId] as ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setX(x);
             } else {
-                graphic.origin = new Vector(x, graphic.origin.y);
+                graphic.origin = new V(x, graphic.origin.y);
             }
         } else if (graphic.type === ELLIPSE) {
             if (this.isFocused(graphicId)) {
                 (this._focusedGraphics[graphicId] as EllipseMutator).setX(x);
             } else {
-                graphic.center = new Vector(x, graphic.center.y);
+                graphic.center = new V(x, graphic.center.y);
             }
         } else {
             console.warn(`Attempted to set property 'x' of graphic with type '${graphic.type}'`);
@@ -364,13 +364,13 @@ class SlideRenderer implements ISlideRenderer {
             if (this.isFocused(graphicId)) {
                 (this._focusedGraphics[graphicId] as ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setY(y);
             } else {
-                graphic.origin = new Vector(graphic.origin.x, y);
+                graphic.origin = new V(graphic.origin.x, y);
             }
         } else if (graphic.type === ELLIPSE) {
             if (this.isFocused(graphicId)) {
                 (this._focusedGraphics[graphicId] as EllipseMutator).setY(y);
             } else {
-                graphic.center = new Vector(graphic.center.x, y);
+                graphic.center = new V(graphic.center.x, y);
             }
         } else {
             console.warn(`Attempted to set property 'y' of graphic with type '${graphic.type}'`);
@@ -422,7 +422,7 @@ class SlideRenderer implements ISlideRenderer {
             if (this.isFocused(graphicId)) {
                 (this._focusedGraphics[graphicId] as EllipseMutator | ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setWidth(width);
             } else {
-                graphic.dimensions = new Vector(width, graphic.dimensions.y);
+                graphic.dimensions = new V(width, graphic.dimensions.y);
             }
         } else {
             console.warn(`Attempted to set property 'width' of graphic with type '${graphic.type}'`);
@@ -435,7 +435,7 @@ class SlideRenderer implements ISlideRenderer {
             if (this.isFocused(graphicId)) {
                 (this._focusedGraphics[graphicId] as EllipseMutator | ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setHeight(height);
             } else {
-                graphic.dimensions = new Vector(graphic.dimensions.x, height);
+                graphic.dimensions = new V(graphic.dimensions.x, height);
             }
         } else {
             console.warn(`Attempted to set property 'height' of graphic with type '${graphic.type}'`);
@@ -465,10 +465,10 @@ class SlideRenderer implements ISlideRenderer {
         Object.values(this._renderedSnapVectors).forEach(snapVector => (snapVector.scale = 1 / this.zoom));
     }
 
-    private _renderBackdrop(dimensions: Vector): void {
+    private _renderBackdrop(dimensions: V): void {
         new CanvasRenderer({
             slide: this,
-            origin: Vector.zero,
+            origin: V.zero,
             dimensions
         }).render();
     }

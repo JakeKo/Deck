@@ -2,7 +2,7 @@ import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import SnapVector from '@/utilities/SnapVector';
 import { closestVector, mod } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import {
     BoundingBoxMutatorHelpers,
     GRAPHIC_TYPES,
@@ -51,23 +51,23 @@ class ImageMutator implements IImageMutator {
         const box = this.target.transformedBox;
         const directions = [
             box.dimensions,
-            box.dimensions.signAs(Vector.northwest),
-            box.dimensions.signAs(Vector.southwest),
-            box.dimensions.signAs(Vector.southeast)
-        ].map(direction => direction.rotateMore(box.rotation));
+            box.dimensions.signAs(V.northwest),
+            box.dimensions.signAs(V.southwest),
+            box.dimensions.signAs(V.southeast)
+        ].map(direction => direction.rotate(box.rotation));
 
         // 1. Resolve the slide-relative mouse position
         // 2. Create a vector which represents how to change the respective corner
         // 3. Constrain the vector (to maintain aspect ratio)
         // 4. Unrotate the corner vector to correct for graphic rotation
         // 5. Use the post-shift corner vector and corrected corner vector to update props
-        const makeListener = (oppositeCorner: Vector): (event: SlideMouseEvent) => void => {
+        const makeListener = (oppositeCorner: V): (event: SlideMouseEvent) => void => {
             return event => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
                 const rawCornerVector = oppositeCorner.towards(position);
                 const cornerVector = rawCornerVector.projectOn(closestVector(rawCornerVector, directions));
-                const correctedCornerVector = cornerVector.rotateMore(-box.rotation);
+                const correctedCornerVector = cornerVector.rotate(-box.rotation);
 
                 const dimensions = correctedCornerVector.abs;
                 const center = oppositeCorner.add(cornerVector.scale(0.5));
@@ -89,7 +89,7 @@ class ImageMutator implements IImageMutator {
 
     public rotateListener(): (event: SlideMouseEvent) => void {
         const { center } = this.target.transformedBox;
-        const directions = [...Vector.cardinals, ...Vector.intermediates];
+        const directions = [...V.cardinals, ...V.intermediates];
 
         return event => {
             const { slide, baseEvent } = event.detail;
@@ -103,7 +103,7 @@ class ImageMutator implements IImageMutator {
         };
     }
 
-    public moveListener(initialPosition: Vector, snapVectors: SnapVector[]): (event: SlideMouseEvent) => void {
+    public moveListener(initialPosition: V, snapVectors: SnapVector[]): (event: SlideMouseEvent) => void {
         const initialOrigin = this.target.origin;
         const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));
 
@@ -122,26 +122,26 @@ class ImageMutator implements IImageMutator {
     }
 
     public setX(x: number): void {
-        this.target.origin = new Vector(x, this.target.origin.y);
+        this.target.origin = new V(x, this.target.origin.y);
         this._repositionBoxHelpers();
     }
 
     public setY(y: number): void {
-        this.target.origin = new Vector(this.target.origin.x, y);
+        this.target.origin = new V(this.target.origin.x, y);
         this._repositionBoxHelpers();
     }
 
     public setWidth(width: number): void {
         // When the width changes, we preserve aspect ratio
         const heightToWidth = this.target.dimensions.y / this.target.dimensions.x;
-        this.target.dimensions = new Vector(width, width * heightToWidth);
+        this.target.dimensions = new V(width, width * heightToWidth);
         this._repositionBoxHelpers();
     }
 
     public setHeight(height: number): void {
         // When the height changes, we preserve aspect ratio
         const widthToHeight = this.target.dimensions.x / this.target.dimensions.y;
-        this.target.dimensions = new Vector(height * widthToHeight, height);
+        this.target.dimensions = new V(height * widthToHeight, height);
         this._repositionBoxHelpers();
     }
 

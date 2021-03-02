@@ -72,7 +72,7 @@
 
 <script lang='ts'>
 import { RectangleStoreModel } from '@/store/types';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
@@ -109,14 +109,14 @@ const RectangleEditorForm = defineComponent({
         const x = computed({
             get: () => props.rectangle.origin.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new Vector(value, props.rectangle.origin.y) });
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new V(value, props.rectangle.origin.y) });
                 store.mutations.broadcastSetX(props.slideId, props.rectangle.id, value);
             }
         });
         const y = computed({
             get: () => props.rectangle.origin.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new Vector(props.rectangle.origin.x, value) });
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new V(props.rectangle.origin.x, value) });
                 store.mutations.broadcastSetY(props.slideId, props.rectangle.id, value);
             }
         });

@@ -2,21 +2,21 @@ import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import { provideId } from '@/utilities/IdProvider';
 import { closestVector } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { EllipseRenderer } from '../graphics';
 import { EllipseOutlineRenderer, VertexRenderer } from '../helpers';
 import { IEllipseMaker, IEllipseOutlineRenderer, IEllipseRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
 type EllipseMakerArgs = {
     slide: ISlideRenderer;
-    initialPosition: Vector;
+    initialPosition: V;
     scale: number;
 };
 
 class EllipseMaker implements IEllipseMaker {
     public readonly target: IEllipseRenderer;
     private _slide: ISlideRenderer;
-    private _initialPosition: Vector;
+    private _initialPosition: V;
     private _helpers: { [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IEllipseOutlineRenderer };
 
     constructor(args: EllipseMakerArgs) {
@@ -43,14 +43,14 @@ class EllipseMaker implements IEllipseMaker {
             [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.target,
-                center: this.target.center.add(new Vector(this.target.dimensions.x, 0)),
+                center: this.target.center.addX(this.target.dimensions.x),
                 scale: args.scale,
                 role: VERTEX_ROLES.TOP_RIGHT
             }),
             [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
                 slide: this._slide,
                 parent: this.target,
-                center: this.target.center.add(new Vector(0, this.target.dimensions.y)),
+                center: this.target.center.addY(this.target.dimensions.y),
                 scale: args.scale,
                 role: VERTEX_ROLES.BOTTOM_LEFT
             }),
@@ -106,25 +106,25 @@ class EllipseMaker implements IEllipseMaker {
             const position = resolvePosition(baseEvent, slide);
 
             // If shift is pressed, constrain to circle
-            const directions = [Vector.northeast, Vector.northwest, Vector.southeast, Vector.southwest];
+            const directions = [V.northeast, V.northwest, V.southeast, V.southwest];
             const rawOffset = this._initialPosition.towards(position);
             const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
 
             if (baseEvent.ctrlKey) {
                 this.target.center = this._initialPosition;
-                this.target.dimensions = offset.transform(Math.abs).scale(2);
+                this.target.dimensions = offset.abs.scale(2);
             } else {
                 this.target.center = this._initialPosition.add(offset.scale(0.5));
-                this.target.dimensions = offset.transform(Math.abs);
+                this.target.dimensions = offset.abs;
             }
 
             // Update helper graphics
             const center = this.target.center;
             const radius = this.target.dimensions.scale(0.5);
             this._helpers[VERTEX_ROLES.TOP_LEFT].center = center.add(radius.scale(-1));
-            this._helpers[VERTEX_ROLES.TOP_RIGHT].center = center.add(radius.signAs(Vector.southeast));
+            this._helpers[VERTEX_ROLES.TOP_RIGHT].center = center.add(radius.signAs(V.southeast));
             this._helpers[VERTEX_ROLES.BOTTOM_LEFT].center = center.add(radius);
-            this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = center.add(radius.signAs(Vector.northwest));
+            this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = center.add(radius.signAs(V.northwest));
             this._helpers.outline.center = center;
             this._helpers.outline.dimensions = this.target.dimensions;
         };

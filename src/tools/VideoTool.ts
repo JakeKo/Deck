@@ -1,13 +1,13 @@
 import { SlideKeyboardEvent, SlideMouseEvent, SlideMouseEventPayload, SLIDE_EVENTS } from '@/events/types';
 import { dispatch, listen, listenOnce, unlisten } from '@/events/utilities';
 import { AppStore } from '@/store/types';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { PointerTool } from '.';
 import { EditorTool, TOOL_NAMES } from './types';
 import { resolvePosition } from './utilities';
 
 export default (store: AppStore): EditorTool => {
-    function seedVideo(videoSource: string, dimensions: Vector): (event: SlideMouseEvent) => void {
+    function seedVideo(videoSource: string, dimensions: V): (event: SlideMouseEvent) => void {
         return function make(event) {
             const { slide, baseEvent } = event.detail;
             const maker = slide.makeVideoInteractive(resolvePosition(baseEvent, slide), videoSource, dimensions);
@@ -105,7 +105,7 @@ export default (store: AppStore): EditorTool => {
             });
 
             const video = await uploadVideo;
-            make = seedVideo(video.source, new Vector(video.width, video.height));
+            make = seedVideo(video.source, new V(video.width, video.height));
             listenOnce(SLIDE_EVENTS.MOUSEDOWN, make);
         },
         unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, make)
