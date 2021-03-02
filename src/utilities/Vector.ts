@@ -115,4 +115,21 @@ export default class V {
             (Math.abs(this.normalized.x - slope.x) <= epsilon && Math.abs(this.normalized.y - slope.y) <= epsilon) ||
             (Math.abs(this.normalized.x - inverseSlope.x) <= epsilon && Math.abs(this.normalized.y - inverseSlope.y) <= epsilon);
     }
+
+    /**
+     * Calculates the coordinates for a vector which is identical to this vector, but in a vector space transformed by the provided values.
+     * In short, this operation inverts the provided transformations.
+     *
+     * For example, (1, 1) contextualized in scale: (2, 2), rotation: PI/2 => (0.5, -0.5)
+     */
+    public contextualize({
+        scale = new V(1, 1),
+        rotation = 0
+    }: {
+        scale: V;
+        rotation: number;
+    }): V {
+        return new V(this.x / scale.x, this.y / scale.y)
+            .rotate(mod(Math.PI * 2 - rotation, Math.PI * 2));
+    }
 }
