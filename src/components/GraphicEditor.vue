@@ -13,12 +13,14 @@
 import { GRAPHIC_TYPES } from '@/rendering/types';
 import { computed, defineComponent, reactive } from 'vue';
 import DeckComponent from './generic/DeckComponent';
-import CurveEditorForm from './graphicEditorForms/CurveEditorForm.vue';
-import EllipseEditorForm from './graphicEditorForms/EllipseEditorForm.vue';
-import ImageEditorForm from './graphicEditorForms/ImageEditorForm.vue';
-import RectangleEditorForm from './graphicEditorForms/RectangleEditorForm.vue';
-import TextboxEditorForm from './graphicEditorForms/TextboxEditorForm.vue';
-import VideoEditorForm from './graphicEditorForms/VideoEditorForm.vue';
+import {
+    CurveEditorForm,
+    EllipseEditorForm,
+    ImageEditorForm,
+    RectangleEditorForm,
+    TextboxEditorForm,
+    VideoEditorForm
+} from './GraphicEditorForms';
 
 const GraphicEditor = defineComponent({
     components: {
