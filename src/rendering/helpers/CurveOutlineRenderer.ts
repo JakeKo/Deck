@@ -1,5 +1,5 @@
 import { radToDeg } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { CurveAnchor, GRAPHIC_TYPES, ICurveOutlineRenderer, ISlideRenderer } from '../types';
 
@@ -59,7 +59,7 @@ class CurveOutlineRenderer implements ICurveOutlineRenderer {
 
     // Reformat points from an array of objects to the bezier curve string
     private _getFormattedPoints(): string {
-        const anchorPoints = this._anchors.reduce<Vector[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []);
+        const anchorPoints = this._anchors.reduce<V[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []);
         const [origin, ...points] = anchorPoints.slice(1, -1);
         return origin === undefined ? '' : `M ${origin.x},${origin.y} ${points.map(({ x, y }, i) => `${i % 3 === 0 ? ' C' : ''} ${x},${y}`)}`;
     }

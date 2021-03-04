@@ -1,22 +1,22 @@
 import SnapVector from '../SnapVector';
-import Vector from '../Vector';
+import V from '../Vector';
 
 describe('SnapVector', () => {
     it('can instantiate with reasonable defaults', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(0, 0), new Vector(1, 1));
+        const snapVector = new SnapVector(new V(0, 0), new V(1, 1));
 
         // Act
 
         // Assert
-        expect(snapVector.origin).toEqual(new Vector(0, 0));
-        expect(snapVector.direction).toEqual(new Vector(1 / Math.SQRT2, 1 / Math.SQRT2));
+        expect(snapVector.origin).toEqual(new V(0, 0));
+        expect(snapVector.direction).toEqual(new V(1 / Math.SQRT2, 1 / Math.SQRT2));
     });
 
     it('can calculate the distance from a point with no direction', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(2, 5));
-        const point = new Vector(-3, 7);
+        const snapVector = new SnapVector(new V(2, 5));
+        const point = new V(-3, 7);
         const expectedDistance = Math.sqrt(29);
 
         // Act
@@ -28,8 +28,8 @@ describe('SnapVector', () => {
 
     it('can calculate the distance from a point with direction', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(3, 8), Vector.southeast);
-        const point = new Vector(9, 3);
+        const snapVector = new SnapVector(new V(3, 8), V.southeast);
+        const point = new V(9, 3);
         const expectedDistance = 1 / Math.sqrt(2);
 
         // Act
@@ -41,8 +41,8 @@ describe('SnapVector', () => {
 
     it('can calculate the distance from a point on the direction vector', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(3, 8), Vector.southeast);
-        const point = new Vector(9, 2);
+        const snapVector = new SnapVector(new V(3, 8), V.southeast);
+        const point = new V(9, 2);
         const expectedDistance = 0;
 
         // Act
@@ -54,8 +54,8 @@ describe('SnapVector', () => {
 
     it('can calculate the distance from a point with a vertical direction', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(0, 0), Vector.north);
-        const point = new Vector(1, 1);
+        const snapVector = new SnapVector(new V(0, 0), V.north);
+        const point = new V(1, 1);
         const expectedDistance = 1;
 
         // Act
@@ -67,8 +67,8 @@ describe('SnapVector', () => {
 
     it('can calculate the distance from a point with a horizontal direction', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(0, 0), Vector.east);
-        const point = new Vector(1, 1);
+        const snapVector = new SnapVector(new V(0, 0), V.east);
+        const point = new V(1, 1);
         const expectedDistance = 1;
 
         // Act
@@ -80,9 +80,9 @@ describe('SnapVector', () => {
 
     it('can calculate the closest point from a point with no direction', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(2, 5));
-        const point = new Vector(-3, 7);
-        const expected = new Vector(2, 5);
+        const snapVector = new SnapVector(new V(2, 5));
+        const point = new V(-3, 7);
+        const expected = new V(2, 5);
 
         // Act
         const actual = snapVector.getClosestPoint(point);
@@ -94,9 +94,9 @@ describe('SnapVector', () => {
 
     it('can calculate the closest point from a point with direction', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(3, 8), Vector.southeast);
-        const point = new Vector(9, 3);
-        const expected = new Vector(8.5, 2.5);
+        const snapVector = new SnapVector(new V(3, 8), V.southeast);
+        const point = new V(9, 3);
+        const expected = new V(8.5, 2.5);
 
         // Act
         const actual = snapVector.getClosestPoint(point);
@@ -108,9 +108,9 @@ describe('SnapVector', () => {
 
     it('can calculate the closest point from a point on the direction vector', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(3, 8), Vector.southeast);
-        const point = new Vector(9, 2);
-        const expected = new Vector(9, 2);
+        const snapVector = new SnapVector(new V(3, 8), V.southeast);
+        const point = new V(9, 2);
+        const expected = new V(9, 2);
 
         // Act
         const actual = snapVector.getClosestPoint(point);
@@ -122,9 +122,9 @@ describe('SnapVector', () => {
 
     it('can calculate the closest point from a point with a vertical direction', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(2, 5), new Vector(0, 1));
-        const point = new Vector(-3, 7);
-        const expected = new Vector(2, 7);
+        const snapVector = new SnapVector(new V(2, 5), new V(0, 1));
+        const point = new V(-3, 7);
+        const expected = new V(2, 7);
 
         // Act
         const actual = snapVector.getClosestPoint(point);
@@ -136,9 +136,9 @@ describe('SnapVector', () => {
 
     it('can calculate the closest point from a point with a horizontal direction', () => {
         // Arrange
-        const snapVector = new SnapVector(new Vector(2, 5), new Vector(1, 0));
-        const point = new Vector(-3, 7);
-        const expected = new Vector(-3, 5);
+        const snapVector = new SnapVector(new V(2, 5), new V(1, 0));
+        const point = new V(-3, 7);
+        const expected = new V(-3, 5);
 
         // Act
         const actual = snapVector.getClosestPoint(point);

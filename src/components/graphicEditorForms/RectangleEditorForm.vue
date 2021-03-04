@@ -72,13 +72,14 @@
 
 <script lang='ts'>
 import { RectangleStoreModel } from '@/store/types';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
 import ColorField from '../generic/ColorField.vue';
 import ToggleField from '../generic/ToggleField.vue';
 import { degToRad, radToDeg } from '@/utilities/utilities';
+import { correctForRotationWhenChangingDimensions } from './utilities';
 
 const RectangleEditorForm = defineComponent({
     components: {
@@ -109,43 +110,55 @@ const RectangleEditorForm = defineComponent({
         const x = computed({
             get: () => props.rectangle.origin.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new Vector(value, props.rectangle.origin.y) });
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new V(value, props.rectangle.origin.y) });
                 store.mutations.broadcastSetX(props.slideId, props.rectangle.id, value);
             }
         });
         const y = computed({
             get: () => props.rectangle.origin.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new Vector(props.rectangle.origin.x, value) });
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new V(props.rectangle.origin.x, value) });
                 store.mutations.broadcastSetY(props.slideId, props.rectangle.id, value);
             }
         });
         const width = computed({
             get: () => props.rectangle.width,
             set: value => {
-                if (lockAspectRatio.value) {
-                    const height = value * props.rectangle.height / props.rectangle.width;
-                    store.mutations.setGraphic(props.slideId, { ...props.rectangle, width: value, height });
-                    store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, value);
-                    store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, height);
-                } else {
-                    store.mutations.setGraphic(props.slideId, { ...props.rectangle, width: value });
-                    store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, value);
-                }
+                const height = lockAspectRatio.value
+                    ? value * props.rectangle.height / props.rectangle.width
+                    : props.rectangle.height;
+                const newOrigin = correctForRotationWhenChangingDimensions({
+                    basePoint: props.rectangle.origin,
+                    initialDimensions: new V(props.rectangle.width, props.rectangle.height),
+                    newDimensions: new V(value, height),
+                    rotation: props.rectangle.rotation
+                });
+
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, width: value, height, origin: newOrigin });
+                store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, value);
+                store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, height);
+                store.mutations.broadcastSetX(props.slideId, props.rectangle.id, newOrigin.x);
+                store.mutations.broadcastSetY(props.slideId, props.rectangle.id, newOrigin.y);
             }
         });
         const height = computed({
             get: () => props.rectangle.height,
             set: value => {
-                if (lockAspectRatio.value) {
-                    const width = value * props.rectangle.width / props.rectangle.height;
-                    store.mutations.setGraphic(props.slideId, { ...props.rectangle, width, height: value });
-                    store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, width);
-                    store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, value);
-                } else {
-                    store.mutations.setGraphic(props.slideId, { ...props.rectangle, height: value });
-                    store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, value);
-                }
+                const width = lockAspectRatio.value
+                    ? value * props.rectangle.width / props.rectangle.height
+                    : props.rectangle.width;
+                const newOrigin = correctForRotationWhenChangingDimensions({
+                    basePoint: props.rectangle.origin,
+                    initialDimensions: new V(props.rectangle.width, props.rectangle.height),
+                    newDimensions: new V(width, value),
+                    rotation: props.rectangle.rotation
+                });
+
+                store.mutations.setGraphic(props.slideId, { ...props.rectangle, width, height: value, origin: newOrigin });
+                store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, width);
+                store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, value);
+                store.mutations.broadcastSetX(props.slideId, props.rectangle.id, newOrigin.x);
+                store.mutations.broadcastSetY(props.slideId, props.rectangle.id, newOrigin.y);
             }
         });
         const rotation = computed({

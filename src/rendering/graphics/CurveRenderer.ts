@@ -1,7 +1,7 @@
 import { decorateCurveEvents } from '@/events/decorators';
 import SnapVector from '@/utilities/SnapVector';
 import { radToDeg } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { BoundingBox, CurveAnchor, GRAPHIC_TYPES, ICurveRenderer, ISlideRenderer } from '../types';
 
@@ -86,26 +86,26 @@ class CurveRenderer implements ICurveRenderer {
     public get staticBox(): BoundingBox {
         if (this._svg === undefined) {
             return {
-                origin: Vector.zero,
-                center: Vector.zero,
-                dimensions: Vector.zero,
-                topLeft: Vector.zero,
-                topRight: Vector.zero,
-                bottomLeft: Vector.zero,
-                bottomRight: Vector.zero,
+                origin: V.zero,
+                center: V.zero,
+                dimensions: V.zero,
+                topLeft: V.zero,
+                topRight: V.zero,
+                bottomLeft: V.zero,
+                bottomRight: V.zero,
                 rotation: 0
             };
         }
 
         const bbox = this._svg.bbox();
         return {
-            origin: new Vector(bbox.x, bbox.y),
-            center: new Vector(bbox.x, bbox.y).add(new Vector(bbox.width, bbox.height).scale(0.5)),
-            dimensions: new Vector(bbox.width, bbox.height),
-            topLeft: new Vector(bbox.x, bbox.y),
-            topRight: new Vector(bbox.x + bbox.width, bbox.y),
-            bottomLeft: new Vector(bbox.x, bbox.y + bbox.height),
-            bottomRight: new Vector(bbox.x + bbox.width, bbox.y + bbox.height),
+            origin: new V(bbox.x, bbox.y),
+            center: new V(bbox.x, bbox.y).add(new V(bbox.width, bbox.height).scale(0.5)),
+            dimensions: new V(bbox.width, bbox.height),
+            topLeft: new V(bbox.x, bbox.y),
+            topRight: new V(bbox.x + bbox.width, bbox.y),
+            bottomLeft: new V(bbox.x, bbox.y + bbox.height),
+            bottomRight: new V(bbox.x + bbox.width, bbox.y + bbox.height),
             rotation: this._rotation
         };
     }
@@ -127,17 +127,17 @@ class CurveRenderer implements ICurveRenderer {
             origin: staticBox.origin,
             center: staticBox.center,
             dimensions: staticBox.dimensions,
-            topLeft: staticBox.center.add(corners.topLeft.rotateMore(staticBox.rotation)),
-            topRight: staticBox.center.add(corners.topRight.rotateMore(staticBox.rotation)),
-            bottomLeft: staticBox.center.add(corners.bottomLeft.rotateMore(staticBox.rotation)),
-            bottomRight: staticBox.center.add(corners.bottomRight.rotateMore(staticBox.rotation)),
+            topLeft: staticBox.center.add(corners.topLeft.rotate(staticBox.rotation)),
+            topRight: staticBox.center.add(corners.topRight.rotate(staticBox.rotation)),
+            bottomLeft: staticBox.center.add(corners.bottomLeft.rotate(staticBox.rotation)),
+            bottomRight: staticBox.center.add(corners.bottomRight.rotate(staticBox.rotation)),
             rotation: staticBox.rotation
         };
     }
 
     // Get the points by which a graphic can be pulled to snap to existing snap vectors
     // These points are based on the transformed shape (unlike snap vectors which distinquish static and transformed)
-    public get pullPoints(): Vector[] {
+    public get pullPoints(): V[] {
         const box = this.transformedBox;
         return [
             box.topLeft.add(box.topLeft.towards(box.topRight).scale(0.5)),
@@ -150,8 +150,8 @@ class CurveRenderer implements ICurveRenderer {
     public get staticSnapVectors(): SnapVector[] {
         const box = this.staticBox;
         return [
-            new SnapVector(box.center, Vector.north),
-            new SnapVector(box.center, Vector.east)
+            new SnapVector(box.center, V.north),
+            new SnapVector(box.center, V.east)
         ];
     }
 
@@ -163,12 +163,12 @@ class CurveRenderer implements ICurveRenderer {
         const rightCenter = box.bottomLeft.add(box.bottomLeft.towards(box.topLeft).scale(0.5));
 
         return [
-            new SnapVector(topCenter, Vector.east.rotateMore(box.rotation)),
-            new SnapVector(leftCenter, Vector.north.rotateMore(box.rotation)),
-            new SnapVector(bottomCenter, Vector.east.rotateMore(box.rotation)),
-            new SnapVector(rightCenter, Vector.north.rotateMore(box.rotation)),
-            new SnapVector(box.center, Vector.east.rotateMore(-box.rotation)),
-            new SnapVector(box.center, Vector.north.rotateMore(-box.rotation))
+            new SnapVector(topCenter, V.east.rotate(box.rotation)),
+            new SnapVector(leftCenter, V.north.rotate(box.rotation)),
+            new SnapVector(bottomCenter, V.east.rotate(box.rotation)),
+            new SnapVector(rightCenter, V.north.rotate(box.rotation)),
+            new SnapVector(box.center, V.east.rotate(-box.rotation)),
+            new SnapVector(box.center, V.north.rotate(-box.rotation))
         ];
     }
 
@@ -212,7 +212,7 @@ class CurveRenderer implements ICurveRenderer {
 
     // Reformat points from an array of objects to the bezier curve string
     private _getFormattedPoints(): string {
-        const anchorPoints = this._anchors.reduce<Vector[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []);
+        const anchorPoints = this._anchors.reduce<V[]>((points, anchor) => [...points, anchor.inHandle, anchor.point, anchor.outHandle], []);
         const [origin, ...points] = anchorPoints.slice(1, -1);
         return origin === undefined ? '' : `M ${origin.x},${origin.y} ${points.map(({ x, y }, i) => `${i % 3 === 0 ? ' C' : ''} ${x},${y}`)}`;
     }

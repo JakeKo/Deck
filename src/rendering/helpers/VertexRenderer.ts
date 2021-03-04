@@ -1,5 +1,5 @@
 import { decorateVertexEvents } from '@/events/decorators';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { GRAPHIC_TYPES, IGraphicRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
@@ -7,7 +7,7 @@ type VertexRendererArgs = {
     slide: ISlideRenderer;
     scale: number;
     role: VERTEX_ROLES;
-    center: Vector;
+    center: V;
     parent: IGraphicRenderer;
 };
 
@@ -20,7 +20,7 @@ class VertexRenderer implements IVertexRenderer {
     private _scale: number;
     private _width: number;
     private _height: number;
-    private _center: Vector;
+    private _center: V;
     private _fillColor: string;
     private _strokeColor: string;
     private _strokeWidth: number;
@@ -50,7 +50,7 @@ class VertexRenderer implements IVertexRenderer {
         return this._parent;
     }
 
-    public set center(center: Vector) {
+    public set center(center: V) {
         this._center = center;
         this._svg && this._svg.center(this._center.x, this._center.y);
     }

@@ -1,7 +1,7 @@
 import { decorateRectangleEvents } from '@/events/decorators';
 import SnapVector from '@/utilities/SnapVector';
 import { radToDeg } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { BoundingBox, GRAPHIC_TYPES, IRectangleRenderer, ISlideRenderer } from '../types';
 
@@ -10,8 +10,8 @@ class RectangleRenderer implements IRectangleRenderer {
     public readonly type = GRAPHIC_TYPES.RECTANGLE;
     private _slide: ISlideRenderer;
     private _svg: SVG.Rect | undefined;
-    private _origin: Vector;
-    private _dimensions: Vector;
+    private _origin: V;
+    private _dimensions: V;
     private _fillColor: string;
     private _strokeColor: string;
     private _strokeWidth: number;
@@ -20,8 +20,8 @@ class RectangleRenderer implements IRectangleRenderer {
     constructor(args: {
         id: string;
         slide: ISlideRenderer;
-        origin?: Vector;
-        dimensions?: Vector;
+        origin?: V;
+        dimensions?: V;
         fillColor?: string;
         strokeColor?: string;
         strokeWidth?: number;
@@ -29,8 +29,8 @@ class RectangleRenderer implements IRectangleRenderer {
     }) {
         this.id = args.id;
         this._slide = args.slide;
-        this._origin = args.origin || Vector.zero;
-        this._dimensions = args.dimensions || Vector.zero;
+        this._origin = args.origin || V.zero;
+        this._dimensions = args.dimensions || V.zero;
         this._fillColor = args.fillColor || '#CCCCCC';
         this._strokeColor = args.strokeColor || 'none';
         this._strokeWidth = args.strokeWidth || 0;
@@ -41,22 +41,22 @@ class RectangleRenderer implements IRectangleRenderer {
         return this._svg !== undefined;
     }
 
-    public get origin(): Vector {
+    public get origin(): V {
         return this._origin;
     }
 
-    public set origin(origin: Vector) {
+    public set origin(origin: V) {
         this._origin = origin;
         this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(radToDeg(this._rotation));
     }
 
-    public get dimensions(): Vector {
+    public get dimensions(): V {
         return this._dimensions;
     }
 
-    public set dimensions(dimensions: Vector) {
+    public set dimensions(dimensions: V) {
         this._dimensions = dimensions;
-        this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
+        this._svg && this._svg.rotate(0).size(this._dimensions.x, this._dimensions.y).rotate(radToDeg(this._rotation));
     }
 
     public get fillColor(): string {
@@ -96,25 +96,26 @@ class RectangleRenderer implements IRectangleRenderer {
     }
 
     public get staticBox(): BoundingBox {
-        return this.isRendered ? {
-            origin: this._origin,
-            center: this._origin.add(this._dimensions.scale(0.5)),
-            dimensions: this._dimensions,
-            topLeft: this._origin,
-            topRight: this._origin.add(new Vector(this._dimensions.x, 0)),
-            bottomLeft: this._origin.add(new Vector(0, this._dimensions.y)),
-            bottomRight: this._origin.add(this._dimensions),
-            rotation: this._rotation
-        } : {
-            origin: Vector.zero,
-            center: Vector.zero,
-            dimensions: Vector.zero,
-            topLeft: Vector.zero,
-            topRight: Vector.zero,
-            bottomLeft: Vector.zero,
-            bottomRight: Vector.zero,
-            rotation: 0
-        };
+        return this.isRendered
+            ? {
+                origin: this._origin,
+                center: this._origin.add(this._dimensions.scale(0.5)),
+                dimensions: this._dimensions,
+                topLeft: this._origin,
+                topRight: this._origin.addX(this._dimensions.x),
+                bottomLeft: this._origin.addY(this._dimensions.y),
+                bottomRight: this._origin.add(this._dimensions),
+                rotation: this._rotation
+            } : {
+                origin: V.zero,
+                center: V.zero,
+                dimensions: V.zero,
+                topLeft: V.zero,
+                topRight: V.zero,
+                bottomLeft: V.zero,
+                bottomRight: V.zero,
+                rotation: 0
+            };
     }
 
     public get transformedBox(): BoundingBox {
@@ -134,17 +135,17 @@ class RectangleRenderer implements IRectangleRenderer {
             origin: staticBox.origin,
             center: staticBox.center,
             dimensions: staticBox.dimensions,
-            topLeft: staticBox.center.add(corners.topLeft.rotateMore(staticBox.rotation)),
-            topRight: staticBox.center.add(corners.topRight.rotateMore(staticBox.rotation)),
-            bottomLeft: staticBox.center.add(corners.bottomLeft.rotateMore(staticBox.rotation)),
-            bottomRight: staticBox.center.add(corners.bottomRight.rotateMore(staticBox.rotation)),
+            topLeft: staticBox.center.add(corners.topLeft.rotate(staticBox.rotation)),
+            topRight: staticBox.center.add(corners.topRight.rotate(staticBox.rotation)),
+            bottomLeft: staticBox.center.add(corners.bottomLeft.rotate(staticBox.rotation)),
+            bottomRight: staticBox.center.add(corners.bottomRight.rotate(staticBox.rotation)),
             rotation: staticBox.rotation
         };
     }
 
     // Get the points by which a graphic can be pulled to snap to existing snap vectors
     // These points are based on the transformed shape (unlike snap vectors which distinquish static and transformed)
-    public get pullPoints(): Vector[] {
+    public get pullPoints(): V[] {
         const box = this.transformedBox;
         return [
             box.topLeft.add(box.topLeft.towards(box.topRight).scale(0.5)),
@@ -157,8 +158,8 @@ class RectangleRenderer implements IRectangleRenderer {
     public get staticSnapVectors(): SnapVector[] {
         const box = this.staticBox;
         return [
-            new SnapVector(box.center, Vector.north),
-            new SnapVector(box.center, Vector.east)
+            new SnapVector(box.center, V.north),
+            new SnapVector(box.center, V.east)
         ];
     }
 
@@ -170,16 +171,16 @@ class RectangleRenderer implements IRectangleRenderer {
         const rightCenter = box.bottomLeft.add(box.bottomLeft.towards(box.topLeft).scale(0.5));
 
         return [
-            new SnapVector(topCenter, Vector.east.rotateMore(box.rotation)),
-            new SnapVector(leftCenter, Vector.north.rotateMore(box.rotation)),
-            new SnapVector(bottomCenter, Vector.east.rotateMore(box.rotation)),
-            new SnapVector(rightCenter, Vector.north.rotateMore(box.rotation)),
-            new SnapVector(box.center, Vector.east.rotateMore(-box.rotation)),
-            new SnapVector(box.center, Vector.north.rotateMore(-box.rotation))
+            new SnapVector(topCenter, V.east.rotate(box.rotation)),
+            new SnapVector(leftCenter, V.north.rotate(box.rotation)),
+            new SnapVector(bottomCenter, V.east.rotate(box.rotation)),
+            new SnapVector(rightCenter, V.north.rotate(box.rotation)),
+            new SnapVector(box.center, V.east.rotate(-box.rotation)),
+            new SnapVector(box.center, V.north.rotate(-box.rotation))
         ];
     }
 
-    public setOriginAndDimensions(origin: Vector, dimensions: Vector): void {
+    public setOriginAndDimensions(origin: V, dimensions: V): void {
         this._origin = origin;
         this._dimensions = dimensions;
 

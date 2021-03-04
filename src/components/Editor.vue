@@ -10,7 +10,7 @@
 
 <script lang='ts'>
 import Slide from './Slide.vue';
-import Vector from '../utilities/Vector';
+import V from '@/utilities/Vector';
 import SlidePlaceholder from './SlidePlaceholder.vue';
 import DeckComponent from './generic/DeckComponent';
 import { dispatch } from '../events/utilities';
@@ -82,7 +82,7 @@ const Editor = defineComponent({
 
                 // TODO: Fetch absolute mouse position without hardcoded values
                 // TODO: Fix the math here (which is incorrect but not by much)
-                const absolutePosition = new Vector(event.clientX - 64, event.clientY - 28);
+                const absolutePosition = new V(event.clientX - 64, event.clientY - 28);
                 const absoluteDestination = absolutePosition.scale(1 / deltaZoom);
                 const scrollCorrection = absoluteDestination.towards(absolutePosition);
                 root.value.scrollLeft = root.value.scrollLeft + scrollCorrection.x;

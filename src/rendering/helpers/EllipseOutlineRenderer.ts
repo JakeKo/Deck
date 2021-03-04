@@ -1,13 +1,13 @@
 import { radToDeg } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { GRAPHIC_TYPES, IEllipseOutlineRenderer, ISlideRenderer } from '../types';
 
 type EllipseOutlineRendererArgs = {
     slide: ISlideRenderer;
     scale: number;
-    center: Vector;
-    dimensions: Vector;
+    center: V;
+    dimensions: V;
     rotation: number;
 };
 
@@ -16,8 +16,8 @@ class EllipseOutlineRenderer implements IEllipseOutlineRenderer {
     private _slide: ISlideRenderer;
     private _svg: SVG.Ellipse | undefined;
     private _scale: number;
-    private _dimensions: Vector;
-    private _center: Vector;
+    private _dimensions: V;
+    private _center: V;
     private _fillColor: string;
     private _strokeColor: string;
     private _strokeWidth: number;
@@ -38,12 +38,12 @@ class EllipseOutlineRenderer implements IEllipseOutlineRenderer {
         return this._svg !== undefined;
     }
 
-    public set center(center: Vector) {
+    public set center(center: V) {
         this._center = center;
         this._svg && this._svg.center(this._center.x, this._center.y);
     }
 
-    public set dimensions(dimensions: Vector) {
+    public set dimensions(dimensions: V) {
         this._dimensions = dimensions;
         this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
     }
@@ -53,7 +53,7 @@ class EllipseOutlineRenderer implements IEllipseOutlineRenderer {
         this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth * this._scale });
     }
 
-    public setCenterAndDimensions(center: Vector, dimensions: Vector): void {
+    public setCenterAndDimensions(center: V, dimensions: V): void {
         this._center = center;
         this._dimensions = dimensions;
 

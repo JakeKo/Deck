@@ -1,13 +1,13 @@
 import * as Utilities from '../utilities';
-import Vector from '../Vector';
+import V from '../Vector';
 
 describe('Utilities', () => {
     describe('closestVector', () => {
         it('can find the closest vector given one candidate', () => {
             // Arrange
-            const candidates = [Vector.east];
-            const target = Vector.southwest;
-            const expected = Vector.east;
+            const candidates = [V.east];
+            const target = V.southwest;
+            const expected = V.east;
 
             // Act
             const actual = Utilities.closestVector(target, candidates);
@@ -18,9 +18,9 @@ describe('Utilities', () => {
 
         it('can find the closest vector given multiple candidates', () => {
             // Arrange
-            const candidates = [Vector.east, Vector.south];
-            const target = Vector.southwest;
-            const expected = Vector.south;
+            const candidates = [V.east, V.south];
+            const target = V.southwest;
+            const expected = V.south;
 
             // Act
             const actual = Utilities.closestVector(target, candidates);
@@ -31,9 +31,9 @@ describe('Utilities', () => {
 
         it('can find the closest vector when target is aligned with candidate', () => {
             // Arrange
-            const candidates = [Vector.east, Vector.southwest];
-            const target = Vector.southwest;
-            const expected = Vector.southwest;
+            const candidates = [V.east, V.southwest];
+            const target = V.southwest;
+            const expected = V.southwest;
 
             // Act
             const actual = Utilities.closestVector(target, candidates);

@@ -1,14 +1,14 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import { provideId } from '@/utilities/IdProvider';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { CurveRenderer } from '../graphics';
 import { CurveAnchorRenderer } from '../helpers';
 import { CurveAnchor, ICurveAnchorRenderer, ICurveMaker, ICurveRenderer, ISlideRenderer } from '../types';
 
 type CurveMakerArgs = {
     slide: ISlideRenderer;
-    initialPosition: Vector;
+    initialPosition: V;
     scale: number;
 };
 

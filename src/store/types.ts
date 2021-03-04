@@ -2,7 +2,7 @@ import { GRAPHIC_TYPES } from '@/rendering/types';
 import { Theme } from '@/styling/types';
 import { EditorTool } from '@/tools/types';
 import SlideStateManager from '@/utilities/SlideStateManager';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 
 export type AppState = {
     activeSlide: Slide | undefined;
@@ -77,7 +77,7 @@ export type GraphicStoreModel = CurveStoreModel | EllipseStoreModel | ImageStore
 export type CurveStoreModel = {
     id: string;
     type: GRAPHIC_TYPES.CURVE;
-    points: Vector[];
+    points: V[];
     fillColor: string;
     strokeColor: string;
     strokeWidth: number;
@@ -87,7 +87,7 @@ export type CurveStoreModel = {
 export type EllipseStoreModel = {
     id: string;
     type: GRAPHIC_TYPES.ELLIPSE;
-    center: Vector;
+    center: V;
     width: number;
     height: number;
     fillColor: string;
@@ -100,7 +100,7 @@ export type ImageStoreModel = {
     id: string;
     type: GRAPHIC_TYPES.IMAGE;
     source: string;
-    origin: Vector;
+    origin: V;
     width: number;
     height: number;
     rotation: number;
@@ -109,7 +109,7 @@ export type ImageStoreModel = {
 export type RectangleStoreModel = {
     id: string;
     type: GRAPHIC_TYPES.RECTANGLE;
-    origin: Vector;
+    origin: V;
     width: number;
     height: number;
     fillColor: string;
@@ -122,7 +122,7 @@ export type TextboxStoreModel = {
     id: string;
     type: GRAPHIC_TYPES.TEXTBOX;
     text: string;
-    origin: Vector;
+    origin: V;
     width: number;
     height: number;
     size: number;
@@ -135,7 +135,7 @@ export type VideoStoreModel = {
     id: string;
     type: GRAPHIC_TYPES.VIDEO;
     source: string;
-    origin: Vector;
+    origin: V;
     width: number;
     height: number;
     strokeColor: string;

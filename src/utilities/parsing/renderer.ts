@@ -27,7 +27,7 @@ import {
     TextboxStoreModel,
     VideoStoreModel
 } from '@/store/types';
-import Vector from '../Vector';
+import V from '../Vector';
 
 export function curveStoreModelToCurveRenderer(curve: CurveStoreModel, slide: ISlideRenderer): ICurveRenderer {
     try {
@@ -35,9 +35,9 @@ export function curveStoreModelToCurveRenderer(curve: CurveStoreModel, slide: IS
             id: curve.id,
             slide,
             anchors: curve.points.reduce<CurveAnchor[]>((anchors, _, index) => index % 3 === 0 ? [...anchors, {
-                inHandle: new Vector(curve.points[index].x, curve.points[index].y),
-                point: new Vector(curve.points[index + 1].x, curve.points[index + 1].y),
-                outHandle: new Vector(curve.points[index + 2].x, curve.points[index + 2].y)
+                inHandle: new V(curve.points[index].x, curve.points[index].y),
+                point: new V(curve.points[index + 1].x, curve.points[index + 1].y),
+                outHandle: new V(curve.points[index + 2].x, curve.points[index + 2].y)
             }] : anchors, []),
             fillColor: curve.fillColor,
             strokeColor: curve.strokeColor,
@@ -54,8 +54,8 @@ export function ellipseStoreModelToEllipseRenderer(ellipse: EllipseStoreModel, s
         return new EllipseRenderer({
             id: ellipse.id,
             slide,
-            center: new Vector(ellipse.center.x, ellipse.center.y),
-            dimensions: new Vector(ellipse.width, ellipse.height),
+            center: new V(ellipse.center.x, ellipse.center.y),
+            dimensions: new V(ellipse.width, ellipse.height),
             fillColor: ellipse.fillColor,
             strokeColor: ellipse.strokeColor,
             strokeWidth: ellipse.strokeWidth,
@@ -71,9 +71,9 @@ export function imageStoreModelToImageRenderer(image: ImageStoreModel, slide: IS
         return new ImageRenderer({
             id: image.id,
             slide,
-            origin: new Vector(image.origin.x, image.origin.y),
+            origin: new V(image.origin.x, image.origin.y),
             source: image.source,
-            dimensions: new Vector(image.width, image.height),
+            dimensions: new V(image.width, image.height),
             rotation: image.rotation
         });
     } catch (error) {
@@ -86,8 +86,8 @@ export function rectangleStoreModelToRectangleRenderer(rectangle: RectangleStore
         return new RectangleRenderer({
             id: rectangle.id,
             slide,
-            origin: new Vector(rectangle.origin.x, rectangle.origin.y),
-            dimensions: new Vector(rectangle.width, rectangle.height),
+            origin: new V(rectangle.origin.x, rectangle.origin.y),
+            dimensions: new V(rectangle.width, rectangle.height),
             fillColor: rectangle.fillColor,
             strokeColor: rectangle.strokeColor,
             strokeWidth: rectangle.strokeWidth,
@@ -104,8 +104,8 @@ export function textboxStoreModelToTextboxRenderer(textbox: TextboxStoreModel, s
             id: textbox.id,
             slide,
             text: textbox.text,
-            origin: new Vector(textbox.origin.x, textbox.origin.y),
-            dimensions: new Vector(textbox.width, textbox.height),
+            origin: new V(textbox.origin.x, textbox.origin.y),
+            dimensions: new V(textbox.width, textbox.height),
             fontSize: textbox.size,
             fontWeight: textbox.weight,
             typeface: textbox.font,
@@ -121,9 +121,9 @@ export function videoStoreModelToVideoRenderer(video: VideoStoreModel, slide: IS
         return new VideoRenderer({
             id: video.id,
             slide,
-            origin: new Vector(video.origin.x, video.origin.y),
+            origin: new V(video.origin.x, video.origin.y),
             source: video.source,
-            dimensions: new Vector(video.width, video.height),
+            dimensions: new V(video.width, video.height),
             strokeColor: video.strokeColor,
             strokeWidth: video.strokeWidth,
             rotation: video.rotation

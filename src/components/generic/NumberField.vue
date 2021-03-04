@@ -64,10 +64,15 @@ const NumberField = defineComponent({
 
         const inputValue = computed({
             get: () => props.value,
-            set: (value: number | '') => {
-                if (value !== '' && (!props.min || props.min <= value) && (!props.max || props.max >= value)) {
-                    emit('deck-input', value);
-                    return value;
+            set: (value: number | string) => {
+                if (value === '') {
+                    return;
+                }
+
+                const valueAsNum = Number(value);
+                if ((!props.min || props.min <= valueAsNum) && (!props.max || props.max >= valueAsNum)) {
+                    emit('deck-input', valueAsNum);
+                    return valueAsNum;
                 }
             }
         });

@@ -1,10 +1,10 @@
-import Vector from './Vector';
+import V from './Vector';
 
 // Returns the vector in candidates which is closest to the target vector
-export function closestVector(target: Vector, candidates: Vector[]): Vector {
+export function closestVector(target: V, candidates: V[]): V {
     const diffs = candidates
-        .map(candidate => candidate.theta(Vector.east))
-        .map(theta => Math.abs(theta - target.theta(Vector.east)));
+        .map(candidate => candidate.theta())
+        .map(theta => Math.abs(theta - target.theta()));
 
     const minDiff = Math.min(...diffs);
     const minDiffIndex = diffs.indexOf(minDiff);

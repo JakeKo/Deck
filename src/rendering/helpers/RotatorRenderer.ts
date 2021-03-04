@@ -1,13 +1,13 @@
 import { decorateRotateEvents } from '@/events/decorators/rotators';
 import { radToDeg } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { GRAPHIC_TYPES, IGraphicRenderer, IRotatorRenderer, ISlideRenderer } from '../types';
 
 type RotatorRendererArgs = {
     slide: ISlideRenderer;
     scale: number;
-    center: Vector;
+    center: V;
     parent: IGraphicRenderer;
     rotation: number;
 };
@@ -20,7 +20,7 @@ class RotatorRenderer implements IRotatorRenderer {
     private _scale: number;
     private _width: number;
     private _height: number;
-    private _center: Vector;
+    private _center: V;
     private _fillColor: string;
     private _baseRotation = 45;
     private _rotation: number;
@@ -44,7 +44,7 @@ class RotatorRenderer implements IRotatorRenderer {
         return this._parent;
     }
 
-    public set center(center: Vector) {
+    public set center(center: V) {
         this._center = center;
         this._svg && this._svg.rotate(0)
             .translate(this._center.x - this._width * this._scale / 2, this._center.y - this._height * this._scale / 2)

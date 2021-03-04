@@ -51,11 +51,12 @@
 <script lang='ts'>
 import { TextboxStoreModel } from '@/store/types';
 import { degToRad, radToDeg } from '@/utilities/utilities';
-import Vector from '@/utilities/Vector';
+import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
 import ToggleField from '../generic/ToggleField.vue';
+import { correctForRotationWhenChangingDimensions } from './utilities';
 
 const TextboxEditorForm = defineComponent({
     components: {
@@ -85,43 +86,55 @@ const TextboxEditorForm = defineComponent({
         const x = computed({
             get: () => props.textbox.origin.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.textbox, origin: new Vector(value, props.textbox.origin.y) });
+                store.mutations.setGraphic(props.slideId, { ...props.textbox, origin: new V(value, props.textbox.origin.y) });
                 store.mutations.broadcastSetX(props.slideId, props.textbox.id, value);
             }
         });
         const y = computed({
             get: () => props.textbox.origin.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.textbox, origin: new Vector(props.textbox.origin.x, value) });
+                store.mutations.setGraphic(props.slideId, { ...props.textbox, origin: new V(props.textbox.origin.x, value) });
                 store.mutations.broadcastSetY(props.slideId, props.textbox.id, value);
             }
         });
         const width = computed({
             get: () => props.textbox.width,
             set: value => {
-                if (lockAspectRatio.value) {
-                    const height = value * props.textbox.height / props.textbox.width;
-                    store.mutations.setGraphic(props.slideId, { ...props.textbox, width: value, height });
-                    store.mutations.broadcastSetWidth(props.slideId, props.textbox.id, value);
-                    store.mutations.broadcastSetHeight(props.slideId, props.textbox.id, height);
-                } else {
-                    store.mutations.setGraphic(props.slideId, { ...props.textbox, width: value });
-                    store.mutations.broadcastSetWidth(props.slideId, props.textbox.id, value);
-                }
+                const height = lockAspectRatio.value
+                    ? value * props.textbox.height / props.textbox.width
+                    : props.textbox.height;
+                const newOrigin = correctForRotationWhenChangingDimensions({
+                    basePoint: props.textbox.origin,
+                    initialDimensions: new V(props.textbox.width, props.textbox.height),
+                    newDimensions: new V(value, height),
+                    rotation: props.textbox.rotation
+                });
+
+                store.mutations.setGraphic(props.slideId, { ...props.textbox, width: value, height, origin: newOrigin });
+                store.mutations.broadcastSetWidth(props.slideId, props.textbox.id, value);
+                store.mutations.broadcastSetHeight(props.slideId, props.textbox.id, height);
+                store.mutations.broadcastSetX(props.slideId, props.textbox.id, newOrigin.x);
+                store.mutations.broadcastSetY(props.slideId, props.textbox.id, newOrigin.y);
             }
         });
         const height = computed({
             get: () => props.textbox.height,
             set: value => {
-                if (lockAspectRatio.value) {
-                    const width = value * props.textbox.width / props.textbox.height;
-                    store.mutations.setGraphic(props.slideId, { ...props.textbox, width, height: value });
-                    store.mutations.broadcastSetWidth(props.slideId, props.textbox.id, width);
-                    store.mutations.broadcastSetHeight(props.slideId, props.textbox.id, value);
-                } else {
-                    store.mutations.setGraphic(props.slideId, { ...props.textbox, height: value });
-                    store.mutations.broadcastSetHeight(props.slideId, props.textbox.id, value);
-                }
+                const width = lockAspectRatio.value
+                    ? value * props.textbox.width / props.textbox.height
+                    : props.textbox.width;
+                const newOrigin = correctForRotationWhenChangingDimensions({
+                    basePoint: props.textbox.origin,
+                    initialDimensions: new V(props.textbox.width, props.textbox.height),
+                    newDimensions: new V(width, value),
+                    rotation: props.textbox.rotation
+                });
+
+                store.mutations.setGraphic(props.slideId, { ...props.textbox, width, height: value, origin: newOrigin });
+                store.mutations.broadcastSetWidth(props.slideId, props.textbox.id, width);
+                store.mutations.broadcastSetHeight(props.slideId, props.textbox.id, value);
+                store.mutations.broadcastSetX(props.slideId, props.textbox.id, newOrigin.x);
+                store.mutations.broadcastSetY(props.slideId, props.textbox.id, newOrigin.y);
             }
         });
         const rotation = computed({
