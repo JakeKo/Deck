@@ -1,7 +1,9 @@
 import V from '@/utilities/Vector';
 
-// Given the basePoint (from which position is determined), calculate it's destination after changing a graphic's dimensions
-// Account for rotation by appending a correction vector to the natural translation of the base point
+/**
+ * Given the basePoint (from which position is determined), calculate it's destination after changing a graphic's dimensions.
+ * Account for rotation by appending a correction vector to the natural translation of the base point.
+ */
 function correctForRotationWhenChangingDimensions({
     basePoint,
     initialDimensions,
