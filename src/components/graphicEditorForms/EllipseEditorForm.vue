@@ -79,6 +79,7 @@ import NumberField from '../generic/NumberField.vue';
 import ColorField from '../generic/ColorField.vue';
 import ToggleField from '../generic/ToggleField.vue';
 import { degToRad, radToDeg } from '@/utilities/utilities';
+import { correctForRotationWhenChangingDimensions } from './utilities';
 
 const EllipseEditorForm = defineComponent({
     components: {
@@ -123,29 +124,53 @@ const EllipseEditorForm = defineComponent({
         const width = computed({
             get: () => props.ellipse.width,
             set: value => {
-                if (lockAspectRatio.value) {
-                    const height = value * props.ellipse.height / props.ellipse.width;
-                    store.mutations.setGraphic(props.slideId, { ...props.ellipse, width: value, height });
-                    store.mutations.broadcastSetWidth(props.slideId, props.ellipse.id, value);
-                    store.mutations.broadcastSetHeight(props.slideId, props.ellipse.id, height);
-                } else {
-                    store.mutations.setGraphic(props.slideId, { ...props.ellipse, width: value });
-                    store.mutations.broadcastSetWidth(props.slideId, props.ellipse.id, value);
-                }
+                const height = lockAspectRatio.value
+                    ? value * props.ellipse.height / props.ellipse.width
+                    : props.ellipse.height;
+                const initialDimensions = new V(props.ellipse.width, props.ellipse.height);
+                const newDimensions = new V(value, height);
+
+                // Unlike other rectangular graphics, the ellipse uses the center as the base point
+                // We have to do some extra vector math to get the center to move but the top-left "origin" to stay in place
+                const newOrigin = correctForRotationWhenChangingDimensions({
+                    basePoint: props.ellipse.center.add(initialDimensions.scale(-0.5)),
+                    initialDimensions,
+                    newDimensions,
+                    rotation: props.ellipse.rotation
+                });
+                const newCenter = newOrigin.add(newDimensions.scale(0.5));
+
+                store.mutations.setGraphic(props.slideId, { ...props.ellipse, width: value, height, center: newCenter });
+                store.mutations.broadcastSetWidth(props.slideId, props.ellipse.id, value);
+                store.mutations.broadcastSetHeight(props.slideId, props.ellipse.id, height);
+                store.mutations.broadcastSetX(props.slideId, props.ellipse.id, newCenter.x);
+                store.mutations.broadcastSetY(props.slideId, props.ellipse.id, newCenter.y);
             }
         });
         const height = computed({
             get: () => props.ellipse.height,
             set: value => {
-                if (lockAspectRatio.value) {
-                    const width = value * props.ellipse.width / props.ellipse.height;
-                    store.mutations.setGraphic(props.slideId, { ...props.ellipse, width, height: value });
-                    store.mutations.broadcastSetWidth(props.slideId, props.ellipse.id, width);
-                    store.mutations.broadcastSetHeight(props.slideId, props.ellipse.id, value);
-                } else {
-                    store.mutations.setGraphic(props.slideId, { ...props.ellipse, height: value });
-                    store.mutations.broadcastSetHeight(props.slideId, props.ellipse.id, value);
-                }
+                const width = lockAspectRatio.value
+                    ? value * props.ellipse.width / props.ellipse.height
+                    : props.ellipse.width;
+                const initialDimensions = new V(props.ellipse.width, props.ellipse.height);
+                const newDimensions = new V(width, value);
+
+                // Unlike other rectangular graphics, the ellipse uses the center as the base point
+                // We have to do some extra vector math to get the center to move but the top-left "origin" to stay in place
+                const newOrigin = correctForRotationWhenChangingDimensions({
+                    basePoint: props.ellipse.center.add(initialDimensions.scale(-0.5)),
+                    initialDimensions,
+                    newDimensions,
+                    rotation: props.ellipse.rotation
+                });
+                const newCenter = newOrigin.add(newDimensions.scale(0.5));
+
+                store.mutations.setGraphic(props.slideId, { ...props.ellipse, width, height: value, center: newCenter });
+                store.mutations.broadcastSetWidth(props.slideId, props.ellipse.id, width);
+                store.mutations.broadcastSetHeight(props.slideId, props.ellipse.id, value);
+                store.mutations.broadcastSetX(props.slideId, props.ellipse.id, newCenter.x);
+                store.mutations.broadcastSetY(props.slideId, props.ellipse.id, newCenter.y);
             }
         });
         const rotation = computed({

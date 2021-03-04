@@ -48,6 +48,7 @@ import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
+import { correctForRotationWhenChangingDimensions } from './utilities';
 
 const ImageEditorForm = defineComponent({
     components: {
@@ -90,18 +91,36 @@ const ImageEditorForm = defineComponent({
             get: () => props.image.width,
             set: value => {
                 const height = value * props.image.height / props.image.width;
-                store.mutations.setGraphic(props.slideId, { ...props.image, width: value, height });
+                const newOrigin = correctForRotationWhenChangingDimensions({
+                    basePoint: props.image.origin,
+                    initialDimensions: new V(props.image.width, props.image.height),
+                    newDimensions: new V(value, height),
+                    rotation: props.image.rotation
+                });
+
+                store.mutations.setGraphic(props.slideId, { ...props.image, width: value, height, origin: newOrigin });
                 store.mutations.broadcastSetWidth(props.slideId, props.image.id, value);
                 store.mutations.broadcastSetHeight(props.slideId, props.image.id, height);
+                store.mutations.broadcastSetX(props.slideId, props.image.id, newOrigin.x);
+                store.mutations.broadcastSetY(props.slideId, props.image.id, newOrigin.y);
             }
         });
         const height = computed({
             get: () => props.image.height,
             set: value => {
                 const width = value * props.image.width / props.image.height;
-                store.mutations.setGraphic(props.slideId, { ...props.image, width, height: value });
+                const newOrigin = correctForRotationWhenChangingDimensions({
+                    basePoint: props.image.origin,
+                    initialDimensions: new V(props.image.width, props.image.height),
+                    newDimensions: new V(width, value),
+                    rotation: props.image.rotation
+                });
+
+                store.mutations.setGraphic(props.slideId, { ...props.image, width, height: value, origin: newOrigin });
                 store.mutations.broadcastSetWidth(props.slideId, props.image.id, width);
                 store.mutations.broadcastSetHeight(props.slideId, props.image.id, value);
+                store.mutations.broadcastSetX(props.slideId, props.image.id, newOrigin.x);
+                store.mutations.broadcastSetY(props.slideId, props.image.id, newOrigin.y);
             }
         });
         const rotation = computed({
