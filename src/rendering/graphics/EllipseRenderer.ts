@@ -151,12 +151,7 @@ class EllipseRenderer implements IEllipseRenderer {
     // These points are based on the transformed shape (unlike snap vectors which distinquish static and transformed)
     public get pullPoints(): V[] {
         const box = this.transformedBox;
-        return [
-            box.topLeft.add(box.topLeft.towards(box.topRight).scale(0.5)),
-            box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5)),
-            box.bottomRight.add(box.bottomRight.towards(box.bottomLeft).scale(0.5)),
-            box.bottomLeft.add(box.bottomLeft.towards(box.topLeft).scale(0.5))
-        ];
+        return [box.topLeft, box.topRight, box.bottomRight, box.bottomLeft, box.center];
     }
 
     public get staticSnapVectors(): SnapVector[] {
