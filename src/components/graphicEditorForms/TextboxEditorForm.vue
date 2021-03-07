@@ -62,9 +62,7 @@ import { degToRad, radToDeg } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
-import NumberField from '../generic/NumberField.vue';
-import ToggleField from '../generic/ToggleField.vue';
-import TextField from '../Core/Field/TextField.vue';
+import { NumberField, ToggleField, TextField } from '../Core/Forms';
 import { correctForRotationWhenChangingDimensions } from './utilities';
 
 const TextboxEditorForm = defineComponent({
