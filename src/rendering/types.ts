@@ -276,6 +276,7 @@ export type ITextboxMutator = BaseGraphicMutator & {
     setY: (y: number) => void;
     setWidth: (width: number) => void;
     setHeight: (height: number) => void;
+    setText: (text: string) => void;
     setRotation: (rotation: number) => void;
 };
 
@@ -329,6 +330,7 @@ export type ISlideRenderer = {
     setWidth: (graphicId: string, width: number) => void;
     setHeight: (graphicId: string, height: number) => void;
     setRotation: (graphicId: string, rotation: number) => void;
+    setText: (graphicId: string, text: string) => void;
 };
 
 export type BoundingBoxMutatorHelpers = {

@@ -46,6 +46,7 @@ export type AppMutations = {
     broadcastSetStrokeWidth: (slideId: string, graphicId: string, strokeWidth: number) => void;
     broadcastSetWidth: (slideId: string, graphicId: string, width: number) => void;
     broadcastSetHeight: (slideId: string, graphicId: string, height: number) => void;
+    broadcastSetText: (slideId: string, graphicId: string, text: string) => void;
     broadcastSetRotation: (slideId: string, graphicId: string, rotation: number) => void;
     broadcastRemoveGraphic: (slideId: string, graphicId: string) => void;
     setTheme: (theme: Theme) => void;

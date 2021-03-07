@@ -171,6 +171,10 @@ function createStore(): AppStore {
             const slide = getSlide(state, slideId);
             slide && slide.stateManager.setRotationFromStore(graphicId, rotation);
         },
+        broadcastSetText: (slideId, graphicId, text) => {
+            const slide = getSlide(state, slideId);
+            slide && slide.stateManager.setTextFromStore(graphicId, text);
+        },
         broadcastRemoveGraphic: (slideId, graphicId) => {
             const slide = getSlide(state, slideId);
             if (slide !== undefined) {

@@ -1,6 +1,14 @@
 <template>
     <div ref='root' :style='style.textboxEditorForm'>
         <div :style='style.row'>
+            <TextField
+                :name='"text"'
+                :labelText='"TEXT"'
+                :value='text'
+                @deck-input='value => text = value'
+            />
+        </div>
+        <div :style='style.row'>
             <NumberField
                 :name='"x"'
                 :labelText='"X"'
@@ -56,12 +64,14 @@ import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import NumberField from '../generic/NumberField.vue';
 import ToggleField from '../generic/ToggleField.vue';
+import TextField from '../Core/Field/TextField.vue';
 import { correctForRotationWhenChangingDimensions } from './utilities';
 
 const TextboxEditorForm = defineComponent({
     components: {
         NumberField,
-        ToggleField
+        ToggleField,
+        TextField
     },
     props: {
         textbox: { type: Object as PropType<TextboxStoreModel>, required: true },
@@ -80,6 +90,14 @@ const TextboxEditorForm = defineComponent({
             column: computed(() => ({
                 ...baseStyle.value.flexCol
             }))
+        });
+
+        const text = computed({
+            get: () => props.textbox.text,
+            set: value => {
+                store.mutations.setGraphic(props.slideId, { ...props.textbox, text: value });
+                store.mutations.broadcastSetText(props.slideId, props.textbox.id, value);
+            }
         });
 
         const lockAspectRatio = ref(false);
@@ -148,6 +166,7 @@ const TextboxEditorForm = defineComponent({
         return {
             root,
             style,
+            text,
             lockAspectRatio,
             x,
             y,
