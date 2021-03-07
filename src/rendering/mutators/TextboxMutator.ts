@@ -141,6 +141,11 @@ class TextboxMutator implements ITextboxMutator {
         this._repositionBoxHelpers();
     }
 
+    public setText(text: string): void {
+        this.target.text = text;
+        this._repositionBoxHelpers();
+    }
+
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
         rotateBoxHelpers(this._helpers, this.target.transformedBox);

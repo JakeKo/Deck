@@ -451,6 +451,19 @@ class SlideRenderer implements ISlideRenderer {
         }
     }
 
+    public setText(graphicId: string, text: string): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic.type === TEXTBOX) {
+            if (this.isFocused(graphicId)) {
+                (this._focusedGraphics[graphicId] as TextboxMutator).setText(text);
+            } else {
+                graphic.text = text;
+            }
+        } else {
+            console.warn(`Attempted to set property 'height' of graphic with type '${graphic.type}'`);
+        }
+    }
+
     private _activateMaker<T extends IGraphicMaker>(maker: T): T {
         this._activeMakers[maker.target.id] = maker;
         return maker;

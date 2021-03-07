@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive } from 'vue';
-import { useHover, useStyle } from './core';
+import { useHover, useStyle } from '../../generic/core';
 
 const ToggleField = defineComponent({
     props: {

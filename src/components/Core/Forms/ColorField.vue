@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive } from 'vue';
-import { useFocus, useHover, useStyle } from './core';
+import { useFocus, useHover, useStyle } from '../../generic/core';
 
 const ColorField = defineComponent({
     props: {

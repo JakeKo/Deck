@@ -47,7 +47,7 @@ import { degToRad, radToDeg } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
-import NumberField from '../generic/NumberField.vue';
+import { NumberField } from '../Core/Forms';
 import { correctForRotationWhenChangingDimensions } from './utilities';
 
 const VideoEditorForm = defineComponent({

@@ -78,6 +78,10 @@ export default class SlideStateManager {
         this._renderer && this._renderer.setRotation(graphicId, rotation);
     }
 
+    public setTextFromStore(graphicId: string, text: string): void {
+        this._renderer && this._renderer.setText(graphicId, text);
+    }
+
     public removeGraphicFromStore(graphicId: string): void {
         this._renderer && this._renderer.removeGraphic(graphicId);
     }

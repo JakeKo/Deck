@@ -37,8 +37,7 @@
 import { CurveStoreModel } from '@/store/types';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
-import NumberField from '../generic/NumberField.vue';
-import ColorField from '../generic/ColorField.vue';
+import { ColorField, NumberField } from '../Core/Forms';
 import { degToRad, radToDeg } from '@/utilities/utilities';
 
 const CurveEditorForm = defineComponent({

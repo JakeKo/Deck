@@ -240,7 +240,7 @@ class TextboxRenderer implements ITextboxRenderer {
         this._textbox.style.height = '100%';
         this._textbox.style.font = `${this._fontSize}px ${this._typeface}`;
         this._textbox.style.fontWeight = this._fontWeight;
-        this._textbox.style.overflow = 'hidden';
+        this._textbox.style.overflowWrap = 'break-word';
         this._svg.appendChild(this._textbox);
 
         decorateTextboxEvents(this._svg, this._slide, this);

@@ -75,9 +75,7 @@ import { RectangleStoreModel } from '@/store/types';
 import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
-import NumberField from '../generic/NumberField.vue';
-import ColorField from '../generic/ColorField.vue';
-import ToggleField from '../generic/ToggleField.vue';
+import { ColorField, NumberField, ToggleField } from '../Core/Forms';
 import { degToRad, radToDeg } from '@/utilities/utilities';
 import { correctForRotationWhenChangingDimensions } from './utilities';
 
