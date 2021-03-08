@@ -1,5 +1,5 @@
 import { CurveAnchorMouseEvent, CurveMouseEvent, CURVE_ANCHOR_EVENTS, CURVE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { listen, listenOnce, unlisten } from '@/events';
 import { CurveMutator } from '@/rendering/mutators';
 import { resolvePosition } from '../utilities';
 
@@ -14,8 +14,8 @@ export function moveCurve(event: CurveMouseEvent): void {
     slide.cursor = 'move';
     slide.cursorLock = true;
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
 
     function move(event: SlideMouseEvent): void {
         moveListener(event);
@@ -27,8 +27,8 @@ export function moveCurve(event: CurveMouseEvent): void {
         slide.broadcastSetGraphic(mutator.target);
         slide.cursorLock = false;
         slide.unrenderAllSnapVectors();
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(CURVE_EVENTS.MOUSEDOWN, moveCurve);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
+        listenOnce(CURVE_EVENTS.MOUSEDOWN, 'moveCurve', moveCurve);
     }
 }
 
@@ -42,8 +42,8 @@ export function moveCurveAnchor(event: CurveAnchorMouseEvent, moveAnchor: (event
     slide.cursor = 'grabbing';
     slide.cursorLock = true;
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
 
     function move(event: SlideMouseEvent): void {
         anchorListener(event);
@@ -54,8 +54,8 @@ export function moveCurveAnchor(event: CurveAnchorMouseEvent, moveAnchor: (event
         slide.cursorLock = false;
         slide.cursor = 'grab';
 
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, moveAnchor);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
+        listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'moveAnchor', moveAnchor);
     }
 }
 
@@ -68,7 +68,7 @@ export function hoverCurve(event: CurveMouseEvent): void {
 
     slide.markGraphic(target.id);
 
-    listenOnce(CURVE_EVENTS.MOUSEOUT, unmark);
+    listenOnce(CURVE_EVENTS.MOUSEOUT, 'unmark', unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.id);
     }

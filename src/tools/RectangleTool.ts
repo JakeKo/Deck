@@ -1,5 +1,5 @@
+import { dispatch, listen, listenOnce, unlisten } from '@/events';
 import { SlideKeyboardEvent, SlideMouseEvent, SlideMouseEventPayload, SLIDE_EVENTS } from '@/events/types';
-import { dispatch, listen, listenOnce, unlisten } from '@/events/utilities';
 import { AppStore } from '@/store/types';
 import { PointerTool } from '.';
 import { EditorTool, TOOL_NAMES } from './types';
@@ -15,10 +15,10 @@ export default (store: AppStore): EditorTool => {
         let lastMouseEvent = event;
         const resizeListener = maker.resizeListener();
 
-        listen(SLIDE_EVENTS.KEYDOWN, keyDownHandler);
-        listen(SLIDE_EVENTS.KEYUP, keyUpHandler);
-        listen(SLIDE_EVENTS.MOUSEMOVE, update);
-        listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+        listen(SLIDE_EVENTS.KEYDOWN, 'keyDownHandler', keyDownHandler);
+        listen(SLIDE_EVENTS.KEYUP, 'keyUpHandler', keyUpHandler);
+        listen(SLIDE_EVENTS.MOUSEMOVE, 'update', update);
+        listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
 
         // When Shift, Ctrl, or Alt are pressed or unpressed, simulate a mousemove event
         // This allows the renderer to immediately adjust the shape dimensions if need be
@@ -36,15 +36,10 @@ export default (store: AppStore): EditorTool => {
                 altKey: baseEvent.key === 'Alt' || lastMouseEvent.detail.baseEvent.altKey
             });
 
-            dispatch(new CustomEvent<SlideMouseEventPayload>(
-                SLIDE_EVENTS.MOUSEMOVE,
-                {
-                    detail: {
-                        ...lastMouseEvent.detail,
-                        baseEvent: mouseEvent
-                    }
-                }
-            ));
+            dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, {
+                ...lastMouseEvent.detail,
+                baseEvent: mouseEvent
+            });
         }
 
         function keyUpHandler(event: SlideKeyboardEvent): void {
@@ -61,15 +56,10 @@ export default (store: AppStore): EditorTool => {
                 altKey: baseEvent.key !== 'Alt' && lastMouseEvent.detail.baseEvent.altKey
             });
 
-            dispatch(new CustomEvent<SlideMouseEventPayload>(
-                SLIDE_EVENTS.MOUSEMOVE,
-                {
-                    detail: {
-                        ...lastMouseEvent.detail,
-                        baseEvent: mouseEvent
-                    }
-                }
-            ));
+            dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, {
+                ...lastMouseEvent.detail,
+                baseEvent: mouseEvent
+            });
         }
 
         function update(event: SlideMouseEvent): void {
@@ -80,9 +70,9 @@ export default (store: AppStore): EditorTool => {
 
         function complete(): void {
             maker.complete();
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
-            unlisten(SLIDE_EVENTS.KEYDOWN, keyDownHandler);
-            unlisten(SLIDE_EVENTS.KEYUP, keyUpHandler);
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'update');
+            unlisten(SLIDE_EVENTS.KEYDOWN, 'keyDownHandler');
+            unlisten(SLIDE_EVENTS.KEYUP, 'keyUpHandler');
 
             store.mutations.setActiveTool(PointerTool());
         }
@@ -90,7 +80,7 @@ export default (store: AppStore): EditorTool => {
 
     return {
         name: TOOL_NAMES.RECTANGLE,
-        mount: () => listenOnce(SLIDE_EVENTS.MOUSEDOWN, make),
-        unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, make)
+        mount: () => listenOnce(SLIDE_EVENTS.MOUSEDOWN, 'make', make),
+        unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, 'make')
     };
 };

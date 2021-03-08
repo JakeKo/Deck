@@ -1,5 +1,5 @@
+import { listen, listenOnce, unlisten } from '@/events';
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { listen, listenOnce, unlisten } from '@/events/utilities';
 import { AppStore } from '@/store/types';
 import { PointerTool } from '.';
 import { EditorTool, TOOL_NAMES } from './types';
@@ -15,7 +15,7 @@ export default (store: AppStore): EditorTool => {
         let anchorListeners = maker.anchorListeners({ inHandle: initialPosition, point: initialPosition, outHandle: initialPosition });
         setPoint();
 
-        listen(SLIDE_EVENTS.KEYDOWN, complete);
+        listen(SLIDE_EVENTS.KEYDOWN, 'complete', complete);
 
         function movePoint(event: SlideMouseEvent): void {
             anchorListeners.setPoint(event);
@@ -24,9 +24,9 @@ export default (store: AppStore): EditorTool => {
         }
 
         function setPoint(): void {
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, movePoint);
-            listen(SLIDE_EVENTS.MOUSEMOVE, moveHandles);
-            listenOnce(SLIDE_EVENTS.MOUSEUP, setHandles);
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'movePoint');
+            listen(SLIDE_EVENTS.MOUSEMOVE, 'moveHandles', moveHandles);
+            listenOnce(SLIDE_EVENTS.MOUSEUP, 'setHandles', setHandles);
         }
 
         function moveHandles(event: SlideMouseEvent): void {
@@ -39,9 +39,9 @@ export default (store: AppStore): EditorTool => {
             anchorListeners = maker.anchorListeners({ inHandle: position, point: position, outHandle: position });
             slide.broadcastSetGraphic(maker.target);
 
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, moveHandles);
-            listen(SLIDE_EVENTS.MOUSEMOVE, movePoint);
-            listenOnce(SLIDE_EVENTS.MOUSEDOWN, setPoint);
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'moveHandles');
+            listen(SLIDE_EVENTS.MOUSEMOVE, 'movePoint', movePoint);
+            listenOnce(SLIDE_EVENTS.MOUSEDOWN, 'setPoint', setPoint);
         }
 
         function complete(event: SlideKeyboardEvent): void {
@@ -50,11 +50,11 @@ export default (store: AppStore): EditorTool => {
             }
 
             maker.complete();
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, movePoint);
-            unlisten(SLIDE_EVENTS.MOUSEDOWN, setPoint);
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, moveHandles);
-            unlisten(SLIDE_EVENTS.MOUSEUP, setHandles);
-            unlisten(SLIDE_EVENTS.KEYDOWN, complete);
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'movePoint');
+            unlisten(SLIDE_EVENTS.MOUSEDOWN, 'setPoint');
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'moveHandles');
+            unlisten(SLIDE_EVENTS.MOUSEUP, 'setHandles');
+            unlisten(SLIDE_EVENTS.KEYDOWN, 'complete');
 
             store.mutations.setActiveTool(PointerTool());
         }
@@ -62,7 +62,7 @@ export default (store: AppStore): EditorTool => {
 
     return {
         name: TOOL_NAMES.CURVE,
-        mount: () => listenOnce(SLIDE_EVENTS.MOUSEDOWN, make),
-        unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, make)
+        mount: () => listenOnce(SLIDE_EVENTS.MOUSEDOWN, 'make', make),
+        unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, 'make')
     };
 };

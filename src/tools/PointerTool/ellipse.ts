@@ -1,5 +1,5 @@
 import { EllipseMouseEvent, ELLIPSE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { listen, listenOnce, unlisten } from '@/events';
 import { EllipseMutator } from '@/rendering/mutators';
 import { resolvePosition } from '../utilities';
 
@@ -14,8 +14,8 @@ export function moveEllipse(event: EllipseMouseEvent): void {
     slide.cursor = 'move';
     slide.cursorLock = true;
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
 
     function move(event: SlideMouseEvent): void {
         moveListener(event);
@@ -27,8 +27,8 @@ export function moveEllipse(event: EllipseMouseEvent): void {
         slide.broadcastSetGraphic(mutator.target);
         slide.cursorLock = false;
         slide.unrenderAllSnapVectors();
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
+        listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, 'moveEllipse', moveEllipse);
     }
 }
 
@@ -41,7 +41,7 @@ export function hoverEllipse(event: EllipseMouseEvent): void {
 
     slide.markGraphic(target.id);
 
-    listenOnce(ELLIPSE_EVENTS.MOUSEOUT, unmark);
+    listenOnce(ELLIPSE_EVENTS.MOUSEOUT, 'unmark', unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.id);
     }

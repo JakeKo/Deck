@@ -1,4 +1,4 @@
-import { decorateRotateEvents } from '@/events/decorators/rotators';
+import { decorateRotatorEvents } from '@/events/decorators';
 import { radToDeg } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import SVG from 'svg.js';
@@ -71,7 +71,7 @@ class RotatorRenderer implements IRotatorRenderer {
             .translate(this._center.x - this._width * this._scale / 2, this._center.y - this._height * this._scale / 2)
             .fill(this._fillColor)
             .rotate((this._baseRotation + radToDeg(this._rotation)) % 360);
-        decorateRotateEvents(this._svg, this._slide, this);
+        decorateRotatorEvents(this._svg, this._slide, this);
     }
 
     public unrender(): void {

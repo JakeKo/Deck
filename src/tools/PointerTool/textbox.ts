@@ -1,5 +1,5 @@
 import { SlideMouseEvent, SLIDE_EVENTS, TextboxMouseEvent, TEXTBOX_EVENTS } from '@/events/types';
-import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { listen, listenOnce, unlisten } from '@/events';
 import { TextboxMutator } from '@/rendering/mutators';
 import { resolvePosition } from '../utilities';
 
@@ -14,8 +14,8 @@ export function moveTextbox(event: TextboxMouseEvent): void {
     slide.cursor = 'move';
     slide.cursorLock = true;
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
 
     function move(event: SlideMouseEvent): void {
         moveListener(event);
@@ -27,8 +27,8 @@ export function moveTextbox(event: TextboxMouseEvent): void {
         slide.broadcastSetGraphic(mutator.target);
         slide.cursorLock = false;
         slide.unrenderAllSnapVectors();
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, moveTextbox);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
+        listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, 'moveTextbox', moveTextbox);
     }
 }
 
@@ -41,7 +41,7 @@ export function hoverTextbox(event: TextboxMouseEvent): void {
 
     slide.markGraphic(target.id);
 
-    listenOnce(TEXTBOX_EVENTS.MOUSEOUT, unmark);
+    listenOnce(TEXTBOX_EVENTS.MOUSEOUT, 'unmark', unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.id);
     }

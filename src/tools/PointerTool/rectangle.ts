@@ -1,5 +1,5 @@
 import { RectangleMouseEvent, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { listen, listenOnce, unlisten } from '@/events';
 import { RectangleMutator } from '@/rendering/mutators';
 import { resolvePosition } from '../utilities';
 
@@ -14,8 +14,8 @@ export function moveRectangle(event: RectangleMouseEvent): void {
     slide.cursor = 'move';
     slide.cursorLock = true;
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
 
     function move(event: SlideMouseEvent): void {
         moveListener(event);
@@ -27,8 +27,8 @@ export function moveRectangle(event: RectangleMouseEvent): void {
         slide.broadcastSetGraphic(mutator.target);
         slide.cursorLock = false;
         slide.unrenderAllSnapVectors();
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
+        listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, 'moveRectangle', moveRectangle);
     }
 }
 
@@ -42,7 +42,7 @@ export function hoverRectangle(event: RectangleMouseEvent): void {
 
     slide.markGraphic(target.id);
 
-    listenOnce(RECTANGLE_EVENTS.MOUSEOUT, unmark);
+    listenOnce(RECTANGLE_EVENTS.MOUSEOUT, 'unmark', unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.id);
     }

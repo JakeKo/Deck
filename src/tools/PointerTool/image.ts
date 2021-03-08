@@ -1,5 +1,5 @@
 import { ImageMouseEvent, IMAGE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { listen, listenOnce, unlisten } from '@/events';
 import { ImageMutator } from '@/rendering/mutators';
 import { resolvePosition } from '../utilities';
 
@@ -14,8 +14,8 @@ export function moveImage(event: ImageMouseEvent): void {
     slide.cursor = 'move';
     slide.cursorLock = true;
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
 
     function move(event: SlideMouseEvent): void {
         moveListener(event);
@@ -27,8 +27,8 @@ export function moveImage(event: ImageMouseEvent): void {
         slide.broadcastSetGraphic(mutator.target);
         slide.cursorLock = false;
         slide.unrenderAllSnapVectors();
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(IMAGE_EVENTS.MOUSEDOWN, moveImage);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
+        listenOnce(IMAGE_EVENTS.MOUSEDOWN, 'moveImage', moveImage);
     }
 }
 
@@ -41,7 +41,7 @@ export function hoverImage(event: ImageMouseEvent): void {
 
     slide.markGraphic(target.id);
 
-    listenOnce(IMAGE_EVENTS.MOUSEOUT, unmark);
+    listenOnce(IMAGE_EVENTS.MOUSEOUT, 'unmark', unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.id);
     }

@@ -1,11 +1,14 @@
+import { listen } from '@/events';
 import { decorateSlideEvents } from '@/events/decorators';
 import { SlideKeyboardEvent, SlideZoomEvent, SLIDE_EVENTS } from '@/events/types';
-import { listen } from '@/events/utilities';
 import { GraphicStoreModel, Viewbox } from '@/store/types';
+import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
 import SlideStateManager from '@/utilities/SlideStateManager';
+import SnapVector from '@/utilities/SnapVector';
 import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { CanvasRenderer } from './helpers';
+import SnapVectorRenderer from './helpers/SnapVectorRenderer';
 import {
     CurveMaker,
     EllipseMaker,
@@ -44,9 +47,6 @@ import {
     ITextboxMaker,
     IVideoMaker
 } from './types';
-import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
-import SnapVector from '@/utilities/SnapVector';
-import SnapVectorRenderer from './helpers/SnapVectorRenderer';
 
 const { CURVE, ELLIPSE, IMAGE, RECTANGLE, TEXTBOX, VIDEO } = GRAPHIC_TYPES;
 
@@ -101,8 +101,8 @@ class SlideRenderer implements ISlideRenderer {
             : {};
         Object.values(this._graphics).forEach(graphic => graphic.render());
 
-        listen(SLIDE_EVENTS.ZOOM, (event: SlideZoomEvent): void => this._setZoom(event.detail.zoom));
-        listen(SLIDE_EVENTS.KEYDOWN, (event: SlideKeyboardEvent): void => {
+        listen(SLIDE_EVENTS.ZOOM, 'onSlideZoom', (event: SlideZoomEvent): void => this._setZoom(event.detail.zoom));
+        listen(SLIDE_EVENTS.KEYDOWN, 'onSlideKeydown', (event: SlideKeyboardEvent): void => {
             if (['Backspace', 'Delete'].indexOf(event.detail.baseEvent.key) !== -1) {
                 this.removeGraphics(Object.keys(this._focusedGraphics));
             }

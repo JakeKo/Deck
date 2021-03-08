@@ -1,40 +1,36 @@
 import { IEllipseRenderer, ISlideRenderer } from '@/rendering/types';
 import SVG from 'svg.js';
-import { EllipseMouseEvent, EllipseMouseEventPayload, ELLIPSE_EVENTS, SLIDE_EVENTS } from '../types';
-import { dispatch, makeSlideMouseEvent } from '../utilities';
+import { dispatch } from '..';
+import { EllipseMouseEventPayload, ELLIPSE_EVENTS, SlideMouseEventPayload, SLIDE_EVENTS } from '../types';
 
-function makeEllipseMouseEvent(name: ELLIPSE_EVENTS, slide: ISlideRenderer, target: IEllipseRenderer, baseEvent: MouseEvent): EllipseMouseEvent {
-    return new CustomEvent<EllipseMouseEventPayload>(name, { detail: { type: name, slide, target, baseEvent } });
-}
-
-export function decorateEllipseEvents(svg: SVG.Element, slide: ISlideRenderer, graphic: IEllipseRenderer) {
+export function decorateEllipseEvents(svg: SVG.Element, slide: ISlideRenderer, target: IEllipseRenderer) {
     svg.node.addEventListener('mouseup', baseEvent => {
         baseEvent.stopPropagation();
-        dispatch(makeEllipseMouseEvent(ELLIPSE_EVENTS.MOUSEUP, slide, graphic, baseEvent));
-        dispatch(makeSlideMouseEvent(SLIDE_EVENTS.MOUSEUP, slide, graphic, baseEvent));
+        dispatch<EllipseMouseEventPayload>(ELLIPSE_EVENTS.MOUSEUP, { type: ELLIPSE_EVENTS.MOUSEUP, slide, target, baseEvent });
+        dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEUP, { type: SLIDE_EVENTS.MOUSEUP, slide, target, baseEvent });
     });
 
     svg.node.addEventListener('mousedown', baseEvent => {
         baseEvent.stopPropagation();
-        dispatch(makeEllipseMouseEvent(ELLIPSE_EVENTS.MOUSEDOWN, slide, graphic, baseEvent));
-        dispatch(makeSlideMouseEvent(SLIDE_EVENTS.MOUSEDOWN, slide, graphic, baseEvent));
+        dispatch<EllipseMouseEventPayload>(ELLIPSE_EVENTS.MOUSEDOWN, { type: ELLIPSE_EVENTS.MOUSEDOWN, slide, target, baseEvent });
+        dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEDOWN, { type: SLIDE_EVENTS.MOUSEDOWN, slide, target, baseEvent });
     });
 
     svg.node.addEventListener('mouseover', baseEvent => {
         baseEvent.stopPropagation();
-        dispatch(makeEllipseMouseEvent(ELLIPSE_EVENTS.MOUSEOVER, slide, graphic, baseEvent));
-        dispatch(makeSlideMouseEvent(SLIDE_EVENTS.MOUSEOVER, slide, graphic, baseEvent));
+        dispatch<EllipseMouseEventPayload>(ELLIPSE_EVENTS.MOUSEOVER, { type: ELLIPSE_EVENTS.MOUSEOVER, slide, target, baseEvent });
+        dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOVER, { type: SLIDE_EVENTS.MOUSEOVER, slide, target, baseEvent });
     });
 
     svg.node.addEventListener('mouseleave', baseEvent => {
         baseEvent.stopPropagation();
-        dispatch(makeEllipseMouseEvent(ELLIPSE_EVENTS.MOUSEOUT, slide, graphic, baseEvent));
-        dispatch(makeSlideMouseEvent(SLIDE_EVENTS.MOUSEOUT, slide, graphic, baseEvent));
+        dispatch<EllipseMouseEventPayload>(ELLIPSE_EVENTS.MOUSEOUT, { type: ELLIPSE_EVENTS.MOUSEOUT, slide, target, baseEvent });
+        dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEOUT, { type: SLIDE_EVENTS.MOUSEOUT, slide, target, baseEvent });
     });
 
     svg.node.addEventListener('mousemove', baseEvent => {
         baseEvent.stopPropagation();
-        dispatch(makeEllipseMouseEvent(ELLIPSE_EVENTS.MOUSEMOVE, slide, graphic, baseEvent));
-        dispatch(makeSlideMouseEvent(SLIDE_EVENTS.MOUSEMOVE, slide, graphic, baseEvent));
+        dispatch<EllipseMouseEventPayload>(ELLIPSE_EVENTS.MOUSEMOVE, { type: ELLIPSE_EVENTS.MOUSEMOVE, slide, target, baseEvent });
+        dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, { type: SLIDE_EVENTS.MOUSEMOVE, slide, target, baseEvent });
     });
 }

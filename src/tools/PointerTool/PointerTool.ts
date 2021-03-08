@@ -1,3 +1,4 @@
+import { dispatch, listen, listenOnce, unlisten } from '@/events';
 import {
     CurveAnchorMouseEvent,
     CURVE_ANCHOR_EVENTS,
@@ -16,7 +17,6 @@ import {
     VERTEX_EVENTS,
     VIDEO_EVENTS
 } from '@/events/types';
-import { dispatch, listen, listenOnce, unlisten } from '@/events/utilities';
 import { GRAPHIC_TYPES } from '@/rendering/types';
 import { EditorTool, TOOL_NAMES } from '../types';
 import { hoverCurve, moveCurve, moveCurveAnchor } from './curve';
@@ -30,48 +30,48 @@ export default (): EditorTool => {
     return {
         name: TOOL_NAMES.POINTER,
         mount: () => {
-            listenOnce(CURVE_EVENTS.MOUSEDOWN, moveCurve);
-            listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, moveAnchor);
-            listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);
-            listenOnce(IMAGE_EVENTS.MOUSEDOWN, moveImage);
-            listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
-            listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, moveTextbox);
-            listenOnce(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
+            listenOnce(CURVE_EVENTS.MOUSEDOWN, 'moveCurve', moveCurve);
+            listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'moveAnchor', moveAnchor);
+            listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, 'moveEllipse', moveEllipse);
+            listenOnce(IMAGE_EVENTS.MOUSEDOWN, 'moveImage', moveImage);
+            listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, 'moveRectangle', moveRectangle);
+            listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, 'moveTextbox', moveTextbox);
+            listenOnce(VIDEO_EVENTS.MOUSEDOWN, 'moveVideo', moveVideo);
 
-            listen(CURVE_EVENTS.MOUSEOVER, hoverCurve);
-            listen(ELLIPSE_EVENTS.MOUSEOVER, hoverEllipse);
-            listen(IMAGE_EVENTS.MOUSEOVER, hoverImage);
-            listen(RECTANGLE_EVENTS.MOUSEOVER, hoverRectangle);
-            listen(TEXTBOX_EVENTS.MOUSEOVER, hoverTextbox);
-            listen(VIDEO_EVENTS.MOUSEOVER, hoverVideo);
+            listen(CURVE_EVENTS.MOUSEOVER, 'hoverCurve', hoverCurve);
+            listen(ELLIPSE_EVENTS.MOUSEOVER, 'hoverEllipse', hoverEllipse);
+            listen(IMAGE_EVENTS.MOUSEOVER, 'hoverImage', hoverImage);
+            listen(RECTANGLE_EVENTS.MOUSEOVER, 'hoverRectangle', hoverRectangle);
+            listen(TEXTBOX_EVENTS.MOUSEOVER, 'hoverTextbox', hoverTextbox);
+            listen(VIDEO_EVENTS.MOUSEOVER, 'hoverVideo', hoverVideo);
 
-            listen(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
-            listen(ROTATOR_EVENTS.MOUSEDOWN, rotateGraphic);
+            listen(VERTEX_EVENTS.MOUSEDOWN, 'moveVertex', moveVertex);
+            listen(ROTATOR_EVENTS.MOUSEDOWN, 'rotateGraphic', rotateGraphic);
 
-            listen(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
-            listen(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
+            listen(SLIDE_EVENTS.MOUSEDOWN, 'reevaluateFocusedGraphics', reevaluateFocusedGraphics);
+            listen(SLIDE_EVENTS.MOUSEMOVE, 'reevaluateCursor', reevaluateCursor);
         },
         unmount: () => {
-            unlisten(CURVE_EVENTS.MOUSEDOWN, moveCurve);
-            unlisten(CURVE_ANCHOR_EVENTS.MOUSEDOWN, moveAnchor);
-            unlisten(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);
-            unlisten(IMAGE_EVENTS.MOUSEDOWN, moveImage);
-            unlisten(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
-            unlisten(TEXTBOX_EVENTS.MOUSEDOWN, moveTextbox);
-            unlisten(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
+            unlisten(CURVE_EVENTS.MOUSEDOWN, 'moveCurve');
+            unlisten(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'moveAnchor');
+            unlisten(ELLIPSE_EVENTS.MOUSEDOWN, 'moveEllipse');
+            unlisten(IMAGE_EVENTS.MOUSEDOWN, 'moveImage');
+            unlisten(RECTANGLE_EVENTS.MOUSEDOWN, 'moveRectangle');
+            unlisten(TEXTBOX_EVENTS.MOUSEDOWN, 'moveTextbox');
+            unlisten(VIDEO_EVENTS.MOUSEDOWN, 'moveVideo');
 
-            unlisten(CURVE_EVENTS.MOUSEOVER, hoverCurve);
-            unlisten(ELLIPSE_EVENTS.MOUSEOVER, hoverEllipse);
-            unlisten(IMAGE_EVENTS.MOUSEOVER, hoverImage);
-            unlisten(RECTANGLE_EVENTS.MOUSEOVER, hoverRectangle);
-            unlisten(TEXTBOX_EVENTS.MOUSEOVER, hoverTextbox);
-            unlisten(VIDEO_EVENTS.MOUSEOVER, hoverVideo);
+            unlisten(CURVE_EVENTS.MOUSEOVER, 'hoverCurve');
+            unlisten(ELLIPSE_EVENTS.MOUSEOVER, 'hoverEllipse');
+            unlisten(IMAGE_EVENTS.MOUSEOVER, 'hoverImage');
+            unlisten(RECTANGLE_EVENTS.MOUSEOVER, 'hoverRectangle');
+            unlisten(TEXTBOX_EVENTS.MOUSEOVER, 'hoverTextbox');
+            unlisten(VIDEO_EVENTS.MOUSEOVER, 'hoverVideo');
 
-            unlisten(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
-            unlisten(ROTATOR_EVENTS.MOUSEDOWN, rotateGraphic);
+            unlisten(VERTEX_EVENTS.MOUSEDOWN, 'moveVertex');
+            unlisten(ROTATOR_EVENTS.MOUSEDOWN, 'rotateGraphic');
 
-            unlisten(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
+            unlisten(SLIDE_EVENTS.MOUSEDOWN, 'reevaluateFocusedGraphics');
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'reevaluateCursor');
         }
     };
 };
@@ -102,20 +102,20 @@ function reevaluateCursor(event: SlideMouseEvent): void {
 }
 
 function moveVertex(event: VertexMouseEvent): void {
-    const { slide, graphic } = event.detail;
-    const mutator = slide.focusGraphic(graphic.parent.id);
+    const { slide, target } = event.detail;
+    const mutator = slide.focusGraphic(target.parent.id);
 
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
     let lastMouseEvent: VertexMouseEvent | SlideMouseEvent = event;
-    const vertexListener = mutator.vertexListener(graphic.role);
+    const vertexListener = mutator.vertexListener(target.role);
     slide.cursor = 'grabbing';
     slide.cursorLock = true;
 
-    listen(SLIDE_EVENTS.KEYDOWN, keyDownHandler);
-    listen(SLIDE_EVENTS.KEYUP, keyUpHandler);
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.KEYDOWN, 'keyDownHandler', keyDownHandler);
+    listen(SLIDE_EVENTS.KEYUP, 'keyUpHandler', keyUpHandler);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
 
     // When Shift, Ctrl, or Alt are pressed or unpressed, simulate a mousemove event
     // This allows the renderer to immediately adjust the shape dimensions if need be
@@ -133,17 +133,12 @@ function moveVertex(event: VertexMouseEvent): void {
             altKey: baseEvent.key === 'Alt' || lastMouseEvent.detail.baseEvent.altKey
         });
 
-        dispatch(new CustomEvent<SlideMouseEventPayload>(
-            SLIDE_EVENTS.MOUSEMOVE,
-            {
-                detail: {
-                    type: SLIDE_EVENTS.MOUSEMOVE,
-                    slide: lastMouseEvent.detail.slide,
-                    baseEvent: mouseEvent,
-                    target: undefined
-                }
-            }
-        ));
+        dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, {
+            type: SLIDE_EVENTS.MOUSEMOVE,
+            slide: lastMouseEvent.detail.slide,
+            baseEvent: mouseEvent,
+            target: undefined
+        });
     }
 
     function keyUpHandler(event: SlideKeyboardEvent): void {
@@ -160,17 +155,12 @@ function moveVertex(event: VertexMouseEvent): void {
             altKey: baseEvent.key !== 'Alt' && lastMouseEvent.detail.baseEvent.altKey
         });
 
-        dispatch(new CustomEvent<SlideMouseEventPayload>(
-            SLIDE_EVENTS.MOUSEMOVE,
-            {
-                detail: {
-                    type: SLIDE_EVENTS.MOUSEMOVE,
-                    slide: lastMouseEvent.detail.slide,
-                    baseEvent: mouseEvent,
-                    target: undefined
-                }
-            }
-        ));
+        dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, {
+            type: SLIDE_EVENTS.MOUSEMOVE,
+            slide: lastMouseEvent.detail.slide,
+            baseEvent: mouseEvent,
+            target: undefined
+        });
     }
 
     function move(event: SlideMouseEvent): void {
@@ -186,9 +176,9 @@ function moveVertex(event: VertexMouseEvent): void {
         slide.cursorLock = false;
         slide.cursor = 'grab';
 
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        unlisten(SLIDE_EVENTS.KEYDOWN, keyDownHandler);
-        unlisten(SLIDE_EVENTS.KEYUP, keyUpHandler);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
+        unlisten(SLIDE_EVENTS.KEYDOWN, 'keyDownHandler');
+        unlisten(SLIDE_EVENTS.KEYUP, 'keyUpHandler');
     }
 }
 
@@ -202,8 +192,8 @@ function rotateGraphic(event: RotatorMouseEvent): void {
     slide.cursor = 'grabbing';
     slide.cursorLock = true;
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, rotate);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'rotate', rotate);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
 
     function rotate(event: SlideMouseEvent): void {
         rotateListener(event);
@@ -217,7 +207,7 @@ function rotateGraphic(event: RotatorMouseEvent): void {
         slide.cursorLock = false;
         slide.cursor = 'grab';
 
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, rotate);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'rotate');
     }
 }
 
