@@ -1,5 +1,6 @@
 import {
     CURVE_ANCHOR_ROLES,
+    GRAPHIC_TYPES,
     ICurveRenderer,
     IEllipseRenderer,
     IGraphicRenderer,
@@ -11,6 +12,7 @@ import {
     IVertexRenderer,
     IVideoRenderer
 } from '@/rendering/types';
+import { CurveSerialized, EllipseSerialized, ImageSerialized, RectangleSerialized, TextboxSerialized, VideoSerialized } from '@/types';
 
 export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
 type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
@@ -73,6 +75,27 @@ export type CurveMouseEventPayload = {
     target: ICurveRenderer;
 };
 
+export type CurveCreated = CustomEvent<CurveCreatedPayload>;
+export type CurveCreatedPayload = {
+    slideId: string;
+    props: CurveSerialized;
+};
+
+export type CurveUpdated = CustomEvent<CurveUpdatedPayload>;
+export type CurveUpdatedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.CURVE;
+    props: Partial<Pick<CurveSerialized, 'points' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+};
+
+export type CurveDeleted = CustomEvent<CurveDeletedPayload>;
+export type CurveDeletedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.CURVE;
+};
+
 // CURVE ANCHOR EVENTS
 export enum CURVE_ANCHOR_EVENTS {
     MOUSEUP = 'deck-curve-anchor-mouseup',
@@ -109,6 +132,27 @@ export type EllipseMouseEventPayload = {
     target: IEllipseRenderer;
 };
 
+export type EllipseCreated = CustomEvent<EllipseCreatedPayload>;
+export type EllipseCreatedPayload = {
+    slideId: string;
+    props: EllipseSerialized;
+};
+
+export type EllipseUpdated = CustomEvent<EllipseUpdatedPayload>;
+export type EllipseUpdatedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.ELLIPSE;
+    props: Partial<Pick<EllipseSerialized, 'center' | 'dimensions' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+};
+
+export type EllipseDeleted = CustomEvent<EllipseDeletedPayload>;
+export type EllipseDeletedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.ELLIPSE;
+};
+
 // IMAGE EVENTS
 export enum IMAGE_EVENTS {
     MOUSEUP = 'deck-image-mouseup',
@@ -126,6 +170,27 @@ export type ImageMouseEventPayload = {
     target: IImageRenderer;
 };
 
+export type ImageCreated = CustomEvent<ImageCreatedPayload>;
+export type ImageCreatedPayload = {
+    slideId: string;
+    props: ImageSerialized;
+};
+
+export type ImageUpdated = CustomEvent<ImageUpdatedPayload>;
+export type ImageUpdatedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.IMAGE;
+    props: Partial<Pick<ImageSerialized, 'source' | 'origin' | 'dimensions' | 'rotation'>>;
+};
+
+export type ImageDeleted = CustomEvent<ImageDeletedPayload>;
+export type ImageDeletedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.IMAGE;
+};
+
 // RECTANGLE EVENTS
 export enum RECTANGLE_EVENTS {
     MOUSEUP = 'deck-rectangle-mouseup',
@@ -141,6 +206,27 @@ export type RectangleMouseEventPayload = {
     slide: ISlideRenderer;
     type: RECTANGLE_EVENTS;
     target: IRectangleRenderer;
+};
+
+export type RectangleCreated = CustomEvent<RectangleCreatedPayload>;
+export type RectangleCreatedPayload = {
+    slideId: string;
+    props: RectangleSerialized;
+};
+
+export type RectangleUpdated = CustomEvent<RectangleUpdatedPayload>;
+export type RectangleUpdatedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.RECTANGLE;
+    props: Partial<Pick<RectangleSerialized, 'origin' | 'dimensions' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+};
+
+export type RectangleDeleted = CustomEvent<RectangleDeletedPayload>;
+export type RectangleDeletedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.RECTANGLE;
 };
 
 // ROTATOR EVENTS
@@ -177,6 +263,27 @@ export type TextboxMouseEventPayload = {
     target: ITextboxRenderer;
 };
 
+export type TextboxCreated = CustomEvent<TextboxCreatedPayload>;
+export type TextboxCreatedPayload = {
+    slideId: string;
+    props: TextboxSerialized;
+};
+
+export type TextboxUpdated = CustomEvent<TextboxUpdatedPayload>;
+export type TextboxUpdatedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.TEXTBOX;
+    props: Partial<Pick<TextboxSerialized, 'origin' | 'dimensions' | 'text' | 'size' | 'weight' | 'font' | 'rotation'>>;
+};
+
+export type TextboxDeleted = CustomEvent<TextboxDeletedPayload>;
+export type TextboxDeletedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.TEXTBOX;
+};
+
 // VIDEO EVENTS
 export enum VIDEO_EVENTS {
     MOUSEUP = 'deck-video-mouseup',
@@ -192,6 +299,27 @@ export type VideoMouseEventPayload = {
     slide: ISlideRenderer;
     type: VIDEO_EVENTS;
     target: IVideoRenderer;
+};
+
+export type VideoCreated = CustomEvent<VideoCreatedPayload>;
+export type VideoCreatedPayload = {
+    slideId: string;
+    props: VideoSerialized;
+};
+
+export type VideoUpdated = CustomEvent<VideoUpdatedPayload>;
+export type VideoUpdatedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.VIDEO;
+    props: Partial<Pick<VideoSerialized, 'origin' | 'dimensions' | 'source' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+};
+
+export type VideoDeleted = CustomEvent<VideoDeletedPayload>;
+export type VideoDeletedPayload = {
+    slideId: string;
+    graphicId: string;
+    type: GRAPHIC_TYPES.VIDEO;
 };
 
 // VERTEX EVENTS
