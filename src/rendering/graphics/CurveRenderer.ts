@@ -1,4 +1,5 @@
 import { decorateCurveEvents } from '@/events/decorators';
+import { CurveMutableSerialized } from '@/types';
 import SnapVector from '@/utilities/SnapVector';
 import { radToDeg } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
@@ -185,6 +186,36 @@ class CurveRenderer implements ICurveRenderer {
     public removeAnchor(index: number): void {
         this._anchors.splice(index, 1);
         this._svg && this._svg.rotate(0).plot(this._getFormattedPoints()).rotate(radToDeg(this._rotation));
+    }
+
+    /**
+     * Updates the graphic with the new provided properties and updates the rendering if necessary.
+     */
+    public setProps({ anchors, fillColor, strokeColor, strokeWidth, rotation }: CurveMutableSerialized): void {
+        if (anchors !== undefined) {
+            this._anchors = anchors.map(({ inHandle, point, outHandle }) => ({
+                inHandle: new V(inHandle.x, inHandle.y),
+                point: new V(point.x, point.y),
+                outHandle: new V(outHandle.x, outHandle.y)
+            }));
+            this._svg && this._svg.rotate(0).plot(this._getFormattedPoints()).rotate(radToDeg(this._rotation));
+        }
+
+        if (fillColor !== undefined) {
+            this._fillColor = fillColor;
+            this._svg && this._svg.fill(this._fillColor);
+        }
+
+        if (strokeColor !== undefined || strokeWidth !== undefined) {
+            this._strokeColor = strokeColor === undefined ? this._strokeColor : strokeColor;
+            this._strokeWidth = strokeWidth === undefined ? this._strokeWidth : strokeWidth;
+            this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        }
+
+        if (rotation !== undefined) {
+            this._rotation = rotation;
+            this._svg && this._svg.rotate(radToDeg(this._rotation));
+        }
     }
 
     public render(): void {

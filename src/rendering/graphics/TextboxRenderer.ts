@@ -1,4 +1,5 @@
 import { decorateTextboxEvents } from '@/events/decorators';
+import { TextboxMutableSerialized } from '@/types';
 import SnapVector from '@/utilities/SnapVector';
 import { radToDeg } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
@@ -216,6 +217,52 @@ class TextboxRenderer implements ITextboxRenderer {
             this._svg.style.transformOrigin = `${this._origin.x + this._dimensions.x / 2}px ${this._origin.y + this._dimensions.y / 2}px`;
             this._svg.style.width = `${this._dimensions.x}px`;
             this._svg.style.height = `${this._dimensions.y}px`;
+        }
+    }
+
+    /**
+     * Updates the graphic with the new provided properties and updates the rendering if necessary.
+     */
+    public setProps({ origin, dimensions, text, size, weight, font, rotation }: TextboxMutableSerialized): void {
+        if (origin !== undefined) {
+            this.origin = new V(origin.x, origin.y);
+            if (this._svg) {
+                this._svg.setAttribute('x', `${this._origin.x}px`);
+                this._svg.setAttribute('y', `${this._origin.y}px`);
+                this._svg.style.transformOrigin = `${this._origin.x + this._dimensions.x / 2}px ${this._origin.y + this._dimensions.y / 2}px`;
+            }
+        }
+
+        if (dimensions !== undefined) {
+            this._dimensions = new V(dimensions.x, dimensions.y);
+            if (this._svg) {
+                this._svg.style.width = `${this._dimensions.x}px`;
+                this._svg.style.height = `${this._dimensions.y}px`;
+            }
+        }
+
+        if (text !== undefined) {
+            this._text = text;
+            if (this._textbox) {
+                this._textbox.innerHTML = this._text;
+            }
+        }
+
+        if (size !== undefined || weight !== undefined || font !== undefined) {
+            this._fontSize = size === undefined ? this._fontSize : size;
+            this._fontWeight = weight === undefined ? this._fontWeight : weight;
+            this._typeface = font === undefined ? this._typeface : font;
+            if (this._textbox) {
+                this._textbox.style.font = `${this._fontSize}px ${this._typeface}`;
+                this._textbox.style.fontWeight = this._fontWeight;
+            }
+        }
+
+        if (rotation !== undefined) {
+            this._rotation = rotation;
+            if (this._svg) {
+                this._svg.style.transform = `rotate(${radToDeg(this._rotation)}deg)`;
+            }
         }
     }
 

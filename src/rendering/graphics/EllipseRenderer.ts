@@ -1,4 +1,5 @@
 import { decorateEllipseEvents } from '@/events/decorators';
+import { EllipseMutableSerialized } from '@/types';
 import SnapVector from '@/utilities/SnapVector';
 import { radToDeg } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
@@ -188,6 +189,37 @@ class EllipseRenderer implements IEllipseRenderer {
             .center(this._center.x, this._center.y)
             .size(this._dimensions.x, this._dimensions.y)
             .rotate(radToDeg(this._rotation));
+    }
+
+    /**
+     * Updates the graphic with the new provided properties and updates the rendering if necessary.
+     */
+    public setProps({ center, dimensions, fillColor, strokeColor, strokeWidth, rotation }: EllipseMutableSerialized): void {
+        if (center !== undefined) {
+            this._center = new V(center.x, center.y);
+            this._svg && this._svg.rotate(0).center(this._center.x, this._center.y).rotate(radToDeg(this._rotation));
+        }
+
+        if (dimensions !== undefined) {
+            this._dimensions = new V(dimensions.x, dimensions.y);
+            this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
+        }
+
+        if (fillColor !== undefined) {
+            this._fillColor = fillColor;
+            this._svg && this._svg.fill(this._fillColor);
+        }
+
+        if (strokeColor !== undefined || strokeWidth !== undefined) {
+            this._strokeColor = strokeColor === undefined ? this._strokeColor : strokeColor;
+            this._strokeWidth = strokeWidth === undefined ? this._strokeWidth : strokeWidth;
+            this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        }
+
+        if (rotation !== undefined) {
+            this._rotation = rotation;
+            this._svg && this._svg.rotate(radToDeg(this._rotation));
+        }
     }
 
     public render(): void {

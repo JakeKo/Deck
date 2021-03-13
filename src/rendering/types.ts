@@ -1,6 +1,13 @@
 import { SlideMouseEvent } from '@/events/types';
 import { Viewbox } from '@/store/types';
-import { CurveMutableSerialized, EllipseMutableSerialized, ImageMutableSerialized, RectangleMutableSerialized, TextboxMutableSerialized, VideoMutableSerialized } from '@/types';
+import {
+    CurveMutableSerialized,
+    EllipseMutableSerialized,
+    ImageMutableSerialized,
+    RectangleMutableSerialized,
+    TextboxMutableSerialized,
+    VideoMutableSerialized
+} from '@/types';
 import SnapVector from '@/utilities/SnapVector';
 import V from '@/utilities/Vector';
 import SVG from 'svg.js';
@@ -35,6 +42,7 @@ export type ICurveRenderer = BaseGraphicRenderer & {
     setAnchor: (index: number, anchor: CurveAnchor) => void;
     addAnchor: (anchor: CurveAnchor) => number;
     removeAnchor: (index: number) => void;
+    setProps: (props: CurveMutableSerialized) => void;
 };
 
 export type IEllipseRenderer = BaseGraphicRenderer & {
@@ -45,6 +53,7 @@ export type IEllipseRenderer = BaseGraphicRenderer & {
     strokeColor: string;
     strokeWidth: number;
     setCenterAndDimensions: (center: V, dimensions: V) => void;
+    setProps: (props: EllipseMutableSerialized) => void;
 };
 
 export type IImageRenderer = BaseGraphicRenderer & {
@@ -53,6 +62,7 @@ export type IImageRenderer = BaseGraphicRenderer & {
     origin: V;
     dimensions: V;
     setOriginAndDimensions: (origin: V, dimensions: V) => void;
+    setProps: (props: ImageMutableSerialized) => void;
 };
 
 export type IRectangleRenderer = BaseGraphicRenderer & {
@@ -63,6 +73,7 @@ export type IRectangleRenderer = BaseGraphicRenderer & {
     strokeColor: string;
     strokeWidth: number;
     setOriginAndDimensions: (origin: V, dimensions: V) => void;
+    setProps: (props: RectangleMutableSerialized) => void;
 };
 
 export type ITextboxRenderer = BaseGraphicRenderer & {
@@ -74,6 +85,7 @@ export type ITextboxRenderer = BaseGraphicRenderer & {
     fontWeight: string;
     typeface: string;
     setOriginAndDimensions: (origin: V, dimensions: V) => void;
+    setProps: (props: TextboxMutableSerialized) => void;
 };
 
 export type IVideoRenderer = BaseGraphicRenderer & {
@@ -84,6 +96,7 @@ export type IVideoRenderer = BaseGraphicRenderer & {
     strokeColor: string;
     strokeWidth: number;
     setOriginAndDimensions: (origin: V, dimensions: V) => void;
+    setProps: (props: VideoMutableSerialized) => void;
 };
 
 export type IHelperRenderer = IBoxRenderer
