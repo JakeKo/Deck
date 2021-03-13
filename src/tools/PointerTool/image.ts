@@ -10,7 +10,7 @@ export function moveImage(event: ImageMouseEvent): void {
     }
 
     const mutator = slide.focusGraphic(target.id) as ImageMutator;
-    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide), slide.getSnapVectors([target.id]));
+    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide));
     slide.cursor = 'move';
     slide.cursorLock = true;
 

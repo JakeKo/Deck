@@ -12,7 +12,7 @@ import {
     IVertexRenderer,
     IVideoRenderer
 } from '@/rendering/types';
-import { CurveSerialized, EllipseSerialized, ImageSerialized, RectangleSerialized, TextboxSerialized, VideoSerialized } from '@/types';
+import { CurveMutableSerialized, CurveSerialized, EllipseMutableSerialized, EllipseSerialized, ImageMutableSerialized, ImageSerialized, RectangleMutableSerialized, RectangleSerialized, TextboxMutableSerialized, TextboxSerialized, VideoMutableSerialized, VideoSerialized } from '@/types';
 
 export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
 type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
@@ -86,7 +86,7 @@ export type CurveUpdatedPayload = {
     slideId: string;
     graphicId: string;
     type: GRAPHIC_TYPES.CURVE;
-    props: Partial<Pick<CurveSerialized, 'points' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+    props: CurveMutableSerialized;
 };
 
 export type CurveDeleted = CustomEvent<CurveDeletedPayload>;
@@ -143,7 +143,7 @@ export type EllipseUpdatedPayload = {
     slideId: string;
     graphicId: string;
     type: GRAPHIC_TYPES.ELLIPSE;
-    props: Partial<Pick<EllipseSerialized, 'center' | 'dimensions' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+    props: EllipseMutableSerialized;
 };
 
 export type EllipseDeleted = CustomEvent<EllipseDeletedPayload>;
@@ -181,7 +181,7 @@ export type ImageUpdatedPayload = {
     slideId: string;
     graphicId: string;
     type: GRAPHIC_TYPES.IMAGE;
-    props: Partial<Pick<ImageSerialized, 'source' | 'origin' | 'dimensions' | 'rotation'>>;
+    props: ImageMutableSerialized;
 };
 
 export type ImageDeleted = CustomEvent<ImageDeletedPayload>;
@@ -219,7 +219,7 @@ export type RectangleUpdatedPayload = {
     slideId: string;
     graphicId: string;
     type: GRAPHIC_TYPES.RECTANGLE;
-    props: Partial<Pick<RectangleSerialized, 'origin' | 'dimensions' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+    props: RectangleMutableSerialized;
 };
 
 export type RectangleDeleted = CustomEvent<RectangleDeletedPayload>;
@@ -274,7 +274,7 @@ export type TextboxUpdatedPayload = {
     slideId: string;
     graphicId: string;
     type: GRAPHIC_TYPES.TEXTBOX;
-    props: Partial<Pick<TextboxSerialized, 'origin' | 'dimensions' | 'text' | 'size' | 'weight' | 'font' | 'rotation'>>;
+    props: TextboxMutableSerialized;
 };
 
 export type TextboxDeleted = CustomEvent<TextboxDeletedPayload>;
@@ -312,7 +312,7 @@ export type VideoUpdatedPayload = {
     slideId: string;
     graphicId: string;
     type: GRAPHIC_TYPES.VIDEO;
-    props: Partial<Pick<VideoSerialized, 'origin' | 'dimensions' | 'source' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+    props: VideoMutableSerialized;
 };
 
 export type VideoDeleted = CustomEvent<VideoDeletedPayload>;

@@ -1,6 +1,6 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
-import SnapVector from '@/utilities/SnapVector';
+import { RectangleMutableSerialized } from '@/types';
 import { closestVector, mod } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import {
@@ -21,22 +21,31 @@ import {
     unrenderBoxHelpers
 } from '../utilities';
 
-type RectangleMutatorArgs = {
-    target: IRectangleRenderer;
-    slide: ISlideRenderer;
-    scale: number;
-};
-
 class RectangleMutator implements IRectangleMutator {
     public readonly type = GRAPHIC_TYPES.RECTANGLE;
     public readonly target: IRectangleRenderer;
-    private _helpers: BoundingBoxMutatorHelpers;
 
-    constructor(args: RectangleMutatorArgs) {
-        this.target = args.target;
+    private _helpers: BoundingBoxMutatorHelpers;
+    private _graphicId: string;
+    private _slide: ISlideRenderer;
+
+    constructor({
+        target,
+        slide,
+        scale,
+        graphicId
+    }: {
+        target: IRectangleRenderer;
+        slide: ISlideRenderer;
+        scale: number;
+        graphicId: string;
+    }) {
+        this.target = target;
+        this._graphicId = graphicId;
+        this._slide = slide;
 
         // Initialize helper graphics
-        this._helpers = makeBoxHelpers(this.target, args.slide, args.scale);
+        this._helpers = makeBoxHelpers(this.target, this._slide, scale);
 
         // Render helper graphics
         renderBoxHelpers(this._helpers);
@@ -47,7 +56,7 @@ class RectangleMutator implements IRectangleMutator {
     }
 
     // TODO: Account for ctrl, alt, and snapping
-    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
+    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => RectangleMutableSerialized {
         const box = this.target.transformedBox;
         const directions = [
             box.dimensions,
@@ -61,7 +70,7 @@ class RectangleMutator implements IRectangleMutator {
         // 3. Constrain the vector (to maintain aspect ratio) if shift is pressed
         // 4. Unrotate the corner vector to correct for graphic rotation
         // 5. Use the post-shift corner vector and corrected corner vector to update props
-        const makeListener = (oppositeCorner: V): (event: SlideMouseEvent) => void => {
+        const makeListener = (oppositeCorner: V): (event: SlideMouseEvent) => RectangleMutableSerialized => {
             return event => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
@@ -77,6 +86,8 @@ class RectangleMutator implements IRectangleMutator {
                 this.target.setOriginAndDimensions(origin, dimensions);
                 slide.broadcastSetGraphic(this.target);
                 this._repositionBoxHelpers();
+
+                return { origin: this.target.origin, dimensions: this.target.dimensions };
             };
         };
 
@@ -88,7 +99,7 @@ class RectangleMutator implements IRectangleMutator {
         })[role];
     }
 
-    public rotateListener(): (event: SlideMouseEvent) => void {
+    public rotateListener(): (event: SlideMouseEvent) => RectangleMutableSerialized {
         const { center } = this.target.transformedBox;
         const directions = [...V.cardinals, ...V.intermediates];
 
@@ -102,12 +113,15 @@ class RectangleMutator implements IRectangleMutator {
             this.target.rotation = mod(theta, Math.PI * 2);
             slide.broadcastSetGraphic(this.target);
             rotateBoxHelpers(this._helpers, this.target.transformedBox);
+
+            return { rotation: this.target.rotation };
         };
     }
 
-    public moveListener(initialPosition: V, snapVectors: SnapVector[]): (event: SlideMouseEvent) => void {
+    public moveListener(initialPosition: V): (event: SlideMouseEvent) => RectangleMutableSerialized {
         const initialOrigin = this.target.origin;
         const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));
+        const snapVectors = this._slide.getSnapVectors([this._graphicId]);
 
         return event => {
             const move = calculateMove({
@@ -120,6 +134,8 @@ class RectangleMutator implements IRectangleMutator {
 
             this.target.origin = initialOrigin.add(move);
             this._repositionBoxHelpers();
+
+            return { origin: this.target.origin };
         };
     }
 

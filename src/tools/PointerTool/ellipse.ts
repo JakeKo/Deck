@@ -10,7 +10,7 @@ export function moveEllipse(event: EllipseMouseEvent): void {
     }
 
     const mutator = slide.focusGraphic(target.id) as EllipseMutator;
-    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide), slide.getSnapVectors([target.id]));
+    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide));
     slide.cursor = 'move';
     slide.cursorLock = true;
 

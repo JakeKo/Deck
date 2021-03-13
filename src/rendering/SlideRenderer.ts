@@ -265,17 +265,17 @@ class SlideRenderer implements ISlideRenderer {
         let mutator;
 
         if (graphic.type === CURVE) {
-            mutator = new CurveMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
+            mutator = new CurveMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
         } else if (graphic.type === ELLIPSE) {
-            mutator = new EllipseMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
+            mutator = new EllipseMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
         } else if (graphic.type === IMAGE) {
-            mutator = new ImageMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
+            mutator = new ImageMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
         } else if (graphic.type === RECTANGLE) {
-            mutator = new RectangleMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
+            mutator = new RectangleMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
         } else if (graphic.type === TEXTBOX) {
-            mutator = new TextboxMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
+            mutator = new TextboxMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
         } else if (graphic.type === VIDEO) {
-            mutator = new VideoMutator({ slide: this, scale: 1 / this.zoom, target: graphic });
+            mutator = new VideoMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
         } else {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }

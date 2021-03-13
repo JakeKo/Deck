@@ -1,6 +1,6 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
-import SnapVector from '@/utilities/SnapVector';
+import { EllipseMutableSerialized } from '@/types';
 import { closestVector, mod } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import {
@@ -21,22 +21,31 @@ import {
     unrenderBoxHelpers
 } from '../utilities';
 
-type EllipseMutatorArgs = {
-    target: IEllipseRenderer;
-    slide: ISlideRenderer;
-    scale: number;
-};
-
 class EllipseMutator implements IEllipseMutator {
     public readonly type = GRAPHIC_TYPES.ELLIPSE;
     public readonly target: IEllipseRenderer;
-    private _helpers: BoundingBoxMutatorHelpers;
 
-    constructor(args: EllipseMutatorArgs) {
-        this.target = args.target;
+    private _helpers: BoundingBoxMutatorHelpers;
+    private _graphicId: string;
+    private _slide: ISlideRenderer;
+
+    constructor({
+        target,
+        slide,
+        scale,
+        graphicId
+    }: {
+        target: IEllipseRenderer;
+        slide: ISlideRenderer;
+        scale: number;
+        graphicId: string;
+    }) {
+        this.target = target;
+        this._graphicId = graphicId;
+        this._slide = slide;
 
         // Initialize helper graphics
-        this._helpers = makeBoxHelpers(this.target, args.slide, args.scale);
+        this._helpers = makeBoxHelpers(this.target, this._slide, scale);
 
         // Render helper graphics
         renderBoxHelpers(this._helpers);
@@ -47,7 +56,7 @@ class EllipseMutator implements IEllipseMutator {
     }
 
     // TODO: Account for ctrl, alt, and snapping
-    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
+    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => EllipseMutableSerialized {
         const box = this.target.transformedBox;
         const directions = [
             box.dimensions,
@@ -61,7 +70,7 @@ class EllipseMutator implements IEllipseMutator {
         // 3. Constrain the vector (to maintain aspect ratio) if shift is pressed
         // 4. Unrotate the corner vector to correct for graphic rotation
         // 5. Use the post-shift corner vector and corrected corner vector to update props
-        const makeListener = (oppositeCorner: V): (event: SlideMouseEvent) => void => {
+        const makeListener = (oppositeCorner: V): (event: SlideMouseEvent) => EllipseMutableSerialized => {
             return event => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
@@ -75,6 +84,8 @@ class EllipseMutator implements IEllipseMutator {
                 // Update rendering
                 this.target.setCenterAndDimensions(center, dimensions);
                 this._repositionBoxHelpers();
+
+                return { center: this.target.center, dimensions: this.target.dimensions };
             };
         };
 
@@ -86,7 +97,7 @@ class EllipseMutator implements IEllipseMutator {
         })[role];
     }
 
-    public rotateListener(): (event: SlideMouseEvent) => void {
+    public rotateListener(): (event: SlideMouseEvent) => EllipseMutableSerialized {
         const { center } = this.target.transformedBox;
         const directions = [...V.cardinals, ...V.intermediates];
 
@@ -99,12 +110,15 @@ class EllipseMutator implements IEllipseMutator {
 
             this.target.rotation = mod(theta, Math.PI * 2);
             rotateBoxHelpers(this._helpers, this.target.transformedBox);
+
+            return { rotation: this.target.rotation };
         };
     }
 
-    public moveListener(initialPosition: V, snapVectors: SnapVector[]): (event: SlideMouseEvent) => void {
+    public moveListener(initialPosition: V): (event: SlideMouseEvent) => EllipseMutableSerialized {
         const initialOrigin = this.target.center;
         const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));
+        const snapVectors = this._slide.getSnapVectors([this._graphicId]);
 
         return event => {
             const move = calculateMove({
@@ -117,6 +131,8 @@ class EllipseMutator implements IEllipseMutator {
 
             this.target.center = initialOrigin.add(move);
             this._repositionBoxHelpers();
+
+            return { center: this.target.center };
         };
     }
 
