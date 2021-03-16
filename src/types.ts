@@ -1,4 +1,11 @@
 // TODO: Move GRAPHIC_TYPES to here
+export type Keyed<T> = { [key: string]: T };
+
+export type GraphicSerialized = CurveSerialized | EllipseSerialized | ImageSerialized
+    | RectangleSerialized | TextboxSerialized | VideoSerialized;
+
+export type GraphicMutableSerialized = CurveMutableSerialized | EllipseMutableSerialized | ImageMutableSerialized
+    | RectangleMutableSerialized | TextboxMutableSerialized | VideoMutableSerialized;
 
 export type CurveSerialized = {
     id: string;

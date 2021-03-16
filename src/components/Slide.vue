@@ -42,7 +42,8 @@ const Slide = defineComponent({
                 canvas,
                 rawViewbox: viewbox,
                 croppedViewbox: store.state.editorViewbox.cropped,
-                zoom: store.state.editorViewbox.zoom
+                zoom: store.state.editorViewbox.zoom,
+                slideId: props.slide.id
             });
 
             Object.values(props.slide.graphics)

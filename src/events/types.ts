@@ -64,7 +64,10 @@ export enum CURVE_EVENTS {
     MOUSEDOWN = 'deck-curve-mousedown',
     MOUSEOVER = 'deck-curve-mouseover',
     MOUSEOUT = 'deck-curve-mouseout',
-    MOUSEMOVE = 'deck-curve-mousemove'
+    MOUSEMOVE = 'deck-curve-mousemove',
+    CREATED = 'deck-curve-created',
+    UPDATED = 'deck-curve-updated',
+    DELETE = 'deck-curve-delete'
 }
 
 export type CurveMouseEvent = CustomEvent<CurveMouseEventPayload>;
@@ -121,7 +124,10 @@ export enum ELLIPSE_EVENTS {
     MOUSEDOWN = 'deck-ellipse-mousedown',
     MOUSEOVER = 'deck-ellipse-mouseover',
     MOUSEOUT = 'deck-ellipse-mouseout',
-    MOUSEMOVE = 'deck-ellipse-mousemove'
+    MOUSEMOVE = 'deck-ellipse-mousemove',
+    CREATED = 'deck-ellipse-created',
+    UPDATED = 'deck-ellipse-updated',
+    DELETE = 'deck-ellipse-delete'
 }
 
 export type EllipseMouseEvent = CustomEvent<EllipseMouseEventPayload>;
@@ -159,7 +165,10 @@ export enum IMAGE_EVENTS {
     MOUSEDOWN = 'deck-image-mousedown',
     MOUSEOVER = 'deck-image-mouseover',
     MOUSEOUT = 'deck-image-mouseout',
-    MOUSEMOVE = 'deck-image-mousemove'
+    MOUSEMOVE = 'deck-image-mousemove',
+    CREATED = 'deck-image-created',
+    UPDATED = 'deck-image-updated',
+    DELETE = 'deck-image-delete'
 }
 
 export type ImageMouseEvent = CustomEvent<ImageMouseEventPayload>;
@@ -197,7 +206,10 @@ export enum RECTANGLE_EVENTS {
     MOUSEDOWN = 'deck-rectangle-mousedown',
     MOUSEOVER = 'deck-rectangle-mouseover',
     MOUSEOUT = 'deck-rectangle-mouseout',
-    MOUSEMOVE = 'deck-rectangle-mousemove'
+    MOUSEMOVE = 'deck-rectangle-mousemove',
+    CREATED = 'deck-rectangle-created',
+    UPDATED = 'deck-rectangle-updated',
+    DELETE = 'deck-rectangle-delete'
 }
 
 export type RectangleMouseEvent = CustomEvent<RectangleMouseEventPayload>;
@@ -252,7 +264,10 @@ export enum TEXTBOX_EVENTS {
     MOUSEDOWN = 'deck-textbox-mousedown',
     MOUSEOVER = 'deck-textbox-mouseover',
     MOUSEOUT = 'deck-textbox-mouseout',
-    MOUSEMOVE = 'deck-textbox-mousemove'
+    MOUSEMOVE = 'deck-textbox-mousemove',
+    CREATED = 'deck-textbox-created',
+    UPDATED = 'deck-textbox-updated',
+    DELETE = 'deck-textbox-delete'
 }
 
 export type TextboxMouseEvent = CustomEvent<TextboxMouseEventPayload>;
@@ -290,7 +305,10 @@ export enum VIDEO_EVENTS {
     MOUSEDOWN = 'deck-video-mousedown',
     MOUSEOVER = 'deck-video-mouseover',
     MOUSEOUT = 'deck-video-mouseout',
-    MOUSEMOVE = 'deck-video-mousemove'
+    MOUSEMOVE = 'deck-video-mousemove',
+    CREATED = 'deck-video-created',
+    UPDATED = 'deck-video-updated',
+    DELETE = 'deck-video-delete'
 }
 
 export type VideoMouseEvent = CustomEvent<VideoMouseEventPayload>;

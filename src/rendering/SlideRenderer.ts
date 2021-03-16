@@ -2,13 +2,13 @@ import { listen } from '@/events';
 import { decorateSlideEvents } from '@/events/decorators';
 import { SlideKeyboardEvent, SlideZoomEvent, SLIDE_EVENTS } from '@/events/types';
 import { GraphicStoreModel, Viewbox } from '@/store/types';
+import { Keyed } from '@/types';
 import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
 import SlideStateManager from '@/utilities/SlideStateManager';
 import SnapVector from '@/utilities/SnapVector';
 import V from '@/utilities/Vector';
 import SVG from 'svg.js';
-import { CanvasRenderer } from './helpers';
-import SnapVectorRenderer from './helpers/SnapVectorRenderer';
+import { CanvasRenderer, SnapVectorRenderer } from './helpers';
 import {
     CurveMaker,
     EllipseMaker,
@@ -55,48 +55,59 @@ class SlideRenderer implements ISlideRenderer {
     public readonly rawViewbox: Viewbox;
     public zoom: number;
     private _stateManager: SlideStateManager;
-    private _graphics: { [key: string]: IGraphicRenderer };
-    private _focusedGraphics: { [key: string]: IGraphicMutator };
-    private _activeMakers: { [key: string]: IGraphicMaker };
-    private _markedGraphics: { [key: string]: IGraphicMarker };
+    private _graphics: Keyed<IGraphicRenderer>;
+    private _graphicsFocused: Keyed<IGraphicMutator>;
+    private _graphicsMaking: Keyed<IGraphicMaker>;
+    private _graphicsHighlighted: Keyed<IGraphicMarker>;
     private _defaultCursor = 'default';
     private _cursor: string;
     private _cursorLock = false;
     private _snapVectors: SnapVector[];
-    private _renderedSnapVectors: { [key: string]: SnapVectorRenderer };
+    private _renderedSnapVectors: Keyed<SnapVectorRenderer>;
+    private _slideId: string;
 
-    constructor(args: {
+    constructor({
+        stateManager,
+        canvas,
+        rawViewbox,
+        croppedViewbox,
+        zoom,
+        graphics,
+        slideId
+    }: {
         stateManager: SlideStateManager;
         canvas: SVG.Doc;
         rawViewbox: Viewbox;
         croppedViewbox: Viewbox;
         zoom: number;
-        graphics?: { [key: string]: GraphicStoreModel };
+        graphics?: Keyed<GraphicStoreModel>;
+        slideId: string;
     }) {
-        this.canvas = args.canvas;
-        this.rawViewbox = args.rawViewbox;
-        this.zoom = args.zoom;
-        this._stateManager = args.stateManager;
-        this._focusedGraphics = {};
-        this._activeMakers = {};
-        this._markedGraphics = {};
+        this.canvas = canvas;
+        this.rawViewbox = rawViewbox;
+        this.zoom = zoom;
+        this._stateManager = stateManager;
+        this._graphicsFocused = {};
+        this._graphicsMaking = {};
+        this._graphicsHighlighted = {};
         this._cursor = this._defaultCursor;
+        this._slideId = slideId;
         this._snapVectors = [
-            new SnapVector(new V(args.croppedViewbox.width / 2, 0), V.east),
-            new SnapVector(new V(args.croppedViewbox.width, args.croppedViewbox.height / 2), V.north),
-            new SnapVector(new V(args.croppedViewbox.width / 2, args.croppedViewbox.height), V.west),
-            new SnapVector(new V(0, args.croppedViewbox.height / 2), V.south),
-            new SnapVector(new V(args.croppedViewbox.width / 2, args.croppedViewbox.height / 2), V.north),
-            new SnapVector(new V(args.croppedViewbox.width / 2, args.croppedViewbox.height / 2), V.east)
+            new SnapVector(new V(croppedViewbox.width / 2, 0), V.east),
+            new SnapVector(new V(croppedViewbox.width, croppedViewbox.height / 2), V.north),
+            new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height), V.west),
+            new SnapVector(new V(0, croppedViewbox.height / 2), V.south),
+            new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height / 2), V.north),
+            new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height / 2), V.east)
         ];
         this._renderedSnapVectors = {};
 
-        this._renderBackdrop(new V(args.croppedViewbox.width, args.croppedViewbox.height));
+        this._renderBackdrop(new V(croppedViewbox.width, croppedViewbox.height));
         decorateSlideEvents(this);
         this.canvas.node.tabIndex = 0;
 
-        this._graphics = args.graphics
-            ? Object.values(args.graphics).map(graphic => graphicStoreModelToGraphicRenderer(graphic, this))
+        this._graphics = graphics
+            ? Object.values(graphics).map(graphic => graphicStoreModelToGraphicRenderer(graphic, this))
                 .reduce((graphics, graphic) => ({ [graphic.id]: graphic, ...graphics }), {})
             : {};
         Object.values(this._graphics).forEach(graphic => graphic.render());
@@ -104,7 +115,7 @@ class SlideRenderer implements ISlideRenderer {
         listen(SLIDE_EVENTS.ZOOM, 'onSlideZoom', (event: SlideZoomEvent): void => this._setZoom(event.detail.zoom));
         listen(SLIDE_EVENTS.KEYDOWN, 'onSlideKeydown', (event: SlideKeyboardEvent): void => {
             if (['Backspace', 'Delete'].indexOf(event.detail.baseEvent.key) !== -1) {
-                this.removeGraphics(Object.keys(this._focusedGraphics));
+                this.removeGraphics(Object.keys(this._graphicsFocused));
             }
         });
     }
@@ -210,7 +221,7 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     public completeInteractiveMake(graphicId: string): void {
-        delete this._activeMakers[graphicId];
+        delete this._graphicsMaking[graphicId];
     }
 
     public getGraphic(graphicId: string): IGraphicRenderer {
@@ -254,7 +265,7 @@ class SlideRenderer implements ISlideRenderer {
 
     public focusGraphic(graphicId: string): IGraphicMutator {
         if (this.isFocused(graphicId)) {
-            return this._focusedGraphics[graphicId];
+            return this._graphicsFocused[graphicId];
         }
 
         if (this.isMarked(graphicId)) {
@@ -280,30 +291,30 @@ class SlideRenderer implements ISlideRenderer {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }
 
-        this._focusedGraphics[graphicId] = mutator;
+        this._graphicsFocused[graphicId] = mutator;
         this._stateManager.focusGraphicFromRenderer(graphicId);
         return mutator;
     }
 
     public unfocusGraphic(graphicId: string): void {
-        this.isFocused(graphicId) && this._focusedGraphics[graphicId].complete();
+        this.isFocused(graphicId) && this._graphicsFocused[graphicId].complete();
         this._stateManager.unfocusGraphicFromRenderer(graphicId);
-        delete this._focusedGraphics[graphicId];
+        delete this._graphicsFocused[graphicId];
     }
 
     public unfocusAllGraphics(exclude: string[] = []): void {
-        Object.keys(this._focusedGraphics)
+        Object.keys(this._graphicsFocused)
             .filter(graphicId => exclude.indexOf(graphicId) === -1)
             .forEach(graphicId => this.unfocusGraphic(graphicId));
     }
 
     public isFocused(graphicId: string): boolean {
-        return this._focusedGraphics[graphicId] !== undefined;
+        return this._graphicsFocused[graphicId] !== undefined;
     }
 
     public markGraphic(graphicId: string): IGraphicMarker {
         if (this.isMarked(graphicId)) {
-            return this._markedGraphics[graphicId];
+            return this._graphicsHighlighted[graphicId];
         }
 
         const graphic = this.getGraphic(graphicId);
@@ -325,17 +336,17 @@ class SlideRenderer implements ISlideRenderer {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }
 
-        this._markedGraphics[graphicId] = marker;
-        return this._markedGraphics[graphicId];
+        this._graphicsHighlighted[graphicId] = marker;
+        return this._graphicsHighlighted[graphicId];
     }
 
     public unmarkGraphic(graphicId: string): void {
-        this._markedGraphics[graphicId] && this._markedGraphics[graphicId].unmark();
-        delete this._markedGraphics[graphicId];
+        this._graphicsHighlighted[graphicId] && this._graphicsHighlighted[graphicId].unmark();
+        delete this._graphicsHighlighted[graphicId];
     }
 
     public isMarked(graphicId: string): boolean {
-        return this._markedGraphics[graphicId] !== undefined;
+        return this._graphicsHighlighted[graphicId] !== undefined;
     }
 
     // SINGLE PROPERTY UPDATE METHODS
@@ -343,13 +354,13 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         if (graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setX(x);
+                (this._graphicsFocused[graphicId] as ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setX(x);
             } else {
                 graphic.origin = new V(x, graphic.origin.y);
             }
         } else if (graphic.type === ELLIPSE) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as EllipseMutator).setX(x);
+                (this._graphicsFocused[graphicId] as EllipseMutator).setX(x);
             } else {
                 graphic.center = new V(x, graphic.center.y);
             }
@@ -362,13 +373,13 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         if (graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setY(y);
+                (this._graphicsFocused[graphicId] as ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setY(y);
             } else {
                 graphic.origin = new V(graphic.origin.x, y);
             }
         } else if (graphic.type === ELLIPSE) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as EllipseMutator).setY(y);
+                (this._graphicsFocused[graphicId] as EllipseMutator).setY(y);
             } else {
                 graphic.center = new V(graphic.center.x, y);
             }
@@ -381,7 +392,7 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | RectangleMutator).setFillColor(fillColor);
+                (this._graphicsFocused[graphicId] as CurveMutator | EllipseMutator | RectangleMutator).setFillColor(fillColor);
             } else {
                 graphic.fillColor = fillColor;
             }
@@ -394,7 +405,7 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | RectangleMutator | VideoMutator).setStrokeColor(strokeColor);
+                (this._graphicsFocused[graphicId] as CurveMutator | EllipseMutator | RectangleMutator | VideoMutator).setStrokeColor(strokeColor);
             } else {
                 graphic.strokeColor = strokeColor;
             }
@@ -407,7 +418,7 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as CurveMutator | EllipseMutator | RectangleMutator | VideoMutator).setStrokeWidth(strokeWidth);
+                (this._graphicsFocused[graphicId] as CurveMutator | EllipseMutator | RectangleMutator | VideoMutator).setStrokeWidth(strokeWidth);
             } else {
                 graphic.strokeWidth = strokeWidth;
             }
@@ -420,7 +431,7 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         if (graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as EllipseMutator | ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setWidth(width);
+                (this._graphicsFocused[graphicId] as EllipseMutator | ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setWidth(width);
             } else {
                 graphic.dimensions = new V(width, graphic.dimensions.y);
             }
@@ -433,7 +444,7 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         if (graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as EllipseMutator | ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setHeight(height);
+                (this._graphicsFocused[graphicId] as EllipseMutator | ImageMutator | RectangleMutator | TextboxMutator | VideoMutator).setHeight(height);
             } else {
                 graphic.dimensions = new V(graphic.dimensions.x, height);
             }
@@ -445,7 +456,7 @@ class SlideRenderer implements ISlideRenderer {
     public setRotation(graphicId: string, rotation: number): void {
         const graphic = this.getGraphic(graphicId);
         if (this.isFocused(graphicId)) {
-            this._focusedGraphics[graphicId].setRotation(rotation);
+            this._graphicsFocused[graphicId].setRotation(rotation);
         } else {
             graphic.rotation = rotation;
         }
@@ -455,7 +466,7 @@ class SlideRenderer implements ISlideRenderer {
         const graphic = this.getGraphic(graphicId);
         if (graphic.type === TEXTBOX) {
             if (this.isFocused(graphicId)) {
-                (this._focusedGraphics[graphicId] as TextboxMutator).setText(text);
+                (this._graphicsFocused[graphicId] as TextboxMutator).setText(text);
             } else {
                 graphic.text = text;
             }
@@ -465,16 +476,16 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     private _activateMaker<T extends IGraphicMaker>(maker: T): T {
-        this._activeMakers[maker.target.id] = maker;
+        this._graphicsMaking[maker.target.id] = maker;
         return maker;
     }
 
     // When the zoom on the slide has changed, we need to correct for it so helpers don't shrink and grow
     private _setZoom(zoom: number): void {
         this.zoom = zoom;
-        Object.values(this._focusedGraphics).forEach(mutator => (mutator.scale = 1 / this.zoom));
-        Object.values(this._activeMakers).forEach(maker => (maker.scale = 1 / this.zoom));
-        Object.values(this._markedGraphics).forEach(marker => (marker.scale = 1 / this.zoom));
+        Object.values(this._graphicsFocused).forEach(mutator => (mutator.scale = 1 / this.zoom));
+        Object.values(this._graphicsMaking).forEach(maker => (maker.scale = 1 / this.zoom));
+        Object.values(this._graphicsHighlighted).forEach(marker => (marker.scale = 1 / this.zoom));
         Object.values(this._renderedSnapVectors).forEach(snapVector => (snapVector.scale = 1 / this.zoom));
     }
 
