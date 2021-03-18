@@ -3,6 +3,7 @@ import { resolvePosition } from '@/tools/utilities';
 import { ImageMutableSerialized } from '@/types';
 import { closestVector, mod } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
+import { SnapVectorRenderer } from '../helpers';
 import {
     BoundingBoxMutatorHelpers,
     GRAPHIC_TYPES,
@@ -14,18 +15,20 @@ import {
 import {
     calculateMove,
     makeBoxHelpers,
+    makeSnapVectors,
     renderBoxHelpers,
     resizeBoxHelpers,
     rotateBoxHelpers,
     scaleBoxHelpers,
-    unrenderBoxHelpers
+    unrenderBoxHelpers,
+    updateSnapVectors
 } from '../utilities';
 
 class ImageMutator implements IImageMutator {
     public readonly type = GRAPHIC_TYPES.IMAGE;
     public readonly target: IImageRenderer;
 
-    private _helpers: BoundingBoxMutatorHelpers;
+    private _helpers: BoundingBoxMutatorHelpers & { snapVectors: SnapVectorRenderer[] };
     private _graphicId: string;
     private _slide: ISlideRenderer;
 
@@ -45,14 +48,19 @@ class ImageMutator implements IImageMutator {
         this._slide = slide;
 
         // Initialize helper graphics
-        this._helpers = makeBoxHelpers(this.target, this._slide, scale);
+        this._helpers = {
+            ...makeBoxHelpers(this.target, this._slide, scale),
+            snapVectors: makeSnapVectors(this._slide, scale)
+        };
 
         // Render helper graphics
         renderBoxHelpers(this._helpers);
+        this._helpers.snapVectors.forEach(s => s.render());
     }
 
     public set scale(scale: number) {
         scaleBoxHelpers(this._helpers, scale);
+        this._helpers.snapVectors.forEach(s => (s.scale = scale));
     }
 
     // TODO: Account for ctrl, alt, and snapping
@@ -122,7 +130,7 @@ class ImageMutator implements IImageMutator {
         const snapVectors = this._slide.getSnapVectors([this._graphicId]);
 
         return event => {
-            const move = calculateMove({
+            const { shift: move, snapVectors: newSnapVectors } = calculateMove({
                 initialOrigin,
                 initialPosition,
                 mouseEvent: event,
@@ -132,6 +140,7 @@ class ImageMutator implements IImageMutator {
 
             this.target.origin = initialOrigin.add(move);
             this._repositionBoxHelpers();
+            updateSnapVectors(newSnapVectors, this._helpers.snapVectors);
 
             return { origin: this.target.origin };
         };
@@ -169,6 +178,7 @@ class ImageMutator implements IImageMutator {
     public complete(): void {
         // Remove helper graphics
         unrenderBoxHelpers(this._helpers);
+        this._helpers.snapVectors.forEach(s => s.unrender());
     }
 
     private _repositionBoxHelpers(): void {

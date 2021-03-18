@@ -26,7 +26,6 @@ export function moveImage(event: ImageMouseEvent): void {
         moveListener(event);
         slide.broadcastSetGraphic(mutator.target);
         slide.cursorLock = false;
-        slide.unrenderAllSnapVectors();
         unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
         listenOnce(IMAGE_EVENTS.MOUSEDOWN, 'moveImage', moveImage);
     }

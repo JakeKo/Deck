@@ -8,7 +8,7 @@ import SlideStateManager from '@/utilities/SlideStateManager';
 import SnapVector from '@/utilities/SnapVector';
 import V from '@/utilities/Vector';
 import SVG from 'svg.js';
-import { CanvasRenderer, SnapVectorRenderer } from './helpers';
+import { CanvasRenderer } from './helpers';
 import {
     CurveMaker,
     EllipseMaker,
@@ -63,7 +63,6 @@ class SlideRenderer implements ISlideRenderer {
     private _cursor: string;
     private _cursorLock = false;
     private _snapVectors: SnapVector[];
-    private _renderedSnapVectors: Keyed<SnapVectorRenderer>;
     private _slideId: string;
 
     constructor({
@@ -100,7 +99,6 @@ class SlideRenderer implements ISlideRenderer {
             new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height / 2), V.north),
             new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height / 2), V.east)
         ];
-        this._renderedSnapVectors = {};
 
         this._renderBackdrop(new V(croppedViewbox.width, croppedViewbox.height));
         decorateSlideEvents(this);
@@ -149,23 +147,6 @@ class SlideRenderer implements ISlideRenderer {
                 .map(g => [...g.staticSnapVectors, ...g.transformedSnapVectors])
                 .reduce((all, some) => [...all, ...some], [])
         ];
-    }
-
-    public renderSnapVectors(snapVectors: { [key: string]: SnapVector }): void {
-        Object.keys(snapVectors).forEach(key => {
-            if (this._renderedSnapVectors[key] === undefined) {
-                const renderer = new SnapVectorRenderer({ slide: this, snapVector: snapVectors[key], scale: 1 / this.zoom });
-                renderer.render();
-                this._renderedSnapVectors[key] = renderer;
-            } else {
-                this._renderedSnapVectors[key].snapVector = snapVectors[key];
-            }
-        });
-    }
-
-    public unrenderAllSnapVectors(): void {
-        Object.values(this._renderedSnapVectors).forEach(renderer => renderer.unrender());
-        this._renderedSnapVectors = {};
     }
 
     public makeCurveInteractive(initialPosition: V): ICurveMaker {
@@ -486,7 +467,6 @@ class SlideRenderer implements ISlideRenderer {
         Object.values(this._graphicsFocused).forEach(mutator => (mutator.scale = 1 / this.zoom));
         Object.values(this._graphicsMaking).forEach(maker => (maker.scale = 1 / this.zoom));
         Object.values(this._graphicsHighlighted).forEach(marker => (marker.scale = 1 / this.zoom));
-        Object.values(this._renderedSnapVectors).forEach(snapVector => (snapVector.scale = 1 / this.zoom));
     }
 
     private _renderBackdrop(dimensions: V): void {

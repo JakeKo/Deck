@@ -3,7 +3,7 @@ import { resolvePosition } from '@/tools/utilities';
 import SnapVector from '@/utilities/SnapVector';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
-import { BoxRenderer, RotatorRenderer, VertexRenderer } from './helpers';
+import { BoxRenderer, RotatorRenderer, SnapVectorRenderer, VertexRenderer } from './helpers';
 import { BoundingBox, BoundingBoxMutatorHelpers, IGraphicRenderer, ISlideRenderer, VERTEX_ROLES } from './types';
 
 export function makeBoxHelpers(target: IGraphicRenderer, slide: ISlideRenderer, scale: number): BoundingBoxMutatorHelpers {
@@ -114,7 +114,7 @@ export function calculateMove({
     mouseEvent: SlideMouseEvent;
     snapVectors: SnapVector[];
     relativePullPoints: V[];
-}): V {
+}): { snapVectors: SnapVector[]; shift: V } {
     const { baseEvent, slide } = mouseEvent.detail;
     const position = resolvePosition(baseEvent, slide);
     const rawMove = initialOrigin.towards(position.add(initialPosition.towards(initialOrigin)));
@@ -147,9 +147,50 @@ export function calculateMove({
     }
 
     const finalSnapPull = snapPulls.reduce((finalPull, pull) => finalPull.add(pull.shift), V.zero);
-    slide.unrenderAllSnapVectors();
-    slide.renderSnapVectors(snapPulls.reduce((pulls, pull) => ({ ...pulls, [Math.random().toString()]: pull.snapVector }), {}));
 
     // TODO: Handle case where moveDirection and snapShift are neither parallel nor perpendicular
-    return (baseEvent.shiftKey ? rawMove.projectOn(moveDirection) : rawMove).add(finalSnapPull);
+    return {
+        shift: (baseEvent.shiftKey ? rawMove.projectOn(moveDirection) : rawMove).add(finalSnapPull),
+        snapVectors: snapPulls.map(s => s.snapVector)
+    };
+}
+
+/**
+ * Create initial SnapVectorRenderers for a mutator
+ */
+export function makeSnapVectors(slide: ISlideRenderer, scale: number): SnapVectorRenderer[] {
+    return [
+        new SnapVectorRenderer({
+            scale,
+            slide,
+            snapVector: new SnapVector(V.zero, V.zero)
+        }),
+        new SnapVectorRenderer({
+            scale,
+            slide,
+            snapVector: new SnapVector(V.zero, V.zero)
+        })
+    ];
+}
+
+/**
+ * Given the two models representing active snap vectors, reconcile the provided renderers so they match the models
+ */
+export function updateSnapVectors(models: SnapVector[], renderers: SnapVectorRenderer[]): void {
+    const [m1, m2] = models;
+    const [r1, r2] = renderers;
+
+    if (models.length === 0) {
+        r1.unrender();
+        r2.unrender();
+    } else if (models.length === 1) {
+        r1.render();
+        r1.snapVector = m1;
+        r2.unrender();
+    } else if (models.length === 2) {
+        r1.render();
+        r1.snapVector = m1;
+        r2.render();
+        r2.snapVector = m2;
+    }
 }

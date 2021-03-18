@@ -3,7 +3,7 @@ import { resolvePosition } from '@/tools/utilities';
 import { CurveMutableSerialized } from '@/types';
 import { closestVector, mod } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
-import { CurveAnchorRenderer } from '../helpers';
+import { CurveAnchorRenderer, SnapVectorRenderer } from '../helpers';
 import {
     BoundingBoxMutatorHelpers,
     CurveAnchor,
@@ -17,18 +17,20 @@ import {
 import {
     calculateMove,
     makeBoxHelpers,
+    makeSnapVectors,
     renderBoxHelpers,
     resizeBoxHelpers,
     rotateBoxHelpers,
     scaleBoxHelpers,
-    unrenderBoxHelpers
+    unrenderBoxHelpers,
+    updateSnapVectors
 } from '../utilities';
 
 class CurveMutator implements ICurveMutator {
     public readonly type = GRAPHIC_TYPES.CURVE;
     public readonly target: ICurveRenderer;
 
-    private _helpers: BoundingBoxMutatorHelpers & { anchors: CurveAnchorRenderer[] };
+    private _helpers: BoundingBoxMutatorHelpers & { anchors: CurveAnchorRenderer[]; snapVectors: SnapVectorRenderer[] };
     private _graphicId: string;
     private _slide: ISlideRenderer;
 
@@ -55,16 +57,19 @@ class CurveMutator implements ICurveMutator {
                 parentId: this._graphicId,
                 index,
                 ...anchor
-            }))
+            })),
+            snapVectors: makeSnapVectors(this._slide, scale)
         };
 
         renderBoxHelpers(this._helpers);
+        this._helpers.snapVectors.forEach(s => s.render());
         this._helpers.anchors.forEach(helper => helper.render());
     }
 
     public set scale(scale: number) {
         this._helpers.anchors.forEach(helper => (helper.scale = scale));
         scaleBoxHelpers(this._helpers, scale);
+        this._helpers.snapVectors.forEach(s => (s.scale = scale));
     }
 
     // TODO: Account for ctrl, alt, and snapping
@@ -143,7 +148,7 @@ class CurveMutator implements ICurveMutator {
         const snapVectors = this._slide.getSnapVectors([this._graphicId]);
 
         return event => {
-            const move = calculateMove({
+            const { shift: move, snapVectors: newSnapVectors } = calculateMove({
                 initialOrigin,
                 initialPosition,
                 mouseEvent: event,
@@ -158,6 +163,7 @@ class CurveMutator implements ICurveMutator {
             }));
             this.target.anchors = newAnchors;
             this._repositionCurveAnchors();
+            updateSnapVectors(newSnapVectors, this._helpers.snapVectors);
 
             return { anchors: this.target.anchors };
         };
@@ -218,6 +224,7 @@ class CurveMutator implements ICurveMutator {
 
     public complete(): void {
         this._helpers.anchors.forEach(helper => helper.unrender());
+        this._helpers.snapVectors.forEach(s => s.unrender());
         unrenderBoxHelpers(this._helpers);
     }
 

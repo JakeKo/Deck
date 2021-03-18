@@ -329,8 +329,6 @@ export type ISlideRenderer = {
     cursor: string;
     cursorLock: boolean;
     getSnapVectors: (exclude: string[]) => SnapVector[];
-    renderSnapVectors: (snapVectors: { [key: string]: SnapVector }) => void;
-    unrenderAllSnapVectors: () => void;
     makeCurveInteractive: (initialPosition: V) => ICurveMaker;
     makeEllipseInteractive: (initialPosition: V) => IEllipseMaker;
     makeImageInteractive: (initialPosition: V, source: string, dimensions: V) => IImageMaker;
