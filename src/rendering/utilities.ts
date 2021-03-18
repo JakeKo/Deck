@@ -83,6 +83,24 @@ export function scaleBoxHelpers(helpers: BoundingBoxMutatorHelpers, scale: numbe
     helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].scale = scale;
 }
 
+/**
+ * Updates the provided bounding box helper graphics to match the provided bounding box.
+ */
+export function updateBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
+    helpers.box.rotation = box.rotation;
+    helpers.rotator.rotation = box.rotation;
+    helpers.box.setOriginAndDimensions(box.origin, box.dimensions);
+    helpers.rotator.center = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
+    helpers.vertices[VERTEX_ROLES.TOP_LEFT].center = box.topLeft;
+    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].center = box.topRight;
+    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].center = box.bottomLeft;
+    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].center = box.bottomRight;
+}
+
+/**
+ * @deprecated
+ * @see updateBoxHelpers
+ */
 export function rotateBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
     helpers.box.rotation = box.rotation;
     helpers.rotator.rotation = box.rotation;
@@ -93,6 +111,10 @@ export function rotateBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: Boundi
     helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].center = box.bottomRight;
 }
 
+/**
+ * @deprecated
+ * @see updateBoxHelpers
+ */
 export function resizeBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
     helpers.box.setOriginAndDimensions(box.origin, box.dimensions);
     helpers.rotator.center = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));

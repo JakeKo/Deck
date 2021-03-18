@@ -21,6 +21,7 @@ import {
     rotateBoxHelpers,
     scaleBoxHelpers,
     unrenderBoxHelpers,
+    updateBoxHelpers,
     updateSnapVectors
 } from '../utilities';
 
@@ -31,36 +32,108 @@ class RectangleMutator implements IRectangleMutator {
     private _helpers: BoundingBoxMutatorHelpers & { snapVectors: SnapVectorRenderer[] };
     private _graphicId: string;
     private _slide: ISlideRenderer;
+    private _isFocusing: boolean;
+    private _isMoving: boolean
 
     constructor({
         target,
         slide,
         scale,
-        graphicId
+        graphicId,
+        focus = true
     }: {
         target: IRectangleRenderer;
         slide: ISlideRenderer;
         scale: number;
         graphicId: string;
+        focus?: boolean;
     }) {
         this.target = target;
         this._graphicId = graphicId;
         this._slide = slide;
-
-        // Initialize helper graphics
+        this._isFocusing = false;
+        this._isMoving = false;
         this._helpers = {
             ...makeBoxHelpers(this.target, this._slide, scale),
             snapVectors: makeSnapVectors(this._slide, scale)
         };
 
-        // Render helper graphics
-        renderBoxHelpers(this._helpers);
-        this._helpers.snapVectors.forEach(s => s.render());
+        if (focus) {
+            this.focus();
+        }
     }
 
     public set scale(scale: number) {
         scaleBoxHelpers(this._helpers, scale);
         this._helpers.snapVectors.forEach(s => (s.scale = scale));
+    }
+
+    /**
+     * Updates the rendered helper graphics with the latest state of this mutator's targeted graphic.
+     */
+    public updateHelpers(): void {
+        if (!this._isFocusing) {
+            return;
+        }
+
+        const graphic = this._graphic;
+        updateBoxHelpers(this._helpers, graphic.transformedBox);
+    }
+
+    /**
+     * Focus the graphic that pertains to this mutator. This will render necessary helper graphics.
+     */
+    public focus(): void {
+        if (this._isFocusing) {
+            return;
+        }
+
+        this._isFocusing = true;
+        renderBoxHelpers(this._helpers);
+    }
+
+    /**
+     * Unfocus the graphic that pertains to this mutator. This will unrender all helper graphics.
+     */
+    public unfocus(): void {
+        if (!this._isFocusing) {
+            return;
+        }
+
+        this._isFocusing = false;
+        unrenderBoxHelpers(this._helpers);
+        this._helpers.snapVectors.forEach(s => s.unrender());
+    }
+
+    /**
+     * Initialize this mutator to begin tracking movement. This returns a handler to be called on each subsequent mouse event.
+     */
+    public initMove(initialPosition: V): (event: SlideMouseEvent) => RectangleMutableSerialized {
+        this._isMoving = true;
+        const graphic = this._graphic;
+        const initialOrigin = graphic.origin;
+        const relativePullPoints = graphic.pullPoints.map(p => initialPosition.towards(p));
+        const snapVectors = this._slide.getSnapVectors([this._graphicId]);
+
+        return event => {
+            const { shift: move, snapVectors: newSnapVectors } = calculateMove({
+                initialOrigin,
+                initialPosition,
+                mouseEvent: event,
+                snapVectors,
+                relativePullPoints
+            });
+
+            updateSnapVectors(newSnapVectors, this._helpers.snapVectors);
+            return { origin: initialOrigin.add(move) };
+        };
+    }
+
+    /**
+     * Conclude tracking of movement.
+     */
+    public endMove(): void {
+        this._isMoving = false;
     }
 
     // TODO: Account for ctrl, alt, and snapping
@@ -185,10 +258,8 @@ class RectangleMutator implements IRectangleMutator {
         this.target.strokeWidth = strokeWidth;
     }
 
-    public complete(): void {
-        // Remove helper graphics
-        unrenderBoxHelpers(this._helpers);
-        this._helpers.snapVectors.forEach(s => s.unrender());
+    private get _graphic(): IRectangleRenderer {
+        return this._slide.getGraphic(this._graphicId) as IRectangleRenderer;
     }
 
     private _repositionBoxHelpers(): void {

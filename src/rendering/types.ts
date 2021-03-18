@@ -3,6 +3,7 @@ import { Viewbox } from '@/store/types';
 import {
     CurveMutableSerialized,
     EllipseMutableSerialized,
+    GraphicMutableSerialized,
     ImageMutableSerialized,
     RectangleMutableSerialized,
     TextboxMutableSerialized,
@@ -229,17 +230,21 @@ export type IGraphicMutator = ICurveMutator
     | ITextboxMutator
     | IVideoMutator;
 
-type BaseGraphicMutator = {
+type BaseGraphicMutator<T extends GraphicMutableSerialized> = {
     scale: number;
-    complete: () => void;
+    updateHelpers: () => void;
+    focus: () => void;
+    unfocus: () => void;
+    initMove: (initialPosition: V) => (event: SlideMouseEvent) => T;
+    endMove: () => void;
+    vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => T;
+    rotateListener: () => (event: SlideMouseEvent) => T;
+    moveListener: (initialPosition: V) => (event: SlideMouseEvent) => T;
 };
 
-export type ICurveMutator = BaseGraphicMutator & {
+export type ICurveMutator = BaseGraphicMutator<CurveMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.CURVE;
     readonly target: ICurveRenderer;
-    vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => CurveMutableSerialized;
-    rotateListener: () => (event: SlideMouseEvent) => CurveMutableSerialized;
-    moveListener: (initialPosition: V) => (event: SlideMouseEvent) => CurveMutableSerialized;
     anchorListener: (index: number, role: CURVE_ANCHOR_ROLES) => (event: SlideMouseEvent) => CurveMutableSerialized;
     setRotation: (rotation: number) => void;
     setFillColor: (fillColor: string) => void;
@@ -247,12 +252,9 @@ export type ICurveMutator = BaseGraphicMutator & {
     setStrokeWidth: (strokeWidth: number) => void;
 };
 
-export type IEllipseMutator = BaseGraphicMutator & {
+export type IEllipseMutator = BaseGraphicMutator<EllipseMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.ELLIPSE;
     readonly target: IEllipseRenderer;
-    vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => EllipseMutableSerialized;
-    rotateListener: () => (event: SlideMouseEvent) => EllipseMutableSerialized;
-    moveListener: (initialPosition: V) => (event: SlideMouseEvent) => EllipseMutableSerialized;
     setX: (x: number) => void;
     setY: (y: number) => void;
     setWidth: (width: number) => void;
@@ -263,12 +265,9 @@ export type IEllipseMutator = BaseGraphicMutator & {
     setStrokeWidth: (strokeWidth: number) => void;
 };
 
-export type IImageMutator = BaseGraphicMutator & {
+export type IImageMutator = BaseGraphicMutator<ImageMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.IMAGE;
     readonly target: IImageRenderer;
-    vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => ImageMutableSerialized;
-    rotateListener: () => (event: SlideMouseEvent) => ImageMutableSerialized;
-    moveListener: (initialPosition: V) => (event: SlideMouseEvent) => ImageMutableSerialized;
     setX: (x: number) => void;
     setY: (y: number) => void;
     setWidth: (width: number) => void;
@@ -276,12 +275,9 @@ export type IImageMutator = BaseGraphicMutator & {
     setRotation: (rotation: number) => void;
 };
 
-export type IRectangleMutator = BaseGraphicMutator & {
+export type IRectangleMutator = BaseGraphicMutator<RectangleMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.RECTANGLE;
     readonly target: IRectangleRenderer;
-    vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => RectangleMutableSerialized;
-    rotateListener: () => (event: SlideMouseEvent) => RectangleMutableSerialized;
-    moveListener: (initialPosition: V) => (event: SlideMouseEvent) => RectangleMutableSerialized;
     setX: (x: number) => void;
     setY: (y: number) => void;
     setWidth: (width: number) => void;
@@ -292,12 +288,9 @@ export type IRectangleMutator = BaseGraphicMutator & {
     setStrokeWidth: (strokeWidth: number) => void;
 };
 
-export type ITextboxMutator = BaseGraphicMutator & {
+export type ITextboxMutator = BaseGraphicMutator<TextboxMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.TEXTBOX;
     readonly target: ITextboxRenderer;
-    vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => TextboxMutableSerialized;
-    rotateListener: () => (event: SlideMouseEvent) => TextboxMutableSerialized;
-    moveListener: (initialPosition: V) => (event: SlideMouseEvent) => TextboxMutableSerialized;
     setX: (x: number) => void;
     setY: (y: number) => void;
     setWidth: (width: number) => void;
@@ -306,12 +299,9 @@ export type ITextboxMutator = BaseGraphicMutator & {
     setRotation: (rotation: number) => void;
 };
 
-export type IVideoMutator = BaseGraphicMutator & {
+export type IVideoMutator = BaseGraphicMutator<VideoMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.VIDEO;
     readonly target: IVideoRenderer;
-    vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => VideoMutableSerialized;
-    rotateListener: () => (event: SlideMouseEvent) => VideoMutableSerialized;
-    moveListener: (initialPosition: V) => (event: SlideMouseEvent) => VideoMutableSerialized;
     setX: (x: number) => void;
     setY: (y: number) => void;
     setWidth: (width: number) => void;
