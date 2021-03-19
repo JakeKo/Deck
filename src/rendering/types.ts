@@ -318,6 +318,8 @@ export type ISlideRenderer = {
     readonly bounds: { origin: V; dimensions: V };
     cursor: string;
     cursorLock: boolean;
+    lockCursor: (cursor: string) => void;
+    unlockCursor: (cursor?: string) => void;
     getSnapVectors: (exclude: string[]) => SnapVector[];
     makeCurveInteractive: (initialPosition: V) => ICurveMaker;
     makeEllipseInteractive: (initialPosition: V) => IEllipseMaker;
@@ -339,6 +341,7 @@ export type ISlideRenderer = {
     isMarked: (graphicId: string) => boolean;
     broadcastSetGraphic: (graphic: IGraphicRenderer) => void;
     broadcastRemoveGraphic: (graphicId: string) => void;
+    setProps: (graphicId: string, graphicType: GRAPHIC_TYPES, props: GraphicMutableSerialized, emit?: boolean) => void;
     setX: (graphicId: string, x: number) => void;
     setY: (graphicId: string, y: number) => void;
     setFillColor: (graphicId: string, fillColor: string) => void;

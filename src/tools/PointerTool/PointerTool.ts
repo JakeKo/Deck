@@ -30,13 +30,13 @@ export default (): EditorTool => {
     return {
         name: TOOL_NAMES.POINTER,
         mount: () => {
-            listenOnce(CURVE_EVENTS.MOUSEDOWN, 'moveCurve', moveCurve);
+            listenOnce(CURVE_EVENTS.MOUSEDOWN, 'curve--init-move', moveCurve);
             listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'moveAnchor', moveAnchor);
-            listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, 'moveEllipse', moveEllipse);
-            listenOnce(IMAGE_EVENTS.MOUSEDOWN, 'moveImage', moveImage);
-            listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, 'moveRectangle', moveRectangle);
-            listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, 'moveTextbox', moveTextbox);
-            listenOnce(VIDEO_EVENTS.MOUSEDOWN, 'moveVideo', moveVideo);
+            listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, 'ellipse--init-move', moveEllipse);
+            listenOnce(IMAGE_EVENTS.MOUSEDOWN, 'image--init-move', moveImage);
+            listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, 'rectangle--init-move', moveRectangle);
+            listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, 'textbox--init-move', moveTextbox);
+            listenOnce(VIDEO_EVENTS.MOUSEDOWN, 'video--init-move', moveVideo);
 
             listen(CURVE_EVENTS.MOUSEOVER, 'hoverCurve', hoverCurve);
             listen(ELLIPSE_EVENTS.MOUSEOVER, 'hoverEllipse', hoverEllipse);
@@ -52,13 +52,13 @@ export default (): EditorTool => {
             listen(SLIDE_EVENTS.MOUSEMOVE, 'reevaluateCursor', reevaluateCursor);
         },
         unmount: () => {
-            unlisten(CURVE_EVENTS.MOUSEDOWN, 'moveCurve');
+            unlisten(CURVE_EVENTS.MOUSEDOWN, 'curve--init-move');
             unlisten(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'moveAnchor');
-            unlisten(ELLIPSE_EVENTS.MOUSEDOWN, 'moveEllipse');
-            unlisten(IMAGE_EVENTS.MOUSEDOWN, 'moveImage');
-            unlisten(RECTANGLE_EVENTS.MOUSEDOWN, 'moveRectangle');
-            unlisten(TEXTBOX_EVENTS.MOUSEDOWN, 'moveTextbox');
-            unlisten(VIDEO_EVENTS.MOUSEDOWN, 'moveVideo');
+            unlisten(ELLIPSE_EVENTS.MOUSEDOWN, 'ellipse--init-move');
+            unlisten(IMAGE_EVENTS.MOUSEDOWN, 'image--init-move');
+            unlisten(RECTANGLE_EVENTS.MOUSEDOWN, 'rectangle--init-move');
+            unlisten(TEXTBOX_EVENTS.MOUSEDOWN, 'textbox--init-move');
+            unlisten(VIDEO_EVENTS.MOUSEDOWN, 'video--init-move');
 
             unlisten(CURVE_EVENTS.MOUSEOVER, 'hoverCurve');
             unlisten(ELLIPSE_EVENTS.MOUSEOVER, 'hoverEllipse');

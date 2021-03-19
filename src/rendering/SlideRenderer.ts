@@ -142,6 +142,10 @@ class SlideRenderer implements ISlideRenderer {
         };
     }
 
+    /**
+     * @deprecated
+     * @see lockCursor
+     */
     public set cursor(cursor: string) {
         if (this._cursorLock) {
             return;
@@ -151,8 +155,24 @@ class SlideRenderer implements ISlideRenderer {
         this.canvas.node.style.cursor = this._cursor;
     }
 
+    /**
+     * @deprecated
+     * @see lockCursor
+     */
     public set cursorLock(cursorLock: boolean) {
         this._cursorLock = cursorLock;
+    }
+
+    public lockCursor(cursor: string): void {
+        this.cursor = cursor;
+        this.cursorLock = true;
+    }
+
+    public unlockCursor(cursor?: string): void {
+        this.cursorLock = false;
+        if (cursor) {
+            this.cursor = cursor;
+        }
     }
 
     public getSnapVectors(exclude: string[]): SnapVector[] {
@@ -353,6 +373,10 @@ class SlideRenderer implements ISlideRenderer {
         }
 
         graphic.setProps(props);
+        const mutator = this._graphicsFocused[graphicId];
+        if (mutator !== undefined) {
+            mutator.updateHelpers();
+        }
 
         if (!emit) {
             return;

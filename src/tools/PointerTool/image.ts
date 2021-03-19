@@ -5,29 +5,31 @@ import { resolvePosition } from '../utilities';
 
 export function moveImage(event: ImageMouseEvent): void {
     const { slide, baseEvent, target } = event.detail;
-    if (!baseEvent.ctrlKey && !slide.isFocused(target.id)) {
-        slide.unfocusAllGraphics([target.id]);
+    const { id: graphicId, type: graphicType } = target;
+    if (!baseEvent.ctrlKey && !slide.isFocused(graphicId)) {
+        slide.unfocusAllGraphics([graphicId]);
     }
 
-    const mutator = slide.focusGraphic(target.id) as ImageMutator;
-    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide));
-    slide.cursor = 'move';
-    slide.cursorLock = true;
+    // Initialize mutator move tracking
+    const mutator = slide.focusGraphic(graphicId) as ImageMutator;
+    const moveListener = mutator.initMove(resolvePosition(baseEvent, slide));
+    slide.lockCursor('move');
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, 'move', move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'image--move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'image--complete', complete);
 
     function move(event: SlideMouseEvent): void {
-        moveListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        const deltas = moveListener(event);
+        slide.setProps(graphicId, graphicType, deltas);
     }
 
     function complete(event: SlideMouseEvent): void {
-        moveListener(event);
-        slide.broadcastSetGraphic(mutator.target);
-        slide.cursorLock = false;
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
-        listenOnce(IMAGE_EVENTS.MOUSEDOWN, 'moveImage', moveImage);
+        move(event);
+        mutator.endMove();
+        slide.unlockCursor();
+
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'image--move');
+        listenOnce(IMAGE_EVENTS.MOUSEDOWN, 'image--init-move', moveImage);
     }
 }
 

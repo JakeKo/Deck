@@ -134,6 +134,7 @@ class RectangleMutator implements IRectangleMutator {
      */
     public endMove(): void {
         this._isMoving = false;
+        updateSnapVectors([], this._helpers.snapVectors);
     }
 
     // TODO: Account for ctrl, alt, and snapping
