@@ -1,8 +1,24 @@
-import { listen } from '@/events';
+import { dispatch, listen } from '@/events';
 import { decorateSlideEvents } from '@/events/decorators';
-import { SlideKeyboardEvent, SlideZoomEvent, SLIDE_EVENTS } from '@/events/types';
+import {
+    CurveUpdatedPayload,
+    CURVE_EVENTS,
+    EllipseUpdatedPayload,
+    ELLIPSE_EVENTS,
+    ImageUpdatedPayload,
+    IMAGE_EVENTS,
+    RectangleUpdatedPayload,
+    RECTANGLE_EVENTS,
+    SlideKeyboardEvent,
+    SlideZoomEvent,
+    SLIDE_EVENTS,
+    TextboxUpdatedPayload,
+    TEXTBOX_EVENTS,
+    VideoUpdatedPayload,
+    VIDEO_EVENTS
+} from '@/events/types';
 import { GraphicStoreModel, Viewbox } from '@/store/types';
-import { Keyed } from '@/types';
+import { GraphicMutableSerialized, Keyed } from '@/types';
 import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
 import SlideStateManager from '@/utilities/SlideStateManager';
 import SnapVector from '@/utilities/SnapVector';
@@ -328,6 +344,63 @@ class SlideRenderer implements ISlideRenderer {
 
     public isMarked(graphicId: string): boolean {
         return this._graphicsHighlighted[graphicId] !== undefined;
+    }
+
+    public setProps(graphicId: string, graphicType: GRAPHIC_TYPES, props: GraphicMutableSerialized, emit = true): void {
+        const graphic = this.getGraphic(graphicId);
+        if (graphic === undefined) {
+            throw new Error(`Could not find graphic with id ${graphicId}`);
+        }
+
+        graphic.setProps(props);
+
+        if (!emit) {
+            return;
+        }
+
+        if (graphicType === GRAPHIC_TYPES.CURVE) {
+            dispatch<CurveUpdatedPayload>(CURVE_EVENTS.UPDATED, {
+                slideId: this._slideId,
+                graphicId: graphicId,
+                type: graphicType,
+                props
+            });
+        } else if (graphicType === GRAPHIC_TYPES.ELLIPSE) {
+            dispatch<EllipseUpdatedPayload>(ELLIPSE_EVENTS.UPDATED, {
+                slideId: this._slideId,
+                graphicId: graphicId,
+                type: graphicType,
+                props
+            });
+        } else if (graphicType === GRAPHIC_TYPES.IMAGE) {
+            dispatch<ImageUpdatedPayload>(IMAGE_EVENTS.UPDATED, {
+                slideId: this._slideId,
+                graphicId: graphicId,
+                type: graphicType,
+                props
+            });
+        } else if (graphicType === GRAPHIC_TYPES.RECTANGLE) {
+            dispatch<RectangleUpdatedPayload>(RECTANGLE_EVENTS.UPDATED, {
+                slideId: this._slideId,
+                graphicId: graphicId,
+                type: graphicType,
+                props
+            });
+        } else if (graphicType === GRAPHIC_TYPES.TEXTBOX) {
+            dispatch<TextboxUpdatedPayload>(TEXTBOX_EVENTS.UPDATED, {
+                slideId: this._slideId,
+                graphicId: graphicId,
+                type: graphicType,
+                props
+            });
+        } else if (graphicType === GRAPHIC_TYPES.VIDEO) {
+            dispatch<VideoUpdatedPayload>(VIDEO_EVENTS.UPDATED, {
+                slideId: this._slideId,
+                graphicId: graphicId,
+                type: graphicType,
+                props
+            });
+        }
     }
 
     // SINGLE PROPERTY UPDATE METHODS
