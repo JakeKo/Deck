@@ -3,37 +3,12 @@ import { resolvePosition } from '@/tools/utilities';
 import { RectangleMutableSerialized } from '@/types';
 import { closestVector, mod } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
-import { SnapVectorRenderer } from '../helpers';
-import {
-    BoundingBoxMutatorHelpers,
-    GRAPHIC_TYPES,
-    IRectangleMutator,
-    IRectangleRenderer,
-    ISlideRenderer,
-    VERTEX_ROLES
-} from '../types';
-import {
-    calculateMove,
-    makeBoxHelpers,
-    makeSnapVectors,
-    renderBoxHelpers,
-    resizeBoxHelpers,
-    rotateBoxHelpers,
-    scaleBoxHelpers,
-    unrenderBoxHelpers,
-    updateBoxHelpers,
-    updateSnapVectors
-} from '../utilities';
+import { GRAPHIC_TYPES, IRectangleMutator, IRectangleRenderer, ISlideRenderer, VERTEX_ROLES } from '../types';
+import { calculateMove, resizeBoxHelpers, rotateBoxHelpers, updateSnapVectors } from '../utilities';
+import GraphicMutatorBase from './GraphicMutatorBase';
 
-class RectangleMutator implements IRectangleMutator {
-    public readonly type = GRAPHIC_TYPES.RECTANGLE;
+class RectangleMutator extends GraphicMutatorBase<GRAPHIC_TYPES.RECTANGLE, IRectangleRenderer, RectangleMutableSerialized> implements IRectangleMutator {
     public readonly target: IRectangleRenderer;
-
-    private _helpers: BoundingBoxMutatorHelpers & { snapVectors: SnapVectorRenderer[] };
-    private _graphicId: string;
-    private _slide: ISlideRenderer;
-    private _isFocusing: boolean;
-    private _isMoving: boolean
 
     constructor({
         target,
@@ -48,72 +23,19 @@ class RectangleMutator implements IRectangleMutator {
         graphicId: string;
         focus?: boolean;
     }) {
+        super({ type: GRAPHIC_TYPES.RECTANGLE, slide, scale, graphicId, focus });
         this.target = target;
-        this._graphicId = graphicId;
-        this._slide = slide;
-        this._isFocusing = false;
-        this._isMoving = false;
-        this._helpers = {
-            ...makeBoxHelpers(this.target, this._slide, scale),
-            snapVectors: makeSnapVectors(this._slide, scale)
-        };
-
-        if (focus) {
-            this.focus();
-        }
-    }
-
-    public set scale(scale: number) {
-        scaleBoxHelpers(this._helpers, scale);
-        this._helpers.snapVectors.forEach(s => (s.scale = scale));
-    }
-
-    /**
-     * Updates the rendered helper graphics with the latest state of this mutator's targeted graphic.
-     */
-    public updateHelpers(): void {
-        if (!this._isFocusing) {
-            return;
-        }
-
-        const graphic = this._graphic;
-        updateBoxHelpers(this._helpers, graphic.transformedBox);
-    }
-
-    /**
-     * Focus the graphic that pertains to this mutator. This will render necessary helper graphics.
-     */
-    public focus(): void {
-        if (this._isFocusing) {
-            return;
-        }
-
-        this._isFocusing = true;
-        renderBoxHelpers(this._helpers);
-    }
-
-    /**
-     * Unfocus the graphic that pertains to this mutator. This will unrender all helper graphics.
-     */
-    public unfocus(): void {
-        if (!this._isFocusing) {
-            return;
-        }
-
-        this._isFocusing = false;
-        unrenderBoxHelpers(this._helpers);
-        this._helpers.snapVectors.forEach(s => s.unrender());
     }
 
     /**
      * Initialize this mutator to begin tracking movement. This returns a handler to be called on each subsequent mouse event.
      */
     public initMove(initialPosition: V): (event: SlideMouseEvent) => RectangleMutableSerialized {
-        this._isMoving = true;
-        const graphic = this._graphic;
+        this.isMoving = true;
+        const graphic = this.graphic;
         const initialOrigin = graphic.origin;
         const relativePullPoints = graphic.pullPoints.map(p => initialPosition.towards(p));
-        const snapVectors = this._slide.getSnapVectors([this._graphicId]);
+        const snapVectors = this.slide.getSnapVectors([this.graphicId]);
 
         return event => {
             const { shift: move, snapVectors: newSnapVectors } = calculateMove({
@@ -124,7 +46,7 @@ class RectangleMutator implements IRectangleMutator {
                 relativePullPoints
             });
 
-            updateSnapVectors(newSnapVectors, this._helpers.snapVectors);
+            updateSnapVectors(newSnapVectors, this.helpers.snapVectors);
             return { origin: initialOrigin.add(move) };
         };
     }
@@ -133,8 +55,8 @@ class RectangleMutator implements IRectangleMutator {
      * Conclude tracking of movement.
      */
     public endMove(): void {
-        this._isMoving = false;
-        updateSnapVectors([], this._helpers.snapVectors);
+        this.isMoving = false;
+        updateSnapVectors([], this.helpers.snapVectors);
     }
 
     // TODO: Account for ctrl, alt, and snapping
@@ -194,7 +116,7 @@ class RectangleMutator implements IRectangleMutator {
 
             this.target.rotation = mod(theta, Math.PI * 2);
             slide.broadcastSetGraphic(this.target);
-            rotateBoxHelpers(this._helpers, this.target.transformedBox);
+            rotateBoxHelpers(this.helpers, this.target.transformedBox);
 
             return { rotation: this.target.rotation };
         };
@@ -203,7 +125,7 @@ class RectangleMutator implements IRectangleMutator {
     public moveListener(initialPosition: V): (event: SlideMouseEvent) => RectangleMutableSerialized {
         const initialOrigin = this.target.origin;
         const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));
-        const snapVectors = this._slide.getSnapVectors([this._graphicId]);
+        const snapVectors = this.slide.getSnapVectors([this.graphicId]);
 
         return event => {
             const { shift: move, snapVectors: newSnapVectors } = calculateMove({
@@ -216,7 +138,7 @@ class RectangleMutator implements IRectangleMutator {
 
             this.target.origin = initialOrigin.add(move);
             this._repositionBoxHelpers();
-            updateSnapVectors(newSnapVectors, this._helpers.snapVectors);
+            updateSnapVectors(newSnapVectors, this.helpers.snapVectors);
 
             return { origin: this.target.origin };
         };
@@ -244,7 +166,7 @@ class RectangleMutator implements IRectangleMutator {
 
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
-        rotateBoxHelpers(this._helpers, this.target.transformedBox);
+        rotateBoxHelpers(this.helpers, this.target.transformedBox);
     }
 
     public setFillColor(fillColor: string): void {
@@ -259,12 +181,8 @@ class RectangleMutator implements IRectangleMutator {
         this.target.strokeWidth = strokeWidth;
     }
 
-    private get _graphic(): IRectangleRenderer {
-        return this._slide.getGraphic(this._graphicId) as IRectangleRenderer;
-    }
-
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this._helpers, this.target.transformedBox);
+        resizeBoxHelpers(this.helpers, this.target.transformedBox);
     }
 }
 

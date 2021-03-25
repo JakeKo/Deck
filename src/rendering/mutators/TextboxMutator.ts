@@ -3,37 +3,12 @@ import { resolvePosition } from '@/tools/utilities';
 import { TextboxMutableSerialized } from '@/types';
 import { closestVector, mod } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
-import { SnapVectorRenderer } from '../helpers';
-import {
-    BoundingBoxMutatorHelpers,
-    GRAPHIC_TYPES,
-    ISlideRenderer,
-    ITextboxMutator,
-    ITextboxRenderer,
-    VERTEX_ROLES
-} from '../types';
-import {
-    calculateMove,
-    makeBoxHelpers,
-    makeSnapVectors,
-    renderBoxHelpers,
-    resizeBoxHelpers,
-    rotateBoxHelpers,
-    scaleBoxHelpers,
-    unrenderBoxHelpers,
-    updateBoxHelpers,
-    updateSnapVectors
-} from '../utilities';
+import { GRAPHIC_TYPES, ISlideRenderer, ITextboxMutator, ITextboxRenderer, VERTEX_ROLES } from '../types';
+import { calculateMove, resizeBoxHelpers, rotateBoxHelpers, updateSnapVectors } from '../utilities';
+import GraphicMutatorBase from './GraphicMutatorBase';
 
-class TextboxMutator implements ITextboxMutator {
-    public readonly type = GRAPHIC_TYPES.TEXTBOX;
+class TextboxMutator extends GraphicMutatorBase<GRAPHIC_TYPES.TEXTBOX, ITextboxRenderer, TextboxMutableSerialized> implements ITextboxMutator {
     public readonly target: ITextboxRenderer;
-
-    private _helpers: BoundingBoxMutatorHelpers & { snapVectors: SnapVectorRenderer[] };
-    private _graphicId: string;
-    private _slide: ISlideRenderer;
-    private _isFocusing: boolean;
-    private _isMoving: boolean;
 
     constructor({
         target,
@@ -48,72 +23,19 @@ class TextboxMutator implements ITextboxMutator {
         graphicId: string;
         focus?: boolean;
     }) {
+        super({ type: GRAPHIC_TYPES.TEXTBOX, slide, scale, graphicId, focus });
         this.target = target;
-        this._graphicId = graphicId;
-        this._slide = slide;
-        this._isFocusing = false;
-        this._isMoving = false;
-        this._helpers = {
-            ...makeBoxHelpers(this.target, this._slide, scale),
-            snapVectors: makeSnapVectors(this._slide, scale)
-        };
-
-        if (focus) {
-            this.focus();
-        }
-    }
-
-    public set scale(scale: number) {
-        scaleBoxHelpers(this._helpers, scale);
-        this._helpers.snapVectors.forEach(s => (s.scale = scale));
-    }
-
-    /**
-     * Updates the rendered helper graphics with the latest state of this mutator's targeted graphic.
-     */
-    public updateHelpers(): void {
-        if (!this._isFocusing) {
-            return;
-        }
-
-        const graphic = this._graphic;
-        updateBoxHelpers(this._helpers, graphic.transformedBox);
-    }
-
-    /**
-     * Focus the graphic that pertains to this mutator. This will render necessary helper graphics.
-     */
-    public focus(): void {
-        if (this._isFocusing) {
-            return;
-        }
-
-        this._isFocusing = true;
-        renderBoxHelpers(this._helpers);
-    }
-
-    /**
-     * Unfocus the graphic that pertains to this mutator. This will unrender all helper graphics.
-     */
-    public unfocus(): void {
-        if (!this._isFocusing) {
-            return;
-        }
-
-        this._isFocusing = false;
-        unrenderBoxHelpers(this._helpers);
-        this._helpers.snapVectors.forEach(s => s.unrender());
     }
 
     /**
      * Initialize this mutator to begin tracking movement. This returns a handler to be called on each subsequent mouse event.
      */
     public initMove(initialPosition: V): (event: SlideMouseEvent) => TextboxMutableSerialized {
-        this._isMoving = true;
-        const graphic = this._graphic;
+        this.isMoving = true;
+        const graphic = this.graphic;
         const initialOrigin = graphic.origin;
         const relativePullPoints = graphic.pullPoints.map(p => initialPosition.towards(p));
-        const snapVectors = this._slide.getSnapVectors([this._graphicId]);
+        const snapVectors = this.slide.getSnapVectors([this.graphicId]);
 
         return event => {
             const { shift: move, snapVectors: newSnapVectors } = calculateMove({
@@ -124,7 +46,7 @@ class TextboxMutator implements ITextboxMutator {
                 relativePullPoints
             });
 
-            updateSnapVectors(newSnapVectors, this._helpers.snapVectors);
+            updateSnapVectors(newSnapVectors, this.helpers.snapVectors);
             return { origin: initialOrigin.add(move) };
         };
     }
@@ -133,8 +55,8 @@ class TextboxMutator implements ITextboxMutator {
      * Conclude tracking of movement.
      */
     public endMove(): void {
-        this._isMoving = false;
-        updateSnapVectors([], this._helpers.snapVectors);
+        this.isMoving = false;
+        updateSnapVectors([], this.helpers.snapVectors);
     }
 
     // TODO: Account for ctrl, alt, and snapping
@@ -192,7 +114,7 @@ class TextboxMutator implements ITextboxMutator {
             const theta = Math.atan2(offset.y, offset.x);
 
             this.target.rotation = mod(theta, Math.PI * 2);
-            rotateBoxHelpers(this._helpers, this.target.transformedBox);
+            rotateBoxHelpers(this.helpers, this.target.transformedBox);
 
             return { rotation: this.target.rotation };
         };
@@ -201,7 +123,7 @@ class TextboxMutator implements ITextboxMutator {
     public moveListener(initialPosition: V): (event: SlideMouseEvent) => TextboxMutableSerialized {
         const initialOrigin = this.target.origin;
         const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));
-        const snapVectors = this._slide.getSnapVectors([this._graphicId]);
+        const snapVectors = this.slide.getSnapVectors([this.graphicId]);
 
         return event => {
             const { shift: move, snapVectors: newSnapVectors } = calculateMove({
@@ -214,7 +136,7 @@ class TextboxMutator implements ITextboxMutator {
 
             this.target.origin = initialOrigin.add(move);
             this._repositionBoxHelpers();
-            updateSnapVectors(newSnapVectors, this._helpers.snapVectors);
+            updateSnapVectors(newSnapVectors, this.helpers.snapVectors);
 
             return { origin: this.target.origin };
         };
@@ -247,17 +169,13 @@ class TextboxMutator implements ITextboxMutator {
 
     public setRotation(rotation: number): void {
         this.target.rotation = rotation;
-        rotateBoxHelpers(this._helpers, this.target.transformedBox);
+        rotateBoxHelpers(this.helpers, this.target.transformedBox);
     }
 
     // TODO: Include mutations for other properties
 
-    private get _graphic(): ITextboxRenderer {
-        return this._slide.getGraphic(this._graphicId) as ITextboxRenderer;
-    }
-
     private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this._helpers, this.target.transformedBox);
+        resizeBoxHelpers(this.helpers, this.target.transformedBox);
     }
 }
 
