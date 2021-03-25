@@ -230,6 +230,7 @@ export type IGraphicMutator = ICurveMutator
     | ITextboxMutator
     | IVideoMutator;
 
+// TODO: Reconcile these types with GraphicMutatorBase
 type BaseGraphicMutator<T extends GraphicMutableSerialized> = {
     scale: number;
     updateHelpers: () => void;
@@ -237,9 +238,9 @@ type BaseGraphicMutator<T extends GraphicMutableSerialized> = {
     unfocus: () => void;
     initMove: (initialPosition: V) => (event: SlideMouseEvent) => T;
     endMove: () => void;
-    vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => T;
+    initVertexMove: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => T;
+    endVertexMove: () => void;
     rotateListener: () => (event: SlideMouseEvent) => T;
-    moveListener: (initialPosition: V) => (event: SlideMouseEvent) => T;
 };
 
 export type ICurveMutator = BaseGraphicMutator<CurveMutableSerialized> & {

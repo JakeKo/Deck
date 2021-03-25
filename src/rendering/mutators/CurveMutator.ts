@@ -94,7 +94,8 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
     }
 
     /**
-     * Initialize this mutator to begin tracking movement. This returns a handler to be called on each subsequent mouse event.
+     * Initialize this mutator to begin tracking movement.
+     * This returns a handler to be called on each subsequent mouse event.
      */
     public initMove(initialPosition: V): (event: SlideMouseEvent) => CurveMutableSerialized {
         this.isMoving = true;
@@ -133,8 +134,13 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
     }
 
     // TODO: Account for ctrl, alt, and snapping
-    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => CurveMutableSerialized {
-        const box = this.target.transformedBox;
+    /**
+     * Initialize this mutator to begin tracking vertex movement.
+     * This returns a handler to be called on each subsequent mouse event.
+     */
+    public initVertexMove(role: VERTEX_ROLES): (event: SlideMouseEvent) => CurveMutableSerialized {
+        this.isMovingVertex = true;
+        const box = this.graphic.transformedBox;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(V.northwest),
@@ -148,7 +154,7 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
         // 4. Unrotate the corner vector to correct for graphic rotation
         // 5. Use the post-shift corner vector and corrected corner vector to update props
         const makeListener = (oppositeCorner: V): (event: SlideMouseEvent) => CurveMutableSerialized => {
-            const anchorOffsets = this.target.anchors.map<CurveAnchor>(anchor => ({
+            const anchorOffsets = this.graphic.anchors.map<CurveAnchor>(anchor => ({
                 inHandle: oppositeCorner.towards(anchor.inHandle).abs,
                 point: oppositeCorner.towards(anchor.point).abs,
                 outHandle: oppositeCorner.towards(anchor.outHandle).abs
@@ -163,15 +169,13 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
 
                 const scale = new V(correctedCornerVector.x / box.dimensions.x, correctedCornerVector.y / box.dimensions.y);
 
-                // Update rendering
-                this.target.anchors = anchorOffsets.map<CurveAnchor>(anchor => ({
-                    inHandle: new V(anchor.inHandle.x * scale.x, anchor.inHandle.y * scale.y).add(oppositeCorner),
-                    point: new V(anchor.point.x * scale.x, anchor.point.y * scale.y).add(oppositeCorner),
-                    outHandle: new V(anchor.outHandle.x * scale.x, anchor.outHandle.y * scale.y).add(oppositeCorner)
-                }));
-                this._repositionCurveAnchors();
-
-                return { anchors: this.target.anchors };
+                return {
+                    anchors: anchorOffsets.map<CurveAnchor>(anchor => ({
+                        inHandle: new V(anchor.inHandle.x * scale.x, anchor.inHandle.y * scale.y).add(oppositeCorner),
+                        point: new V(anchor.point.x * scale.x, anchor.point.y * scale.y).add(oppositeCorner),
+                        outHandle: new V(anchor.outHandle.x * scale.x, anchor.outHandle.y * scale.y).add(oppositeCorner)
+                    }))
+                };
             };
         };
 
@@ -181,6 +185,13 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
             [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
             [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
         })[role];
+    }
+
+    /**
+     * Conclude tracking of vertex movement.
+     */
+    public endVertexMove(): void {
+        this.isMovingVertex = false;
     }
 
     public rotateListener(): (event: SlideMouseEvent) => CurveMutableSerialized {
@@ -198,34 +209,6 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
             rotateBoxHelpers(this.helpers, this.target.transformedBox);
 
             return { rotation: this.target.rotation };
-        };
-    }
-
-    public moveListener(initialPosition: V): (event: SlideMouseEvent) => CurveMutableSerialized {
-        const initialOrigin = this.target.getAnchor(0).point;
-        const initialAnchors = this.target.anchors;
-        const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));
-        const snapVectors = this.slide.getSnapVectors([this.graphicId]);
-
-        return event => {
-            const { shift: move, snapVectors: newSnapVectors } = calculateMove({
-                initialOrigin,
-                initialPosition,
-                mouseEvent: event,
-                snapVectors,
-                relativePullPoints
-            });
-
-            const newAnchors = initialAnchors.map(anchor => ({
-                inHandle: anchor.inHandle.add(move),
-                point: anchor.point.add(move),
-                outHandle: anchor.outHandle.add(move)
-            }));
-            this.target.anchors = newAnchors;
-            this._repositionCurveAnchors();
-            updateSnapVectors(newSnapVectors, this.helpers.snapVectors);
-
-            return { anchors: this.target.anchors };
         };
     }
 
@@ -286,17 +269,6 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
         this.anchorHelpers[index].inHandle = anchor.inHandle;
         this.anchorHelpers[index].point = anchor.point;
         this.anchorHelpers[index].outHandle = anchor.outHandle;
-
-        resizeBoxHelpers(this.helpers, this.target.transformedBox);
-    }
-
-    private _repositionCurveAnchors(): void {
-        this.anchorHelpers.forEach((_, index) => {
-            const anchor = this.target.getAnchor(index);
-            this.anchorHelpers[index].inHandle = anchor.inHandle;
-            this.anchorHelpers[index].point = anchor.point;
-            this.anchorHelpers[index].outHandle = anchor.outHandle;
-        });
 
         resizeBoxHelpers(this.helpers, this.target.transformedBox);
     }

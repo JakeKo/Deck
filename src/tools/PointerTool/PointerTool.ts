@@ -45,7 +45,7 @@ export default (): EditorTool => {
             listen(TEXTBOX_EVENTS.MOUSEOVER, 'hoverTextbox', hoverTextbox);
             listen(VIDEO_EVENTS.MOUSEOVER, 'hoverVideo', hoverVideo);
 
-            listen(VERTEX_EVENTS.MOUSEDOWN, 'moveVertex', moveVertex);
+            listenOnce(VERTEX_EVENTS.MOUSEDOWN, 'vertex--init-move', moveVertex);
             listen(ROTATOR_EVENTS.MOUSEDOWN, 'rotateGraphic', rotateGraphic);
 
             listen(SLIDE_EVENTS.MOUSEDOWN, 'reevaluateFocusedGraphics', reevaluateFocusedGraphics);
@@ -67,7 +67,7 @@ export default (): EditorTool => {
             unlisten(TEXTBOX_EVENTS.MOUSEOVER, 'hoverTextbox');
             unlisten(VIDEO_EVENTS.MOUSEOVER, 'hoverVideo');
 
-            unlisten(VERTEX_EVENTS.MOUSEDOWN, 'moveVertex');
+            unlisten(VERTEX_EVENTS.MOUSEDOWN, 'vertex--init-move');
             unlisten(ROTATOR_EVENTS.MOUSEDOWN, 'rotateGraphic');
 
             unlisten(SLIDE_EVENTS.MOUSEDOWN, 'reevaluateFocusedGraphics');
@@ -103,19 +103,19 @@ function reevaluateCursor(event: SlideMouseEvent): void {
 
 function moveVertex(event: VertexMouseEvent): void {
     const { slide, target } = event.detail;
-    const mutator = slide.focusGraphic(target.parent.id);
+    const { id: graphicId, type: graphicType } = target.parent;
+    const mutator = slide.focusGraphic(graphicId);
 
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
     let lastMouseEvent: VertexMouseEvent | SlideMouseEvent = event;
-    const vertexListener = mutator.vertexListener(target.role);
-    slide.cursor = 'grabbing';
-    slide.cursorLock = true;
+    const vertexListener = mutator.initVertexMove(target.role);
+    slide.lockCursor('grabbing');
 
-    listen(SLIDE_EVENTS.KEYDOWN, 'keyDownHandler', keyDownHandler);
-    listen(SLIDE_EVENTS.KEYUP, 'keyUpHandler', keyUpHandler);
-    listen(SLIDE_EVENTS.MOUSEMOVE, 'move', move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
+    listen(SLIDE_EVENTS.KEYDOWN, 'vertex--key-down', keyDownHandler);
+    listen(SLIDE_EVENTS.KEYUP, 'vertex--key-up', keyUpHandler);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'vertex--move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'vertex--complete', complete);
 
     // When Shift, Ctrl, or Alt are pressed or unpressed, simulate a mousemove event
     // This allows the renderer to immediately adjust the shape dimensions if need be
@@ -164,21 +164,20 @@ function moveVertex(event: VertexMouseEvent): void {
     }
 
     function move(event: SlideMouseEvent): void {
-        vertexListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        const deltas = vertexListener(event);
+        slide.setProps(graphicId, graphicType, deltas);
         lastMouseEvent = event;
     }
 
     function complete(event: SlideMouseEvent): void {
-        vertexListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        move(event);
+        mutator.endVertexMove();
+        slide.unlockCursor('grab');
 
-        slide.cursorLock = false;
-        slide.cursor = 'grab';
-
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
-        unlisten(SLIDE_EVENTS.KEYDOWN, 'keyDownHandler');
-        unlisten(SLIDE_EVENTS.KEYUP, 'keyUpHandler');
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'vertex--move');
+        unlisten(SLIDE_EVENTS.KEYDOWN, 'vertex--key-down');
+        unlisten(SLIDE_EVENTS.KEYUP, 'vertex--key-up');
+        listenOnce(VERTEX_EVENTS.MOUSEDOWN, 'vertex--init-move', moveVertex);
     }
 }
 

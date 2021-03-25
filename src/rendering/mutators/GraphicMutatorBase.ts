@@ -28,6 +28,7 @@ abstract class GraphicMutatorBase<S extends GRAPHIC_TYPES, T extends IGraphicRen
     protected slide: ISlideRenderer;
     protected isFocusing: boolean;
     protected isMoving: boolean;
+    protected isMovingVertex: boolean;
 
     constructor({
         slide,
@@ -42,11 +43,12 @@ abstract class GraphicMutatorBase<S extends GRAPHIC_TYPES, T extends IGraphicRen
         type: S,
         focus?: boolean
     }) {
-        this.slide = slide;
         this.type = type;
+        this.slide = slide;
         this.graphicId = graphicId;
         this.isFocusing = false;
         this.isMoving = false;
+        this.isMovingVertex = false;
 
         this.helpers = {
             ...makeBoxHelpers(this.graphic, this.slide, scale),
@@ -106,9 +108,9 @@ abstract class GraphicMutatorBase<S extends GRAPHIC_TYPES, T extends IGraphicRen
 
     abstract initMove(initialPosition: V): (event: SlideMouseEvent) => U;
     abstract endMove(): void;
-    abstract vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => U;
+    abstract initVertexMove(role: VERTEX_ROLES): (event: SlideMouseEvent) => U;
+    abstract endVertexMove(): void;
     abstract rotateListener(): (event: SlideMouseEvent) => U;
-    abstract moveListener(initialPosition: V): (event: SlideMouseEvent) => U;
 }
 
 export default GraphicMutatorBase;

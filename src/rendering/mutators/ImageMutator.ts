@@ -28,7 +28,8 @@ class ImageMutator extends GraphicMutatorBase<GRAPHIC_TYPES.IMAGE, IImageRendere
     }
 
     /**
-     * Initialize this mutator to begin tracking movement. This returns a handler to be called on each subsequent mouse event.
+     * Initialize this mutator to begin tracking movement.
+     * This returns a handler to be called on each subsequent mouse event.
      */
     public initMove(initialPosition: V): (event: SlideMouseEvent) => ImageMutableSerialized {
         this.isMoving = true;
@@ -60,8 +61,13 @@ class ImageMutator extends GraphicMutatorBase<GRAPHIC_TYPES.IMAGE, IImageRendere
     }
 
     // TODO: Account for ctrl, alt, and snapping
-    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => ImageMutableSerialized {
-        const box = this.target.transformedBox;
+    /**
+     * Initialize this mutator to begin tracking vertex movement.
+     * This returns a handler to be called on each subsequent mouse event.
+     */
+    public initVertexMove(role: VERTEX_ROLES): (event: SlideMouseEvent) => ImageMutableSerialized {
+        this.isMovingVertex = true;
+        const box = this.graphic.transformedBox;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(V.northwest),
@@ -86,11 +92,7 @@ class ImageMutator extends GraphicMutatorBase<GRAPHIC_TYPES.IMAGE, IImageRendere
                 const center = oppositeCorner.add(cornerVector.scale(0.5));
                 const origin = center.add(dimensions.scale(-0.5));
 
-                // Update rendering
-                this.target.setOriginAndDimensions(origin, dimensions);
-                this._repositionBoxHelpers();
-
-                return { origin: this.target.origin, dimensions: this.target.dimensions };
+                return { origin, dimensions };
             };
         };
 
@@ -100,6 +102,13 @@ class ImageMutator extends GraphicMutatorBase<GRAPHIC_TYPES.IMAGE, IImageRendere
             [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
             [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
         })[role];
+    }
+
+    /**
+     * Conclude tracking of vertex movement.
+     */
+    public endVertexMove(): void {
+        this.isMovingVertex = false;
     }
 
     public rotateListener(): (event: SlideMouseEvent) => ImageMutableSerialized {
@@ -117,28 +126,6 @@ class ImageMutator extends GraphicMutatorBase<GRAPHIC_TYPES.IMAGE, IImageRendere
             rotateBoxHelpers(this.helpers, this.target.transformedBox);
 
             return { rotation: this.target.rotation };
-        };
-    }
-
-    public moveListener(initialPosition: V): (event: SlideMouseEvent) => ImageMutableSerialized {
-        const initialOrigin = this.target.origin;
-        const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));
-        const snapVectors = this.slide.getSnapVectors([this.graphicId]);
-
-        return event => {
-            const { shift: move, snapVectors: newSnapVectors } = calculateMove({
-                initialOrigin,
-                initialPosition,
-                mouseEvent: event,
-                snapVectors,
-                relativePullPoints
-            });
-
-            this.target.origin = initialOrigin.add(move);
-            this._repositionBoxHelpers();
-            updateSnapVectors(newSnapVectors, this.helpers.snapVectors);
-
-            return { origin: this.target.origin };
         };
     }
 

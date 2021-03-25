@@ -28,7 +28,8 @@ class EllipseMutator extends GraphicMutatorBase<GRAPHIC_TYPES.ELLIPSE, IEllipseR
     }
 
     /**
-     * Initialize this mutator to begin tracking movement. This returns a handler to be called on each subsequent mouse event.
+     * Initialize this mutator to begin tracking movement.
+     * This returns a handler to be called on each subsequent mouse event.
      */
     public initMove(initialPosition: V): (event: SlideMouseEvent) => EllipseMutableSerialized {
         this.isMoving = true;
@@ -61,8 +62,13 @@ class EllipseMutator extends GraphicMutatorBase<GRAPHIC_TYPES.ELLIPSE, IEllipseR
     }
 
     // TODO: Account for ctrl, alt, and snapping
-    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => EllipseMutableSerialized {
-        const box = this.target.transformedBox;
+    /**
+     * Initialize this mutator to begin tracking vertex movement.
+     * This returns a handler to be called on each subsequent mouse event.
+     */
+    public initVertexMove(role: VERTEX_ROLES): (event: SlideMouseEvent) => EllipseMutableSerialized {
+        this.isMovingVertex = true;
+        const box = this.graphic.transformedBox;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(V.northwest),
@@ -86,11 +92,7 @@ class EllipseMutator extends GraphicMutatorBase<GRAPHIC_TYPES.ELLIPSE, IEllipseR
                 const dimensions = correctedCornerVector.abs;
                 const center = oppositeCorner.add(cornerVector.scale(0.5));
 
-                // Update rendering
-                this.target.setCenterAndDimensions(center, dimensions);
-                this._repositionBoxHelpers();
-
-                return { center: this.target.center, dimensions: this.target.dimensions };
+                return { center, dimensions };
             };
         };
 
@@ -100,6 +102,13 @@ class EllipseMutator extends GraphicMutatorBase<GRAPHIC_TYPES.ELLIPSE, IEllipseR
             [VERTEX_ROLES.BOTTOM_LEFT]: makeListener(box.topRight),
             [VERTEX_ROLES.BOTTOM_RIGHT]: makeListener(box.topLeft)
         })[role];
+    }
+
+    /**
+     * Conclude tracking of vertex movement.
+     */
+    public endVertexMove(): void {
+        this.isMovingVertex = false;
     }
 
     public rotateListener(): (event: SlideMouseEvent) => EllipseMutableSerialized {
@@ -117,28 +126,6 @@ class EllipseMutator extends GraphicMutatorBase<GRAPHIC_TYPES.ELLIPSE, IEllipseR
             rotateBoxHelpers(this.helpers, this.target.transformedBox);
 
             return { rotation: this.target.rotation };
-        };
-    }
-
-    public moveListener(initialPosition: V): (event: SlideMouseEvent) => EllipseMutableSerialized {
-        const initialOrigin = this.target.center;
-        const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));
-        const snapVectors = this.slide.getSnapVectors([this.graphicId]);
-
-        return event => {
-            const { shift: move, snapVectors: newSnapVectors } = calculateMove({
-                initialOrigin,
-                initialPosition,
-                mouseEvent: event,
-                snapVectors,
-                relativePullPoints
-            });
-
-            this.target.center = initialOrigin.add(move);
-            this._repositionBoxHelpers();
-            updateSnapVectors(newSnapVectors, this.helpers.snapVectors);
-
-            return { center: this.target.center };
         };
     }
 
