@@ -1,4 +1,4 @@
-import { dispatch, listen, listenOnce, unlisten } from '@/events';
+import { listen, listenOnce, unlisten } from '@/events';
 import {
     CurveAnchorMouseEvent,
     CURVE_ANCHOR_EVENTS,
@@ -10,7 +10,6 @@ import {
     ROTATOR_EVENTS,
     SlideKeyboardEvent,
     SlideMouseEvent,
-    SlideMouseEventPayload,
     SLIDE_EVENTS,
     TEXTBOX_EVENTS,
     VertexMouseEvent,
@@ -19,6 +18,7 @@ import {
 } from '@/events/types';
 import { GRAPHIC_TYPES } from '@/rendering/types';
 import { EditorTool, TOOL_NAMES } from '../types';
+import { mouseEventFromKeyDownEvent, mouseEventFromKeyUpEvent } from '../utilities';
 import { hoverCurve, moveCurve, moveCurveAnchor } from './curve';
 import { hoverEllipse, moveEllipse } from './ellipse';
 import { hoverImage, moveImage } from './image';
@@ -117,50 +117,12 @@ function moveVertex(event: VertexMouseEvent): void {
     listen(SLIDE_EVENTS.MOUSEMOVE, 'vertex--move', move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, 'vertex--complete', complete);
 
-    // When Shift, Ctrl, or Alt are pressed or unpressed, simulate a mousemove event
-    // This allows the renderer to immediately adjust the shape dimensions if need be
     function keyDownHandler(event: SlideKeyboardEvent): void {
-        const { baseEvent } = event.detail;
-        if (!['Shift', 'Control', 'Alt'].includes(baseEvent.key)) {
-            return;
-        }
-
-        const mouseEvent = new MouseEvent('mousemeove', {
-            clientX: lastMouseEvent.detail.baseEvent.clientX,
-            clientY: lastMouseEvent.detail.baseEvent.clientY,
-            shiftKey: baseEvent.key === 'Shift' || lastMouseEvent.detail.baseEvent.shiftKey,
-            ctrlKey: baseEvent.key === 'Control' || lastMouseEvent.detail.baseEvent.ctrlKey,
-            altKey: baseEvent.key === 'Alt' || lastMouseEvent.detail.baseEvent.altKey
-        });
-
-        dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, {
-            type: SLIDE_EVENTS.MOUSEMOVE,
-            slide: lastMouseEvent.detail.slide,
-            baseEvent: mouseEvent,
-            target: undefined
-        });
+        mouseEventFromKeyDownEvent(event, lastMouseEvent);
     }
 
     function keyUpHandler(event: SlideKeyboardEvent): void {
-        const { baseEvent } = event.detail;
-        if (!['Shift', 'Control', 'Alt'].includes(baseEvent.key)) {
-            return;
-        }
-
-        const mouseEvent = new MouseEvent('mousemeove', {
-            clientX: lastMouseEvent.detail.baseEvent.clientX,
-            clientY: lastMouseEvent.detail.baseEvent.clientY,
-            shiftKey: baseEvent.key !== 'Shift' && lastMouseEvent.detail.baseEvent.shiftKey,
-            ctrlKey: baseEvent.key !== 'Control' && lastMouseEvent.detail.baseEvent.ctrlKey,
-            altKey: baseEvent.key !== 'Alt' && lastMouseEvent.detail.baseEvent.altKey
-        });
-
-        dispatch<SlideMouseEventPayload>(SLIDE_EVENTS.MOUSEMOVE, {
-            type: SLIDE_EVENTS.MOUSEMOVE,
-            slide: lastMouseEvent.detail.slide,
-            baseEvent: mouseEvent,
-            target: undefined
-        });
+        mouseEventFromKeyUpEvent(event, lastMouseEvent);
     }
 
     function move(event: SlideMouseEvent): void {
