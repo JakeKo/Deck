@@ -22,6 +22,15 @@ export default class V {
         this.y = y;
     }
 
+    public static slice(n: number): V[] {
+        if (n === 0) {
+            return [];
+        }
+
+        const increment = Math.PI * 2 / n;
+        return [...Array(n)].map((_, i) => V.east.rotate(increment * i));
+    }
+
     public get magnitude(): number {
         return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
     }

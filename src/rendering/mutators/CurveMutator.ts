@@ -1,11 +1,11 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import { CurveMutableSerialized } from '@/types';
-import { closestVector, mod } from '@/utilities/utilities';
+import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { CurveAnchorRenderer } from '../helpers';
 import { CurveAnchor, CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, ICurveMutator, ICurveRenderer, ISlideRenderer, VERTEX_ROLES } from '../types';
-import { calculateMove, resizeBoxHelpers, rotateBoxHelpers, updateSnapVectors} from '../utilities';
+import { calculateMove, resizeBoxHelpers, rotateBoxHelpers, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRenderer, CurveMutableSerialized> implements ICurveMutator {
@@ -194,24 +194,6 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
         this.isMovingVertex = false;
     }
 
-    public rotateListener(): (event: SlideMouseEvent) => CurveMutableSerialized {
-        const { center } = this.target.transformedBox;
-        const directions = [...V.cardinals, ...V.intermediates];
-
-        return event => {
-            const { slide, baseEvent } = event.detail;
-            const position = resolvePosition(baseEvent, slide);
-            const rawOffset = center.towards(position);
-            const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
-            const theta = Math.atan2(offset.y, offset.x);
-
-            this.target.rotation = mod(theta, Math.PI * 2);
-            rotateBoxHelpers(this.helpers, this.target.transformedBox);
-
-            return { rotation: this.target.rotation };
-        };
-    }
-
     // TODO: Account for shift, alt, and snapping
     public anchorListener(index: number, role: CURVE_ANCHOR_ROLES): (event: SlideMouseEvent) => CurveMutableSerialized {
         const anchor = this.target.getAnchor(index);
@@ -264,6 +246,7 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
     public setStrokeWidth(strokeWidth: number): void {
         this.target.strokeWidth = strokeWidth;
     }
+
     private _repositionCurveAnchor(index: number): void {
         const anchor = this.target.getAnchor(index);
         this.anchorHelpers[index].inHandle = anchor.inHandle;

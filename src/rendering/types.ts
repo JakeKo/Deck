@@ -240,7 +240,8 @@ type BaseGraphicMutator<T extends GraphicMutableSerialized> = {
     endMove: () => void;
     initVertexMove: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => T;
     endVertexMove: () => void;
-    rotateListener: () => (event: SlideMouseEvent) => T;
+    initRotate: () => (event: SlideMouseEvent) => T;
+    endRotate: () => void;
 };
 
 export type ICurveMutator = BaseGraphicMutator<CurveMutableSerialized> & {

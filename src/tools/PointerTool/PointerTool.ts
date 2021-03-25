@@ -145,28 +145,38 @@ function moveVertex(event: VertexMouseEvent): void {
 
 function rotateGraphic(event: RotatorMouseEvent): void {
     const { parentId, slide } = event.detail;
-    const mutator = slide.focusGraphic(parentId);
+    const { id: graphicId, type: graphicType } = slide.getGraphic(parentId);
+    const mutator = slide.focusGraphic(graphicId);
 
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
-    const rotateListener = mutator.rotateListener();
-    slide.cursor = 'grabbing';
-    slide.cursorLock = true;
+    let lastMouseEvent: RotatorMouseEvent | SlideMouseEvent = event;
+    const rotateListener = mutator.initRotate();
+    slide.lockCursor('grabbing');
 
+    listen(SLIDE_EVENTS.KEYDOWN, 'rotator--key-down', keyDownHandler);
+    listen(SLIDE_EVENTS.KEYUP, 'rotator--key-up', keyUpHandler);
     listen(SLIDE_EVENTS.MOUSEMOVE, 'rotate', rotate);
     listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
 
+    function keyDownHandler(event: SlideKeyboardEvent): void {
+        mouseEventFromKeyDownEvent(event, lastMouseEvent);
+    }
+
+    function keyUpHandler(event: SlideKeyboardEvent): void {
+        mouseEventFromKeyUpEvent(event, lastMouseEvent);
+    }
+
     function rotate(event: SlideMouseEvent): void {
-        rotateListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        const deltas = rotateListener(event);
+        slide.setProps(graphicId, graphicType, deltas);
+        lastMouseEvent = event;
     }
 
     function complete(event: SlideMouseEvent): void {
-        rotateListener(event);
-        slide.broadcastSetGraphic(mutator.target);
-
-        slide.cursorLock = false;
-        slide.cursor = 'grab';
+        rotate(event);
+        mutator.endRotate();
+        slide.unlockCursor('grab');
 
         unlisten(SLIDE_EVENTS.MOUSEMOVE, 'rotate');
     }

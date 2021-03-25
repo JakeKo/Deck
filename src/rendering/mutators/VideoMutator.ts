@@ -1,7 +1,7 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
 import { VideoMutableSerialized } from '@/types';
-import { closestVector, mod } from '@/utilities/utilities';
+import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { GRAPHIC_TYPES, ISlideRenderer, IVideoMutator, IVideoRenderer, VERTEX_ROLES } from '../types';
 import { calculateMove, resizeBoxHelpers, rotateBoxHelpers, updateSnapVectors } from '../utilities';
@@ -109,24 +109,6 @@ class VideoMutator extends GraphicMutatorBase<GRAPHIC_TYPES.VIDEO, IVideoRendere
      */
     public endVertexMove(): void {
         this.isMovingVertex = false;
-    }
-
-    public rotateListener(): (event: SlideMouseEvent) => VideoMutableSerialized {
-        const { center } = this.target.transformedBox;
-        const directions = [...V.cardinals, ...V.intermediates];
-
-        return event => {
-            const { slide, baseEvent } = event.detail;
-            const position = resolvePosition(baseEvent, slide);
-            const rawOffset = center.towards(position);
-            const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
-            const theta = Math.atan2(offset.y, offset.x);
-
-            this.target.rotation = mod(theta, Math.PI * 2);
-            rotateBoxHelpers(this.helpers, this.target.transformedBox);
-
-            return { rotation: this.target.rotation };
-        };
     }
 
     public setX(x: number): void {
