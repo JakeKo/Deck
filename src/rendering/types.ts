@@ -247,7 +247,8 @@ type BaseGraphicMutator<T extends GraphicMutableSerialized> = {
 export type ICurveMutator = BaseGraphicMutator<CurveMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.CURVE;
     readonly target: ICurveRenderer;
-    anchorListener: (index: number, role: CURVE_ANCHOR_ROLES) => (event: SlideMouseEvent) => CurveMutableSerialized;
+    initAnchorMove: (index: number, role: CURVE_ANCHOR_ROLES) => (event: SlideMouseEvent) => CurveMutableSerialized;
+    endAnchorMove: () => void;
     setRotation: (rotation: number) => void;
     setFillColor: (fillColor: string) => void;
     setStrokeColor: (strokeColor: string) => void;

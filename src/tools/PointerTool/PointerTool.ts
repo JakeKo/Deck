@@ -1,6 +1,5 @@
 import { listen, listenOnce, unlisten } from '@/events';
 import {
-    CurveAnchorMouseEvent,
     CURVE_ANCHOR_EVENTS,
     CURVE_EVENTS,
     ELLIPSE_EVENTS,
@@ -31,7 +30,7 @@ export default (): EditorTool => {
         name: TOOL_NAMES.POINTER,
         mount: () => {
             listenOnce(CURVE_EVENTS.MOUSEDOWN, 'curve--init-move', moveCurve);
-            listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'moveAnchor', moveAnchor);
+            listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'curve-anchor--init-move', moveCurveAnchor);
             listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, 'ellipse--init-move', moveEllipse);
             listenOnce(IMAGE_EVENTS.MOUSEDOWN, 'image--init-move', moveImage);
             listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, 'rectangle--init-move', moveRectangle);
@@ -53,7 +52,7 @@ export default (): EditorTool => {
         },
         unmount: () => {
             unlisten(CURVE_EVENTS.MOUSEDOWN, 'curve--init-move');
-            unlisten(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'moveAnchor');
+            unlisten(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'curve-anchor--init-move');
             unlisten(ELLIPSE_EVENTS.MOUSEDOWN, 'ellipse--init-move');
             unlisten(IMAGE_EVENTS.MOUSEDOWN, 'image--init-move');
             unlisten(RECTANGLE_EVENTS.MOUSEDOWN, 'rectangle--init-move');
@@ -180,8 +179,4 @@ function rotateGraphic(event: RotatorMouseEvent): void {
 
         unlisten(SLIDE_EVENTS.MOUSEMOVE, 'rotate');
     }
-}
-
-function moveAnchor(event: CurveAnchorMouseEvent): void {
-    moveCurveAnchor(event, moveAnchor);
 }

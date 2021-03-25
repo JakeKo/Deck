@@ -33,30 +33,31 @@ export function moveCurve(event: CurveMouseEvent): void {
     }
 }
 
-export function moveCurveAnchor(event: CurveAnchorMouseEvent, moveAnchor: (event: CurveAnchorMouseEvent) => void): void {
+export function moveCurveAnchor(event: CurveAnchorMouseEvent): void {
     const { slide, parentId, index, role } = event.detail;
-    const mutator = slide.focusGraphic(parentId) as CurveMutator;
+    const { id: graphicId, type: graphicType } = slide.getGraphic(parentId);
+    const mutator = slide.focusGraphic(graphicId) as CurveMutator;
 
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
-    const anchorListener = mutator.anchorListener(index, role);
-    slide.cursor = 'grabbing';
-    slide.cursorLock = true;
+    const anchorListener = mutator.initAnchorMove(index, role);
+    slide.lockCursor('grabbing');
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, 'move', move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'curve-anchor--move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'curve-anchor--complete', complete);
 
     function move(event: SlideMouseEvent): void {
-        anchorListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        const deltas = anchorListener(event);
+        slide.setProps(graphicId, graphicType, deltas);
     }
 
-    function complete(): void {
-        slide.cursorLock = false;
-        slide.cursor = 'grab';
+    function complete(event: SlideMouseEvent): void {
+        move(event);
+        mutator.endAnchorMove();
+        slide.unlockCursor('grab');
 
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'move');
-        listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'moveAnchor', moveAnchor);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'curve-anchor--move');
+        listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'curve-anchor--init-move', moveCurveAnchor);
     }
 }
 

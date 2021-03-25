@@ -11,7 +11,8 @@ import GraphicMutatorBase from './GraphicMutatorBase';
 class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRenderer, CurveMutableSerialized> implements ICurveMutator {
     public readonly target: ICurveRenderer;
 
-    private anchorHelpers: CurveAnchorRenderer[];
+    protected anchorHelpers: CurveAnchorRenderer[];
+    protected isMovingAnchor: boolean;
 
     constructor({
         target,
@@ -28,6 +29,7 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
     }) {
         super({ type: GRAPHIC_TYPES.CURVE, slide, scale, graphicId, focus });
         this.target = target;
+        this.isMovingAnchor = false;
 
         this.anchorHelpers = this.graphic.anchors.map((anchor, index) => new CurveAnchorRenderer({
             slide: this.slide,
@@ -195,39 +197,52 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
     }
 
     // TODO: Account for shift, alt, and snapping
-    public anchorListener(index: number, role: CURVE_ANCHOR_ROLES): (event: SlideMouseEvent) => CurveMutableSerialized {
-        const anchor = this.target.getAnchor(index);
+    /**
+     * Initialize this mutator to begin tracking anchor movement.
+     * This returns a handler to be called on each subsequent mouse event.
+     */
+    public initAnchorMove(index: number, role: CURVE_ANCHOR_ROLES): (event: SlideMouseEvent) => CurveMutableSerialized {
+        this.isMovingAnchor = true;
+        const anchors = this.graphic.anchors;
+
         return {
-            [CURVE_ANCHOR_ROLES.IN_HANDLE]: (event: SlideMouseEvent): CurveMutableSerialized => {
+            [CURVE_ANCHOR_ROLES.IN_HANDLE]: (event: SlideMouseEvent) => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
-                this.target.setAnchor(index, { ...anchor, inHandle: position });
-                this._repositionCurveAnchor(index);
 
-                return { anchors: this.target.anchors };
+                return {
+                    anchors: anchors.map((a, i) => i === index ? { ...a, inHandle: position } : a)
+                };
             },
-            [CURVE_ANCHOR_ROLES.POINT]: (event: SlideMouseEvent): CurveMutableSerialized => {
+            [CURVE_ANCHOR_ROLES.POINT]: (event: SlideMouseEvent) => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
-                const move = anchor.point.towards(position);
-                this.target.setAnchor(index, {
-                    inHandle: anchor.inHandle.add(move),
-                    point: anchor.point.add(move),
-                    outHandle: anchor.outHandle.add(move)
-                });
-                this._repositionCurveAnchor(index);
+                const move = anchors[index].point.towards(position);
 
-                return { anchors: this.target.anchors };
+                return {
+                    anchors: anchors.map((a, i) => i === index ? {
+                        inHandle: a.inHandle.add(move),
+                        point: a.point.add(move),
+                        outHandle: a.outHandle.add(move)
+                    } : a)
+                };
             },
-            [CURVE_ANCHOR_ROLES.OUT_HANDLE]: (event: SlideMouseEvent): CurveMutableSerialized => {
+            [CURVE_ANCHOR_ROLES.OUT_HANDLE]: (event: SlideMouseEvent) => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
-                this.target.setAnchor(index, { ...anchor, outHandle: position });
-                this._repositionCurveAnchor(index);
 
-                return { anchors: this.target.anchors };
+                return {
+                    anchors: anchors.map((a, i) => i === index ? { ...a, outHandle: position } : a)
+                };
             }
         }[role];
+    }
+
+    /**
+     * Conclude tracking of anchor movement.
+     */
+    public endAnchorMove(): void {
+        this.isMovingAnchor = false;
     }
 
     public setRotation(rotation: number): void {
