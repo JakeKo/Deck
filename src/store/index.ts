@@ -1,11 +1,242 @@
+import { dispatch } from '@/events';
+import { GraphicUpdatedPayload, GRAPHIC_EVENT_CODES } from '@/events/types';
+import { GRAPHIC_TYPES } from '@/rendering/types';
 import { themes } from '@/styling';
 import { THEMES } from '@/styling/types';
 import NullTool from '@/tools/NullTool';
+import {
+    CurveMutableSerialized,
+    EllipseMutableSerialized,
+    GraphicMutableSerialized,
+    ImageMutableSerialized,
+    RectangleMutableSerialized,
+    TextboxMutableSerialized,
+    VideoMutableSerialized
+} from '@/types';
 import { provideId } from '@/utilities/IdProvider';
 import SlideStateManager from '@/utilities/SlideStateManager';
+import V from '@/utilities/Vector';
 import { inject, reactive } from 'vue';
-import { AppMutations, AppState, AppStore } from './types';
+import {
+    AppMutations,
+    AppState,
+    AppStore,
+    CurveStoreModel,
+    EllipseStoreModel,
+    GraphicStoreModel,
+    ImageStoreModel,
+    RectangleStoreModel,
+    TextboxStoreModel,
+    VideoStoreModel
+} from './types';
 import { getSlide } from './utilities';
+
+function setVector(source: { x?: number, y?: number }, target: V): void {
+    if (source.x) {
+        target.x = source.x;
+    }
+
+    if (source.y) {
+        target.y = source.y;
+    }
+}
+
+const propSetters = {
+    [GRAPHIC_TYPES.CURVE]: (graphic: CurveStoreModel, props: CurveMutableSerialized): void => {
+        if (props.anchors) {
+            props.anchors.forEach((anchor, index) => {
+                if (anchor) {
+                    // The store model for points is a flat array (vs. the curve anchor model)
+                    // Calculate the corresponding index of the curve anchor's in-handle
+                    const pointsIndex = index * 3;
+
+                    if (anchor.inHandle) {
+                        if (!graphic.points[pointsIndex]) {
+                            graphic.points[pointsIndex] = V.zero;
+                        }
+
+                        setVector(anchor.inHandle, graphic.points[pointsIndex]);
+                    }
+
+                    if (anchor.point) {
+                        if (!graphic.points[pointsIndex + 1]) {
+                            graphic.points[pointsIndex + 1] = V.zero;
+                        }
+
+                        setVector(anchor.point, graphic.points[pointsIndex + 1]);
+                    }
+
+                    if (anchor.outHandle) {
+                        if (!graphic.points[pointsIndex + 2]) {
+                            graphic.points[pointsIndex + 2] = V.zero;
+                        }
+
+                        setVector(anchor.outHandle, graphic.points[pointsIndex + 2]);
+                    }
+                }
+            });
+        }
+
+        if (props.fillColor) {
+            graphic.fillColor = props.fillColor;
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+
+        if (props.strokeWidth) {
+            graphic.strokeWidth = props.strokeWidth;
+        }
+
+        if (props.strokeColor) {
+            graphic.strokeColor = props.strokeColor;
+        }
+    },
+    [GRAPHIC_TYPES.ELLIPSE]: (graphic: EllipseStoreModel, props: EllipseMutableSerialized): void => {
+        if (props.center) {
+            setVector(props.center, graphic.center);
+        }
+
+        if (props.dimensions) {
+            if (props.dimensions.x) {
+                graphic.width = props.dimensions.x;
+            }
+
+            if (props.dimensions.y) {
+                graphic.height = props.dimensions.y;
+            }
+        }
+
+        if (props.fillColor) {
+            graphic.fillColor = props.fillColor;
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+
+        if (props.strokeColor) {
+            graphic.strokeColor = props.strokeColor;
+        }
+
+        if (props.strokeWidth) {
+            graphic.strokeWidth = props.strokeWidth;
+        }
+    },
+    [GRAPHIC_TYPES.IMAGE]: (graphic: ImageStoreModel, props: ImageMutableSerialized): void => {
+        if (props.origin) {
+            setVector(props.origin, graphic.origin);
+        }
+
+        if (props.dimensions) {
+            if (props.dimensions.x) {
+                graphic.width = props.dimensions.x;
+            }
+
+            if (props.dimensions.y) {
+                graphic.height = props.dimensions.y;
+            }
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+    },
+    [GRAPHIC_TYPES.RECTANGLE]: (graphic: RectangleStoreModel, props: RectangleMutableSerialized): void => {
+        if (props.origin) {
+            setVector(props.origin, graphic.origin);
+        }
+
+        if (props.dimensions) {
+            if (props.dimensions.x) {
+                graphic.width = props.dimensions.x;
+            }
+
+            if (props.dimensions.y) {
+                graphic.height = props.dimensions.y;
+            }
+        }
+
+        if (props.fillColor) {
+            graphic.fillColor = props.fillColor;
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+
+        if (props.strokeColor) {
+            graphic.strokeColor = props.strokeColor;
+        }
+
+        if (props.strokeWidth) {
+            graphic.strokeWidth = props.strokeWidth;
+        }
+    },
+    [GRAPHIC_TYPES.TEXTBOX]: (graphic: TextboxStoreModel, props: TextboxMutableSerialized): void => {
+        if (props.origin) {
+            setVector(props.origin, graphic.origin);
+        }
+
+        if (props.dimensions) {
+            if (props.dimensions.x) {
+                graphic.width = props.dimensions.x;
+            }
+
+            if (props.dimensions.y) {
+                graphic.height = props.dimensions.y;
+            }
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+
+        if (props.font) {
+            graphic.font = props.font;
+        }
+
+        if (props.size) {
+            graphic.size = props.size;
+        }
+
+        if (props.text) {
+            graphic.text = props.text;
+        }
+
+        if (props.weight) {
+            graphic.weight = props.weight;
+        }
+    },
+    [GRAPHIC_TYPES.VIDEO]: (graphic: VideoStoreModel, props: VideoMutableSerialized): void => {
+        if (props.origin) {
+            setVector(props.origin, graphic.origin);
+        }
+
+        if (props.dimensions) {
+            if (props.dimensions.x) {
+                graphic.width = props.dimensions.x;
+            }
+
+            if (props.dimensions.y) {
+                graphic.height = props.dimensions.y;
+            }
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+
+        if (props.strokeColor) {
+            graphic.strokeColor = props.strokeColor;
+        }
+
+        if (props.strokeWidth) {
+            graphic.strokeWidth = props.strokeWidth;
+        }
+    },
+} as { [key in GRAPHIC_TYPES]: (graphic: GraphicStoreModel, props: GraphicMutableSerialized) => void };
 
 function createStore(): AppStore {
     const state = reactive<AppState>({
@@ -125,6 +356,29 @@ function createStore(): AppStore {
             slide.graphics[graphic.id] = graphic;
             if (slide.focusedGraphics[graphic.id]) {
                 slide.focusedGraphics[graphic.id] = graphic;
+            }
+        },
+        setProps: (slideId, graphicId, graphicType, props, emit = true) => {
+            const slide = getSlide(state, slideId);
+            if (slide === undefined) {
+                return;
+            }
+
+            const graphic = slide.graphics[graphicId];
+            if (!graphic) {
+                return;
+            }
+
+            const setter = propSetters[graphicType];
+            setter(graphic, props);
+
+            if (emit) {
+                dispatch<GraphicUpdatedPayload>(GRAPHIC_EVENT_CODES.UPDATED, {
+                    slideId,
+                    graphicType,
+                    graphicId,
+                    props
+                });
             }
         },
         removeGraphic: (slideId, graphicId) => {

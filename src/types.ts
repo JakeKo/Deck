@@ -1,6 +1,13 @@
 // TODO: Move GRAPHIC_TYPES to here
 export type Keyed<T> = { [key: string]: T };
 
+export type RecursivePartial<T> = {
+    [K in keyof T]?:
+    T[K] extends (infer U)[] ? RecursivePartial<U>[] :
+    T[K] extends object ? RecursivePartial<T[K]> :
+    T[K];
+};
+
 export type GraphicSerialized = CurveSerialized | EllipseSerialized | ImageSerialized
     | RectangleSerialized | TextboxSerialized | VideoSerialized;
 
@@ -30,7 +37,7 @@ export type CurveSerialized = {
     rotation: number;
 };
 
-export type CurveMutableSerialized = Partial<Pick<CurveSerialized, 'anchors' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+export type CurveMutableSerialized = RecursivePartial<Pick<CurveSerialized, 'anchors' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
 
 export type EllipseSerialized = {
     id: string;
@@ -49,7 +56,7 @@ export type EllipseSerialized = {
     rotation: number;
 };
 
-export type EllipseMutableSerialized = Partial<Pick<EllipseSerialized, 'center' | 'dimensions' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+export type EllipseMutableSerialized = RecursivePartial<Pick<EllipseSerialized, 'center' | 'dimensions' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
 
 export type ImageSerialized = {
     id: string;
@@ -66,7 +73,7 @@ export type ImageSerialized = {
     rotation: number;
 };
 
-export type ImageMutableSerialized = Partial<Pick<ImageSerialized, 'origin' | 'dimensions' | 'rotation'>>;
+export type ImageMutableSerialized = RecursivePartial<Pick<ImageSerialized, 'origin' | 'dimensions' | 'rotation'>>;
 
 export type RectangleSerialized = {
     id: string;
@@ -85,7 +92,7 @@ export type RectangleSerialized = {
     rotation: number;
 };
 
-export type RectangleMutableSerialized = Partial<Pick<RectangleSerialized, 'origin' | 'dimensions' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+export type RectangleMutableSerialized = RecursivePartial<Pick<RectangleSerialized, 'origin' | 'dimensions' | 'fillColor' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
 
 export type TextboxSerialized = {
     id: string;
@@ -105,7 +112,7 @@ export type TextboxSerialized = {
     rotation: number;
 };
 
-export type TextboxMutableSerialized = Partial<Pick<TextboxSerialized, 'origin' | 'dimensions' | 'text' | 'size' | 'weight' | 'font' | 'rotation'>>;
+export type TextboxMutableSerialized = RecursivePartial<Pick<TextboxSerialized, 'origin' | 'dimensions' | 'text' | 'size' | 'weight' | 'font' | 'rotation'>>;
 
 export type VideoSerialized = {
     id: string;
@@ -124,4 +131,4 @@ export type VideoSerialized = {
     rotation: number;
 };
 
-export type VideoMutableSerialized = Partial<Pick<VideoSerialized, 'origin' | 'dimensions' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;
+export type VideoMutableSerialized = RecursivePartial<Pick<VideoSerialized, 'origin' | 'dimensions' | 'strokeColor' | 'strokeWidth' | 'rotation'>>;

@@ -1,6 +1,7 @@
 import { GRAPHIC_TYPES } from '@/rendering/types';
 import { Theme } from '@/styling/types';
 import { EditorTool } from '@/tools/types';
+import { GraphicMutableSerialized } from '@/types';
 import SlideStateManager from '@/utilities/SlideStateManager';
 import V from '@/utilities/Vector';
 
@@ -37,6 +38,7 @@ export type AppMutations = {
     setEditorZoom: (zoom: number) => void;
     setDeckTitle: (deckTitle: string) => void;
     setGraphic: (slideId: string, graphic: GraphicStoreModel) => void;
+    setProps: (slideId: string, graphicId: string, graphicType: GRAPHIC_TYPES, props: GraphicMutableSerialized, emit?: boolean) => void;
     removeGraphic: (slideId: string, graphicId: string) => void;
     broadcastSetGraphic: (slideId: string, graphic: GraphicStoreModel) => void;
     broadcastSetX: (slideId: string, graphicId: string, x: number) => void;

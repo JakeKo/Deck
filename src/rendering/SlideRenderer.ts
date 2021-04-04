@@ -1,21 +1,11 @@
 import { dispatch, listen } from '@/events';
 import { decorateSlideEvents } from '@/events/decorators';
 import {
-    CurveUpdatedPayload,
-    CURVE_EVENTS,
-    EllipseUpdatedPayload,
-    ELLIPSE_EVENTS,
-    ImageUpdatedPayload,
-    IMAGE_EVENTS,
-    RectangleUpdatedPayload,
-    RECTANGLE_EVENTS,
+    GraphicUpdatedPayload,
+    GRAPHIC_EVENT_CODES,
     SlideKeyboardEvent,
     SlideZoomEvent,
-    SLIDE_EVENTS,
-    TextboxUpdatedPayload,
-    TEXTBOX_EVENTS,
-    VideoUpdatedPayload,
-    VIDEO_EVENTS
+    SLIDE_EVENTS
 } from '@/events/types';
 import { GraphicStoreModel, Viewbox } from '@/store/types';
 import { GraphicMutableSerialized, Keyed } from '@/types';
@@ -378,50 +368,11 @@ class SlideRenderer implements ISlideRenderer {
             mutator.updateHelpers();
         }
 
-        if (!emit) {
-            return;
-        }
-
-        if (graphicType === GRAPHIC_TYPES.CURVE) {
-            dispatch<CurveUpdatedPayload>(CURVE_EVENTS.UPDATED, {
+        if (emit) {
+            dispatch<GraphicUpdatedPayload>(GRAPHIC_EVENT_CODES.UPDATED, {
                 slideId: this._slideId,
-                graphicId: graphicId,
-                type: graphicType,
-                props
-            });
-        } else if (graphicType === GRAPHIC_TYPES.ELLIPSE) {
-            dispatch<EllipseUpdatedPayload>(ELLIPSE_EVENTS.UPDATED, {
-                slideId: this._slideId,
-                graphicId: graphicId,
-                type: graphicType,
-                props
-            });
-        } else if (graphicType === GRAPHIC_TYPES.IMAGE) {
-            dispatch<ImageUpdatedPayload>(IMAGE_EVENTS.UPDATED, {
-                slideId: this._slideId,
-                graphicId: graphicId,
-                type: graphicType,
-                props
-            });
-        } else if (graphicType === GRAPHIC_TYPES.RECTANGLE) {
-            dispatch<RectangleUpdatedPayload>(RECTANGLE_EVENTS.UPDATED, {
-                slideId: this._slideId,
-                graphicId: graphicId,
-                type: graphicType,
-                props
-            });
-        } else if (graphicType === GRAPHIC_TYPES.TEXTBOX) {
-            dispatch<TextboxUpdatedPayload>(TEXTBOX_EVENTS.UPDATED, {
-                slideId: this._slideId,
-                graphicId: graphicId,
-                type: graphicType,
-                props
-            });
-        } else if (graphicType === GRAPHIC_TYPES.VIDEO) {
-            dispatch<VideoUpdatedPayload>(VIDEO_EVENTS.UPDATED, {
-                slideId: this._slideId,
-                graphicId: graphicId,
-                type: graphicType,
+                graphicType,
+                graphicId,
                 props
             });
         }

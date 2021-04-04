@@ -61,7 +61,6 @@ class TextboxMutator extends GraphicMutatorBase<GRAPHIC_TYPES.TEXTBOX, ITextboxR
     }
 
     // TODO: Account for ctrl, alt, and snapping
-
     /**
      * Initialize this mutator to begin tracking vertex movement.
      * This returns a handler to be called on each subsequent mouse event.
