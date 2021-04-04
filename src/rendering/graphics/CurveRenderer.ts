@@ -193,11 +193,40 @@ class CurveRenderer implements ICurveRenderer {
      */
     public setProps({ anchors, fillColor, strokeColor, strokeWidth, rotation }: CurveMutableSerialized): void {
         if (anchors !== undefined) {
-            this._anchors = anchors.map(({ inHandle, point, outHandle }) => ({
-                inHandle: new V(inHandle.x, inHandle.y),
-                point: new V(point.x, point.y),
-                outHandle: new V(outHandle.x, outHandle.y)
-            }));
+            anchors.forEach((anchor, index) => {
+                if (anchor) {
+                    if (anchor.inHandle) {
+                        if (anchor.inHandle.x) {
+                            this._anchors[index].inHandle.x = anchor.inHandle.x;
+                        }
+
+                        if (anchor.inHandle.y) {
+                            this._anchors[index].inHandle.y = anchor.inHandle.y;
+                        }
+                    }
+
+                    if (anchor.point) {
+                        if (anchor.point.x) {
+                            this._anchors[index].point.x = anchor.point.x;
+                        }
+
+                        if (anchor.point.y) {
+                            this._anchors[index].point.y = anchor.point.y;
+                        }
+                    }
+
+                    if (anchor.outHandle) {
+                        if (anchor.outHandle.x) {
+                            this._anchors[index].outHandle.x = anchor.outHandle.x;
+                        }
+
+                        if (anchor.outHandle.y) {
+                            this._anchors[index].outHandle.y = anchor.outHandle.y;
+                        }
+                    }
+                }
+            });
+
             this._svg && this._svg.rotate(0).plot(this._getFormattedPoints()).rotate(radToDeg(this._rotation));
         }
 

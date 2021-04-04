@@ -34,7 +34,7 @@ class EllipseMutator extends GraphicMutatorBase<GRAPHIC_TYPES.ELLIPSE, IEllipseR
     public initMove(initialPosition: V): (event: SlideMouseEvent) => EllipseMutableSerialized {
         this.isMoving = true;
         const graphic = this.graphic;
-        const initialOrigin = graphic.center;
+        const initialOrigin = V.copy(graphic.center);
         const relativePullPoints = graphic.pullPoints.map(p => initialPosition.towards(p));
         const snapVectors = this.slide.getSnapVectors([graphic.id]);
 

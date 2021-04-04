@@ -31,7 +31,7 @@ import {
 } from './types';
 import { getSlide } from './utilities';
 
-function setVector(source: { x?: number, y?: number }, target: V): void {
+function setVector(source: { x?: number; y?: number }, target: V): void {
     if (source.x) {
         target.x = source.x;
     }
@@ -235,7 +235,7 @@ const propSetters = {
         if (props.strokeWidth) {
             graphic.strokeWidth = props.strokeWidth;
         }
-    },
+    }
 } as { [key in GRAPHIC_TYPES]: (graphic: GraphicStoreModel, props: GraphicMutableSerialized) => void };
 
 function createStore(): AppStore {

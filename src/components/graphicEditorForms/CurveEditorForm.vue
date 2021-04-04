@@ -67,29 +67,25 @@ const CurveEditorForm = defineComponent({
         const rotation = computed({
             get: () => radToDeg(props.curve.rotation),
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.curve, rotation: degToRad(value) });
-                store.mutations.broadcastSetRotation(props.slideId, props.curve.id, degToRad(value));
+                store.mutations.setProps(props.slideId, props.curve.id, props.curve.type, { rotation: degToRad(value) });
             }
         });
         const strokeWidth = computed({
             get: () => props.curve.strokeWidth,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.curve, strokeWidth: value });
-                store.mutations.broadcastSetStrokeWidth(props.slideId, props.curve.id, value);
+                store.mutations.setProps(props.slideId, props.curve.id, props.curve.type, { strokeWidth: value });
             }
         });
         const fillColor = computed({
             get: () => props.curve.fillColor,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.curve, fillColor: value });
-                store.mutations.broadcastSetFillColor(props.slideId, props.curve.id, value);
+                store.mutations.setProps(props.slideId, props.curve.id, props.curve.type, { fillColor: value });
             }
         });
         const strokeColor = computed({
             get: () => props.curve.strokeColor,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.curve, strokeColor: value });
-                store.mutations.broadcastSetStrokeColor(props.slideId, props.curve.id, value);
+                store.mutations.setProps(props.slideId, props.curve.id, props.curve.type, { strokeColor: value });
             }
         });
 

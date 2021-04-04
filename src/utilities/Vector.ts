@@ -22,6 +22,10 @@ export default class V {
         this.y = y;
     }
 
+    public static copy(vector: V): V {
+        return new V(vector.x, vector.y);
+    }
+
     public static slice(n: number): V[] {
         if (n === 0) {
             return [];

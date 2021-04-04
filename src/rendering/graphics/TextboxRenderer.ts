@@ -225,7 +225,14 @@ class TextboxRenderer implements ITextboxRenderer {
      */
     public setProps({ origin, dimensions, text, size, weight, font, rotation }: TextboxMutableSerialized): void {
         if (origin !== undefined) {
-            this.origin = new V(origin.x, origin.y);
+            if (origin.x) {
+                this._origin.x = origin.x;
+            }
+
+            if (origin.y) {
+                this._origin.y = origin.y;
+            }
+
             if (this._svg) {
                 this._svg.setAttribute('x', `${this._origin.x}px`);
                 this._svg.setAttribute('y', `${this._origin.y}px`);
@@ -234,7 +241,14 @@ class TextboxRenderer implements ITextboxRenderer {
         }
 
         if (dimensions !== undefined) {
-            this._dimensions = new V(dimensions.x, dimensions.y);
+            if (dimensions.x) {
+                this._dimensions.x = dimensions.x;
+            }
+
+            if (dimensions.y) {
+                this._dimensions.y = dimensions.y;
+            }
+
             if (this._svg) {
                 this._svg.style.width = `${this._dimensions.x}px`;
                 this._svg.style.height = `${this._dimensions.y}px`;

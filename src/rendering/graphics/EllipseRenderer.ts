@@ -196,12 +196,26 @@ class EllipseRenderer implements IEllipseRenderer {
      */
     public setProps({ center, dimensions, fillColor, strokeColor, strokeWidth, rotation }: EllipseMutableSerialized): void {
         if (center !== undefined) {
-            this._center = new V(center.x, center.y);
+            if (center.x) {
+                this._center.x = center.x;
+            }
+
+            if (center.y) {
+                this._center.y = center.y;
+            }
+
             this._svg && this._svg.rotate(0).center(this._center.x, this._center.y).rotate(radToDeg(this._rotation));
         }
 
         if (dimensions !== undefined) {
-            this._dimensions = new V(dimensions.x, dimensions.y);
+            if (dimensions.x) {
+                this._dimensions.x = dimensions.x;
+            }
+
+            if (dimensions.y) {
+                this._dimensions.y = dimensions.y;
+            }
+
             this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
         }
 

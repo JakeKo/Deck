@@ -34,7 +34,7 @@ class TextboxMutator extends GraphicMutatorBase<GRAPHIC_TYPES.TEXTBOX, ITextboxR
     public initMove(initialPosition: V): (event: SlideMouseEvent) => TextboxMutableSerialized {
         this.isMoving = true;
         const graphic = this.graphic;
-        const initialOrigin = graphic.origin;
+        const initialOrigin = V.copy(graphic.origin);
         const relativePullPoints = graphic.pullPoints.map(p => initialPosition.towards(p));
         const snapVectors = this.slide.getSnapVectors([this.graphicId]);
 

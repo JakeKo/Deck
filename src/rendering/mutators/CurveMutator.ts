@@ -102,7 +102,7 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
     public initMove(initialPosition: V): (event: SlideMouseEvent) => CurveMutableSerialized {
         this.isMoving = true;
         const graphic = this.graphic;
-        const initialOrigin = graphic.getAnchor(0).point;
+        const initialOrigin = V.copy(graphic.getAnchor(0).point);
         const initialAnchors = graphic.anchors;
         const relativePullPoints = graphic.pullPoints.map(p => initialPosition.towards(p));
         const snapVectors = this.slide.getSnapVectors([this.graphicId]);

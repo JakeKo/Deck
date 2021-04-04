@@ -108,15 +108,13 @@ const EllipseEditorForm = defineComponent({
         const x = computed({
             get: () => props.ellipse.center.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.ellipse, center: new V(value, props.ellipse.center.y) });
-                store.mutations.broadcastSetX(props.slideId, props.ellipse.id, value);
+                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { center: { x: value } });
             }
         });
         const y = computed({
             get: () => props.ellipse.center.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.ellipse, center: new V(props.ellipse.center.x, value) });
-                store.mutations.broadcastSetY(props.slideId, props.ellipse.id, value);
+                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { center: { y: value } });
             }
         });
         const width = computed({
@@ -138,11 +136,16 @@ const EllipseEditorForm = defineComponent({
                 });
                 const newCenter = newOrigin.add(newDimensions.scale(0.5));
 
-                store.mutations.setGraphic(props.slideId, { ...props.ellipse, width: value, height, center: newCenter });
-                store.mutations.broadcastSetWidth(props.slideId, props.ellipse.id, value);
-                store.mutations.broadcastSetHeight(props.slideId, props.ellipse.id, height);
-                store.mutations.broadcastSetX(props.slideId, props.ellipse.id, newCenter.x);
-                store.mutations.broadcastSetY(props.slideId, props.ellipse.id, newCenter.y);
+                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, {
+                    center: {
+                        x: newCenter.x === props.ellipse.center.x ? undefined : newCenter.x,
+                        y: newCenter.y === props.ellipse.center.y ? undefined : newCenter.y
+                    },
+                    dimensions: {
+                        x: value,
+                        y: height === props.ellipse.height ? undefined : height
+                    }
+                });
             }
         });
         const height = computed({
@@ -164,39 +167,40 @@ const EllipseEditorForm = defineComponent({
                 });
                 const newCenter = newOrigin.add(newDimensions.scale(0.5));
 
-                store.mutations.setGraphic(props.slideId, { ...props.ellipse, width, height: value, center: newCenter });
-                store.mutations.broadcastSetWidth(props.slideId, props.ellipse.id, width);
-                store.mutations.broadcastSetHeight(props.slideId, props.ellipse.id, value);
-                store.mutations.broadcastSetX(props.slideId, props.ellipse.id, newCenter.x);
-                store.mutations.broadcastSetY(props.slideId, props.ellipse.id, newCenter.y);
+                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, {
+                    center: {
+                        x: newCenter.x === props.ellipse.center.x ? undefined : newCenter.x,
+                        y: newCenter.y === props.ellipse.center.y ? undefined : newCenter.y
+                    },
+                    dimensions: {
+                        x: width === props.ellipse.width ? undefined : width,
+                        y: value
+                    }
+                });
             }
         });
         const rotation = computed({
             get: () => radToDeg(props.ellipse.rotation),
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.ellipse, rotation: degToRad(value) });
-                store.mutations.broadcastSetRotation(props.slideId, props.ellipse.id, degToRad(value));
+                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { rotation: degToRad(value) });
             }
         });
         const strokeWidth = computed({
             get: () => props.ellipse.strokeWidth,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.ellipse, strokeWidth: value });
-                store.mutations.broadcastSetStrokeWidth(props.slideId, props.ellipse.id, value);
+                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { strokeWidth: value });
             }
         });
         const fillColor = computed({
             get: () => props.ellipse.fillColor,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.ellipse, fillColor: value });
-                store.mutations.broadcastSetFillColor(props.slideId, props.ellipse.id, value);
+                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { fillColor: value });
             }
         });
         const strokeColor = computed({
             get: () => props.ellipse.strokeColor,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.ellipse, strokeColor: value });
-                store.mutations.broadcastSetStrokeColor(props.slideId, props.ellipse.id, value);
+                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { strokeColor: value });
             }
         });
 

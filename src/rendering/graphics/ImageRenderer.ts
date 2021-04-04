@@ -158,12 +158,26 @@ class ImageRenderer implements IImageRenderer {
      */
     public setProps({ origin, dimensions, rotation }: ImageMutableSerialized): void {
         if (origin !== undefined) {
-            this._origin = new V(origin.x, origin.y);
+            if (origin.x) {
+                this._origin.x = origin.x;
+            }
+
+            if (origin.y) {
+                this._origin.y = origin.y;
+            }
+
             this._svg && this._svg.rotate(0).translate(this._origin.x, this._origin.y).rotate(radToDeg(this._rotation));
         }
 
         if (dimensions !== undefined) {
-            this._dimensions = new V(dimensions.x, dimensions.y);
+            if (dimensions.x) {
+                this._dimensions.x = dimensions.x;
+            }
+
+            if (dimensions.y) {
+                this._dimensions.y = dimensions.y;
+            }
+
             this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
         }
 

@@ -76,15 +76,13 @@ const ImageEditorForm = defineComponent({
         const x = computed({
             get: () => props.image.origin.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.image, origin: new V(value, props.image.origin.y) });
-                store.mutations.broadcastSetX(props.slideId, props.image.id, value);
+                store.mutations.setProps(props.slideId, props.image.id, props.image.type, { origin: { x: value } });
             }
         });
         const y = computed({
             get: () => props.image.origin.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.image, origin: new V(props.image.origin.x, value) });
-                store.mutations.broadcastSetY(props.slideId, props.image.id, value);
+                store.mutations.setProps(props.slideId, props.image.id, props.image.type, { origin: { y: value } });
             }
         });
         const width = computed({
@@ -98,11 +96,16 @@ const ImageEditorForm = defineComponent({
                     rotation: props.image.rotation
                 });
 
-                store.mutations.setGraphic(props.slideId, { ...props.image, width: value, height, origin: newOrigin });
-                store.mutations.broadcastSetWidth(props.slideId, props.image.id, value);
-                store.mutations.broadcastSetHeight(props.slideId, props.image.id, height);
-                store.mutations.broadcastSetX(props.slideId, props.image.id, newOrigin.x);
-                store.mutations.broadcastSetY(props.slideId, props.image.id, newOrigin.y);
+                store.mutations.setProps(props.slideId, props.image.id, props.image.type, {
+                    origin: {
+                        x: newOrigin.x === props.image.origin.x ? undefined : newOrigin.x,
+                        y: newOrigin.y === props.image.origin.y ? undefined : newOrigin.y
+                    },
+                    dimensions: {
+                        x: value,
+                        y: height === props.image.height ? undefined : height
+                    }
+                });
             }
         });
         const height = computed({
@@ -116,18 +119,22 @@ const ImageEditorForm = defineComponent({
                     rotation: props.image.rotation
                 });
 
-                store.mutations.setGraphic(props.slideId, { ...props.image, width, height: value, origin: newOrigin });
-                store.mutations.broadcastSetWidth(props.slideId, props.image.id, width);
-                store.mutations.broadcastSetHeight(props.slideId, props.image.id, value);
-                store.mutations.broadcastSetX(props.slideId, props.image.id, newOrigin.x);
-                store.mutations.broadcastSetY(props.slideId, props.image.id, newOrigin.y);
+                store.mutations.setProps(props.slideId, props.image.id, props.image.type, {
+                    origin: {
+                        x: newOrigin.x === props.image.origin.x ? undefined : newOrigin.x,
+                        y: newOrigin.y === props.image.origin.y ? undefined : newOrigin.y
+                    },
+                    dimensions: {
+                        x: width === props.image.width ? undefined : width,
+                        y: value
+                    }
+                });
             }
         });
         const rotation = computed({
             get: () => radToDeg(props.image.rotation),
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.image, rotation: degToRad(value) });
-                store.mutations.broadcastSetRotation(props.slideId, props.image.id, degToRad(value));
+                store.mutations.setProps(props.slideId, props.image.id, props.image.type, { rotation: degToRad(value) });
             }
         });
 

@@ -108,15 +108,13 @@ const RectangleEditorForm = defineComponent({
         const x = computed({
             get: () => props.rectangle.origin.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new V(value, props.rectangle.origin.y) });
-                store.mutations.broadcastSetX(props.slideId, props.rectangle.id, value);
+                store.mutations.setProps(props.slideId, props.rectangle.id, props.rectangle.type, { origin: { x: value } });
             }
         });
         const y = computed({
             get: () => props.rectangle.origin.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, origin: new V(props.rectangle.origin.x, value) });
-                store.mutations.broadcastSetY(props.slideId, props.rectangle.id, value);
+                store.mutations.setProps(props.slideId, props.rectangle.id, props.rectangle.type, { origin: { y: value } });
             }
         });
         const width = computed({
@@ -132,11 +130,16 @@ const RectangleEditorForm = defineComponent({
                     rotation: props.rectangle.rotation
                 });
 
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, width: value, height, origin: newOrigin });
-                store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, value);
-                store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, height);
-                store.mutations.broadcastSetX(props.slideId, props.rectangle.id, newOrigin.x);
-                store.mutations.broadcastSetY(props.slideId, props.rectangle.id, newOrigin.y);
+                store.mutations.setProps(props.slideId, props.rectangle.id, props.rectangle.type, {
+                    origin: {
+                        x: newOrigin.x === props.rectangle.origin.x ? undefined : newOrigin.x,
+                        y: newOrigin.y === props.rectangle.origin.y ? undefined : newOrigin.y
+                    },
+                    dimensions: {
+                        x: value,
+                        y: height === props.rectangle.height ? undefined : height
+                    }
+                });
             }
         });
         const height = computed({
@@ -152,39 +155,40 @@ const RectangleEditorForm = defineComponent({
                     rotation: props.rectangle.rotation
                 });
 
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, width, height: value, origin: newOrigin });
-                store.mutations.broadcastSetWidth(props.slideId, props.rectangle.id, width);
-                store.mutations.broadcastSetHeight(props.slideId, props.rectangle.id, value);
-                store.mutations.broadcastSetX(props.slideId, props.rectangle.id, newOrigin.x);
-                store.mutations.broadcastSetY(props.slideId, props.rectangle.id, newOrigin.y);
+                store.mutations.setProps(props.slideId, props.rectangle.id, props.rectangle.type, {
+                    origin: {
+                        x: newOrigin.x === props.rectangle.origin.x ? undefined : newOrigin.x,
+                        y: newOrigin.y === props.rectangle.origin.y ? undefined : newOrigin.y
+                    },
+                    dimensions: {
+                        x: width === props.rectangle.width ? undefined : width,
+                        y: value
+                    }
+                });
             }
         });
         const rotation = computed({
             get: () => radToDeg(props.rectangle.rotation),
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, rotation: degToRad(value) });
-                store.mutations.broadcastSetRotation(props.slideId, props.rectangle.id, degToRad(value));
+                store.mutations.setProps(props.slideId, props.rectangle.id, props.rectangle.type, { rotation: degToRad(value) });
             }
         });
         const strokeWidth = computed({
             get: () => props.rectangle.strokeWidth,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, strokeWidth: value });
-                store.mutations.broadcastSetStrokeWidth(props.slideId, props.rectangle.id, value);
+                store.mutations.setProps(props.slideId, props.rectangle.id, props.rectangle.type, { strokeWidth: value });
             }
         });
         const fillColor = computed({
             get: () => props.rectangle.fillColor,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, fillColor: value });
-                store.mutations.broadcastSetFillColor(props.slideId, props.rectangle.id, value);
+                store.mutations.setProps(props.slideId, props.rectangle.id, props.rectangle.type, { fillColor: value });
             }
         });
         const strokeColor = computed({
             get: () => props.rectangle.strokeColor,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.rectangle, strokeColor: value });
-                store.mutations.broadcastSetStrokeColor(props.slideId, props.rectangle.id, value);
+                store.mutations.setProps(props.slideId, props.rectangle.id, props.rectangle.type, { strokeColor: value });
             }
         });
 

@@ -93,8 +93,7 @@ const TextboxEditorForm = defineComponent({
         const text = computed({
             get: () => props.textbox.text,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.textbox, text: value });
-                store.mutations.broadcastSetText(props.slideId, props.textbox.id, value);
+                store.mutations.setProps(props.slideId, props.textbox.id, props.textbox.type, { text: value });
             }
         });
 
@@ -102,15 +101,13 @@ const TextboxEditorForm = defineComponent({
         const x = computed({
             get: () => props.textbox.origin.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.textbox, origin: new V(value, props.textbox.origin.y) });
-                store.mutations.broadcastSetX(props.slideId, props.textbox.id, value);
+                store.mutations.setProps(props.slideId, props.textbox.id, props.textbox.type, { origin: { x: value } });
             }
         });
         const y = computed({
             get: () => props.textbox.origin.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.textbox, origin: new V(props.textbox.origin.x, value) });
-                store.mutations.broadcastSetY(props.slideId, props.textbox.id, value);
+                store.mutations.setProps(props.slideId, props.textbox.id, props.textbox.type, { origin: { y: value } });
             }
         });
         const width = computed({
@@ -126,11 +123,16 @@ const TextboxEditorForm = defineComponent({
                     rotation: props.textbox.rotation
                 });
 
-                store.mutations.setGraphic(props.slideId, { ...props.textbox, width: value, height, origin: newOrigin });
-                store.mutations.broadcastSetWidth(props.slideId, props.textbox.id, value);
-                store.mutations.broadcastSetHeight(props.slideId, props.textbox.id, height);
-                store.mutations.broadcastSetX(props.slideId, props.textbox.id, newOrigin.x);
-                store.mutations.broadcastSetY(props.slideId, props.textbox.id, newOrigin.y);
+                store.mutations.setProps(props.slideId, props.textbox.id, props.textbox.type, {
+                    origin: {
+                        x: newOrigin.x === props.textbox.origin.x ? undefined : newOrigin.x,
+                        y: newOrigin.y === props.textbox.origin.y ? undefined : newOrigin.y
+                    },
+                    dimensions: {
+                        x: value,
+                        y: height === props.textbox.height ? undefined : height
+                    }
+                });
             }
         });
         const height = computed({
@@ -146,18 +148,22 @@ const TextboxEditorForm = defineComponent({
                     rotation: props.textbox.rotation
                 });
 
-                store.mutations.setGraphic(props.slideId, { ...props.textbox, width, height: value, origin: newOrigin });
-                store.mutations.broadcastSetWidth(props.slideId, props.textbox.id, width);
-                store.mutations.broadcastSetHeight(props.slideId, props.textbox.id, value);
-                store.mutations.broadcastSetX(props.slideId, props.textbox.id, newOrigin.x);
-                store.mutations.broadcastSetY(props.slideId, props.textbox.id, newOrigin.y);
+                store.mutations.setProps(props.slideId, props.textbox.id, props.textbox.type, {
+                    origin: {
+                        x: newOrigin.x === props.textbox.origin.x ? undefined : newOrigin.x,
+                        y: newOrigin.y === props.textbox.origin.y ? undefined : newOrigin.y
+                    },
+                    dimensions: {
+                        x: width === props.textbox.width ? undefined : width,
+                        y: value
+                    }
+                });
             }
         });
         const rotation = computed({
             get: () => radToDeg(props.textbox.rotation),
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.textbox, rotation: degToRad(value) });
-                store.mutations.broadcastSetRotation(props.slideId, props.textbox.id, degToRad(value));
+                store.mutations.setProps(props.slideId, props.textbox.id, props.textbox.type, { rotation: degToRad(value) });
             }
         });
 

@@ -198,13 +198,27 @@ class VideoRenderer implements IVideoRenderer {
      */
     public setProps({ origin, dimensions, strokeWidth, strokeColor, rotation }: VideoMutableSerialized): void {
         if (origin !== undefined) {
-            this._origin = new V(origin.x, origin.y);
+            if (origin.x) {
+                this._origin.x = origin.x;
+            }
+
+            if (origin.y) {
+                this._origin.y = origin.y;
+            }
+
             this._svg && this._svg.node.setAttribute('x', this._origin.x.toString());
             this._svg && this._svg.node.setAttribute('y', this._origin.y.toString());
         }
 
         if (dimensions !== undefined) {
-            this._dimensions = new V(dimensions.x, dimensions.y);
+            if (dimensions.x) {
+                this._dimensions.x = dimensions.x;
+            }
+
+            if (dimensions.y) {
+                this._dimensions.y = dimensions.y;
+            }
+
             this._svg && this._svg.node.setAttribute('width', this._dimensions.x.toString());
             this._svg && this._svg.node.setAttribute('height', this._dimensions.y.toString());
 

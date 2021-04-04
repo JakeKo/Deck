@@ -34,7 +34,7 @@ class VideoMutator extends GraphicMutatorBase<GRAPHIC_TYPES.VIDEO, IVideoRendere
     public initMove(initialPosition: V): (event: SlideMouseEvent) => VideoMutableSerialized {
         this.isMoving = true;
         const graphic = this.graphic;
-        const initialOrigin = graphic.origin;
+        const initialOrigin = V.copy(graphic.origin);
         const relativePullPoints = graphic.pullPoints.map(p => initialPosition.towards(p));
         const snapVectors = this.slide.getSnapVectors([this.graphicId]);
 

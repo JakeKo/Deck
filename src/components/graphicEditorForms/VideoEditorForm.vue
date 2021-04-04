@@ -76,15 +76,13 @@ const VideoEditorForm = defineComponent({
         const x = computed({
             get: () => props.video.origin.x,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.video, origin: new V(value, props.video.origin.y) });
-                store.mutations.broadcastSetX(props.slideId, props.video.id, value);
+                store.mutations.setProps(props.slideId, props.video.id, props.video.type, { origin: { x: value } });
             }
         });
         const y = computed({
             get: () => props.video.origin.y,
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.video, origin: new V(props.video.origin.x, value) });
-                store.mutations.broadcastSetY(props.slideId, props.video.id, value);
+                store.mutations.setProps(props.slideId, props.video.id, props.video.type, { origin: { y: value } });
             }
         });
         const width = computed({
@@ -98,11 +96,16 @@ const VideoEditorForm = defineComponent({
                     rotation: props.video.rotation
                 });
 
-                store.mutations.setGraphic(props.slideId, { ...props.video, width: value, height, origin: newOrigin });
-                store.mutations.broadcastSetWidth(props.slideId, props.video.id, value);
-                store.mutations.broadcastSetHeight(props.slideId, props.video.id, height);
-                store.mutations.broadcastSetX(props.slideId, props.video.id, newOrigin.x);
-                store.mutations.broadcastSetY(props.slideId, props.video.id, newOrigin.y);
+                store.mutations.setProps(props.slideId, props.video.id, props.video.type, {
+                    origin: {
+                        x: newOrigin.x === props.video.origin.x ? undefined : newOrigin.x,
+                        y: newOrigin.y === props.video.origin.y ? undefined : newOrigin.y
+                    },
+                    dimensions: {
+                        x: value,
+                        y: height === props.video.height ? undefined : height
+                    }
+                });
             }
         });
         const height = computed({
@@ -116,18 +119,22 @@ const VideoEditorForm = defineComponent({
                     rotation: props.video.rotation
                 });
 
-                store.mutations.setGraphic(props.slideId, { ...props.video, width, height: value, origin: newOrigin });
-                store.mutations.broadcastSetWidth(props.slideId, props.video.id, width);
-                store.mutations.broadcastSetHeight(props.slideId, props.video.id, value);
-                store.mutations.broadcastSetX(props.slideId, props.video.id, newOrigin.x);
-                store.mutations.broadcastSetY(props.slideId, props.video.id, newOrigin.y);
+                store.mutations.setProps(props.slideId, props.video.id, props.video.type, {
+                    origin: {
+                        x: newOrigin.x === props.video.origin.x ? undefined : newOrigin.x,
+                        y: newOrigin.y === props.video.origin.y ? undefined : newOrigin.y
+                    },
+                    dimensions: {
+                        x: width === props.video.width ? undefined : width,
+                        y: value
+                    }
+                });
             }
         });
         const rotation = computed({
             get: () => radToDeg(props.video.rotation),
             set: value => {
-                store.mutations.setGraphic(props.slideId, { ...props.video, rotation: degToRad(value) });
-                store.mutations.broadcastSetRotation(props.slideId, props.video.id, degToRad(value));
+                store.mutations.setProps(props.slideId, props.video.id, props.video.type, { rotation: degToRad(value) });
             }
         });
 
