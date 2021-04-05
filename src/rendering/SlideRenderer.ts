@@ -60,6 +60,9 @@ class SlideRenderer implements ISlideRenderer {
     public readonly canvas: SVG.Doc;
     public readonly rawViewbox: Viewbox;
     public zoom: number;
+    public eventPublisherId = 'renderer';
+    public slideId: string;
+
     private _stateManager: SlideStateManager;
     private _graphics: Keyed<IGraphicRenderer>;
     private _graphicsFocused: Keyed<IGraphicMutator>;
@@ -69,7 +72,6 @@ class SlideRenderer implements ISlideRenderer {
     private _cursor: string;
     private _cursorLock = false;
     private _snapVectors: SnapVector[];
-    private _slideId: string;
 
     constructor({
         stateManager,
@@ -96,7 +98,7 @@ class SlideRenderer implements ISlideRenderer {
         this._graphicsMaking = {};
         this._graphicsHighlighted = {};
         this._cursor = this._defaultCursor;
-        this._slideId = slideId;
+        this.slideId = slideId;
         this._snapVectors = [
             new SnapVector(new V(croppedViewbox.width / 2, 0), V.east),
             new SnapVector(new V(croppedViewbox.width, croppedViewbox.height / 2), V.north),
@@ -370,7 +372,8 @@ class SlideRenderer implements ISlideRenderer {
 
         if (emit) {
             dispatch<GraphicUpdatedPayload>(GRAPHIC_EVENT_CODES.UPDATED, {
-                slideId: this._slideId,
+                publisherId: this.eventPublisherId,
+                slideId: this.slideId,
                 graphicType,
                 graphicId,
                 props

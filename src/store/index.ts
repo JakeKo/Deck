@@ -240,6 +240,7 @@ const propSetters = {
 
 function createStore(): AppStore {
     const state = reactive<AppState>({
+        eventPublisherId: 'store',
         activeSlide: undefined,
         slides: [],
         activeTool: NullTool,
@@ -374,6 +375,7 @@ function createStore(): AppStore {
 
             if (emit) {
                 dispatch<GraphicUpdatedPayload>(GRAPHIC_EVENT_CODES.UPDATED, {
+                    publisherId: state.eventPublisherId,
                     slideId,
                     graphicType,
                     graphicId,

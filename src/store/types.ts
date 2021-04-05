@@ -6,6 +6,7 @@ import SlideStateManager from '@/utilities/SlideStateManager';
 import V from '@/utilities/Vector';
 
 export type AppState = {
+    eventPublisherId: 'store';
     activeSlide: Slide | undefined;
     slides: Slide[];
     activeTool: EditorTool;

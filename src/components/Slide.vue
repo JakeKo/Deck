@@ -4,7 +4,8 @@
 
 <script lang='ts'>
 import SVG from 'svg.js';
-import SlideRenderer from '../rendering/SlideRenderer';
+import SlideRenderer from '@/rendering/SlideRenderer';
+import initRendererEventBus from '@/rendering/eventBus';
 import { Slide as SlideModel } from '@/store/types';
 import DeckComponent from './generic/DeckComponent';
 import { defineComponent, reactive, computed, onMounted, PropType } from 'vue';
@@ -45,6 +46,7 @@ const Slide = defineComponent({
                 zoom: store.state.editorViewbox.zoom,
                 slideId: props.slide.id
             });
+            initRendererEventBus(renderer);
 
             Object.values(props.slide.graphics)
                 .map(graphic => graphicStoreModelToGraphicRenderer(graphic, renderer))

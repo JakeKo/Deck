@@ -22,11 +22,10 @@ import PresentationLayer from './components/Presentation/PresentationLayer.vue';
 import GraphicEditor from './components/GraphicEditor.vue';
 import { PointerTool } from './tools';
 import { createStore } from './store';
+import initStoreEventBus from './store/eventBus';
 import { defineComponent, computed, readonly, provide } from 'vue';
 import './styling/application.css';
 import { useStyle } from './components/generic/core';
-import { listen } from './events';
-import { GraphicUpdated, GRAPHIC_EVENT_CODES } from './events/types';
 
 const App = defineComponent({
     components: {
@@ -62,12 +61,9 @@ const App = defineComponent({
         const store = createStore();
         store.mutations.setActiveTool(PointerTool());
         provide('store', store);
+        initStoreEventBus(store);
 
         const showPresentation = computed(() => store.state.showPresentation);
-
-        listen(GRAPHIC_EVENT_CODES.UPDATED, 'test-graphic-updates', (event: GraphicUpdated) => {
-            console.log(JSON.stringify(event.detail.props));
-        });
 
         return {
             style,

@@ -315,6 +315,8 @@ export type IVideoMutator = BaseGraphicMutator<VideoMutableSerialized> & {
 };
 
 export type ISlideRenderer = {
+    eventPublisherId: string;
+    slideId: string;
     readonly canvas: SVG.Doc;
     readonly rawViewbox: Viewbox;
     readonly zoom: number;

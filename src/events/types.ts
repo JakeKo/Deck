@@ -43,12 +43,14 @@ export enum GRAPHIC_EVENT_CODES {
 
 export type GraphicCreated = CustomEvent<GraphicCreatedPayload>;
 export type GraphicCreatedPayload = {
+    publisherId: string;
     slideId: string;
     props: GraphicSerialized;
 };
 
 export type GraphicUpdated = CustomEvent<GraphicUpdatedPayload>;
 export type GraphicUpdatedPayload = {
+    publisherId: string;
     slideId: string;
     graphicId: string;
     graphicType: GRAPHIC_TYPES;
@@ -57,6 +59,7 @@ export type GraphicUpdatedPayload = {
 
 export type GraphicDeleted = CustomEvent<GraphicDeletedPayload>;
 export type GraphicDeletedPayload = {
+    publisherId: string;
     slideId: string;
     graphicId: string;
 };
