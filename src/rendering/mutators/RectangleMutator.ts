@@ -4,7 +4,7 @@ import { RectangleMutableSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { GRAPHIC_TYPES, IRectangleMutator, IRectangleRenderer, ISlideRenderer, VERTEX_ROLES } from '../types';
-import { calculateMove, resizeBoxHelpers, rotateBoxHelpers, updateSnapVectors } from '../utilities';
+import { calculateMove, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class RectangleMutator extends GraphicMutatorBase<GRAPHIC_TYPES.RECTANGLE, IRectangleRenderer, RectangleMutableSerialized> implements IRectangleMutator {
@@ -109,47 +109,6 @@ class RectangleMutator extends GraphicMutatorBase<GRAPHIC_TYPES.RECTANGLE, IRect
      */
     public endVertexMove(): void {
         this.isMovingVertex = false;
-    }
-
-    public setX(x: number): void {
-        this.target.origin = new V(x, this.target.origin.y);
-        this._repositionBoxHelpers();
-    }
-
-    public setY(y: number): void {
-        this.target.origin = new V(this.target.origin.x, y);
-        this._repositionBoxHelpers();
-    }
-
-    public setWidth(width: number): void {
-        this.target.dimensions = new V(width, this.target.dimensions.y);
-        this._repositionBoxHelpers();
-    }
-
-    public setHeight(height: number): void {
-        this.target.dimensions = new V(this.target.dimensions.x, height);
-        this._repositionBoxHelpers();
-    }
-
-    public setRotation(rotation: number): void {
-        this.target.rotation = rotation;
-        rotateBoxHelpers(this.helpers, this.target.transformedBox);
-    }
-
-    public setFillColor(fillColor: string): void {
-        this.target.fillColor = fillColor;
-    }
-
-    public setStrokeColor(strokeColor: string): void {
-        this.target.strokeColor = strokeColor;
-    }
-
-    public setStrokeWidth(strokeWidth: number): void {
-        this.target.strokeWidth = strokeWidth;
-    }
-
-    private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this.helpers, this.target.transformedBox);
     }
 }
 

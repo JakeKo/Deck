@@ -249,69 +249,31 @@ export type ICurveMutator = BaseGraphicMutator<CurveMutableSerialized> & {
     readonly target: ICurveRenderer;
     initAnchorMove: (index: number, role: CURVE_ANCHOR_ROLES) => (event: SlideMouseEvent) => CurveMutableSerialized;
     endAnchorMove: () => void;
-    setRotation: (rotation: number) => void;
-    setFillColor: (fillColor: string) => void;
-    setStrokeColor: (strokeColor: string) => void;
-    setStrokeWidth: (strokeWidth: number) => void;
 };
 
 export type IEllipseMutator = BaseGraphicMutator<EllipseMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.ELLIPSE;
     readonly target: IEllipseRenderer;
-    setX: (x: number) => void;
-    setY: (y: number) => void;
-    setWidth: (width: number) => void;
-    setHeight: (height: number) => void;
-    setRotation: (rotation: number) => void;
-    setFillColor: (fillColor: string) => void;
-    setStrokeColor: (strokeColor: string) => void;
-    setStrokeWidth: (strokeWidth: number) => void;
 };
 
 export type IImageMutator = BaseGraphicMutator<ImageMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.IMAGE;
     readonly target: IImageRenderer;
-    setX: (x: number) => void;
-    setY: (y: number) => void;
-    setWidth: (width: number) => void;
-    setHeight: (height: number) => void;
-    setRotation: (rotation: number) => void;
 };
 
 export type IRectangleMutator = BaseGraphicMutator<RectangleMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.RECTANGLE;
     readonly target: IRectangleRenderer;
-    setX: (x: number) => void;
-    setY: (y: number) => void;
-    setWidth: (width: number) => void;
-    setHeight: (height: number) => void;
-    setRotation: (rotation: number) => void;
-    setFillColor: (fillColor: string) => void;
-    setStrokeColor: (strokeColor: string) => void;
-    setStrokeWidth: (strokeWidth: number) => void;
 };
 
 export type ITextboxMutator = BaseGraphicMutator<TextboxMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.TEXTBOX;
     readonly target: ITextboxRenderer;
-    setX: (x: number) => void;
-    setY: (y: number) => void;
-    setWidth: (width: number) => void;
-    setHeight: (height: number) => void;
-    setText: (text: string) => void;
-    setRotation: (rotation: number) => void;
 };
 
 export type IVideoMutator = BaseGraphicMutator<VideoMutableSerialized> & {
     readonly type: GRAPHIC_TYPES.VIDEO;
     readonly target: IVideoRenderer;
-    setX: (x: number) => void;
-    setY: (y: number) => void;
-    setWidth: (width: number) => void;
-    setHeight: (height: number) => void;
-    setRotation: (rotation: number) => void;
-    setStrokeColor: (strokeColor: string) => void;
-    setStrokeWidth: (strokeWidth: number) => void;
 };
 
 export type ISlideRenderer = {

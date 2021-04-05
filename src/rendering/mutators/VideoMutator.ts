@@ -4,7 +4,7 @@ import { VideoMutableSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { GRAPHIC_TYPES, ISlideRenderer, IVideoMutator, IVideoRenderer, VERTEX_ROLES } from '../types';
-import { calculateMove, resizeBoxHelpers, rotateBoxHelpers, updateSnapVectors } from '../utilities';
+import { calculateMove, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class VideoMutator extends GraphicMutatorBase<GRAPHIC_TYPES.VIDEO, IVideoRenderer, VideoMutableSerialized> implements IVideoMutator {
@@ -109,47 +109,6 @@ class VideoMutator extends GraphicMutatorBase<GRAPHIC_TYPES.VIDEO, IVideoRendere
      */
     public endVertexMove(): void {
         this.isMovingVertex = false;
-    }
-
-    public setX(x: number): void {
-        this.target.origin = new V(x, this.target.origin.y);
-        this._repositionBoxHelpers();
-    }
-
-    public setY(y: number): void {
-        this.target.origin = new V(this.target.origin.x, y);
-        this._repositionBoxHelpers();
-    }
-
-    public setWidth(width: number): void {
-        // When the width changes, we preserve aspect ratio
-        const heightToWidth = this.target.dimensions.y / this.target.dimensions.x;
-        this.target.dimensions = new V(width, width * heightToWidth);
-        this._repositionBoxHelpers();
-    }
-
-    public setHeight(height: number): void {
-        // When the height changes, we preserve aspect ratio
-        const widthToHeight = this.target.dimensions.x / this.target.dimensions.y;
-        this.target.dimensions = new V(height * widthToHeight, height);
-        this._repositionBoxHelpers();
-    }
-
-    public setRotation(rotation: number): void {
-        this.target.rotation = rotation;
-        rotateBoxHelpers(this.helpers, this.target.transformedBox);
-    }
-
-    public setStrokeColor(strokeColor: string): void {
-        this.target.strokeColor = strokeColor;
-    }
-
-    public setStrokeWidth(strokeWidth: number): void {
-        this.target.strokeWidth = strokeWidth;
-    }
-
-    private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this.helpers, this.target.transformedBox);
     }
 }
 

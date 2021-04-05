@@ -4,7 +4,7 @@ import { ImageMutableSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { GRAPHIC_TYPES, IImageMutator, IImageRenderer, ISlideRenderer, VERTEX_ROLES } from '../types';
-import { calculateMove, resizeBoxHelpers, rotateBoxHelpers, updateSnapVectors } from '../utilities';
+import { calculateMove, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class ImageMutator extends GraphicMutatorBase<GRAPHIC_TYPES.IMAGE, IImageRenderer, ImageMutableSerialized> implements IImageMutator {
@@ -109,39 +109,6 @@ class ImageMutator extends GraphicMutatorBase<GRAPHIC_TYPES.IMAGE, IImageRendere
      */
     public endVertexMove(): void {
         this.isMovingVertex = false;
-    }
-
-    public setX(x: number): void {
-        this.target.origin = new V(x, this.target.origin.y);
-        this._repositionBoxHelpers();
-    }
-
-    public setY(y: number): void {
-        this.target.origin = new V(this.target.origin.x, y);
-        this._repositionBoxHelpers();
-    }
-
-    public setWidth(width: number): void {
-        // When the width changes, we preserve aspect ratio
-        const heightToWidth = this.target.dimensions.y / this.target.dimensions.x;
-        this.target.dimensions = new V(width, width * heightToWidth);
-        this._repositionBoxHelpers();
-    }
-
-    public setHeight(height: number): void {
-        // When the height changes, we preserve aspect ratio
-        const widthToHeight = this.target.dimensions.x / this.target.dimensions.y;
-        this.target.dimensions = new V(height * widthToHeight, height);
-        this._repositionBoxHelpers();
-    }
-
-    public setRotation(rotation: number): void {
-        this.target.rotation = rotation;
-        rotateBoxHelpers(this.helpers, this.target.transformedBox);
-    }
-
-    private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this.helpers, this.target.transformedBox);
     }
 }
 

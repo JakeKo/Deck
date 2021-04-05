@@ -5,7 +5,7 @@ import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { CurveAnchorRenderer } from '../helpers';
 import { CurveAnchor, CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, ICurveMutator, ICurveRenderer, ISlideRenderer, VERTEX_ROLES } from '../types';
-import { calculateMove, resizeBoxHelpers, rotateBoxHelpers, updateSnapVectors } from '../utilities';
+import { calculateMove, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRenderer, CurveMutableSerialized> implements ICurveMutator {
@@ -243,32 +243,6 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
      */
     public endAnchorMove(): void {
         this.isMovingAnchor = false;
-    }
-
-    public setRotation(rotation: number): void {
-        this.target.rotation = rotation;
-        rotateBoxHelpers(this.helpers, this.target.transformedBox);
-    }
-
-    public setFillColor(fillColor: string): void {
-        this.target.fillColor = fillColor;
-    }
-
-    public setStrokeColor(strokeColor: string): void {
-        this.target.strokeColor = strokeColor;
-    }
-
-    public setStrokeWidth(strokeWidth: number): void {
-        this.target.strokeWidth = strokeWidth;
-    }
-
-    private _repositionCurveAnchor(index: number): void {
-        const anchor = this.target.getAnchor(index);
-        this.anchorHelpers[index].inHandle = anchor.inHandle;
-        this.anchorHelpers[index].point = anchor.point;
-        this.anchorHelpers[index].outHandle = anchor.outHandle;
-
-        resizeBoxHelpers(this.helpers, this.target.transformedBox);
     }
 }
 

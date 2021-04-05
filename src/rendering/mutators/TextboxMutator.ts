@@ -4,7 +4,7 @@ import { TextboxMutableSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { GRAPHIC_TYPES, ISlideRenderer, ITextboxMutator, ITextboxRenderer, VERTEX_ROLES } from '../types';
-import { calculateMove, resizeBoxHelpers, rotateBoxHelpers, updateSnapVectors } from '../utilities';
+import { calculateMove, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class TextboxMutator extends GraphicMutatorBase<GRAPHIC_TYPES.TEXTBOX, ITextboxRenderer, TextboxMutableSerialized> implements ITextboxMutator {
@@ -109,42 +109,6 @@ class TextboxMutator extends GraphicMutatorBase<GRAPHIC_TYPES.TEXTBOX, ITextboxR
      */
     public endVertexMove(): void {
         this.isMovingVertex = false;
-    }
-
-    public setX(x: number): void {
-        this.target.origin = new V(x, this.target.origin.y);
-        this._repositionBoxHelpers();
-    }
-
-    public setY(y: number): void {
-        this.target.origin = new V(this.target.origin.x, y);
-        this._repositionBoxHelpers();
-    }
-
-    public setWidth(width: number): void {
-        this.target.dimensions = new V(width, this.target.dimensions.y);
-        this._repositionBoxHelpers();
-    }
-
-    public setHeight(height: number): void {
-        this.target.dimensions = new V(this.target.dimensions.x, height);
-        this._repositionBoxHelpers();
-    }
-
-    public setText(text: string): void {
-        this.target.text = text;
-        this._repositionBoxHelpers();
-    }
-
-    public setRotation(rotation: number): void {
-        this.target.rotation = rotation;
-        rotateBoxHelpers(this.helpers, this.target.transformedBox);
-    }
-
-    // TODO: Include mutations for other properties
-
-    private _repositionBoxHelpers(): void {
-        resizeBoxHelpers(this.helpers, this.target.transformedBox);
     }
 }
 
