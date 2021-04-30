@@ -19,11 +19,11 @@
 
 <script lang='ts'>
 import { defineComponent, PropType } from 'vue';
-import { TextboxStoreModel } from '@/store/types';
+import { TextboxSerialized } from '@/types';
 
 const SvgTextbox = defineComponent({
     props: {
-        target: { type: Object as PropType<TextboxStoreModel>, required: true }
+        target: { type: Object as PropType<TextboxSerialized>, required: true }
     },
     setup: props => {
         const style: { [key: string]: string } = {
@@ -31,7 +31,7 @@ const SvgTextbox = defineComponent({
         };
         const textStyle: { [key: string]: string } = {
             fontSize: props.target.size.toString(),
-            fontWeight: props.target.width.toString(),
+            fontWeight: props.target.weight.toString(),
             fontFamily: props.target.font,
             margin: '0'
         };
@@ -39,12 +39,12 @@ const SvgTextbox = defineComponent({
         return {
             x: props.target.origin.x,
             y: props.target.origin.y,
-            width: props.target.width,
-            height: props.target.height,
+            width: props.target.dimensions.x,
+            height: props.target.dimensions.y,
             text: props.target.text,
             textStyle,
             style: Object.keys(style).map(key => `${key}:${style[key]}`).join(';'),
-            transformOrigin: `${props.target.origin.x + props.target.width / 2}px ${props.target.origin.y + props.target.height / 2}px`
+            transformOrigin: `${props.target.origin.x + props.target.dimensions.x / 2}px ${props.target.origin.y + props.target.dimensions.y / 2}px`
         };
     }
 });

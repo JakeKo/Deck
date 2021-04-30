@@ -8,23 +8,18 @@ import { calculateMove, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class TextboxMutator extends GraphicMutatorBase<GRAPHIC_TYPES.TEXTBOX, ITextboxRenderer, TextboxMutableSerialized> implements ITextboxMutator {
-    public readonly target: ITextboxRenderer;
-
     constructor({
-        target,
         slide,
         scale,
         graphicId,
         focus = true
     }: {
-        target: ITextboxRenderer;
         slide: ISlideRenderer;
         scale: number;
         graphicId: string;
         focus?: boolean;
     }) {
         super({ type: GRAPHIC_TYPES.TEXTBOX, slide, scale, graphicId, focus });
-        this.target = target;
     }
 
     /**

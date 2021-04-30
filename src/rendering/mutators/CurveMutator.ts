@@ -9,26 +9,21 @@ import { calculateMove, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRenderer, CurveMutableSerialized> implements ICurveMutator {
-    public readonly target: ICurveRenderer;
-
     protected anchorHelpers: CurveAnchorRenderer[];
     protected isMovingAnchor: boolean;
 
     constructor({
-        target,
         slide,
         scale,
         graphicId,
         focus = true
     }: {
-        target: ICurveRenderer;
         slide: ISlideRenderer;
         scale: number;
         graphicId: string;
         focus?: boolean;
     }) {
         super({ type: GRAPHIC_TYPES.CURVE, slide, scale, graphicId, focus });
-        this.target = target;
         this.isMovingAnchor = false;
 
         this.anchorHelpers = this.graphic.anchors.map((anchor, index) => new CurveAnchorRenderer({
@@ -103,7 +98,11 @@ class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRendere
         this.isMoving = true;
         const graphic = this.graphic;
         const initialOrigin = V.copy(graphic.getAnchor(0).point);
-        const initialAnchors = graphic.anchors;
+        const initialAnchors = graphic.anchors.map<CurveAnchor>(anchor => ({
+            inHandle: V.from(anchor.inHandle),
+            point: V.from(anchor.point),
+            outHandle: V.from(anchor.outHandle)
+        }));
         const relativePullPoints = graphic.pullPoints.map(p => initialPosition.towards(p));
         const snapVectors = this.slide.getSnapVectors([this.graphicId]);
 

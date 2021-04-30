@@ -1,131 +1,180 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
-import { provideId } from '@/utilities/IdProvider';
+import { RectangleMutableSerialized, RectangleSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
-import { RectangleRenderer } from '../graphics';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
 import { IRectangleMaker, IRectangleOutlineRenderer, IRectangleRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-type RectangleMakerArgs = {
-    slide: ISlideRenderer;
-    initialPosition: V;
-    scale: number;
-};
-
 class RectangleMaker implements IRectangleMaker {
-    public readonly target: IRectangleRenderer;
-    private _slide: ISlideRenderer;
-    private _initialPosition: V;
-    private _helpers: { [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer };
+    protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
+    protected graphicId: string;
+    protected slide: ISlideRenderer;
+    protected isResizing: boolean;
+    protected isCreated: boolean;
+    protected helpersScale: number;
 
-    constructor(args: RectangleMakerArgs) {
-        this._slide = args.slide;
-        this._initialPosition = args.initialPosition;
+    constructor({
+        slide,
+        scale,
+        graphicId
+    }: {
+        slide: ISlideRenderer;
+        scale: number;
+        graphicId: string;
+    }) {
+        this.graphicId = graphicId;
+        this.slide = slide;
+        this.isResizing = false;
+        this.isCreated = false;
+        this.helpersScale = scale;
+    }
 
-        // TODO: Aggregate snap vectors here
-        // Initialize primary graphic
-        this.target = new RectangleRenderer({
-            id: provideId(),
-            slide: this._slide,
-            origin: this._initialPosition
-        });
-
-        // Initialize helper graphics
-        this._helpers = {
-            [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
-                slide: this._slide,
-                parent: this.target,
-                center: this.target.origin,
-                scale: args.scale,
-                role: VERTEX_ROLES.TOP_LEFT
-            }),
-            [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
-                slide: this._slide,
-                parent: this.target,
-                center: this.target.origin.addX(this.target.dimensions.x),
-                scale: args.scale,
-                role: VERTEX_ROLES.TOP_RIGHT
-            }),
-            [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
-                slide: this._slide,
-                parent: this.target,
-                center: this.target.origin.addY(this.target.dimensions.y),
-                scale: args.scale,
-                role: VERTEX_ROLES.BOTTOM_LEFT
-            }),
-            [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
-                slide: this._slide,
-                parent: this.target,
-                center: this.target.origin.add(this.target.dimensions),
-                scale: args.scale,
-                role: VERTEX_ROLES.BOTTOM_RIGHT
-            }),
-            outline: new RectangleOutlineRenderer({
-                slide: this._slide,
-                scale: args.scale,
-                origin: this.target.origin,
-                dimensions: this.target.dimensions,
-                rotation: this.target.rotation
-            })
-        };
-
-        // Render primary graphic
-        this.target.render();
-
-        // Render helper graphics
-        this._helpers[VERTEX_ROLES.TOP_LEFT].render();
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].render();
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].render();
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].render();
-        this._helpers.outline.render();
+    protected get graphic(): IRectangleRenderer {
+        return this.slide.getGraphic(this.graphicId) as IRectangleRenderer;
     }
 
     public set scale(scale: number) {
-        this._helpers[VERTEX_ROLES.TOP_LEFT].scale = scale;
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].scale = scale;
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].scale = scale;
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].scale = scale;
-        this._helpers.outline.scale = scale;
+        this.helpersScale = scale;
+
+        if (this.helpers) {
+            this.helpers[VERTEX_ROLES.TOP_LEFT].scale = scale;
+            this.helpers[VERTEX_ROLES.TOP_RIGHT].scale = scale;
+            this.helpers[VERTEX_ROLES.BOTTOM_LEFT].scale = scale;
+            this.helpers[VERTEX_ROLES.BOTTOM_RIGHT].scale = scale;
+            this.helpers.outline.scale = scale;
+        }
     }
 
-    public complete(): void {
-        this._slide.setGraphic(this.target);
+    /**
+     * Updates the rendered helper graphics with the latest state of this maker's targeted graphic.
+     */
+    public updateHelpers(): void {
+        if (!this.isResizing) {
+            return;
+        }
 
-        // Remove helper graphics
-        this._helpers[VERTEX_ROLES.TOP_LEFT].unrender();
-        this._helpers[VERTEX_ROLES.TOP_RIGHT].unrender();
-        this._helpers[VERTEX_ROLES.BOTTOM_LEFT].unrender();
-        this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].unrender();
-        this._helpers.outline.unrender();
+        if (this.helpers) {
+            const { origin, dimensions } = this.graphic;
+            this.helpers[VERTEX_ROLES.TOP_LEFT].center = origin;
+            this.helpers[VERTEX_ROLES.TOP_RIGHT].center = origin.addX(dimensions.x);
+            this.helpers[VERTEX_ROLES.BOTTOM_LEFT].center = origin.addY(dimensions.y);
+            this.helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = origin.add(dimensions);
+            this.helpers.outline.origin = origin;
+            this.helpers.outline.dimensions = dimensions;
+        }
     }
 
-    public resizeListener(): (event: SlideMouseEvent) => void {
+    /**
+     * Creates a serialized form of the target graphic given the provided props.
+     */
+    public create(props: RectangleMutableSerialized): RectangleSerialized {
+        if (this.isCreated) {
+            throw new Error(`Graphic with id ${this.graphicId} already created`);
+        }
+
+        this.isCreated = true;
+        const graphic = {
+            id: this.graphicId,
+            type: 'rectangle',
+            origin: new V(props.origin?.x ?? 0, props.origin?.y ?? 0),
+            dimensions: new V(props.dimensions?.x ?? 0, props.dimensions?.y ?? 0),
+            fillColor: props.fillColor ?? '#CCCCCC',
+            strokeColor: props.strokeColor ?? 'none',
+            strokeWidth: props.strokeWidth ?? 0,
+            rotation: props.rotation ?? 0
+        } as RectangleSerialized;
+
+        const origin = V.from(graphic.origin);
+        const dimensions = V.from(graphic.dimensions);
+
+        this.helpers = {
+            [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
+                slide: this.slide,
+                parentId: graphic.id,
+                center: origin,
+                scale: this.helpersScale,
+                role: VERTEX_ROLES.TOP_LEFT
+            }),
+            [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
+                slide: this.slide,
+                parentId: graphic.id,
+                center: origin.addX(dimensions.x),
+                scale: this.helpersScale,
+                role: VERTEX_ROLES.TOP_RIGHT
+            }),
+            [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
+                slide: this.slide,
+                parentId: graphic.id,
+                center: origin.addY(dimensions.y),
+                scale: this.helpersScale,
+                role: VERTEX_ROLES.BOTTOM_LEFT
+            }),
+            [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
+                slide: this.slide,
+                parentId: graphic.id,
+                center: origin.add(dimensions),
+                scale: this.helpersScale,
+                role: VERTEX_ROLES.BOTTOM_RIGHT
+            }),
+            outline: new RectangleOutlineRenderer({
+                slide: this.slide,
+                scale: this.helpersScale,
+                origin,
+                dimensions,
+                rotation: graphic.rotation
+            })
+        };
+
+        return graphic;
+    }
+
+    /**
+     * Initialize this maker to begin tracking movement for the purpose of resizing.
+     * This returns a handler to be called on each subsequent mouse event.
+     */
+    public initResize(basePoint: V): (event: SlideMouseEvent) => RectangleMutableSerialized {
+        this.isResizing = true;
+
+        if (this.helpers) {
+            this.updateHelpers();
+            this.helpers[VERTEX_ROLES.TOP_LEFT].render();
+            this.helpers[VERTEX_ROLES.TOP_RIGHT].render();
+            this.helpers[VERTEX_ROLES.BOTTOM_LEFT].render();
+            this.helpers[VERTEX_ROLES.BOTTOM_RIGHT].render();
+            this.helpers.outline.render();
+        }
+
         return event => {
             const { baseEvent, slide } = event.detail;
             const position = resolvePosition(baseEvent, slide);
 
-            // If shift is pressed, constrain to square
-            const directions = [V.northeast, V.northwest, V.southeast, V.southwest];
-            const rawOffset = this._initialPosition.towards(position);
-            const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, directions)) : rawOffset;
+            const rawOffset = basePoint.towards(position);
+            const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, V.intermediates)) : rawOffset;
 
-            if (baseEvent.ctrlKey) {
-                this.target.origin = this._initialPosition.add(offset.abs.scale(-1));
-                this.target.dimensions = offset.abs.scale(2);
-            } else {
-                this.target.origin = this._initialPosition.add(offset.scale(0.5).add(offset.abs.scale(-0.5)));
-                this.target.dimensions = offset.abs;
-            }
+            const origin = baseEvent.ctrlKey ? basePoint.add(offset.abs.neg) : basePoint.add(offset.scale(0.5).add(offset.abs.scale(-0.5)));
+            const dimensions = baseEvent.ctrlKey ? offset.abs.scale(2) : offset.abs;
 
-            // Update helper graphics
-            this._helpers[VERTEX_ROLES.TOP_LEFT].center = this.target.origin;
-            this._helpers[VERTEX_ROLES.TOP_RIGHT].center = this.target.origin.addX(this.target.dimensions.x);
-            this._helpers[VERTEX_ROLES.BOTTOM_LEFT].center = this.target.origin.addY(this.target.dimensions.y);
-            this._helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = this.target.origin.add(this.target.dimensions);
-            this._helpers.outline.origin = this.target.origin;
-            this._helpers.outline.dimensions = this.target.dimensions;
+            return { origin, dimensions };
         };
+    }
+
+    /**
+     * Conclude tracking of movement for the purpose of resizing.
+     */
+    public endResize(): void {
+        if (!this.isResizing) {
+            return;
+        }
+
+        this.isResizing = false;
+        if (this.helpers) {
+            this.helpers[VERTEX_ROLES.TOP_LEFT].unrender();
+            this.helpers[VERTEX_ROLES.TOP_RIGHT].unrender();
+            this.helpers[VERTEX_ROLES.BOTTOM_LEFT].unrender();
+            this.helpers[VERTEX_ROLES.BOTTOM_RIGHT].unrender();
+            this.helpers.outline.unrender();
+        }
     }
 }
 

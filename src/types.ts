@@ -3,7 +3,7 @@ export type Keyed<T> = { [key: string]: T };
 
 export type RecursivePartial<T> = {
     [K in keyof T]?:
-    T[K] extends (infer U)[] ? RecursivePartial<U>[] :
+    T[K] extends (infer U)[] ? RecursivePartial<U | undefined>[] :
     T[K] extends object ? RecursivePartial<T[K]> :
     T[K];
 };

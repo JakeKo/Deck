@@ -7,6 +7,7 @@ import { SnapVectorRenderer } from '../helpers';
 import {
     BoundingBoxMutatorHelpers,
     GRAPHIC_TYPES,
+    IGraphicMutatorBase,
     IGraphicRenderer,
     ISlideRenderer,
     VERTEX_ROLES
@@ -22,7 +23,7 @@ import {
 
 // TODO: Implement better type inference here so passing in a generic could look something like the following
 // abstract class GraphicMutatorBase<T extends Graphic> => GraphicType<T>, Renderer<T>, MutableProps<T>
-abstract class GraphicMutatorBase<S extends GRAPHIC_TYPES, T extends IGraphicRenderer, U extends GraphicMutableSerialized> {
+abstract class GraphicMutatorBase<S extends GRAPHIC_TYPES, T extends IGraphicRenderer, U extends GraphicMutableSerialized> implements IGraphicMutatorBase<S, U> {
     public readonly type: S;
 
     protected helpers: BoundingBoxMutatorHelpers & { snapVectors: SnapVectorRenderer[] };

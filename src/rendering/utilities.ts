@@ -26,28 +26,28 @@ export function makeBoxHelpers(target: IGraphicRenderer, slide: ISlideRenderer, 
         vertices: {
             [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
                 slide: slide,
-                parent: target,
+                parentId: target.id,
                 center: box.topLeft,
                 scale: scale,
                 role: VERTEX_ROLES.TOP_LEFT
             }),
             [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
                 slide: slide,
-                parent: target,
+                parentId: target.id,
                 center: box.topRight,
                 scale: scale,
                 role: VERTEX_ROLES.TOP_RIGHT
             }),
             [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
                 slide: slide,
-                parent: target,
+                parentId: target.id,
                 center: box.bottomLeft,
                 scale: scale,
                 role: VERTEX_ROLES.BOTTOM_LEFT
             }),
             [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
                 slide: slide,
-                parent: target,
+                parentId: target.id,
                 center: box.bottomRight,
                 scale: scale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
@@ -89,33 +89,6 @@ export function scaleBoxHelpers(helpers: BoundingBoxMutatorHelpers, scale: numbe
 export function updateBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
     helpers.box.rotation = box.rotation;
     helpers.rotator.rotation = box.rotation;
-    helpers.box.setOriginAndDimensions(box.origin, box.dimensions);
-    helpers.rotator.center = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
-    helpers.vertices[VERTEX_ROLES.TOP_LEFT].center = box.topLeft;
-    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].center = box.topRight;
-    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].center = box.bottomLeft;
-    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].center = box.bottomRight;
-}
-
-/**
- * @deprecated
- * @see updateBoxHelpers
- */
-export function rotateBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
-    helpers.box.rotation = box.rotation;
-    helpers.rotator.rotation = box.rotation;
-    helpers.rotator.center = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
-    helpers.vertices[VERTEX_ROLES.TOP_LEFT].center = box.topLeft;
-    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].center = box.topRight;
-    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].center = box.bottomLeft;
-    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].center = box.bottomRight;
-}
-
-/**
- * @deprecated
- * @see updateBoxHelpers
- */
-export function resizeBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
     helpers.box.setOriginAndDimensions(box.origin, box.dimensions);
     helpers.rotator.center = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
     helpers.vertices[VERTEX_ROLES.TOP_LEFT].center = box.topLeft;

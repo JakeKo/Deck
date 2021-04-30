@@ -1,47 +1,53 @@
 import { listen, listenOnce, unlisten } from '@/events';
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
+import { GRAPHIC_TYPES, ICurveMaker } from '@/rendering/types';
 import { AppStore } from '@/store/types';
+import { provideId } from '@/utilities/IdProvider';
 import { PointerTool } from '.';
 import { EditorTool, TOOL_NAMES } from './types';
-import { resolvePosition } from './utilities';
 
 export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
-        const { slide, baseEvent } = event.detail;
-        const initialPosition = resolvePosition(baseEvent, slide);
-        const maker = slide.makeCurveInteractive(initialPosition);
-        slide.broadcastSetGraphic(maker.target);
+        const { slide } = event.detail;
+        const graphicId = provideId();
+        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.CURVE) as ICurveMaker;
+        slide.createGraphic(maker.create({}));
+        slide.setProps(graphicId, GRAPHIC_TYPES.CURVE, maker.addAnchor(event));
 
-        let anchorListeners = maker.anchorListeners({ inHandle: initialPosition, point: initialPosition, outHandle: initialPosition });
+        const drawHandler = maker.initDraw();
+        let createAnchorHandler: ReturnType<typeof maker.initCreateAnchor>;
+
         setPoint();
-
-        listen(SLIDE_EVENTS.KEYDOWN, 'complete', complete);
+        listen(SLIDE_EVENTS.KEYDOWN, 'curve--complete', complete);
 
         function movePoint(event: SlideMouseEvent): void {
-            anchorListeners.setPoint(event);
-            anchorListeners.setHandles(event);
-            slide.broadcastSetGraphic(maker.target);
+            const deltas = drawHandler(event);
+            slide.setProps(graphicId, GRAPHIC_TYPES.CURVE, deltas);
         }
 
         function setPoint(): void {
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'movePoint');
-            listen(SLIDE_EVENTS.MOUSEMOVE, 'moveHandles', moveHandles);
-            listenOnce(SLIDE_EVENTS.MOUSEUP, 'setHandles', setHandles);
+            createAnchorHandler = maker.initCreateAnchor();
+
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'curve--move-point');
+            listen(SLIDE_EVENTS.MOUSEMOVE, 'curve--move-handles', moveHandles);
+            listenOnce(SLIDE_EVENTS.MOUSEUP, 'curve--set-handles', setHandles);
         }
 
         function moveHandles(event: SlideMouseEvent): void {
-            anchorListeners.setHandles(event);
-            slide.broadcastSetGraphic(maker.target);
+            const deltas = createAnchorHandler?.(event);
+            slide.setProps(graphicId, GRAPHIC_TYPES.CURVE, deltas);
         }
 
         function setHandles(event: SlideMouseEvent): void {
-            const position = resolvePosition(event.detail.baseEvent, slide);
-            anchorListeners = maker.anchorListeners({ inHandle: position, point: position, outHandle: position });
-            slide.broadcastSetGraphic(maker.target);
+            const deltas = createAnchorHandler(event);
+            slide.setProps(graphicId, GRAPHIC_TYPES.CURVE, deltas);
+            maker.endCreateAnchor();
 
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'moveHandles');
-            listen(SLIDE_EVENTS.MOUSEMOVE, 'movePoint', movePoint);
-            listenOnce(SLIDE_EVENTS.MOUSEDOWN, 'setPoint', setPoint);
+            slide.setProps(graphicId, GRAPHIC_TYPES.CURVE, maker.addAnchor(event));
+
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'curve--move-handles');
+            listen(SLIDE_EVENTS.MOUSEMOVE, 'curve--move-point', movePoint);
+            listenOnce(SLIDE_EVENTS.MOUSEDOWN, 'curve--setPoint', setPoint);
         }
 
         function complete(event: SlideKeyboardEvent): void {
@@ -49,12 +55,14 @@ export default (store: AppStore): EditorTool => {
                 return;
             }
 
-            maker.complete();
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'movePoint');
-            unlisten(SLIDE_EVENTS.MOUSEDOWN, 'setPoint');
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'moveHandles');
-            unlisten(SLIDE_EVENTS.MOUSEUP, 'setHandles');
-            unlisten(SLIDE_EVENTS.KEYDOWN, 'complete');
+            const deltas = maker.endDraw();
+            slide.setProps(graphicId, GRAPHIC_TYPES.CURVE, deltas);
+
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'curve--move-point');
+            unlisten(SLIDE_EVENTS.MOUSEDOWN, 'curve--setPoint');
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'curve--move-handles');
+            unlisten(SLIDE_EVENTS.MOUSEUP, 'curve--set-handles');
+            unlisten(SLIDE_EVENTS.KEYDOWN, 'curve--complete');
 
             store.mutations.setActiveTool(PointerTool());
         }

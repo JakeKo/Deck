@@ -102,7 +102,7 @@ function reevaluateCursor(event: SlideMouseEvent): void {
 
 function moveVertex(event: VertexMouseEvent): void {
     const { slide, target } = event.detail;
-    const { id: graphicId, type: graphicType } = target.parent;
+    const { id: graphicId, type: graphicType } = slide.getGraphic(target.parentId);
     const mutator = slide.focusGraphic(graphicId);
 
     // Handler must be instantiated at the beginning of the mutation to capture initial state

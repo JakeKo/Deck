@@ -1,19 +1,22 @@
 import { dispatch, listen } from '@/events';
 import { decorateSlideEvents } from '@/events/decorators';
 import {
+    GraphicCreatedPayload,
+    GraphicFocusedPayload,
+    GraphicUnfocusedPayload,
     GraphicUpdatedPayload,
     GRAPHIC_EVENT_CODES,
     SlideKeyboardEvent,
     SlideZoomEvent,
     SLIDE_EVENTS
 } from '@/events/types';
-import { GraphicStoreModel, Viewbox } from '@/store/types';
-import { GraphicMutableSerialized, Keyed } from '@/types';
-import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
-import SlideStateManager from '@/utilities/SlideStateManager';
+import { Viewbox } from '@/store/types';
+import { GraphicMutableSerialized, GraphicSerialized, Keyed } from '@/types';
 import SnapVector from '@/utilities/SnapVector';
 import V from '@/utilities/Vector';
 import SVG from 'svg.js';
+import initRendererEventBus from './eventBus';
+import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from './graphics';
 import { CanvasRenderer } from './helpers';
 import {
     CurveMaker,
@@ -41,17 +44,11 @@ import {
 } from './mutators';
 import {
     GRAPHIC_TYPES,
-    ICurveMaker,
-    IEllipseMaker,
     IGraphicMaker,
     IGraphicMarker,
     IGraphicMutator,
     IGraphicRenderer,
-    IImageMaker,
-    IRectangleMaker,
-    ISlideRenderer,
-    ITextboxMaker,
-    IVideoMaker
+    ISlideRenderer
 } from './types';
 
 const { CURVE, ELLIPSE, IMAGE, RECTANGLE, TEXTBOX, VIDEO } = GRAPHIC_TYPES;
@@ -63,7 +60,6 @@ class SlideRenderer implements ISlideRenderer {
     public eventPublisherId = 'renderer';
     public slideId: string;
 
-    private _stateManager: SlideStateManager;
     private _graphics: Keyed<IGraphicRenderer>;
     private _graphicsFocused: Keyed<IGraphicMutator>;
     private _graphicsMaking: Keyed<IGraphicMaker>;
@@ -74,7 +70,6 @@ class SlideRenderer implements ISlideRenderer {
     private _snapVectors: SnapVector[];
 
     constructor({
-        stateManager,
         canvas,
         rawViewbox,
         croppedViewbox,
@@ -82,18 +77,17 @@ class SlideRenderer implements ISlideRenderer {
         graphics,
         slideId
     }: {
-        stateManager: SlideStateManager;
         canvas: SVG.Doc;
         rawViewbox: Viewbox;
         croppedViewbox: Viewbox;
         zoom: number;
-        graphics?: Keyed<GraphicStoreModel>;
+        graphics?: Keyed<GraphicSerialized>;
         slideId: string;
     }) {
         this.canvas = canvas;
         this.rawViewbox = rawViewbox;
         this.zoom = zoom;
-        this._stateManager = stateManager;
+        this._graphics = {};
         this._graphicsFocused = {};
         this._graphicsMaking = {};
         this._graphicsHighlighted = {};
@@ -108,15 +102,12 @@ class SlideRenderer implements ISlideRenderer {
             new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height / 2), V.east)
         ];
 
+        initRendererEventBus(this);
         this._renderBackdrop(new V(croppedViewbox.width, croppedViewbox.height));
         decorateSlideEvents(this);
         this.canvas.node.tabIndex = 0;
 
-        this._graphics = graphics
-            ? Object.values(graphics).map(graphic => graphicStoreModelToGraphicRenderer(graphic, this))
-                .reduce((graphics, graphic) => ({ [graphic.id]: graphic, ...graphics }), {})
-            : {};
-        Object.values(this._graphics).forEach(graphic => graphic.render());
+        Object.values((graphics ?? {})).map(graphic => this.createGraphic(graphic));
 
         listen(SLIDE_EVENTS.ZOOM, 'onSlideZoom', (event: SlideZoomEvent): void => this._setZoom(event.detail.zoom));
         listen(SLIDE_EVENTS.KEYDOWN, 'onSlideKeydown', (event: SlideKeyboardEvent): void => {
@@ -177,59 +168,99 @@ class SlideRenderer implements ISlideRenderer {
         ];
     }
 
-    public makeCurveInteractive(initialPosition: V): ICurveMaker {
-        return this._activateMaker(new CurveMaker({
-            slide: this,
-            initialPosition,
-            scale: 1 / this.zoom
-        }));
+    public createGraphic(props: GraphicSerialized, render = true, emit = true): IGraphicRenderer {
+        let graphic: IGraphicRenderer | undefined;
+
+        if (props.type === GRAPHIC_TYPES.CURVE) {
+            graphic = new CurveRenderer({
+                ...props,
+                slide: this,
+                anchors: props.anchors.map(anchor => ({
+                    inHandle: V.from(anchor.inHandle),
+                    point: V.from(anchor.point),
+                    outHandle: V.from(anchor.outHandle)
+                }))
+            });
+        } else if (props.type === GRAPHIC_TYPES.ELLIPSE) {
+            graphic = new EllipseRenderer({
+                ...props,
+                slide: this,
+                center: V.from(props.center),
+                dimensions: V.from(props.dimensions)
+            });
+        } else if (props.type === GRAPHIC_TYPES.IMAGE) {
+            graphic = new ImageRenderer({
+                ...props,
+                slide: this,
+                origin: V.from(props.origin),
+                dimensions: V.from(props.dimensions)
+            });
+        } else if (props.type === GRAPHIC_TYPES.RECTANGLE) {
+            graphic = new RectangleRenderer({
+                ...props,
+                slide: this,
+                origin: V.from(props.origin),
+                dimensions: V.from(props.dimensions)
+            });
+        } else if (props.type === GRAPHIC_TYPES.TEXTBOX) {
+            graphic = new TextboxRenderer({
+                ...props,
+                slide: this,
+                origin: V.from(props.origin),
+                dimensions: V.from(props.dimensions)
+            });
+        } else if (props.type === GRAPHIC_TYPES.VIDEO) {
+            graphic = new VideoRenderer({
+                ...props,
+                slide: this,
+                origin: V.from(props.origin),
+                dimensions: V.from(props.dimensions)
+            });
+        } else {
+            throw new Error(`Tried to create a graphic of unknown type ${(props as { type: string}).type}`);
+        }
+
+        if (render) {
+            graphic.render();
+        }
+
+        if (emit) {
+            dispatch<GraphicCreatedPayload>(GRAPHIC_EVENT_CODES.CREATED, {
+                publisherId: this.eventPublisherId,
+                slideId: this.slideId,
+                props
+            });
+        }
+
+        this._graphics[graphic.id] = graphic;
+        return graphic;
     }
 
-    public makeEllipseInteractive(initialPosition: V): IEllipseMaker {
-        return this._activateMaker(new EllipseMaker({
-            slide: this,
-            initialPosition,
-            scale: 1 / this.zoom
-        }));
+    public initInteractiveCreate(graphicId: string, graphicType: GRAPHIC_TYPES): IGraphicMaker {
+        const props = { slide: this, scale: 1 / this.zoom, graphicId };
+        let creator: IGraphicMaker | undefined;
+
+        if (graphicType === GRAPHIC_TYPES.CURVE) {
+            creator = new CurveMaker(props);
+        } else if (graphicType === GRAPHIC_TYPES.ELLIPSE) {
+            creator = new EllipseMaker(props);
+        } else if (graphicType === GRAPHIC_TYPES.IMAGE) {
+            creator = new ImageMaker(props);
+        } else if (graphicType === GRAPHIC_TYPES.RECTANGLE) {
+            creator = new RectangleMaker(props);
+        } else if (graphicType === GRAPHIC_TYPES.TEXTBOX) {
+            creator = new TextboxMaker(props);
+        } else if (graphicType === GRAPHIC_TYPES.VIDEO) {
+            creator = new VideoMaker(props);
+        } else {
+            throw new Error(`Could not initialize interactive create session for unknown graphic type: ${graphicType}`);
+        }
+
+        this._graphicsMaking[graphicId] = creator;
+        return creator;
     }
 
-    public makeImageInteractive(initialPosition: V, source: string, dimensions: V): IImageMaker {
-        return this._activateMaker(new ImageMaker({
-            slide: this,
-            initialPosition,
-            source,
-            dimensions,
-            scale: 1 / this.zoom
-        }));
-    }
-
-    public makeRectangleInteractive(initialPosition: V): IRectangleMaker {
-        return this._activateMaker(new RectangleMaker({
-            slide: this,
-            initialPosition,
-            scale: 1 / this.zoom
-        }));
-    }
-
-    public makeTextboxInteractive(initialPosition: V): ITextboxMaker {
-        return this._activateMaker(new TextboxMaker({
-            slide: this,
-            initialPosition,
-            scale: 1 / this.zoom
-        }));
-    }
-
-    public makeVideoInteractive(initialPosition: V, source: string, dimensions: V): IVideoMaker {
-        return this._activateMaker(new VideoMaker({
-            slide: this,
-            initialPosition,
-            source,
-            dimensions,
-            scale: 1 / this.zoom
-        }));
-    }
-
-    public completeInteractiveMake(graphicId: string): void {
+    public endInteractiveCreate(graphicId: string): void {
         delete this._graphicsMaking[graphicId];
     }
 
@@ -239,10 +270,6 @@ class SlideRenderer implements ISlideRenderer {
 
     public getGraphics(): { [key: string]: IGraphicRenderer } {
         return this._graphics;
-    }
-
-    public setGraphic(graphic: IGraphicRenderer): void {
-        this._graphics[graphic.id] = graphic;
     }
 
     public removeGraphic(graphicId: string): void {
@@ -264,15 +291,7 @@ class SlideRenderer implements ISlideRenderer {
         graphicIds.forEach(graphicId => this.removeGraphic(graphicId));
     }
 
-    public broadcastSetGraphic(graphic: IGraphicRenderer): void {
-        this._stateManager.setGraphicFromRenderer(graphic);
-    }
-
-    public broadcastRemoveGraphic(graphicId: string): void {
-        this._stateManager.removeGraphicFromRenderer(graphicId);
-    }
-
-    public focusGraphic(graphicId: string): IGraphicMutator {
+    public focusGraphic(graphicId: string, emit = true): IGraphicMutator {
         if (this.isFocused(graphicId)) {
             return this._graphicsFocused[graphicId];
         }
@@ -285,30 +304,45 @@ class SlideRenderer implements ISlideRenderer {
         let mutator;
 
         if (graphic.type === CURVE) {
-            mutator = new CurveMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
+            mutator = new CurveMutator({ slide: this, scale: 1 / this.zoom, graphicId: graphic.id });
         } else if (graphic.type === ELLIPSE) {
-            mutator = new EllipseMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
+            mutator = new EllipseMutator({ slide: this, scale: 1 / this.zoom, graphicId: graphic.id });
         } else if (graphic.type === IMAGE) {
-            mutator = new ImageMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
+            mutator = new ImageMutator({ slide: this, scale: 1 / this.zoom, graphicId: graphic.id });
         } else if (graphic.type === RECTANGLE) {
-            mutator = new RectangleMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
+            mutator = new RectangleMutator({ slide: this, scale: 1 / this.zoom, graphicId: graphic.id });
         } else if (graphic.type === TEXTBOX) {
-            mutator = new TextboxMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
+            mutator = new TextboxMutator({ slide: this, scale: 1 / this.zoom, graphicId: graphic.id });
         } else if (graphic.type === VIDEO) {
-            mutator = new VideoMutator({ slide: this, scale: 1 / this.zoom, target: graphic, graphicId: graphic.id });
+            mutator = new VideoMutator({ slide: this, scale: 1 / this.zoom, graphicId: graphic.id });
         } else {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }
 
         this._graphicsFocused[graphicId] = mutator;
-        this._stateManager.focusGraphicFromRenderer(graphicId);
+
+        if (emit) {
+            dispatch<GraphicFocusedPayload>(GRAPHIC_EVENT_CODES.FOCUSED, {
+                publisherId: this.eventPublisherId,
+                slideId: this.slideId,
+                graphicId
+            });
+        }
+
         return mutator;
     }
 
-    public unfocusGraphic(graphicId: string): void {
+    public unfocusGraphic(graphicId: string, emit = true): void {
         this.isFocused(graphicId) && this._graphicsFocused[graphicId].unfocus();
-        this._stateManager.unfocusGraphicFromRenderer(graphicId);
         delete this._graphicsFocused[graphicId];
+
+        if (emit) {
+            dispatch<GraphicUnfocusedPayload>(GRAPHIC_EVENT_CODES.UNFOCUSED, {
+                publisherId: this.eventPublisherId,
+                slideId: this.slideId,
+                graphicId
+            });
+        }
     }
 
     public unfocusAllGraphics(exclude: string[] = []): void {
@@ -370,6 +404,11 @@ class SlideRenderer implements ISlideRenderer {
             mutator.updateHelpers();
         }
 
+        const makers = this._graphicsMaking[graphicId];
+        if (makers !== undefined) {
+            makers.updateHelpers();
+        }
+
         if (emit) {
             dispatch<GraphicUpdatedPayload>(GRAPHIC_EVENT_CODES.UPDATED, {
                 publisherId: this.eventPublisherId,
@@ -379,93 +418,6 @@ class SlideRenderer implements ISlideRenderer {
                 props
             });
         }
-    }
-
-    // SINGLE PROPERTY UPDATE METHODS
-    public setX(graphicId: string, x: number): void {
-        const graphic = this.getGraphic(graphicId);
-        if (graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
-            graphic.origin = new V(x, graphic.origin.y);
-        } else if (graphic.type === ELLIPSE) {
-            graphic.center = new V(x, graphic.center.y);
-        } else {
-            console.warn(`Attempted to set property 'x' of graphic with type '${graphic.type}'`);
-        }
-    }
-
-    public setY(graphicId: string, y: number): void {
-        const graphic = this.getGraphic(graphicId);
-        if (graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
-            graphic.origin = new V(graphic.origin.x, y);
-        } else if (graphic.type === ELLIPSE) {
-            graphic.center = new V(graphic.center.x, y);
-        } else {
-            console.warn(`Attempted to set property 'y' of graphic with type '${graphic.type}'`);
-        }
-    }
-
-    public setFillColor(graphicId: string, fillColor: string): void {
-        const graphic = this.getGraphic(graphicId);
-        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE) {
-            graphic.fillColor = fillColor;
-        } else {
-            console.warn(`Attempted to set property 'fillColor' of graphic with type '${graphic.type}'`);
-        }
-    }
-
-    public setStrokeColor(graphicId: string, strokeColor: string): void {
-        const graphic = this.getGraphic(graphicId);
-        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
-            graphic.strokeColor = strokeColor;
-        } else {
-            console.warn(`Attempted to set property 'strokeColor' of graphic with type '${graphic.type}'`);
-        }
-    }
-
-    public setStrokeWidth(graphicId: string, strokeWidth: number): void {
-        const graphic = this.getGraphic(graphicId);
-        if (graphic.type === CURVE || graphic.type === ELLIPSE || graphic.type === RECTANGLE || graphic.type === VIDEO) {
-            graphic.strokeWidth = strokeWidth;
-        } else {
-            console.warn(`Attempted to set property 'strokeWidth' of graphic with type '${graphic.type}'`);
-        }
-    }
-
-    public setWidth(graphicId: string, width: number): void {
-        const graphic = this.getGraphic(graphicId);
-        if (graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
-            graphic.dimensions = new V(width, graphic.dimensions.y);
-        } else {
-            console.warn(`Attempted to set property 'width' of graphic with type '${graphic.type}'`);
-        }
-    }
-
-    public setHeight(graphicId: string, height: number): void {
-        const graphic = this.getGraphic(graphicId);
-        if (graphic.type === ELLIPSE || graphic.type === IMAGE || graphic.type === RECTANGLE || graphic.type === TEXTBOX || graphic.type === VIDEO) {
-            graphic.dimensions = new V(graphic.dimensions.x, height);
-        } else {
-            console.warn(`Attempted to set property 'height' of graphic with type '${graphic.type}'`);
-        }
-    }
-
-    public setRotation(graphicId: string, rotation: number): void {
-        const graphic = this.getGraphic(graphicId);
-        graphic.rotation = rotation;
-    }
-
-    public setText(graphicId: string, text: string): void {
-        const graphic = this.getGraphic(graphicId);
-        if (graphic.type === TEXTBOX) {
-            graphic.text = text;
-        } else {
-            console.warn(`Attempted to set property 'height' of graphic with type '${graphic.type}'`);
-        }
-    }
-
-    private _activateMaker<T extends IGraphicMaker>(maker: T): T {
-        this._graphicsMaking[maker.target.id] = maker;
-        return maker;
     }
 
     // When the zoom on the slide has changed, we need to correct for it so helpers don't shrink and grow

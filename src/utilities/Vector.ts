@@ -26,6 +26,10 @@ export default class V {
         return new V(vector.x, vector.y);
     }
 
+    public static from({ x, y }: { x: number, y: number }): V {
+        return new V(x, y);
+    }
+
     public static slice(n: number): V[] {
         if (n === 0) {
             return [];

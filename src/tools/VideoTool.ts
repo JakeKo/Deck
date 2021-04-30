@@ -1,6 +1,8 @@
 import { listen, listenOnce, unlisten } from '@/events';
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
+import { GRAPHIC_TYPES, IVideoMaker } from '@/rendering/types';
 import { AppStore } from '@/store/types';
+import { provideId } from '@/utilities/IdProvider';
 import V from '@/utilities/Vector';
 import { PointerTool } from '.';
 import { EditorTool, TOOL_NAMES } from './types';
@@ -10,17 +12,17 @@ export default (store: AppStore): EditorTool => {
     function seedVideo(videoSource: string, dimensions: V): (event: SlideMouseEvent) => void {
         return function make(event) {
             const { slide, baseEvent } = event.detail;
-            const maker = slide.makeVideoInteractive(resolvePosition(baseEvent, slide), videoSource, dimensions);
-            slide.broadcastSetGraphic(maker.target);
+            const graphicId = provideId();
+            const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.VIDEO) as IVideoMaker;
+            slide.createGraphic(maker.create({ source: videoSource, dimensions }));
 
-            // Start tracking the last mouse event so keypress handlers can emulate mouse events
             let lastMouseEvent = event;
-            const resizeListener = maker.resizeListener();
+            const resizeHandler = maker.initResize(resolvePosition(baseEvent, slide));
 
-            listen(SLIDE_EVENTS.KEYDOWN, 'keyDownHandler', keyDownHandler);
-            listen(SLIDE_EVENTS.KEYUP, 'keyUpHandler', keyUpHandler);
-            listen(SLIDE_EVENTS.MOUSEMOVE, 'update', update);
-            listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
+            listen(SLIDE_EVENTS.KEYDOWN, 'video--key-down-handler', keyDownHandler);
+            listen(SLIDE_EVENTS.KEYUP, 'video--key-up-handler', keyUpHandler);
+            listen(SLIDE_EVENTS.MOUSEMOVE, 'video--update', update);
+            listenOnce(SLIDE_EVENTS.MOUSEUP, 'video--complete', complete);
 
             function keyDownHandler(event: SlideKeyboardEvent): void {
                 mouseEventFromKeyDownEvent(event, lastMouseEvent);
@@ -31,16 +33,18 @@ export default (store: AppStore): EditorTool => {
             }
 
             function update(event: SlideMouseEvent): void {
-                resizeListener(event);
-                slide.broadcastSetGraphic(maker.target);
+                const deltas = resizeHandler(event);
+                slide.setProps(graphicId, GRAPHIC_TYPES.VIDEO, deltas);
                 lastMouseEvent = event;
             }
 
-            function complete(): void {
-                maker.complete();
-                unlisten(SLIDE_EVENTS.MOUSEMOVE, 'update');
-                unlisten(SLIDE_EVENTS.KEYDOWN, 'keyDownHandler');
-                unlisten(SLIDE_EVENTS.KEYUP, 'keyUpHandler');
+            function complete(event: SlideMouseEvent): void {
+                update(event);
+                maker.endResize();
+
+                unlisten(SLIDE_EVENTS.MOUSEMOVE, 'video--update');
+                unlisten(SLIDE_EVENTS.KEYDOWN, 'video--key-down-handler');
+                unlisten(SLIDE_EVENTS.KEYUP, 'video--key-up-handler');
 
                 store.mutations.setActiveTool(PointerTool());
             }

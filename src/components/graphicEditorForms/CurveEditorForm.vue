@@ -34,11 +34,12 @@
 </template>
 
 <script lang='ts'>
-import { CurveStoreModel } from '@/store/types';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import { ColorField, NumberField } from '../Core/Forms';
 import { degToRad, radToDeg } from '@/utilities/utilities';
+import { CurveSerialized } from '@/types';
+import { GRAPHIC_TYPES } from '@/rendering/types';
 
 const CurveEditorForm = defineComponent({
     components: {
@@ -46,7 +47,7 @@ const CurveEditorForm = defineComponent({
         ColorField
     },
     props: {
-        curve: { type: Object as PropType<CurveStoreModel>, required: true },
+        curve: { type: Object as PropType<CurveSerialized>, required: true },
         slideId: { type: String, required: true }
     },
     setup: props => {
@@ -67,25 +68,25 @@ const CurveEditorForm = defineComponent({
         const rotation = computed({
             get: () => radToDeg(props.curve.rotation),
             set: value => {
-                store.mutations.setProps(props.slideId, props.curve.id, props.curve.type, { rotation: degToRad(value) });
+                store.mutations.setProps(props.slideId, props.curve.id, GRAPHIC_TYPES.CURVE, { rotation: degToRad(value) });
             }
         });
         const strokeWidth = computed({
             get: () => props.curve.strokeWidth,
             set: value => {
-                store.mutations.setProps(props.slideId, props.curve.id, props.curve.type, { strokeWidth: value });
+                store.mutations.setProps(props.slideId, props.curve.id, GRAPHIC_TYPES.CURVE, { strokeWidth: value });
             }
         });
         const fillColor = computed({
             get: () => props.curve.fillColor,
             set: value => {
-                store.mutations.setProps(props.slideId, props.curve.id, props.curve.type, { fillColor: value });
+                store.mutations.setProps(props.slideId, props.curve.id, GRAPHIC_TYPES.CURVE, { fillColor: value });
             }
         });
         const strokeColor = computed({
             get: () => props.curve.strokeColor,
             set: value => {
-                store.mutations.setProps(props.slideId, props.curve.id, props.curve.type, { strokeColor: value });
+                store.mutations.setProps(props.slideId, props.curve.id, GRAPHIC_TYPES.CURVE, { strokeColor: value });
             }
         });
 

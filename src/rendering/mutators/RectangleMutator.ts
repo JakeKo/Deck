@@ -8,23 +8,18 @@ import { calculateMove, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class RectangleMutator extends GraphicMutatorBase<GRAPHIC_TYPES.RECTANGLE, IRectangleRenderer, RectangleMutableSerialized> implements IRectangleMutator {
-    public readonly target: IRectangleRenderer;
-
     constructor({
-        target,
         slide,
         scale,
         graphicId,
         focus = true
     }: {
-        target: IRectangleRenderer;
         slide: ISlideRenderer;
         scale: number;
         graphicId: string;
         focus?: boolean;
     }) {
         super({ type: GRAPHIC_TYPES.RECTANGLE, slide, scale, graphicId, focus });
-        this.target = target;
     }
 
     /**

@@ -8,23 +8,18 @@ import { calculateMove, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class EllipseMutator extends GraphicMutatorBase<GRAPHIC_TYPES.ELLIPSE, IEllipseRenderer, EllipseMutableSerialized> implements IEllipseMutator {
-    public readonly target: IEllipseRenderer;
-
     constructor({
-        target,
         slide,
         scale,
         graphicId,
         focus = true
     }: {
-        target: IEllipseRenderer;
         slide: ISlideRenderer;
         scale: number;
         graphicId: string;
         focus?: boolean;
     }) {
         super({ type: GRAPHIC_TYPES.ELLIPSE, slide, scale, graphicId, focus });
-        this.target = target;
     }
 
     /**

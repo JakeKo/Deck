@@ -12,7 +12,6 @@ import DeckComponent from './generic/DeckComponent';
 import TitleField from './TitleField.vue';
 import { defineComponent, computed, reactive } from 'vue';
 import { jsonToSlides } from '@/utilities/parsing/storeModel';
-import SlideStateManager from '@/utilities/SlideStateManager';
 
 const MenuBar = defineComponent({
     components: {
@@ -78,8 +77,7 @@ const MenuBar = defineComponent({
                             id: slide.id,
                             isActive: false,
                             graphics: slide.graphics,
-                            focusedGraphics: {},
-                            stateManager: new SlideStateManager(slide.id)
+                            focusedGraphics: {}
                         });
                     });
 

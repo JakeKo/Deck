@@ -42,20 +42,21 @@
 </template>
 
 <script lang='ts'>
-import { ImageStoreModel } from '@/store/types';
 import { degToRad, radToDeg } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import { NumberField } from '../Core/Forms';
 import { correctForRotationWhenChangingDimensions } from './utilities';
+import { ImageSerialized } from '@/types';
+import { GRAPHIC_TYPES } from '@/rendering/types';
 
 const ImageEditorForm = defineComponent({
     components: {
         NumberField
     },
     props: {
-        image: { type: Object as PropType<ImageStoreModel>, required: true },
+        image: { type: Object as PropType<ImageSerialized>, required: true },
         slideId: { type: String, required: true }
     },
     setup: props => {
@@ -76,56 +77,56 @@ const ImageEditorForm = defineComponent({
         const x = computed({
             get: () => props.image.origin.x,
             set: value => {
-                store.mutations.setProps(props.slideId, props.image.id, props.image.type, { origin: { x: value } });
+                store.mutations.setProps(props.slideId, props.image.id, GRAPHIC_TYPES.IMAGE, { origin: { x: value } });
             }
         });
         const y = computed({
             get: () => props.image.origin.y,
             set: value => {
-                store.mutations.setProps(props.slideId, props.image.id, props.image.type, { origin: { y: value } });
+                store.mutations.setProps(props.slideId, props.image.id, GRAPHIC_TYPES.IMAGE, { origin: { y: value } });
             }
         });
         const width = computed({
-            get: () => props.image.width,
+            get: () => props.image.dimensions.x,
             set: value => {
-                const height = value * props.image.height / props.image.width;
+                const height = value * props.image.dimensions.y / props.image.dimensions.x;
                 const newOrigin = correctForRotationWhenChangingDimensions({
-                    basePoint: props.image.origin,
-                    initialDimensions: new V(props.image.width, props.image.height),
+                    basePoint: V.from(props.image.origin),
+                    initialDimensions: new V(props.image.dimensions.x, props.image.dimensions.y),
                     newDimensions: new V(value, height),
                     rotation: props.image.rotation
                 });
 
-                store.mutations.setProps(props.slideId, props.image.id, props.image.type, {
+                store.mutations.setProps(props.slideId, props.image.id, GRAPHIC_TYPES.IMAGE, {
                     origin: {
                         x: newOrigin.x === props.image.origin.x ? undefined : newOrigin.x,
                         y: newOrigin.y === props.image.origin.y ? undefined : newOrigin.y
                     },
                     dimensions: {
                         x: value,
-                        y: height === props.image.height ? undefined : height
+                        y: height === props.image.dimensions.y ? undefined : height
                     }
                 });
             }
         });
         const height = computed({
-            get: () => props.image.height,
+            get: () => props.image.dimensions.y,
             set: value => {
-                const width = value * props.image.width / props.image.height;
+                const width = value * props.image.dimensions.x / props.image.dimensions.y;
                 const newOrigin = correctForRotationWhenChangingDimensions({
-                    basePoint: props.image.origin,
-                    initialDimensions: new V(props.image.width, props.image.height),
+                    basePoint: V.from(props.image.origin),
+                    initialDimensions: new V(props.image.dimensions.x, props.image.dimensions.y),
                     newDimensions: new V(width, value),
                     rotation: props.image.rotation
                 });
 
-                store.mutations.setProps(props.slideId, props.image.id, props.image.type, {
+                store.mutations.setProps(props.slideId, props.image.id, GRAPHIC_TYPES.IMAGE, {
                     origin: {
                         x: newOrigin.x === props.image.origin.x ? undefined : newOrigin.x,
                         y: newOrigin.y === props.image.origin.y ? undefined : newOrigin.y
                     },
                     dimensions: {
-                        x: width === props.image.width ? undefined : width,
+                        x: width === props.image.dimensions.x ? undefined : width,
                         y: value
                     }
                 });
@@ -134,7 +135,7 @@ const ImageEditorForm = defineComponent({
         const rotation = computed({
             get: () => radToDeg(props.image.rotation),
             set: value => {
-                store.mutations.setProps(props.slideId, props.image.id, props.image.type, { rotation: degToRad(value) });
+                store.mutations.setProps(props.slideId, props.image.id, GRAPHIC_TYPES.IMAGE, { rotation: degToRad(value) });
             }
         });
 

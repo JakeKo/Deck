@@ -8,23 +8,18 @@ import { calculateMove, updateSnapVectors } from '../utilities';
 import GraphicMutatorBase from './GraphicMutatorBase';
 
 class VideoMutator extends GraphicMutatorBase<GRAPHIC_TYPES.VIDEO, IVideoRenderer, VideoMutableSerialized> implements IVideoMutator {
-    public readonly target: IVideoRenderer;
-
     constructor({
-        target,
         slide,
         scale,
         graphicId,
         focus = true
     }: {
-        target: IVideoRenderer;
         slide: ISlideRenderer;
         scale: number;
         graphicId: string;
         focus?: boolean;
     }) {
         super({ type: GRAPHIC_TYPES.VIDEO, slide, scale, graphicId, focus });
-        this.target = target;
     }
 
     /**

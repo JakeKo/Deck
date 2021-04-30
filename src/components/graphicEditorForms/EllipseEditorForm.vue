@@ -71,13 +71,14 @@
 </template>
 
 <script lang='ts'>
-import { EllipseStoreModel } from '@/store/types';
 import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import { ColorField, NumberField, ToggleField } from '../Core/Forms';
 import { degToRad, radToDeg } from '@/utilities/utilities';
 import { correctForRotationWhenChangingDimensions } from './utilities';
+import { EllipseSerialized } from '@/types';
+import { GRAPHIC_TYPES } from '@/rendering/types';
 
 const EllipseEditorForm = defineComponent({
     components: {
@@ -86,7 +87,7 @@ const EllipseEditorForm = defineComponent({
         ToggleField
     },
     props: {
-        ellipse: { type: Object as PropType<EllipseStoreModel>, required: true },
+        ellipse: { type: Object as PropType<EllipseSerialized>, required: true },
         slideId: { type: String, required: true }
     },
     setup: props => {
@@ -108,72 +109,72 @@ const EllipseEditorForm = defineComponent({
         const x = computed({
             get: () => props.ellipse.center.x,
             set: value => {
-                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { center: { x: value } });
+                store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, { center: { x: value } });
             }
         });
         const y = computed({
             get: () => props.ellipse.center.y,
             set: value => {
-                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { center: { y: value } });
+                store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, { center: { y: value } });
             }
         });
         const width = computed({
-            get: () => props.ellipse.width,
+            get: () => props.ellipse.dimensions.x,
             set: value => {
                 const height = lockAspectRatio.value
-                    ? value * props.ellipse.height / props.ellipse.width
-                    : props.ellipse.height;
-                const initialDimensions = new V(props.ellipse.width, props.ellipse.height);
+                    ? value * props.ellipse.dimensions.y / props.ellipse.dimensions.x
+                    : props.ellipse.dimensions.y;
+                const initialDimensions = new V(props.ellipse.dimensions.x, props.ellipse.dimensions.y);
                 const newDimensions = new V(value, height);
 
                 // Unlike other rectangular graphics, the ellipse uses the center as the base point
                 // We have to do some extra vector math to get the center to move but the top-left "origin" to stay in place
                 const newOrigin = correctForRotationWhenChangingDimensions({
-                    basePoint: props.ellipse.center.add(initialDimensions.scale(-0.5)),
+                    basePoint: V.from(props.ellipse.center).add(initialDimensions.scale(-0.5)),
                     initialDimensions,
                     newDimensions,
                     rotation: props.ellipse.rotation
                 });
                 const newCenter = newOrigin.add(newDimensions.scale(0.5));
 
-                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, {
+                store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, {
                     center: {
                         x: newCenter.x === props.ellipse.center.x ? undefined : newCenter.x,
                         y: newCenter.y === props.ellipse.center.y ? undefined : newCenter.y
                     },
                     dimensions: {
                         x: value,
-                        y: height === props.ellipse.height ? undefined : height
+                        y: height === props.ellipse.dimensions.y ? undefined : height
                     }
                 });
             }
         });
         const height = computed({
-            get: () => props.ellipse.height,
+            get: () => props.ellipse.dimensions.y,
             set: value => {
                 const width = lockAspectRatio.value
-                    ? value * props.ellipse.width / props.ellipse.height
-                    : props.ellipse.width;
-                const initialDimensions = new V(props.ellipse.width, props.ellipse.height);
+                    ? value * props.ellipse.dimensions.x / props.ellipse.dimensions.y
+                    : props.ellipse.dimensions.x;
+                const initialDimensions = new V(props.ellipse.dimensions.x, props.ellipse.dimensions.y);
                 const newDimensions = new V(width, value);
 
                 // Unlike other rectangular graphics, the ellipse uses the center as the base point
                 // We have to do some extra vector math to get the center to move but the top-left "origin" to stay in place
                 const newOrigin = correctForRotationWhenChangingDimensions({
-                    basePoint: props.ellipse.center.add(initialDimensions.scale(-0.5)),
+                    basePoint: V.from(props.ellipse.center).add(initialDimensions.scale(-0.5)),
                     initialDimensions,
                     newDimensions,
                     rotation: props.ellipse.rotation
                 });
                 const newCenter = newOrigin.add(newDimensions.scale(0.5));
 
-                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, {
+                store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, {
                     center: {
                         x: newCenter.x === props.ellipse.center.x ? undefined : newCenter.x,
                         y: newCenter.y === props.ellipse.center.y ? undefined : newCenter.y
                     },
                     dimensions: {
-                        x: width === props.ellipse.width ? undefined : width,
+                        x: width === props.ellipse.dimensions.x ? undefined : width,
                         y: value
                     }
                 });
@@ -182,25 +183,25 @@ const EllipseEditorForm = defineComponent({
         const rotation = computed({
             get: () => radToDeg(props.ellipse.rotation),
             set: value => {
-                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { rotation: degToRad(value) });
+                store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, { rotation: degToRad(value) });
             }
         });
         const strokeWidth = computed({
             get: () => props.ellipse.strokeWidth,
             set: value => {
-                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { strokeWidth: value });
+                store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, { strokeWidth: value });
             }
         });
         const fillColor = computed({
             get: () => props.ellipse.fillColor,
             set: value => {
-                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { fillColor: value });
+                store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, { fillColor: value });
             }
         });
         const strokeColor = computed({
             get: () => props.ellipse.strokeColor,
             set: value => {
-                store.mutations.setProps(props.slideId, props.ellipse.id, props.ellipse.type, { strokeColor: value });
+                store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, { strokeColor: value });
             }
         });
 

@@ -42,20 +42,21 @@
 </template>
 
 <script lang='ts'>
-import { VideoStoreModel } from '@/store/types';
 import { degToRad, radToDeg } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import { NumberField } from '../Core/Forms';
 import { correctForRotationWhenChangingDimensions } from './utilities';
+import { VideoSerialized } from '@/types';
+import { GRAPHIC_TYPES } from '@/rendering/types';
 
 const VideoEditorForm = defineComponent({
     components: {
         NumberField
     },
     props: {
-        video: { type: Object as PropType<VideoStoreModel>, required: true },
+        video: { type: Object as PropType<VideoSerialized>, required: true },
         slideId: { type: String, required: true }
     },
     setup: props => {
@@ -76,56 +77,56 @@ const VideoEditorForm = defineComponent({
         const x = computed({
             get: () => props.video.origin.x,
             set: value => {
-                store.mutations.setProps(props.slideId, props.video.id, props.video.type, { origin: { x: value } });
+                store.mutations.setProps(props.slideId, props.video.id, GRAPHIC_TYPES.VIDEO, { origin: { x: value } });
             }
         });
         const y = computed({
             get: () => props.video.origin.y,
             set: value => {
-                store.mutations.setProps(props.slideId, props.video.id, props.video.type, { origin: { y: value } });
+                store.mutations.setProps(props.slideId, props.video.id, GRAPHIC_TYPES.VIDEO, { origin: { y: value } });
             }
         });
         const width = computed({
-            get: () => props.video.width,
+            get: () => props.video.dimensions.x,
             set: value => {
-                const height = value * props.video.height / props.video.width;
+                const height = value * props.video.dimensions.y / props.video.dimensions.x;
                 const newOrigin = correctForRotationWhenChangingDimensions({
-                    basePoint: props.video.origin,
-                    initialDimensions: new V(props.video.width, props.video.height),
+                    basePoint: V.from(props.video.origin),
+                    initialDimensions: new V(props.video.dimensions.x, props.video.dimensions.y),
                     newDimensions: new V(value, height),
                     rotation: props.video.rotation
                 });
 
-                store.mutations.setProps(props.slideId, props.video.id, props.video.type, {
+                store.mutations.setProps(props.slideId, props.video.id, GRAPHIC_TYPES.VIDEO, {
                     origin: {
                         x: newOrigin.x === props.video.origin.x ? undefined : newOrigin.x,
                         y: newOrigin.y === props.video.origin.y ? undefined : newOrigin.y
                     },
                     dimensions: {
                         x: value,
-                        y: height === props.video.height ? undefined : height
+                        y: height === props.video.dimensions.y ? undefined : height
                     }
                 });
             }
         });
         const height = computed({
-            get: () => props.video.height,
+            get: () => props.video.dimensions.y,
             set: value => {
-                const width = value * props.video.width / props.video.height;
+                const width = value * props.video.dimensions.x / props.video.dimensions.y;
                 const newOrigin = correctForRotationWhenChangingDimensions({
-                    basePoint: props.video.origin,
-                    initialDimensions: new V(props.video.width, props.video.height),
+                    basePoint: V.from(props.video.origin),
+                    initialDimensions: new V(props.video.dimensions.x, props.video.dimensions.y),
                     newDimensions: new V(width, value),
                     rotation: props.video.rotation
                 });
 
-                store.mutations.setProps(props.slideId, props.video.id, props.video.type, {
+                store.mutations.setProps(props.slideId, props.video.id, GRAPHIC_TYPES.VIDEO, {
                     origin: {
                         x: newOrigin.x === props.video.origin.x ? undefined : newOrigin.x,
                         y: newOrigin.y === props.video.origin.y ? undefined : newOrigin.y
                     },
                     dimensions: {
-                        x: width === props.video.width ? undefined : width,
+                        x: width === props.video.dimensions.x ? undefined : width,
                         y: value
                     }
                 });
@@ -134,7 +135,7 @@ const VideoEditorForm = defineComponent({
         const rotation = computed({
             get: () => radToDeg(props.video.rotation),
             set: value => {
-                store.mutations.setProps(props.slideId, props.video.id, props.video.type, { rotation: degToRad(value) });
+                store.mutations.setProps(props.slideId, props.video.id, GRAPHIC_TYPES.VIDEO, { rotation: degToRad(value) });
             }
         });
 

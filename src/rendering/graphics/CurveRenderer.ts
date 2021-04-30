@@ -195,6 +195,14 @@ class CurveRenderer implements ICurveRenderer {
         if (anchors !== undefined) {
             anchors.forEach((anchor, index) => {
                 if (anchor) {
+                    if (!this._anchors[index]) {
+                        this._anchors[index] = {
+                            inHandle: V.from(V.zero),
+                            point: V.from(V.zero),
+                            outHandle: V.from(V.zero)
+                        };
+                    }
+
                     if (anchor.inHandle) {
                         if (anchor.inHandle.x) {
                             this._anchors[index].inHandle.x = anchor.inHandle.x;
@@ -226,6 +234,8 @@ class CurveRenderer implements ICurveRenderer {
                     }
                 }
             });
+
+            this._anchors.length = anchors.length;
 
             this._svg && this._svg.rotate(0).plot(this._getFormattedPoints()).rotate(radToDeg(this._rotation));
         }

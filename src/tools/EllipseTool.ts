@@ -1,6 +1,8 @@
 import { listen, listenOnce, unlisten } from '@/events';
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
+import { GRAPHIC_TYPES, IEllipseMaker } from '@/rendering/types';
 import { AppStore } from '@/store/types';
+import { provideId } from '@/utilities/IdProvider';
 import { PointerTool } from '.';
 import { EditorTool, TOOL_NAMES } from './types';
 import { mouseEventFromKeyDownEvent, mouseEventFromKeyUpEvent, resolvePosition } from './utilities';
@@ -8,17 +10,17 @@ import { mouseEventFromKeyDownEvent, mouseEventFromKeyUpEvent, resolvePosition }
 export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
-        const maker = slide.makeEllipseInteractive(resolvePosition(baseEvent, slide));
-        slide.broadcastSetGraphic(maker.target);
+        const graphicId = provideId();
+        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.ELLIPSE) as IEllipseMaker;
+        slide.createGraphic(maker.create({}));
 
-        // Start tracking the last mouse event so keypress handlers can emulate mouse events
         let lastMouseEvent = event;
-        const resizeListener = maker.resizeListener();
+        const resizeHandler = maker.initResize(resolvePosition(baseEvent, slide));
 
-        listen(SLIDE_EVENTS.KEYDOWN, 'keyDownHandler', keyDownHandler);
-        listen(SLIDE_EVENTS.KEYUP, 'keyUpHandler', keyUpHandler);
-        listen(SLIDE_EVENTS.MOUSEMOVE, 'update', update);
-        listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
+        listen(SLIDE_EVENTS.KEYDOWN, 'ellipse--key-down-handler', keyDownHandler);
+        listen(SLIDE_EVENTS.KEYUP, 'ellipse--key-up-handler', keyUpHandler);
+        listen(SLIDE_EVENTS.MOUSEMOVE, 'ellipse--update', update);
+        listenOnce(SLIDE_EVENTS.MOUSEUP, 'ellipse--complete', complete);
 
         function keyDownHandler(event: SlideKeyboardEvent): void {
             mouseEventFromKeyDownEvent(event, lastMouseEvent);
@@ -29,16 +31,18 @@ export default (store: AppStore): EditorTool => {
         }
 
         function update(event: SlideMouseEvent): void {
-            resizeListener(event);
-            slide.broadcastSetGraphic(maker.target);
+            const deltas = resizeHandler(event);
+            slide.setProps(graphicId, GRAPHIC_TYPES.ELLIPSE, deltas);
             lastMouseEvent = event;
         }
 
-        function complete(): void {
-            maker.complete();
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'update');
-            unlisten(SLIDE_EVENTS.KEYDOWN, 'keyDownHandler');
-            unlisten(SLIDE_EVENTS.KEYUP, 'keyUpHandler');
+        function complete(event: SlideMouseEvent): void {
+            update(event);
+            maker.endResize();
+
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'ellipse--update');
+            unlisten(SLIDE_EVENTS.KEYDOWN, 'ellipse--key-down-handler');
+            unlisten(SLIDE_EVENTS.KEYUP, 'ellipse--key-up-handler');
 
             store.mutations.setActiveTool(PointerTool());
         }

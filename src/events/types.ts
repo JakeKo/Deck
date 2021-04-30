@@ -38,7 +38,9 @@ export type GraphicMouseEvent = CurveMouseEvent | EllipseMouseEvent | ImageMouse
 export enum GRAPHIC_EVENT_CODES {
     CREATED = 'deck-graphic-created',
     UPDATED = 'deck-graphic-updated',
-    DELETED = 'deck-graphic-deleted'
+    DELETED = 'deck-graphic-deleted',
+    FOCUSED = 'deck-graphic-focused',
+    UNFOCUSED = 'deck-graphic-unfocused'
 };
 
 export type GraphicCreated = CustomEvent<GraphicCreatedPayload>;
@@ -59,6 +61,20 @@ export type GraphicUpdatedPayload = {
 
 export type GraphicDeleted = CustomEvent<GraphicDeletedPayload>;
 export type GraphicDeletedPayload = {
+    publisherId: string;
+    slideId: string;
+    graphicId: string;
+};
+
+export type GraphicFocused = CustomEvent<GraphicFocusedPayload>;
+export type GraphicFocusedPayload = {
+    publisherId: string;
+    slideId: string;
+    graphicId: string;
+};
+
+export type GraphicUnfocused = CustomEvent<GraphicUnfocusedPayload>;
+export type GraphicUnfocusedPayload = {
     publisherId: string;
     slideId: string;
     graphicId: string;
