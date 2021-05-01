@@ -119,7 +119,7 @@ abstract class GraphicMutatorBase<S extends GRAPHIC_TYPES, T extends IGraphicRen
         this.isRotating = true;
         const { center } = this.graphic.transformedBox;
         const directions = [...V.cardinals, ...V.intermediates];
-        const increments = V.slice(72);
+        const increments = V.slice(24);
 
         return event => {
             const { slide, baseEvent } = event.detail;
