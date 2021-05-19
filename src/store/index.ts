@@ -74,7 +74,7 @@ const propSetters = {
             graphic.fillColor = props.fillColor;
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
 
@@ -99,7 +99,7 @@ const propSetters = {
             graphic.fillColor = props.fillColor;
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
 
@@ -120,7 +120,7 @@ const propSetters = {
             setVector(props.dimensions, graphic.dimensions);
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
     },
@@ -137,7 +137,7 @@ const propSetters = {
             graphic.fillColor = props.fillColor;
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
 
@@ -158,7 +158,7 @@ const propSetters = {
             setVector(props.dimensions, graphic.dimensions);
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
 
@@ -187,7 +187,7 @@ const propSetters = {
             setVector(props.dimensions, graphic.dimensions);
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
 

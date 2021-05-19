@@ -57,7 +57,7 @@
 </template>
 
 <script lang='ts'>
-import { degToRad, radToDeg } from '@/utilities/utilities';
+import { degToRad, radToDeg, round } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
@@ -100,19 +100,19 @@ const TextboxEditorForm = defineComponent({
 
         const lockAspectRatio = ref(false);
         const x = computed({
-            get: () => props.textbox.origin.x,
+            get: () => round(props.textbox.origin.x, 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.textbox.id, GRAPHIC_TYPES.TEXTBOX, { origin: { x: value } });
             }
         });
         const y = computed({
-            get: () => props.textbox.origin.y,
+            get: () => round(props.textbox.origin.y, 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.textbox.id, GRAPHIC_TYPES.TEXTBOX, { origin: { y: value } });
             }
         });
         const width = computed({
-            get: () => props.textbox.dimensions.x,
+            get: () => round(props.textbox.dimensions.x, 1E-3),
             set: value => {
                 const height = lockAspectRatio.value
                     ? value * props.textbox.dimensions.y / props.textbox.dimensions.x
@@ -137,7 +137,7 @@ const TextboxEditorForm = defineComponent({
             }
         });
         const height = computed({
-            get: () => props.textbox.dimensions.y,
+            get: () => round(props.textbox.dimensions.y, 1E-3),
             set: value => {
                 const width = lockAspectRatio.value
                     ? value * props.textbox.dimensions.x / props.textbox.dimensions.y
@@ -162,7 +162,7 @@ const TextboxEditorForm = defineComponent({
             }
         });
         const rotation = computed({
-            get: () => radToDeg(props.textbox.rotation),
+            get: () => round(radToDeg(props.textbox.rotation), 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.textbox.id, GRAPHIC_TYPES.TEXTBOX, { rotation: degToRad(value) });
             }

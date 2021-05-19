@@ -42,7 +42,7 @@
 </template>
 
 <script lang='ts'>
-import { degToRad, radToDeg } from '@/utilities/utilities';
+import { degToRad, radToDeg, round } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
@@ -75,19 +75,19 @@ const VideoEditorForm = defineComponent({
         });
 
         const x = computed({
-            get: () => props.video.origin.x,
+            get: () => round(props.video.origin.x, 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.video.id, GRAPHIC_TYPES.VIDEO, { origin: { x: value } });
             }
         });
         const y = computed({
-            get: () => props.video.origin.y,
+            get: () => round(props.video.origin.y, 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.video.id, GRAPHIC_TYPES.VIDEO, { origin: { y: value } });
             }
         });
         const width = computed({
-            get: () => props.video.dimensions.x,
+            get: () => round(props.video.dimensions.x, 1E-3),
             set: value => {
                 const height = value * props.video.dimensions.y / props.video.dimensions.x;
                 const newOrigin = correctForRotationWhenChangingDimensions({
@@ -110,7 +110,7 @@ const VideoEditorForm = defineComponent({
             }
         });
         const height = computed({
-            get: () => props.video.dimensions.y,
+            get: () => round(props.video.dimensions.y, 1E-3),
             set: value => {
                 const width = value * props.video.dimensions.x / props.video.dimensions.y;
                 const newOrigin = correctForRotationWhenChangingDimensions({
@@ -133,7 +133,7 @@ const VideoEditorForm = defineComponent({
             }
         });
         const rotation = computed({
-            get: () => radToDeg(props.video.rotation),
+            get: () => round(radToDeg(props.video.rotation), 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.video.id, GRAPHIC_TYPES.VIDEO, { rotation: degToRad(value) });
             }

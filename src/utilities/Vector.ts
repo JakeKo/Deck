@@ -1,4 +1,4 @@
-import { mod } from './utilities';
+import { mod, round } from './utilities';
 
 export default class V {
     public static undefined: V = new V(NaN, NaN);
@@ -148,5 +148,12 @@ export default class V {
     }): V {
         return new V(this.x / scale.x, this.y / scale.y)
             .rotate(mod(Math.PI * 2 - rotation, Math.PI * 2));
+    }
+
+    /**
+     * Rounds the coordinates of this vector to the nearest step.
+     */
+    public round(step = 1.0): V {
+        return new V(round(this.x, step), round(this.y, step));
     }
 }

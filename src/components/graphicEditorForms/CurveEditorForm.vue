@@ -37,7 +37,7 @@
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import { ColorField, NumberField } from '../Core/Forms';
-import { degToRad, radToDeg } from '@/utilities/utilities';
+import { degToRad, radToDeg, round } from '@/utilities/utilities';
 import { CurveSerialized } from '@/types';
 import { GRAPHIC_TYPES } from '@/rendering/types';
 
@@ -66,13 +66,13 @@ const CurveEditorForm = defineComponent({
         });
 
         const rotation = computed({
-            get: () => radToDeg(props.curve.rotation),
+            get: () => round(radToDeg(props.curve.rotation), 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.curve.id, GRAPHIC_TYPES.CURVE, { rotation: degToRad(value) });
             }
         });
         const strokeWidth = computed({
-            get: () => props.curve.strokeWidth,
+            get: () => round(props.curve.strokeWidth),
             set: value => {
                 store.mutations.setProps(props.slideId, props.curve.id, GRAPHIC_TYPES.CURVE, { strokeWidth: value });
             }

@@ -75,7 +75,7 @@ import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import { ColorField, NumberField, ToggleField } from '../Core/Forms';
-import { degToRad, radToDeg } from '@/utilities/utilities';
+import { degToRad, radToDeg, round } from '@/utilities/utilities';
 import { correctForRotationWhenChangingDimensions } from './utilities';
 import { EllipseSerialized } from '@/types';
 import { GRAPHIC_TYPES } from '@/rendering/types';
@@ -107,19 +107,19 @@ const EllipseEditorForm = defineComponent({
 
         const lockAspectRatio = ref(false);
         const x = computed({
-            get: () => props.ellipse.center.x,
+            get: () => round(props.ellipse.center.x, 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, { center: { x: value } });
             }
         });
         const y = computed({
-            get: () => props.ellipse.center.y,
+            get: () => round(props.ellipse.center.y, 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, { center: { y: value } });
             }
         });
         const width = computed({
-            get: () => props.ellipse.dimensions.x,
+            get: () => round(props.ellipse.dimensions.x, 1E-3),
             set: value => {
                 const height = lockAspectRatio.value
                     ? value * props.ellipse.dimensions.y / props.ellipse.dimensions.x
@@ -150,7 +150,7 @@ const EllipseEditorForm = defineComponent({
             }
         });
         const height = computed({
-            get: () => props.ellipse.dimensions.y,
+            get: () => round(props.ellipse.dimensions.y, 1E-3),
             set: value => {
                 const width = lockAspectRatio.value
                     ? value * props.ellipse.dimensions.x / props.ellipse.dimensions.y
@@ -181,13 +181,13 @@ const EllipseEditorForm = defineComponent({
             }
         });
         const rotation = computed({
-            get: () => radToDeg(props.ellipse.rotation),
+            get: () => round(radToDeg(props.ellipse.rotation), 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, { rotation: degToRad(value) });
             }
         });
         const strokeWidth = computed({
-            get: () => props.ellipse.strokeWidth,
+            get: () => round(props.ellipse.strokeWidth),
             set: value => {
                 store.mutations.setProps(props.slideId, props.ellipse.id, GRAPHIC_TYPES.ELLIPSE, { strokeWidth: value });
             }

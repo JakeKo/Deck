@@ -178,5 +178,7 @@ function rotateGraphic(event: RotatorMouseEvent): void {
         slide.unlockCursor('grab');
 
         unlisten(SLIDE_EVENTS.MOUSEMOVE, 'rotate');
+        unlisten(SLIDE_EVENTS.KEYDOWN, 'rotator--key-down');
+        unlisten(SLIDE_EVENTS.KEYUP, 'rotator--key-up');
     }
 }
