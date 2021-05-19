@@ -1,5 +1,5 @@
 import { listen } from '@/events';
-import { GraphicCreated, GraphicFocused, GraphicUnfocused, GraphicUpdated, GRAPHIC_EVENT_CODES } from '@/events/types';
+import { GraphicCreated, GraphicDeleted, GraphicFocused, GraphicUnfocused, GraphicUpdated, GRAPHIC_EVENT_CODES } from '@/events/types';
 import { ISlideRenderer } from './types';
 
 function eventIsRelevant(renderer: ISlideRenderer, { publisherId, slideId }: { publisherId: string; slideId: string }): boolean {
@@ -22,6 +22,14 @@ function initRendererEventBus(renderer: ISlideRenderer): void {
 
         const { graphicId, graphicType, props } = event.detail;
         renderer.setProps(graphicId, graphicType, props, false);
+    });
+
+    listen(GRAPHIC_EVENT_CODES.DELETED, `renderer-${renderer.slideId}-event-bus-graphic-deleted-listener`, (event: GraphicDeleted): void => {
+        if (!eventIsRelevant(renderer, event.detail)) {
+            return;
+        }
+
+        renderer.removeGraphic(event.detail.graphicId, false);
     });
 
     listen(GRAPHIC_EVENT_CODES.FOCUSED, `renderer-${renderer.slideId}-event-bus-graphic-focused-listener`, (event: GraphicFocused): void => {

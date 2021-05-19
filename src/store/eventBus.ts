@@ -1,5 +1,5 @@
 import { listen } from '@/events';
-import { GraphicCreated, GraphicFocused, GraphicUnfocused, GraphicUpdated, GRAPHIC_EVENT_CODES } from '@/events/types';
+import { GraphicCreated, GraphicDeleted, GraphicFocused, GraphicUnfocused, GraphicUpdated, GRAPHIC_EVENT_CODES } from '@/events/types';
 import { AppStore } from './types';
 
 function eventIsRelevant(store: AppStore, { publisherId }: { publisherId: string }): boolean {
@@ -23,6 +23,15 @@ function initStoreEventBus(store: AppStore): void {
 
         const { slideId, graphicId, graphicType, props } = event.detail;
         store.mutations.setProps(slideId, graphicId, graphicType, props, false);
+    });
+
+    listen(GRAPHIC_EVENT_CODES.DELETED, 'store-event-bus-graphic-deleted-listener', (event: GraphicDeleted): void => {
+        if (!eventIsRelevant(store, event.detail)) {
+            return;
+        }
+
+        const { slideId, graphicId } = event.detail;
+        store.mutations.removeGraphic(slideId, graphicId, false);
     });
 
     listen(GRAPHIC_EVENT_CODES.FOCUSED, 'store-event-bus-graphic-focused-listener', (event: GraphicFocused): void => {

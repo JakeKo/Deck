@@ -26,7 +26,7 @@ export default class V {
         return new V(vector.x, vector.y);
     }
 
-    public static from({ x, y }: { x: number, y: number }): V {
+    public static from({ x, y }: { x: number; y: number }): V {
         return new V(x, y);
     }
 

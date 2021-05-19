@@ -1,12 +1,12 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
-import { RectangleMutableSerialized, RectangleSerialized } from '@/types';
+import { TextboxMutableSerialized, TextboxSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
-import { IRectangleMaker, IRectangleOutlineRenderer, IRectangleRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { IRectangleOutlineRenderer, ISlideRenderer, ITextboxMaker, ITextboxRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class RectangleMaker implements IRectangleMaker {
+class TextboxCreator implements ITextboxMaker {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;
@@ -30,13 +30,12 @@ class RectangleMaker implements IRectangleMaker {
         this.helpersScale = scale;
     }
 
-    protected get graphic(): IRectangleRenderer {
-        return this.slide.getGraphic(this.graphicId) as IRectangleRenderer;
+    protected get graphic(): ITextboxRenderer {
+        return this.slide.getGraphic(this.graphicId) as ITextboxRenderer;
     }
 
     public set scale(scale: number) {
         this.helpersScale = scale;
-
         if (this.helpers) {
             this.helpers[VERTEX_ROLES.TOP_LEFT].scale = scale;
             this.helpers[VERTEX_ROLES.TOP_RIGHT].scale = scale;
@@ -68,7 +67,7 @@ class RectangleMaker implements IRectangleMaker {
     /**
      * Creates a serialized form of the target graphic given the provided props.
      */
-    public create(props: RectangleMutableSerialized): RectangleSerialized {
+    public create(props: TextboxMutableSerialized): TextboxSerialized {
         if (this.isCreated) {
             throw new Error(`Graphic with id ${this.graphicId} already created`);
         }
@@ -76,14 +75,15 @@ class RectangleMaker implements IRectangleMaker {
         this.isCreated = true;
         const graphic = {
             id: this.graphicId,
-            type: 'rectangle',
+            type: 'textbox',
             origin: new V(props.origin?.x ?? 0, props.origin?.y ?? 0),
             dimensions: new V(props.dimensions?.x ?? 0, props.dimensions?.y ?? 0),
-            fillColor: props.fillColor ?? '#CCCCCC',
-            strokeColor: props.strokeColor ?? 'none',
-            strokeWidth: props.strokeWidth ?? 0,
+            text: props.text ?? '',
+            size: props.size ?? 12,
+            weight: props.weight ?? '400',
+            font: props.font ?? 'Arial',
             rotation: props.rotation ?? 0
-        } as RectangleSerialized;
+        } as TextboxSerialized;
 
         const origin = V.from(graphic.origin);
         const dimensions = V.from(graphic.dimensions);
@@ -133,7 +133,7 @@ class RectangleMaker implements IRectangleMaker {
      * Initialize this maker to begin tracking movement for the purpose of resizing.
      * This returns a handler to be called on each subsequent mouse event.
      */
-    public initResize(basePoint: V): (event: SlideMouseEvent) => RectangleMutableSerialized {
+    public initResize(basePoint: V): (event: SlideMouseEvent) => TextboxMutableSerialized {
         this.isResizing = true;
 
         if (this.helpers) {
@@ -178,4 +178,4 @@ class RectangleMaker implements IRectangleMaker {
     }
 }
 
-export default RectangleMaker;
+export default TextboxCreator;

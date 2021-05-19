@@ -6,7 +6,7 @@ import V from '@/utilities/Vector';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
 import { IRectangleOutlineRenderer, ISlideRenderer, IVertexRenderer, IVideoMaker, IVideoRenderer, VERTEX_ROLES } from '../types';
 
-class VideoMaker implements IVideoMaker {
+class VideoCreator implements IVideoMaker {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;
@@ -181,4 +181,4 @@ class VideoMaker implements IVideoMaker {
     }
 }
 
-export default VideoMaker;
+export default VideoCreator;

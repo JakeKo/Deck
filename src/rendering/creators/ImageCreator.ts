@@ -6,7 +6,7 @@ import V from '@/utilities/Vector';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
 import { IImageMaker, IImageRenderer, IRectangleOutlineRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class ImageMaker implements IImageMaker {
+class ImageCreator implements IImageMaker {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;
@@ -179,4 +179,4 @@ class ImageMaker implements IImageMaker {
     }
 }
 
-export default ImageMaker;
+export default ImageCreator;

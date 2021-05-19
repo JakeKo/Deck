@@ -9,7 +9,6 @@ import {
     GraphicSerialized,
     ImageMutableSerialized,
     ImageSerialized,
-    Keyed,
     RectangleMutableSerialized,
     RectangleSerialized,
     TextboxMutableSerialized,
@@ -282,8 +281,7 @@ export type ISlideRenderer = {
     readonly rawViewbox: Viewbox;
     readonly zoom: number;
     readonly bounds: { origin: V; dimensions: V };
-    cursor: string;
-    cursorLock: boolean;
+    setCursor: (cursor: string) => void;
     lockCursor: (cursor: string) => void;
     unlockCursor: (cursor?: string) => void;
     getSnapVectors: (exclude: string[]) => SnapVector[];
@@ -291,8 +289,7 @@ export type ISlideRenderer = {
     initInteractiveCreate: (graphicId: string, graphicType: GRAPHIC_TYPES) => IGraphicMaker;
     endInteractiveCreate: (graphicId: string) => void;
     getGraphic: (graphicId: string) => IGraphicRenderer;
-    getGraphics: () => Keyed<IGraphicRenderer>;
-    removeGraphic: (graphicId: string) => void;
+    removeGraphic: (graphicId: string, emit?: boolean) => void;
     focusGraphic: (graphicId: string, emit?: boolean) => IGraphicMutator;
     unfocusGraphic: (graphicId: string, emit?: boolean) => void;
     unfocusAllGraphics: (exclude?: string[]) => void;

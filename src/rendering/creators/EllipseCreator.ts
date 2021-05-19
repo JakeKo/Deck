@@ -6,7 +6,7 @@ import V from '@/utilities/Vector';
 import { EllipseOutlineRenderer, VertexRenderer } from '../helpers';
 import { IEllipseMaker, IEllipseOutlineRenderer, IEllipseRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class EllipseMaker implements IEllipseMaker {
+class EllipseCreator implements IEllipseMaker {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IEllipseOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;
@@ -179,4 +179,4 @@ class EllipseMaker implements IEllipseMaker {
     }
 }
 
-export default EllipseMaker;
+export default EllipseCreator;

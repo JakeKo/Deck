@@ -36,7 +36,7 @@ export type AppMutations = {
     setEditorZoom: (zoom: number) => void;
     setDeckTitle: (deckTitle: string) => void;
     setProps: (slideId: string, graphicId: string, graphicType: GRAPHIC_TYPES, props: GraphicMutableSerialized, emit?: boolean) => void;
-    removeGraphic: (slideId: string, graphicId: string) => void;
+    removeGraphic: (slideId: string, graphicId: string, emit?: boolean) => void;
     setTheme: (theme: Theme) => void;
     setShowPresentation: (showPresentation: boolean) => void;
 };
