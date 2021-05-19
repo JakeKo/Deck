@@ -13,8 +13,8 @@ import Slide from './Slide.vue';
 import V from '@/utilities/Vector';
 import SlidePlaceholder from './SlidePlaceholder.vue';
 import DeckComponent from './generic/DeckComponent';
-import { dispatch } from '../events/utilities';
-import { SlideZoomEventPayload, SLIDE_EVENTS } from '../events/types';
+import { dispatch } from '@/events';
+import { SlideZoomEventPayload, SLIDE_EVENTS } from '@/events/types';
 import { defineComponent, computed, reactive, onMounted, watchEffect } from 'vue';
 
 const Editor = defineComponent({
@@ -63,7 +63,7 @@ const Editor = defineComponent({
             root.value.scrollTop = (root.value.scrollHeight - root.value.clientHeight) / 2;
             root.value.scrollLeft = (root.value.scrollWidth - root.value.clientWidth) / 2;
 
-            dispatch(new CustomEvent<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { detail: { zoom: defaultZoom.value } }));
+            dispatch<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { zoom: defaultZoom.value });
         }
 
         function handleMouseWheel(event: WheelEvent): void {
@@ -78,7 +78,7 @@ const Editor = defineComponent({
                 store.mutations.setEditorZoom(newZoom);
                 root.value.style.zoom = newZoom.toString();
 
-                dispatch(new CustomEvent<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { detail: { zoom: newZoom } }));
+                dispatch<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { zoom: newZoom });
 
                 // TODO: Fetch absolute mouse position without hardcoded values
                 // TODO: Fix the math here (which is incorrect but not by much)

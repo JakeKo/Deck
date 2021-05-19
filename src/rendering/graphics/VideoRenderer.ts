@@ -1,4 +1,5 @@
 import { decorateVideoEvents } from '@/events/decorators';
+import { VideoMutableSerialized } from '@/types';
 import { provideId } from '@/utilities/IdProvider';
 import SnapVector from '@/utilities/SnapVector';
 import { radToDeg } from '@/utilities/utilities';
@@ -190,6 +191,64 @@ class VideoRenderer implements IVideoRenderer {
         this._svg && this._svg.node.setAttribute('y', this._origin.y.toString());
         this._svg && this._svg.node.setAttribute('width', this._dimensions.x.toString());
         this._svg && this._svg.node.setAttribute('height', this._dimensions.y.toString());
+    }
+
+    /**
+     * Updates the graphic with the new provided properties and updates the rendering if necessary.
+     */
+    public setProps({ origin, dimensions, strokeWidth, strokeColor, rotation }: VideoMutableSerialized): void {
+        if (origin !== undefined) {
+            if (origin.x) {
+                this._origin.x = origin.x;
+            }
+
+            if (origin.y) {
+                this._origin.y = origin.y;
+            }
+
+            this._svg && this._svg.node.setAttribute('x', this._origin.x.toString());
+            this._svg && this._svg.node.setAttribute('y', this._origin.y.toString());
+        }
+
+        if (dimensions !== undefined) {
+            if (dimensions.x) {
+                this._dimensions.x = dimensions.x;
+            }
+
+            if (dimensions.y) {
+                this._dimensions.y = dimensions.y;
+            }
+
+            this._svg && this._svg.node.setAttribute('width', this._dimensions.x.toString());
+            this._svg && this._svg.node.setAttribute('height', this._dimensions.y.toString());
+
+            const iframe = document.getElementById(this._iframeId || '');
+            if (this._svg && iframe) {
+                iframe.setAttribute('width', this._dimensions.x.toString());
+                iframe.setAttribute('height', this._dimensions.y.toString());
+            }
+        }
+
+        if (strokeWidth !== undefined) {
+            this._strokeWidth = strokeWidth;
+            if (this._svg) {
+                this._svg.node.style.strokeWidth = `${this._strokeWidth.toString()}px`;
+            }
+        }
+
+        if (strokeColor !== undefined) {
+            this._strokeColor = strokeColor;
+            if (this._svg) {
+                this._svg.node.style.stroke = this._strokeColor;
+            }
+        }
+
+        if (rotation !== undefined) {
+            this._rotation = rotation;
+            if (this._svg) {
+                this._svg.node.style.transform = `rotate(${radToDeg(this._rotation)}deg)`;
+            }
+        }
     }
 
     public render(): void {

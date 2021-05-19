@@ -1,4 +1,5 @@
 import { decorateCurveEvents } from '@/events/decorators';
+import { CurveMutableSerialized } from '@/types';
 import SnapVector from '@/utilities/SnapVector';
 import { radToDeg } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
@@ -185,6 +186,75 @@ class CurveRenderer implements ICurveRenderer {
     public removeAnchor(index: number): void {
         this._anchors.splice(index, 1);
         this._svg && this._svg.rotate(0).plot(this._getFormattedPoints()).rotate(radToDeg(this._rotation));
+    }
+
+    /**
+     * Updates the graphic with the new provided properties and updates the rendering if necessary.
+     */
+    public setProps({ anchors, fillColor, strokeColor, strokeWidth, rotation }: CurveMutableSerialized): void {
+        if (anchors !== undefined) {
+            anchors.forEach((anchor, index) => {
+                if (anchor) {
+                    if (!this._anchors[index]) {
+                        this._anchors[index] = {
+                            inHandle: V.from(V.zero),
+                            point: V.from(V.zero),
+                            outHandle: V.from(V.zero)
+                        };
+                    }
+
+                    if (anchor.inHandle) {
+                        if (anchor.inHandle.x) {
+                            this._anchors[index].inHandle.x = anchor.inHandle.x;
+                        }
+
+                        if (anchor.inHandle.y) {
+                            this._anchors[index].inHandle.y = anchor.inHandle.y;
+                        }
+                    }
+
+                    if (anchor.point) {
+                        if (anchor.point.x) {
+                            this._anchors[index].point.x = anchor.point.x;
+                        }
+
+                        if (anchor.point.y) {
+                            this._anchors[index].point.y = anchor.point.y;
+                        }
+                    }
+
+                    if (anchor.outHandle) {
+                        if (anchor.outHandle.x) {
+                            this._anchors[index].outHandle.x = anchor.outHandle.x;
+                        }
+
+                        if (anchor.outHandle.y) {
+                            this._anchors[index].outHandle.y = anchor.outHandle.y;
+                        }
+                    }
+                }
+            });
+
+            this._anchors.length = anchors.length;
+
+            this._svg && this._svg.rotate(0).plot(this._getFormattedPoints()).rotate(radToDeg(this._rotation));
+        }
+
+        if (fillColor !== undefined) {
+            this._fillColor = fillColor;
+            this._svg && this._svg.fill(this._fillColor);
+        }
+
+        if (strokeColor !== undefined || strokeWidth !== undefined) {
+            this._strokeColor = strokeColor === undefined ? this._strokeColor : strokeColor;
+            this._strokeWidth = strokeWidth === undefined ? this._strokeWidth : strokeWidth;
+            this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        }
+
+        if (rotation !== undefined) {
+            this._rotation = rotation;
+            this._svg && this._svg.rotate(radToDeg(this._rotation));
+        }
     }
 
     public render(): void {

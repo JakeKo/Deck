@@ -1,5 +1,5 @@
+import { listen, listenOnce, unlisten } from '@/events';
 import {
-    CurveAnchorMouseEvent,
     CURVE_ANCHOR_EVENTS,
     CURVE_EVENTS,
     ELLIPSE_EVENTS,
@@ -9,16 +9,15 @@ import {
     ROTATOR_EVENTS,
     SlideKeyboardEvent,
     SlideMouseEvent,
-    SlideMouseEventPayload,
     SLIDE_EVENTS,
     TEXTBOX_EVENTS,
     VertexMouseEvent,
     VERTEX_EVENTS,
     VIDEO_EVENTS
 } from '@/events/types';
-import { dispatch, listen, listenOnce, unlisten } from '@/events/utilities';
 import { GRAPHIC_TYPES } from '@/rendering/types';
 import { EditorTool, TOOL_NAMES } from '../types';
+import { mouseEventFromKeyDownEvent, mouseEventFromKeyUpEvent } from '../utilities';
 import { hoverCurve, moveCurve, moveCurveAnchor } from './curve';
 import { hoverEllipse, moveEllipse } from './ellipse';
 import { hoverImage, moveImage } from './image';
@@ -30,48 +29,48 @@ export default (): EditorTool => {
     return {
         name: TOOL_NAMES.POINTER,
         mount: () => {
-            listenOnce(CURVE_EVENTS.MOUSEDOWN, moveCurve);
-            listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, moveAnchor);
-            listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);
-            listenOnce(IMAGE_EVENTS.MOUSEDOWN, moveImage);
-            listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
-            listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, moveTextbox);
-            listenOnce(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
+            listenOnce(CURVE_EVENTS.MOUSEDOWN, 'curve--init-move', moveCurve);
+            listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'curve-anchor--init-move', moveCurveAnchor);
+            listenOnce(ELLIPSE_EVENTS.MOUSEDOWN, 'ellipse--init-move', moveEllipse);
+            listenOnce(IMAGE_EVENTS.MOUSEDOWN, 'image--init-move', moveImage);
+            listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, 'rectangle--init-move', moveRectangle);
+            listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, 'textbox--init-move', moveTextbox);
+            listenOnce(VIDEO_EVENTS.MOUSEDOWN, 'video--init-move', moveVideo);
 
-            listen(CURVE_EVENTS.MOUSEOVER, hoverCurve);
-            listen(ELLIPSE_EVENTS.MOUSEOVER, hoverEllipse);
-            listen(IMAGE_EVENTS.MOUSEOVER, hoverImage);
-            listen(RECTANGLE_EVENTS.MOUSEOVER, hoverRectangle);
-            listen(TEXTBOX_EVENTS.MOUSEOVER, hoverTextbox);
-            listen(VIDEO_EVENTS.MOUSEOVER, hoverVideo);
+            listen(CURVE_EVENTS.MOUSEOVER, 'hoverCurve', hoverCurve);
+            listen(ELLIPSE_EVENTS.MOUSEOVER, 'hoverEllipse', hoverEllipse);
+            listen(IMAGE_EVENTS.MOUSEOVER, 'hoverImage', hoverImage);
+            listen(RECTANGLE_EVENTS.MOUSEOVER, 'hoverRectangle', hoverRectangle);
+            listen(TEXTBOX_EVENTS.MOUSEOVER, 'hoverTextbox', hoverTextbox);
+            listen(VIDEO_EVENTS.MOUSEOVER, 'hoverVideo', hoverVideo);
 
-            listen(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
-            listen(ROTATOR_EVENTS.MOUSEDOWN, rotateGraphic);
+            listenOnce(VERTEX_EVENTS.MOUSEDOWN, 'vertex--init-move', moveVertex);
+            listen(ROTATOR_EVENTS.MOUSEDOWN, 'rotateGraphic', rotateGraphic);
 
-            listen(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
-            listen(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
+            listen(SLIDE_EVENTS.MOUSEDOWN, 'reevaluateFocusedGraphics', reevaluateFocusedGraphics);
+            listen(SLIDE_EVENTS.MOUSEMOVE, 'reevaluateCursor', reevaluateCursor);
         },
         unmount: () => {
-            unlisten(CURVE_EVENTS.MOUSEDOWN, moveCurve);
-            unlisten(CURVE_ANCHOR_EVENTS.MOUSEDOWN, moveAnchor);
-            unlisten(ELLIPSE_EVENTS.MOUSEDOWN, moveEllipse);
-            unlisten(IMAGE_EVENTS.MOUSEDOWN, moveImage);
-            unlisten(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
-            unlisten(TEXTBOX_EVENTS.MOUSEDOWN, moveTextbox);
-            unlisten(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
+            unlisten(CURVE_EVENTS.MOUSEDOWN, 'curve--init-move');
+            unlisten(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'curve-anchor--init-move');
+            unlisten(ELLIPSE_EVENTS.MOUSEDOWN, 'ellipse--init-move');
+            unlisten(IMAGE_EVENTS.MOUSEDOWN, 'image--init-move');
+            unlisten(RECTANGLE_EVENTS.MOUSEDOWN, 'rectangle--init-move');
+            unlisten(TEXTBOX_EVENTS.MOUSEDOWN, 'textbox--init-move');
+            unlisten(VIDEO_EVENTS.MOUSEDOWN, 'video--init-move');
 
-            unlisten(CURVE_EVENTS.MOUSEOVER, hoverCurve);
-            unlisten(ELLIPSE_EVENTS.MOUSEOVER, hoverEllipse);
-            unlisten(IMAGE_EVENTS.MOUSEOVER, hoverImage);
-            unlisten(RECTANGLE_EVENTS.MOUSEOVER, hoverRectangle);
-            unlisten(TEXTBOX_EVENTS.MOUSEOVER, hoverTextbox);
-            unlisten(VIDEO_EVENTS.MOUSEOVER, hoverVideo);
+            unlisten(CURVE_EVENTS.MOUSEOVER, 'hoverCurve');
+            unlisten(ELLIPSE_EVENTS.MOUSEOVER, 'hoverEllipse');
+            unlisten(IMAGE_EVENTS.MOUSEOVER, 'hoverImage');
+            unlisten(RECTANGLE_EVENTS.MOUSEOVER, 'hoverRectangle');
+            unlisten(TEXTBOX_EVENTS.MOUSEOVER, 'hoverTextbox');
+            unlisten(VIDEO_EVENTS.MOUSEOVER, 'hoverVideo');
 
-            unlisten(VERTEX_EVENTS.MOUSEDOWN, moveVertex);
-            unlisten(ROTATOR_EVENTS.MOUSEDOWN, rotateGraphic);
+            unlisten(VERTEX_EVENTS.MOUSEDOWN, 'vertex--init-move');
+            unlisten(ROTATOR_EVENTS.MOUSEDOWN, 'rotateGraphic');
 
-            unlisten(SLIDE_EVENTS.MOUSEDOWN, reevaluateFocusedGraphics);
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, reevaluateCursor);
+            unlisten(SLIDE_EVENTS.MOUSEDOWN, 'reevaluateFocusedGraphics');
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'reevaluateCursor');
         }
     };
 };
@@ -102,125 +101,82 @@ function reevaluateCursor(event: SlideMouseEvent): void {
 }
 
 function moveVertex(event: VertexMouseEvent): void {
-    const { slide, graphic } = event.detail;
-    const mutator = slide.focusGraphic(graphic.parent.id);
+    const { slide, target } = event.detail;
+    const { id: graphicId, type: graphicType } = slide.getGraphic(target.parentId);
+    const mutator = slide.focusGraphic(graphicId);
 
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
     let lastMouseEvent: VertexMouseEvent | SlideMouseEvent = event;
-    const vertexListener = mutator.vertexListener(graphic.role);
-    slide.cursor = 'grabbing';
-    slide.cursorLock = true;
+    const vertexListener = mutator.initVertexMove(target.role);
+    slide.lockCursor('grabbing');
 
-    listen(SLIDE_EVENTS.KEYDOWN, keyDownHandler);
-    listen(SLIDE_EVENTS.KEYUP, keyUpHandler);
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.KEYDOWN, 'vertex--key-down', keyDownHandler);
+    listen(SLIDE_EVENTS.KEYUP, 'vertex--key-up', keyUpHandler);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'vertex--move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'vertex--complete', complete);
 
-    // When Shift, Ctrl, or Alt are pressed or unpressed, simulate a mousemove event
-    // This allows the renderer to immediately adjust the shape dimensions if need be
     function keyDownHandler(event: SlideKeyboardEvent): void {
-        const { baseEvent } = event.detail;
-        if (!['Shift', 'Control', 'Alt'].includes(baseEvent.key)) {
-            return;
-        }
-
-        const mouseEvent = new MouseEvent('mousemeove', {
-            clientX: lastMouseEvent.detail.baseEvent.clientX,
-            clientY: lastMouseEvent.detail.baseEvent.clientY,
-            shiftKey: baseEvent.key === 'Shift' || lastMouseEvent.detail.baseEvent.shiftKey,
-            ctrlKey: baseEvent.key === 'Control' || lastMouseEvent.detail.baseEvent.ctrlKey,
-            altKey: baseEvent.key === 'Alt' || lastMouseEvent.detail.baseEvent.altKey
-        });
-
-        dispatch(new CustomEvent<SlideMouseEventPayload>(
-            SLIDE_EVENTS.MOUSEMOVE,
-            {
-                detail: {
-                    type: SLIDE_EVENTS.MOUSEMOVE,
-                    slide: lastMouseEvent.detail.slide,
-                    baseEvent: mouseEvent,
-                    target: undefined
-                }
-            }
-        ));
+        mouseEventFromKeyDownEvent(event, lastMouseEvent);
     }
 
     function keyUpHandler(event: SlideKeyboardEvent): void {
-        const { baseEvent } = event.detail;
-        if (!['Shift', 'Control', 'Alt'].includes(baseEvent.key)) {
-            return;
-        }
-
-        const mouseEvent = new MouseEvent('mousemeove', {
-            clientX: lastMouseEvent.detail.baseEvent.clientX,
-            clientY: lastMouseEvent.detail.baseEvent.clientY,
-            shiftKey: baseEvent.key !== 'Shift' && lastMouseEvent.detail.baseEvent.shiftKey,
-            ctrlKey: baseEvent.key !== 'Control' && lastMouseEvent.detail.baseEvent.ctrlKey,
-            altKey: baseEvent.key !== 'Alt' && lastMouseEvent.detail.baseEvent.altKey
-        });
-
-        dispatch(new CustomEvent<SlideMouseEventPayload>(
-            SLIDE_EVENTS.MOUSEMOVE,
-            {
-                detail: {
-                    type: SLIDE_EVENTS.MOUSEMOVE,
-                    slide: lastMouseEvent.detail.slide,
-                    baseEvent: mouseEvent,
-                    target: undefined
-                }
-            }
-        ));
+        mouseEventFromKeyUpEvent(event, lastMouseEvent);
     }
 
     function move(event: SlideMouseEvent): void {
-        vertexListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        const deltas = vertexListener(event);
+        slide.setProps(graphicId, graphicType, deltas);
         lastMouseEvent = event;
     }
 
     function complete(event: SlideMouseEvent): void {
-        vertexListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        move(event);
+        mutator.endVertexMove();
+        slide.unlockCursor('grab');
 
-        slide.cursorLock = false;
-        slide.cursor = 'grab';
-
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        unlisten(SLIDE_EVENTS.KEYDOWN, keyDownHandler);
-        unlisten(SLIDE_EVENTS.KEYUP, keyUpHandler);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'vertex--move');
+        unlisten(SLIDE_EVENTS.KEYDOWN, 'vertex--key-down');
+        unlisten(SLIDE_EVENTS.KEYUP, 'vertex--key-up');
+        listenOnce(VERTEX_EVENTS.MOUSEDOWN, 'vertex--init-move', moveVertex);
     }
 }
 
 function rotateGraphic(event: RotatorMouseEvent): void {
     const { parentId, slide } = event.detail;
-    const mutator = slide.focusGraphic(parentId);
+    const { id: graphicId, type: graphicType } = slide.getGraphic(parentId);
+    const mutator = slide.focusGraphic(graphicId);
 
     // Handler must be instantiated at the beginning of the mutation to capture initial state
     // Handler cannot be instantiated immediately during each move event
-    const rotateListener = mutator.rotateListener();
-    slide.cursor = 'grabbing';
-    slide.cursorLock = true;
+    let lastMouseEvent: RotatorMouseEvent | SlideMouseEvent = event;
+    const rotateListener = mutator.initRotate();
+    slide.lockCursor('grabbing');
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, rotate);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.KEYDOWN, 'rotator--key-down', keyDownHandler);
+    listen(SLIDE_EVENTS.KEYUP, 'rotator--key-up', keyUpHandler);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'rotate', rotate);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'complete', complete);
+
+    function keyDownHandler(event: SlideKeyboardEvent): void {
+        mouseEventFromKeyDownEvent(event, lastMouseEvent);
+    }
+
+    function keyUpHandler(event: SlideKeyboardEvent): void {
+        mouseEventFromKeyUpEvent(event, lastMouseEvent);
+    }
 
     function rotate(event: SlideMouseEvent): void {
-        rotateListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        const deltas = rotateListener(event);
+        slide.setProps(graphicId, graphicType, deltas);
+        lastMouseEvent = event;
     }
 
     function complete(event: SlideMouseEvent): void {
-        rotateListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        rotate(event);
+        mutator.endRotate();
+        slide.unlockCursor('grab');
 
-        slide.cursorLock = false;
-        slide.cursor = 'grab';
-
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, rotate);
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'rotate');
     }
-}
-
-function moveAnchor(event: CurveAnchorMouseEvent): void {
-    moveCurveAnchor(event, moveAnchor);
 }

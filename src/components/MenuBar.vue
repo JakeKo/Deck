@@ -11,8 +11,7 @@
 import DeckComponent from './generic/DeckComponent';
 import TitleField from './TitleField.vue';
 import { defineComponent, computed, reactive } from 'vue';
-import { jsonToSlides } from '@/utilities/parsing/storeModel';
-import SlideStateManager from '@/utilities/SlideStateManager';
+import { Keyed, GraphicSerialized } from '@/types';
 
 const MenuBar = defineComponent({
     components: {
@@ -62,6 +61,14 @@ const MenuBar = defineComponent({
             anchor.remove();
         }
 
+        function jsonToSlides(json: string): { id: string; graphics: Keyed<GraphicSerialized> }[] {
+            try {
+                return JSON.parse(json);
+            } catch (error) {
+                throw new Error(`Schema violation when parsing json into slides: ${json}`);
+            }
+        }
+
         async function importSlideDeck(): Promise<void> {
             const reader = new FileReader();
             const input = document.createElement('input');
@@ -78,8 +85,7 @@ const MenuBar = defineComponent({
                             id: slide.id,
                             isActive: false,
                             graphics: slide.graphics,
-                            focusedGraphics: {},
-                            stateManager: new SlideStateManager(slide.id)
+                            focusedGraphics: {}
                         });
                     });
 

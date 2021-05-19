@@ -11,11 +11,11 @@
 
 <script lang='ts'>
 import { defineComponent, PropType } from 'vue';
-import { EllipseStoreModel } from '@/store/types';
+import { EllipseSerialized } from '@/types';
 
 const SvgEllipse = defineComponent({
     props: {
-        target: { type: Object as PropType<EllipseStoreModel>, required: true }
+        target: { type: Object as PropType<EllipseSerialized>, required: true }
     },
     setup: props => {
         const style: { [key: string]: string } = {
@@ -28,10 +28,10 @@ const SvgEllipse = defineComponent({
         return {
             cx: props.target.center.x,
             cy: props.target.center.y,
-            rx: props.target.width / 2,
-            ry: props.target.height / 2,
+            rx: props.target.dimensions.x / 2,
+            ry: props.target.dimensions.y / 2,
             style: Object.keys(style).map(key => `${key}:${style[key]}`).join(';'),
-            transformOrigin: `${props.target.center.x + props.target.width / 2}px ${props.target.center.y + props.target.height / 2}px`
+            transformOrigin: `${props.target.center.x + props.target.dimensions.x / 2}px ${props.target.center.y + props.target.dimensions.y / 2}px`
         };
     }
 });

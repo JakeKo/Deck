@@ -1,88 +1,48 @@
-import { SlideKeyboardEvent, SlideMouseEvent, SlideMouseEventPayload, SLIDE_EVENTS } from '@/events/types';
-import { dispatch, listen, listenOnce, unlisten } from '@/events/utilities';
+import { listen, listenOnce, unlisten } from '@/events';
+import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
+import { GRAPHIC_TYPES, ITextboxMaker } from '@/rendering/types';
 import { AppStore } from '@/store/types';
+import { provideId } from '@/utilities/IdProvider';
 import { PointerTool } from '.';
 import { EditorTool, TOOL_NAMES } from './types';
-import { resolvePosition } from './utilities';
+import { mouseEventFromKeyDownEvent, mouseEventFromKeyUpEvent, resolvePosition } from './utilities';
 
 export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
-        const maker = slide.makeTextboxInteractive(resolvePosition(baseEvent, slide));
-        slide.broadcastSetGraphic(maker.target);
+        const graphicId = provideId();
+        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.TEXTBOX) as ITextboxMaker;
+        slide.createGraphic(maker.create({}));
 
-        // Start tracking the last mouse event so keypress handlers can emulate mouse events
         let lastMouseEvent = event;
-        const resizeListener = maker.resizeListener();
+        const resizeHandler = maker.initResize(resolvePosition(baseEvent, slide));
 
-        listen(SLIDE_EVENTS.KEYDOWN, keyDownHandler);
-        listen(SLIDE_EVENTS.KEYUP, keyUpHandler);
-        listen(SLIDE_EVENTS.MOUSEMOVE, update);
-        listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+        listen(SLIDE_EVENTS.KEYDOWN, 'textbox--key-down-handler', keyDownHandler);
+        listen(SLIDE_EVENTS.KEYUP, 'textbox--key-up-handler', keyUpHandler);
+        listen(SLIDE_EVENTS.MOUSEMOVE, 'textbox--update', update);
+        listenOnce(SLIDE_EVENTS.MOUSEUP, 'textbox--complete', complete);
 
-        // When Shift, Ctrl, or Alt are pressed or unpressed, simulate a mousemove event
-        // This allows the renderer to immediately adjust the shape dimensions if need be
         function keyDownHandler(event: SlideKeyboardEvent): void {
-            const { baseEvent } = event.detail;
-            if (!['Shift', 'Control', 'Alt'].includes(baseEvent.key)) {
-                return;
-            }
-
-            const mouseEvent = new MouseEvent('mousemeove', {
-                clientX: lastMouseEvent.detail.baseEvent.clientX,
-                clientY: lastMouseEvent.detail.baseEvent.clientY,
-                shiftKey: baseEvent.key === 'Shift' || lastMouseEvent.detail.baseEvent.shiftKey,
-                ctrlKey: baseEvent.key === 'Control' || lastMouseEvent.detail.baseEvent.ctrlKey,
-                altKey: baseEvent.key === 'Alt' || lastMouseEvent.detail.baseEvent.altKey
-            });
-
-            dispatch(new CustomEvent<SlideMouseEventPayload>(
-                SLIDE_EVENTS.MOUSEMOVE,
-                {
-                    detail: {
-                        ...lastMouseEvent.detail,
-                        baseEvent: mouseEvent
-                    }
-                }
-            ));
+            mouseEventFromKeyDownEvent(event, lastMouseEvent);
         }
 
         function keyUpHandler(event: SlideKeyboardEvent): void {
-            const { baseEvent } = event.detail;
-            if (!['Shift', 'Control', 'Alt'].includes(baseEvent.key)) {
-                return;
-            }
-
-            const mouseEvent = new MouseEvent('mousemeove', {
-                clientX: lastMouseEvent.detail.baseEvent.clientX,
-                clientY: lastMouseEvent.detail.baseEvent.clientY,
-                shiftKey: baseEvent.key !== 'Shift' && lastMouseEvent.detail.baseEvent.shiftKey,
-                ctrlKey: baseEvent.key !== 'Control' && lastMouseEvent.detail.baseEvent.ctrlKey,
-                altKey: baseEvent.key !== 'Alt' && lastMouseEvent.detail.baseEvent.altKey
-            });
-
-            dispatch(new CustomEvent<SlideMouseEventPayload>(
-                SLIDE_EVENTS.MOUSEMOVE,
-                {
-                    detail: {
-                        ...lastMouseEvent.detail,
-                        baseEvent: mouseEvent
-                    }
-                }
-            ));
+            mouseEventFromKeyUpEvent(event, lastMouseEvent);
         }
 
         function update(event: SlideMouseEvent): void {
-            resizeListener(event);
-            slide.broadcastSetGraphic(maker.target);
+            const deltas = resizeHandler(event);
+            slide.setProps(graphicId, GRAPHIC_TYPES.TEXTBOX, deltas);
             lastMouseEvent = event;
         }
 
-        function complete(): void {
-            maker.complete();
-            unlisten(SLIDE_EVENTS.MOUSEMOVE, update);
-            unlisten(SLIDE_EVENTS.KEYDOWN, keyDownHandler);
-            unlisten(SLIDE_EVENTS.KEYUP, keyUpHandler);
+        function complete(event: SlideMouseEvent): void {
+            update(event);
+            maker.endResize();
+
+            unlisten(SLIDE_EVENTS.MOUSEMOVE, 'textbox--update');
+            unlisten(SLIDE_EVENTS.KEYDOWN, 'textbox--key-down-handler');
+            unlisten(SLIDE_EVENTS.KEYUP, 'textbox--key-up-handler');
 
             store.mutations.setActiveTool(PointerTool());
         }
@@ -90,7 +50,7 @@ export default (store: AppStore): EditorTool => {
 
     return {
         name: TOOL_NAMES.TEXTBOX,
-        mount: () => listenOnce(SLIDE_EVENTS.MOUSEDOWN, make),
-        unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, make)
+        mount: () => listenOnce(SLIDE_EVENTS.MOUSEDOWN, 'make', make),
+        unmount: () => unlisten(SLIDE_EVENTS.MOUSEDOWN, 'make')
     };
 };

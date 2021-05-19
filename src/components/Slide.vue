@@ -4,11 +4,10 @@
 
 <script lang='ts'>
 import SVG from 'svg.js';
-import SlideRenderer from '../rendering/SlideRenderer';
+import SlideRenderer from '@/rendering/SlideRenderer';
 import { Slide as SlideModel } from '@/store/types';
 import DeckComponent from './generic/DeckComponent';
 import { defineComponent, reactive, computed, onMounted, PropType } from 'vue';
-import { graphicStoreModelToGraphicRenderer } from '@/utilities/parsing/renderer';
 
 const Slide = defineComponent({
     props: {
@@ -37,23 +36,15 @@ const Slide = defineComponent({
             const viewbox = store.state.editorViewbox.raw;
             const canvas = SVG(root.value.id).viewbox(viewbox.x, viewbox.y, viewbox.width, viewbox.height).style({ position: 'absolute', top: 0, left: 0 });
 
-            const renderer = new SlideRenderer({
-                stateManager: props.slide.stateManager,
+            // eslint-disable-next-line no-new
+            new SlideRenderer({
                 canvas,
                 rawViewbox: viewbox,
                 croppedViewbox: store.state.editorViewbox.cropped,
-                zoom: store.state.editorViewbox.zoom
+                zoom: store.state.editorViewbox.zoom,
+                slideId: props.slide.id,
+                graphics: props.slide.graphics
             });
-
-            Object.values(props.slide.graphics)
-                .map(graphic => graphicStoreModelToGraphicRenderer(graphic, renderer))
-                .forEach(graphic => {
-                    renderer.setGraphic(graphic);
-                    renderer.getGraphic(graphic.id).render();
-                });
-
-            props.slide.stateManager.setStore(store);
-            props.slide.stateManager.setRenderer(renderer);
         });
 
         return {

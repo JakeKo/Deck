@@ -1,34 +1,35 @@
 import { SlideMouseEvent, SLIDE_EVENTS, VideoMouseEvent, VIDEO_EVENTS } from '@/events/types';
-import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { listen, listenOnce, unlisten } from '@/events';
 import { VideoMutator } from '@/rendering/mutators';
 import { resolvePosition } from '../utilities';
 
 export function moveVideo(event: VideoMouseEvent): void {
     const { slide, baseEvent, target } = event.detail;
-    if (!baseEvent.ctrlKey && !slide.isFocused(target.id)) {
-        slide.unfocusAllGraphics([target.id]);
+    const { id: graphicId, type: graphicType } = target;
+    if (!baseEvent.ctrlKey && !slide.isFocused(graphicId)) {
+        slide.unfocusAllGraphics([graphicId]);
     }
 
-    const mutator = slide.focusGraphic(target.id) as VideoMutator;
-    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide), slide.getSnapVectors([target.id]));
-    slide.cursor = 'move';
-    slide.cursorLock = true;
+    // Initialize mutator move tracking
+    const mutator = slide.focusGraphic(graphicId) as VideoMutator;
+    const moveListener = mutator.initMove(resolvePosition(baseEvent, slide));
+    slide.lockCursor('move');
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'video--move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'video--complete', complete);
 
     function move(event: SlideMouseEvent): void {
-        moveListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        const deltas = moveListener(event);
+        slide.setProps(graphicId, graphicType, deltas);
     }
 
     function complete(event: SlideMouseEvent): void {
-        moveListener(event);
-        slide.broadcastSetGraphic(mutator.target);
-        slide.cursorLock = false;
-        slide.unrenderAllSnapVectors();
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(VIDEO_EVENTS.MOUSEDOWN, moveVideo);
+        move(event);
+        mutator.endMove();
+        slide.unlockCursor();
+
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'video--move');
+        listenOnce(VIDEO_EVENTS.MOUSEDOWN, 'video--init-move', moveVideo);
     }
 }
 
@@ -41,7 +42,7 @@ export function hoverVideo(event: VideoMouseEvent): void {
 
     slide.markGraphic(target.id);
 
-    listenOnce(VIDEO_EVENTS.MOUSEOUT, unmark);
+    listenOnce(VIDEO_EVENTS.MOUSEOUT, 'unmark', unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.id);
     }

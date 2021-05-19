@@ -1,5 +1,6 @@
 import {
     CURVE_ANCHOR_ROLES,
+    GRAPHIC_TYPES,
     ICurveRenderer,
     IEllipseRenderer,
     IGraphicRenderer,
@@ -11,12 +12,73 @@ import {
     IVertexRenderer,
     IVideoRenderer
 } from '@/rendering/types';
+import { GraphicMutableSerialized, GraphicSerialized } from '@/types';
 
-export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS;
+export type DECK_EVENTS = SLIDE_EVENTS | GRAPHIC_EVENTS | HELPER_EVENTS | GRAPHIC_EVENT_CODES;
 type GRAPHIC_EVENTS = CURVE_EVENTS | ELLIPSE_EVENTS | IMAGE_EVENTS | RECTANGLE_EVENTS | TEXTBOX_EVENTS | VIDEO_EVENTS;
 type HELPER_EVENTS = CURVE_ANCHOR_EVENTS | ROTATOR_EVENTS | VERTEX_EVENTS;
 
+export type DeckCustomEvent = GraphicMouseEvent | GraphicCreated | GraphicUpdated | GraphicDeleted | SlideMouseEvent | SlideKeyboardEvent | SlideZoomEvent;
+export type DeckCustomEventPayload =
+    GraphicCreatedPayload | GraphicUpdatedPayload | GraphicDeletedPayload |
+    SlideMouseEventPayload | SlideKeyboardEventPayload | SlideZoomEventPayload |
+    CurveMouseEventPayload |
+    CurveAnchorMouseEventPayload |
+    EllipseMouseEventPayload |
+    ImageMouseEventPayload |
+    RectangleMouseEventPayload |
+    RotatorMouseEventPayload |
+    TextboxMouseEventPayload |
+    VertexMouseEventPayload |
+    VideoMouseEventPayload;
+
 export type GraphicMouseEvent = CurveMouseEvent | EllipseMouseEvent | ImageMouseEvent | RectangleMouseEvent | TextboxMouseEvent | VideoMouseEvent;
+
+// GENERAL GRAPHIC EVENTS
+export enum GRAPHIC_EVENT_CODES {
+    CREATED = 'deck-graphic-created',
+    UPDATED = 'deck-graphic-updated',
+    DELETED = 'deck-graphic-deleted',
+    FOCUSED = 'deck-graphic-focused',
+    UNFOCUSED = 'deck-graphic-unfocused'
+};
+
+export type GraphicCreated = CustomEvent<GraphicCreatedPayload>;
+export type GraphicCreatedPayload = {
+    publisherId: string;
+    slideId: string;
+    props: GraphicSerialized;
+};
+
+export type GraphicUpdated = CustomEvent<GraphicUpdatedPayload>;
+export type GraphicUpdatedPayload = {
+    publisherId: string;
+    slideId: string;
+    graphicId: string;
+    graphicType: GRAPHIC_TYPES;
+    props: GraphicMutableSerialized;
+};
+
+export type GraphicDeleted = CustomEvent<GraphicDeletedPayload>;
+export type GraphicDeletedPayload = {
+    publisherId: string;
+    slideId: string;
+    graphicId: string;
+};
+
+export type GraphicFocused = CustomEvent<GraphicFocusedPayload>;
+export type GraphicFocusedPayload = {
+    publisherId: string;
+    slideId: string;
+    graphicId: string;
+};
+
+export type GraphicUnfocused = CustomEvent<GraphicUnfocusedPayload>;
+export type GraphicUnfocusedPayload = {
+    publisherId: string;
+    slideId: string;
+    graphicId: string;
+};
 
 // SLIDE EVENTS
 export enum SLIDE_EVENTS {
@@ -203,5 +265,5 @@ export type VertexMouseEventPayload = {
     baseEvent: MouseEvent;
     slide: ISlideRenderer;
     type: VERTEX_EVENTS;
-    graphic: IVertexRenderer;
+    target: IVertexRenderer;
 };

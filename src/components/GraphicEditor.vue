@@ -77,6 +77,7 @@ const GraphicEditor = defineComponent({
         });
         const rectangle = computed(() => {
             const graphic = focusedGraphic.value;
+
             if (graphic && graphic.type === GRAPHIC_TYPES.RECTANGLE) {
                 return graphic;
             }

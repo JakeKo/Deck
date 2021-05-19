@@ -3,7 +3,7 @@ import { resolvePosition } from '@/tools/utilities';
 import SnapVector from '@/utilities/SnapVector';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
-import { BoxRenderer, RotatorRenderer, VertexRenderer } from './helpers';
+import { BoxRenderer, RotatorRenderer, SnapVectorRenderer, VertexRenderer } from './helpers';
 import { BoundingBox, BoundingBoxMutatorHelpers, IGraphicRenderer, ISlideRenderer, VERTEX_ROLES } from './types';
 
 export function makeBoxHelpers(target: IGraphicRenderer, slide: ISlideRenderer, scale: number): BoundingBoxMutatorHelpers {
@@ -26,28 +26,28 @@ export function makeBoxHelpers(target: IGraphicRenderer, slide: ISlideRenderer, 
         vertices: {
             [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
                 slide: slide,
-                parent: target,
+                parentId: target.id,
                 center: box.topLeft,
                 scale: scale,
                 role: VERTEX_ROLES.TOP_LEFT
             }),
             [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
                 slide: slide,
-                parent: target,
+                parentId: target.id,
                 center: box.topRight,
                 scale: scale,
                 role: VERTEX_ROLES.TOP_RIGHT
             }),
             [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
                 slide: slide,
-                parent: target,
+                parentId: target.id,
                 center: box.bottomLeft,
                 scale: scale,
                 role: VERTEX_ROLES.BOTTOM_LEFT
             }),
             [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
                 slide: slide,
-                parent: target,
+                parentId: target.id,
                 center: box.bottomRight,
                 scale: scale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
@@ -83,17 +83,12 @@ export function scaleBoxHelpers(helpers: BoundingBoxMutatorHelpers, scale: numbe
     helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].scale = scale;
 }
 
-export function rotateBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
+/**
+ * Updates the provided bounding box helper graphics to match the provided bounding box.
+ */
+export function updateBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
     helpers.box.rotation = box.rotation;
     helpers.rotator.rotation = box.rotation;
-    helpers.rotator.center = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
-    helpers.vertices[VERTEX_ROLES.TOP_LEFT].center = box.topLeft;
-    helpers.vertices[VERTEX_ROLES.TOP_RIGHT].center = box.topRight;
-    helpers.vertices[VERTEX_ROLES.BOTTOM_LEFT].center = box.bottomLeft;
-    helpers.vertices[VERTEX_ROLES.BOTTOM_RIGHT].center = box.bottomRight;
-}
-
-export function resizeBoxHelpers(helpers: BoundingBoxMutatorHelpers, box: BoundingBox): void {
     helpers.box.setOriginAndDimensions(box.origin, box.dimensions);
     helpers.rotator.center = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
     helpers.vertices[VERTEX_ROLES.TOP_LEFT].center = box.topLeft;
@@ -114,7 +109,7 @@ export function calculateMove({
     mouseEvent: SlideMouseEvent;
     snapVectors: SnapVector[];
     relativePullPoints: V[];
-}): V {
+}): { snapVectors: SnapVector[]; shift: V } {
     const { baseEvent, slide } = mouseEvent.detail;
     const position = resolvePosition(baseEvent, slide);
     const rawMove = initialOrigin.towards(position.add(initialPosition.towards(initialOrigin)));
@@ -147,9 +142,50 @@ export function calculateMove({
     }
 
     const finalSnapPull = snapPulls.reduce((finalPull, pull) => finalPull.add(pull.shift), V.zero);
-    slide.unrenderAllSnapVectors();
-    slide.renderSnapVectors(snapPulls.reduce((pulls, pull) => ({ ...pulls, [Math.random().toString()]: pull.snapVector }), {}));
 
     // TODO: Handle case where moveDirection and snapShift are neither parallel nor perpendicular
-    return (baseEvent.shiftKey ? rawMove.projectOn(moveDirection) : rawMove).add(finalSnapPull);
+    return {
+        shift: (baseEvent.shiftKey ? rawMove.projectOn(moveDirection) : rawMove).add(finalSnapPull),
+        snapVectors: snapPulls.map(s => s.snapVector)
+    };
+}
+
+/**
+ * Create initial SnapVectorRenderers for a mutator
+ */
+export function makeSnapVectors(slide: ISlideRenderer, scale: number): SnapVectorRenderer[] {
+    return [
+        new SnapVectorRenderer({
+            scale,
+            slide,
+            snapVector: new SnapVector(V.zero, V.zero)
+        }),
+        new SnapVectorRenderer({
+            scale,
+            slide,
+            snapVector: new SnapVector(V.zero, V.zero)
+        })
+    ];
+}
+
+/**
+ * Given the two models representing active snap vectors, reconcile the provided renderers so they match the models
+ */
+export function updateSnapVectors(models: SnapVector[], renderers: SnapVectorRenderer[]): void {
+    const [m1, m2] = models;
+    const [r1, r2] = renderers;
+
+    if (models.length === 0) {
+        r1.unrender();
+        r2.unrender();
+    } else if (models.length === 1) {
+        r1.render();
+        r1.snapVector = m1;
+        r2.unrender();
+    } else if (models.length === 2) {
+        r1.render();
+        r1.snapVector = m1;
+        r2.render();
+        r2.snapVector = m2;
+    }
 }

@@ -1,14 +1,209 @@
+import { dispatch } from '@/events';
+import { GraphicCreatedPayload, GraphicFocusedPayload, GraphicUnfocusedPayload, GraphicUpdatedPayload, GRAPHIC_EVENT_CODES } from '@/events/types';
+import { GRAPHIC_TYPES } from '@/rendering/types';
 import { themes } from '@/styling';
 import { THEMES } from '@/styling/types';
 import NullTool from '@/tools/NullTool';
+import {
+    CurveMutableSerialized,
+    CurveSerialized,
+    EllipseMutableSerialized,
+    EllipseSerialized,
+    GraphicMutableSerialized,
+    GraphicSerialized,
+    ImageMutableSerialized,
+    ImageSerialized,
+    RectangleMutableSerialized,
+    RectangleSerialized,
+    TextboxMutableSerialized,
+    TextboxSerialized,
+    VideoMutableSerialized,
+    VideoSerialized
+} from '@/types';
 import { provideId } from '@/utilities/IdProvider';
-import SlideStateManager from '@/utilities/SlideStateManager';
 import { inject, reactive } from 'vue';
-import { AppMutations, AppState, AppStore } from './types';
+import {
+    AppMutations,
+    AppState,
+    AppStore
+} from './types';
 import { getSlide } from './utilities';
+
+function setVector(source: { x?: number; y?: number }, target: { x: number; y: number }): void {
+    if (source.x) {
+        target.x = source.x;
+    }
+
+    if (source.y) {
+        target.y = source.y;
+    }
+}
+
+const propSetters = {
+    [GRAPHIC_TYPES.CURVE]: (graphic: CurveSerialized, props: CurveMutableSerialized): void => {
+        if (props.anchors) {
+            props.anchors.forEach((sourceAnchor, index) => {
+                if (!sourceAnchor) {
+                    return;
+                }
+
+                if (!graphic.anchors[index]) {
+                    graphic.anchors[index] = {
+                        inHandle: { x: sourceAnchor.inHandle?.x ?? 0, y: sourceAnchor.inHandle?.y ?? 0 },
+                        point: { x: sourceAnchor.point?.x ?? 0, y: sourceAnchor.point?.y ?? 0 },
+                        outHandle: { x: sourceAnchor.outHandle?.x ?? 0, y: sourceAnchor.outHandle?.y ?? 0 }
+                    };
+                } else {
+                    const targetAnchor = graphic.anchors[index];
+                    if (sourceAnchor.inHandle) {
+                        setVector(sourceAnchor.inHandle, targetAnchor.inHandle);
+                    }
+
+                    if (sourceAnchor.point) {
+                        setVector(sourceAnchor.point, targetAnchor.point);
+                    }
+
+                    if (sourceAnchor.outHandle) {
+                        setVector(sourceAnchor.outHandle, targetAnchor.outHandle);
+                    }
+                }
+            });
+        }
+
+        if (props.fillColor) {
+            graphic.fillColor = props.fillColor;
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+
+        if (props.strokeWidth) {
+            graphic.strokeWidth = props.strokeWidth;
+        }
+
+        if (props.strokeColor) {
+            graphic.strokeColor = props.strokeColor;
+        }
+    },
+    [GRAPHIC_TYPES.ELLIPSE]: (graphic: EllipseSerialized, props: EllipseMutableSerialized): void => {
+        if (props.center) {
+            setVector(props.center, graphic.center);
+        }
+
+        if (props.dimensions) {
+            setVector(props.dimensions, graphic.dimensions);
+        }
+
+        if (props.fillColor) {
+            graphic.fillColor = props.fillColor;
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+
+        if (props.strokeColor) {
+            graphic.strokeColor = props.strokeColor;
+        }
+
+        if (props.strokeWidth) {
+            graphic.strokeWidth = props.strokeWidth;
+        }
+    },
+    [GRAPHIC_TYPES.IMAGE]: (graphic: ImageSerialized, props: ImageMutableSerialized): void => {
+        if (props.origin) {
+            setVector(props.origin, graphic.origin);
+        }
+
+        if (props.dimensions) {
+            setVector(props.dimensions, graphic.dimensions);
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+    },
+    [GRAPHIC_TYPES.RECTANGLE]: (graphic: RectangleSerialized, props: RectangleMutableSerialized): void => {
+        if (props.origin) {
+            setVector(props.origin, graphic.origin);
+        }
+
+        if (props.dimensions) {
+            setVector(props.dimensions, graphic.dimensions);
+        }
+
+        if (props.fillColor) {
+            graphic.fillColor = props.fillColor;
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+
+        if (props.strokeColor) {
+            graphic.strokeColor = props.strokeColor;
+        }
+
+        if (props.strokeWidth) {
+            graphic.strokeWidth = props.strokeWidth;
+        }
+    },
+    [GRAPHIC_TYPES.TEXTBOX]: (graphic: TextboxSerialized, props: TextboxMutableSerialized): void => {
+        if (props.origin) {
+            setVector(props.origin, graphic.origin);
+        }
+
+        if (props.dimensions) {
+            setVector(props.dimensions, graphic.dimensions);
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+
+        if (props.font) {
+            graphic.font = props.font;
+        }
+
+        if (props.size) {
+            graphic.size = props.size;
+        }
+
+        if (props.text) {
+            graphic.text = props.text;
+        }
+
+        if (props.weight) {
+            graphic.weight = props.weight;
+        }
+    },
+    [GRAPHIC_TYPES.VIDEO]: (graphic: VideoSerialized, props: VideoMutableSerialized): void => {
+        if (props.origin) {
+            setVector(props.origin, graphic.origin);
+        }
+
+        if (props.dimensions) {
+            setVector(props.dimensions, graphic.dimensions);
+        }
+
+        if (props.rotation) {
+            graphic.rotation = props.rotation;
+        }
+
+        if (props.strokeColor) {
+            graphic.strokeColor = props.strokeColor;
+        }
+
+        if (props.strokeWidth) {
+            graphic.strokeWidth = props.strokeWidth;
+        }
+    }
+} as { [key in GRAPHIC_TYPES]: (graphic: GraphicSerialized, props: GraphicMutableSerialized) => void };
 
 function createStore(): AppStore {
     const state = reactive<AppState>({
+        eventPublisherId: 'store',
         activeSlide: undefined,
         slides: [],
         activeTool: NullTool,
@@ -41,8 +236,7 @@ function createStore(): AppStore {
                     id: slideId,
                     isActive: false,
                     graphics: {},
-                    focusedGraphics: {},
-                    stateManager: new SlideStateManager(slideId)
+                    focusedGraphics: {}
                 },
                 ...state.slides.slice(index)
             ];
@@ -73,35 +267,52 @@ function createStore(): AppStore {
                 state.activeSlide.isActive = true;
             }
         },
-        focusGraphic: (slideId, graphicId) => {
+        createGraphic: (slideId, props, emit = true) => {
+            const slide = getSlide(state, slideId);
+            if (slide === undefined) {
+                return;
+            }
+
+            const preexistingGraphic = slide.graphics[props.id];
+            if (preexistingGraphic) {
+                throw new Error(`Attempting to create a graphic with a duplicate ID ${props.id}`);
+            }
+
+            slide.graphics[props.id] = props;
+
+            if (emit) {
+                dispatch<GraphicCreatedPayload>(GRAPHIC_EVENT_CODES.CREATED, {
+                    publisherId: state.eventPublisherId,
+                    slideId,
+                    props
+                });
+            }
+        },
+        focusGraphic: (slideId, graphicId, emit = true) => {
             const slide = getSlide(state, slideId);
             if (slide !== undefined && !slide.focusedGraphics[graphicId] && slide.graphics[graphicId]) {
                 slide.focusedGraphics[graphicId] = slide.graphics[graphicId];
             }
-        },
-        focusGraphicBulk: (slideId, graphicIds) => {
-            const slide = getSlide(state, slideId);
-            if (slide !== undefined) {
-                graphicIds.forEach(graphicId => {
-                    if (!slide.focusedGraphics[graphicId] && slide.graphics[graphicId]) {
-                        slide.focusedGraphics[graphicId] = slide.graphics[graphicId];
-                    }
+
+            if (emit) {
+                dispatch<GraphicFocusedPayload>(GRAPHIC_EVENT_CODES.FOCUSED, {
+                    publisherId: state.eventPublisherId,
+                    slideId,
+                    graphicId
                 });
             }
         },
-        unfocusGraphic: (slideId, graphicId) => {
+        unfocusGraphic: (slideId, graphicId, emit = true) => {
             const slide = getSlide(state, slideId);
             if (slide !== undefined && slide.focusedGraphics[graphicId]) {
                 delete slide.focusedGraphics[graphicId];
             }
-        },
-        unfocusGraphicBulk: (slideId, graphicIds) => {
-            const slide = getSlide(state, slideId);
-            if (slide !== undefined) {
-                graphicIds.forEach(graphicId => {
-                    if (slide.focusedGraphics[graphicId]) {
-                        delete slide.focusedGraphics[graphicId];
-                    }
+
+            if (emit) {
+                dispatch<GraphicUnfocusedPayload>(GRAPHIC_EVENT_CODES.UNFOCUSED, {
+                    publisherId: state.eventPublisherId,
+                    slideId,
+                    graphicId
                 });
             }
         },
@@ -116,69 +327,33 @@ function createStore(): AppStore {
         setDeckTitle: deckTitle => {
             state.deckTitle = deckTitle === '' ? undefined : deckTitle;
         },
-        setGraphic: (slideId, graphic) => {
+        setProps: (slideId, graphicId, graphicType, props, emit = true) => {
             const slide = getSlide(state, slideId);
             if (slide === undefined) {
                 return;
             }
 
-            slide.graphics[graphic.id] = graphic;
-            if (slide.focusedGraphics[graphic.id]) {
-                slide.focusedGraphics[graphic.id] = graphic;
+            const graphic = slide.graphics[graphicId];
+            if (!graphic) {
+                return;
+            }
+
+            propSetters[graphicType](graphic, props);
+
+            if (emit) {
+                dispatch<GraphicUpdatedPayload>(GRAPHIC_EVENT_CODES.UPDATED, {
+                    publisherId: state.eventPublisherId,
+                    slideId,
+                    graphicType,
+                    graphicId,
+                    props
+                });
             }
         },
         removeGraphic: (slideId, graphicId) => {
             const slide = getSlide(state, slideId);
             if (slide !== undefined) {
                 delete slide.graphics[graphicId];
-            }
-        },
-        broadcastSetGraphic: (slideId, graphic) => {
-            const slide = getSlide(state, slideId);
-            if (slide !== undefined) {
-                slide.stateManager.setGraphicFromStore(graphic);
-            }
-        },
-        broadcastSetX: (slideId, graphicId, x) => {
-            const slide = getSlide(state, slideId);
-            slide && slide.stateManager.setXFromStore(graphicId, x);
-        },
-        broadcastSetY: (slideId, graphicId, y) => {
-            const slide = getSlide(state, slideId);
-            slide && slide.stateManager.setYFromStore(graphicId, y);
-        },
-        broadcastSetFillColor: (slideId, graphicId, fillColor) => {
-            const slide = getSlide(state, slideId);
-            slide && slide.stateManager.setFillColorFromStore(graphicId, fillColor);
-        },
-        broadcastSetStrokeColor: (slideId, graphicId, strokeColor) => {
-            const slide = getSlide(state, slideId);
-            slide && slide.stateManager.setStrokeColorFromStore(graphicId, strokeColor);
-        },
-        broadcastSetStrokeWidth: (slideId, graphicId, strokeWidth) => {
-            const slide = getSlide(state, slideId);
-            slide && slide.stateManager.setStrokeWidthFromStore(graphicId, strokeWidth);
-        },
-        broadcastSetWidth: (slideId, graphicId, width) => {
-            const slide = getSlide(state, slideId);
-            slide && slide.stateManager.setWidthFromStore(graphicId, width);
-        },
-        broadcastSetHeight: (slideId, graphicId, height) => {
-            const slide = getSlide(state, slideId);
-            slide && slide.stateManager.setHeightFromStore(graphicId, height);
-        },
-        broadcastSetRotation: (slideId, graphicId, rotation) => {
-            const slide = getSlide(state, slideId);
-            slide && slide.stateManager.setRotationFromStore(graphicId, rotation);
-        },
-        broadcastSetText: (slideId, graphicId, text) => {
-            const slide = getSlide(state, slideId);
-            slide && slide.stateManager.setTextFromStore(graphicId, text);
-        },
-        broadcastRemoveGraphic: (slideId, graphicId) => {
-            const slide = getSlide(state, slideId);
-            if (slide !== undefined) {
-                slide.stateManager.removeGraphicFromStore(graphicId);
             }
         },
         setTheme: theme => {

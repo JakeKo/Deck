@@ -1,66 +1,147 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
-import SnapVector from '@/utilities/SnapVector';
-import { closestVector, mod } from '@/utilities/utilities';
+import { CurveMutableSerialized } from '@/types';
+import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { CurveAnchorRenderer } from '../helpers';
-import {
-    BoundingBoxMutatorHelpers,
-    CurveAnchor,
-    CURVE_ANCHOR_ROLES,
-    GRAPHIC_TYPES,
-    ICurveMutator,
-    ICurveRenderer,
-    ISlideRenderer,
-    VERTEX_ROLES
-} from '../types';
-import {
-    calculateMove,
-    makeBoxHelpers,
-    renderBoxHelpers,
-    resizeBoxHelpers,
-    rotateBoxHelpers,
-    scaleBoxHelpers,
-    unrenderBoxHelpers
-} from '../utilities';
+import { CurveAnchor, CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, ICurveMutator, ICurveRenderer, ISlideRenderer, VERTEX_ROLES } from '../types';
+import { calculateMove, updateSnapVectors } from '../utilities';
+import GraphicMutatorBase from './GraphicMutatorBase';
 
-type CurveMutatorArgs = {
-    target: ICurveRenderer;
-    slide: ISlideRenderer;
-    scale: number;
-};
+class CurveMutator extends GraphicMutatorBase<GRAPHIC_TYPES.CURVE, ICurveRenderer, CurveMutableSerialized> implements ICurveMutator {
+    protected anchorHelpers: CurveAnchorRenderer[];
+    protected isMovingAnchor: boolean;
 
-class CurveMutator implements ICurveMutator {
-    public readonly type = GRAPHIC_TYPES.CURVE;
-    public readonly target: ICurveRenderer;
-    private _helpers: BoundingBoxMutatorHelpers & { anchors: CurveAnchorRenderer[] };
+    constructor({
+        slide,
+        scale,
+        graphicId,
+        focus = true
+    }: {
+        slide: ISlideRenderer;
+        scale: number;
+        graphicId: string;
+        focus?: boolean;
+    }) {
+        super({ type: GRAPHIC_TYPES.CURVE, slide, scale, graphicId, focus });
+        this.isMovingAnchor = false;
 
-    constructor(args: CurveMutatorArgs) {
-        this.target = args.target;
+        this.anchorHelpers = this.graphic.anchors.map((anchor, index) => new CurveAnchorRenderer({
+            slide: this.slide,
+            scale,
+            parentId: this.graphicId,
+            index,
+            ...anchor
+        }));
 
-        this._helpers = {
-            ...makeBoxHelpers(this.target, args.slide, args.scale),
-            anchors: this.target.anchors.map((anchor, index) => new CurveAnchorRenderer({
-                slide: args.slide,
-                scale: args.scale,
-                parentId: this.target.id,
-                index,
-                ...anchor
-            }))
-        };
-
-        renderBoxHelpers(this._helpers);
-        this._helpers.anchors.forEach(helper => helper.render());
+        // Manually render anchorHelpers since, if focus() is called in super, anchorHelpers won't exist yet
+        if (focus) {
+            this.anchorHelpers.forEach(helper => helper.render());
+        }
     }
 
     public set scale(scale: number) {
-        this._helpers.anchors.forEach(helper => (helper.scale = scale));
-        scaleBoxHelpers(this._helpers, scale);
+        super.scale = scale;
+        this.anchorHelpers.forEach(helper => (helper.scale = scale));
+    }
+
+    /**
+     * Updates the rendered helper graphics with the latest state of this mutator's targeted graphic.
+     */
+    public updateHelpers(): void {
+        super.updateHelpers();
+
+        if (!this.isFocusing) {
+            return;
+        }
+
+        const graphic = this.graphic;
+        this.anchorHelpers.forEach((_, index) => {
+            const { inHandle, point, outHandle } = graphic.getAnchor(index);
+            this.anchorHelpers[index].inHandle = inHandle;
+            this.anchorHelpers[index].point = point;
+            this.anchorHelpers[index].outHandle = outHandle;
+        });
+    }
+
+    /**
+     * Focus the graphic that pertains to this mutator. This will render necessary helper graphics.
+     */
+    public focus(): void {
+        super.focus();
+
+        if (this.isFocusing) {
+            return;
+        }
+
+        this.anchorHelpers.forEach(helper => helper.render());
+    }
+
+    /**
+     * Unfocus the graphic that pertains to this mutator. This will unrender all helper graphics.
+     */
+    public unfocus(): void {
+        super.unfocus();
+
+        if (!this.isFocusing) {
+            return;
+        }
+
+        this.anchorHelpers.forEach(helper => helper.unrender());
+    }
+
+    /**
+     * Initialize this mutator to begin tracking movement.
+     * This returns a handler to be called on each subsequent mouse event.
+     */
+    public initMove(initialPosition: V): (event: SlideMouseEvent) => CurveMutableSerialized {
+        this.isMoving = true;
+        const graphic = this.graphic;
+        const initialOrigin = V.copy(graphic.getAnchor(0).point);
+        const initialAnchors = graphic.anchors.map<CurveAnchor>(anchor => ({
+            inHandle: V.from(anchor.inHandle),
+            point: V.from(anchor.point),
+            outHandle: V.from(anchor.outHandle)
+        }));
+        const relativePullPoints = graphic.pullPoints.map(p => initialPosition.towards(p));
+        const snapVectors = this.slide.getSnapVectors([this.graphicId]);
+
+        return event => {
+            const { shift: move, snapVectors: newSnapVectors } = calculateMove({
+                initialOrigin,
+                initialPosition,
+                mouseEvent: event,
+                snapVectors,
+                relativePullPoints
+            });
+            const newAnchors = initialAnchors.map(anchor => ({
+                inHandle: anchor.inHandle.add(move),
+                point: anchor.point.add(move),
+                outHandle: anchor.outHandle.add(move)
+            }));
+
+            // TODO: Consider how to move snap vector updates out of calculator
+            updateSnapVectors(newSnapVectors, this.helpers.snapVectors);
+            return { anchors: newAnchors };
+        };
+    }
+
+    /**
+     * Conclude tracking of movement.
+     */
+    public endMove(): void {
+        this.isMoving = false;
+        updateSnapVectors([], this.helpers.snapVectors);
     }
 
     // TODO: Account for ctrl, alt, and snapping
-    public vertexListener(role: VERTEX_ROLES): (event: SlideMouseEvent) => void {
-        const box = this.target.transformedBox;
+    /**
+     * Initialize this mutator to begin tracking vertex movement.
+     * This returns a handler to be called on each subsequent mouse event.
+     */
+    public initVertexMove(role: VERTEX_ROLES): (event: SlideMouseEvent) => CurveMutableSerialized {
+        this.isMovingVertex = true;
+        const box = this.graphic.transformedBox;
         const directions = [
             box.dimensions,
             box.dimensions.signAs(V.northwest),
@@ -73,8 +154,8 @@ class CurveMutator implements ICurveMutator {
         // 3. Constrain the vector (to maintain aspect ratio) if shift is pressed
         // 4. Unrotate the corner vector to correct for graphic rotation
         // 5. Use the post-shift corner vector and corrected corner vector to update props
-        const makeListener = (oppositeCorner: V): (event: SlideMouseEvent) => void => {
-            const anchorOffsets = this.target.anchors.map<CurveAnchor>(anchor => ({
+        const makeListener = (oppositeCorner: V): (event: SlideMouseEvent) => CurveMutableSerialized => {
+            const anchorOffsets = this.graphic.anchors.map<CurveAnchor>(anchor => ({
                 inHandle: oppositeCorner.towards(anchor.inHandle).abs,
                 point: oppositeCorner.towards(anchor.point).abs,
                 outHandle: oppositeCorner.towards(anchor.outHandle).abs
@@ -89,13 +170,13 @@ class CurveMutator implements ICurveMutator {
 
                 const scale = new V(correctedCornerVector.x / box.dimensions.x, correctedCornerVector.y / box.dimensions.y);
 
-                // Update rendering
-                this.target.anchors = anchorOffsets.map<CurveAnchor>(anchor => ({
-                    inHandle: new V(anchor.inHandle.x * scale.x, anchor.inHandle.y * scale.y).add(oppositeCorner),
-                    point: new V(anchor.point.x * scale.x, anchor.point.y * scale.y).add(oppositeCorner),
-                    outHandle: new V(anchor.outHandle.x * scale.x, anchor.outHandle.y * scale.y).add(oppositeCorner)
-                }));
-                this._repositionCurveAnchors();
+                return {
+                    anchors: anchorOffsets.map<CurveAnchor>(anchor => ({
+                        inHandle: new V(anchor.inHandle.x * scale.x, anchor.inHandle.y * scale.y).add(oppositeCorner),
+                        point: new V(anchor.point.x * scale.x, anchor.point.y * scale.y).add(oppositeCorner),
+                        outHandle: new V(anchor.outHandle.x * scale.x, anchor.outHandle.y * scale.y).add(oppositeCorner)
+                    }))
+                };
             };
         };
 
@@ -107,116 +188,60 @@ class CurveMutator implements ICurveMutator {
         })[role];
     }
 
-    public rotateListener(): (event: SlideMouseEvent) => void {
-        const { center } = this.target.transformedBox;
-        const directions = [...V.cardinals, ...V.intermediates];
-
-        return event => {
-            const { slide, baseEvent } = event.detail;
-            const position = resolvePosition(baseEvent, slide);
-            const rawOffset = center.towards(position);
-            const offset = baseEvent.shiftKey ? closestVector(rawOffset, directions) : rawOffset;
-            const theta = Math.atan2(offset.y, offset.x);
-
-            this.target.rotation = mod(theta, Math.PI * 2);
-            rotateBoxHelpers(this._helpers, this.target.transformedBox);
-        };
-    }
-
-    public moveListener(initialPosition: V, snapVectors: SnapVector[]): (event: SlideMouseEvent) => void {
-        const initialOrigin = this.target.getAnchor(0).point;
-        const initialAnchors = this.target.anchors;
-        const relativePullPoints = this.target.pullPoints.map(p => initialPosition.towards(p));
-
-        return event => {
-            const move = calculateMove({
-                initialOrigin,
-                initialPosition,
-                mouseEvent: event,
-                snapVectors,
-                relativePullPoints
-            });
-
-            const newAnchors = initialAnchors.map(anchor => ({
-                inHandle: anchor.inHandle.add(move),
-                point: anchor.point.add(move),
-                outHandle: anchor.outHandle.add(move)
-            }));
-            this.target.anchors = newAnchors;
-            this._repositionCurveAnchors();
-        };
+    /**
+     * Conclude tracking of vertex movement.
+     */
+    public endVertexMove(): void {
+        this.isMovingVertex = false;
     }
 
     // TODO: Account for shift, alt, and snapping
-    public anchorListener(index: number, role: CURVE_ANCHOR_ROLES): (event: SlideMouseEvent) => void {
-        const anchor = this.target.getAnchor(index);
+    /**
+     * Initialize this mutator to begin tracking anchor movement.
+     * This returns a handler to be called on each subsequent mouse event.
+     */
+    public initAnchorMove(index: number, role: CURVE_ANCHOR_ROLES): (event: SlideMouseEvent) => CurveMutableSerialized {
+        this.isMovingAnchor = true;
+        const anchors = this.graphic.anchors;
+
         return {
-            [CURVE_ANCHOR_ROLES.IN_HANDLE]: (event: SlideMouseEvent): void => {
+            [CURVE_ANCHOR_ROLES.IN_HANDLE]: (event: SlideMouseEvent) => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
-                this.target.setAnchor(index, { ...anchor, inHandle: position });
-                this._repositionCurveAnchor(index);
+
+                return {
+                    anchors: anchors.map((a, i) => i === index ? { ...a, inHandle: position } : a)
+                };
             },
-            [CURVE_ANCHOR_ROLES.POINT]: (event: SlideMouseEvent): void => {
+            [CURVE_ANCHOR_ROLES.POINT]: (event: SlideMouseEvent) => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
-                const move = anchor.point.towards(position);
-                this.target.setAnchor(index, {
-                    inHandle: anchor.inHandle.add(move),
-                    point: anchor.point.add(move),
-                    outHandle: anchor.outHandle.add(move)
-                });
-                this._repositionCurveAnchor(index);
+                const move = anchors[index].point.towards(position);
+
+                return {
+                    anchors: anchors.map((a, i) => i === index ? {
+                        inHandle: a.inHandle.add(move),
+                        point: a.point.add(move),
+                        outHandle: a.outHandle.add(move)
+                    } : a)
+                };
             },
-            [CURVE_ANCHOR_ROLES.OUT_HANDLE]: (event: SlideMouseEvent): void => {
+            [CURVE_ANCHOR_ROLES.OUT_HANDLE]: (event: SlideMouseEvent) => {
                 const { baseEvent, slide } = event.detail;
                 const position = resolvePosition(baseEvent, slide);
-                this.target.setAnchor(index, { ...anchor, outHandle: position });
-                this._repositionCurveAnchor(index);
+
+                return {
+                    anchors: anchors.map((a, i) => i === index ? { ...a, outHandle: position } : a)
+                };
             }
         }[role];
     }
 
-    public setRotation(rotation: number): void {
-        this.target.rotation = rotation;
-        rotateBoxHelpers(this._helpers, this.target.transformedBox);
-    }
-
-    public setFillColor(fillColor: string): void {
-        this.target.fillColor = fillColor;
-    }
-
-    public setStrokeColor(strokeColor: string): void {
-        this.target.strokeColor = strokeColor;
-    }
-
-    public setStrokeWidth(strokeWidth: number): void {
-        this.target.strokeWidth = strokeWidth;
-    }
-
-    public complete(): void {
-        this._helpers.anchors.forEach(helper => helper.unrender());
-        unrenderBoxHelpers(this._helpers);
-    }
-
-    private _repositionCurveAnchor(index: number): void {
-        const anchor = this.target.getAnchor(index);
-        this._helpers.anchors[index].inHandle = anchor.inHandle;
-        this._helpers.anchors[index].point = anchor.point;
-        this._helpers.anchors[index].outHandle = anchor.outHandle;
-
-        resizeBoxHelpers(this._helpers, this.target.transformedBox);
-    }
-
-    private _repositionCurveAnchors(): void {
-        this._helpers.anchors.forEach((_, index) => {
-            const anchor = this.target.getAnchor(index);
-            this._helpers.anchors[index].inHandle = anchor.inHandle;
-            this._helpers.anchors[index].point = anchor.point;
-            this._helpers.anchors[index].outHandle = anchor.outHandle;
-        });
-
-        resizeBoxHelpers(this._helpers, this.target.transformedBox);
+    /**
+     * Conclude tracking of anchor movement.
+     */
+    public endAnchorMove(): void {
+        this.isMovingAnchor = false;
     }
 }
 

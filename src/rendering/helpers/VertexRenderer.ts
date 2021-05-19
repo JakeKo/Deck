@@ -1,22 +1,23 @@
 import { decorateVertexEvents } from '@/events/decorators';
 import V from '@/utilities/Vector';
 import SVG from 'svg.js';
-import { GRAPHIC_TYPES, IGraphicRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { GRAPHIC_TYPES, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
 type VertexRendererArgs = {
     slide: ISlideRenderer;
     scale: number;
     role: VERTEX_ROLES;
     center: V;
-    parent: IGraphicRenderer;
+    parentId: string;
 };
 
 class VertexRenderer implements IVertexRenderer {
     public readonly type = GRAPHIC_TYPES.VERTEX;
+    public readonly parentId: string;
+
     private _slide: ISlideRenderer;
     private _svg: SVG.Ellipse | undefined;
     private _role: VERTEX_ROLES;
-    private _parent: IGraphicRenderer;
     private _scale: number;
     private _width: number;
     private _height: number;
@@ -28,7 +29,7 @@ class VertexRenderer implements IVertexRenderer {
     constructor(args: VertexRendererArgs) {
         this._slide = args.slide;
         this._role = args.role;
-        this._parent = args.parent;
+        this.parentId = args.parentId;
         this._scale = args.scale;
         this._center = args.center;
         this._width = 8;
@@ -44,10 +45,6 @@ class VertexRenderer implements IVertexRenderer {
 
     public get role(): VERTEX_ROLES {
         return this._role;
-    }
-
-    public get parent(): IGraphicRenderer {
-        return this._parent;
     }
 
     public set center(center: V) {

@@ -268,4 +268,50 @@ describe('Vector', () => {
         expect(actual2.x).toBeCloseTo(expected2.x, 5);
         expect(actual2.y).toBeCloseTo(expected2.y, 5);
     });
+
+    describe('slice', () => {
+        it('can slice a circle into zero pieces', () => {
+            // Arrange
+            const n = 0;
+            const expectedSlices: V[] = [];
+
+            // Act
+            const actualSlices = V.slice(n);
+
+            // Assert
+            expect(actualSlices).toEqual(expectedSlices);
+        });
+
+        it('can slice a circle into one piece', () => {
+            // Arrange
+            const n = 1;
+            const expectedSlices: V[] = [V.east];
+
+            // Act
+            const actualSlices = V.slice(n);
+
+            // Assert
+            actualSlices.forEach((actualSlice, index) => {
+                const expectedSlice = expectedSlices[index];
+                expect(actualSlice.x).toBeCloseTo(expectedSlice.x, 5);
+                expect(actualSlice.y).toBeCloseTo(expectedSlice.y, 5);
+            });
+        });
+
+        it('can slice a circle into more than one piece', () => {
+            // Arrange
+            const n = 4;
+            const expectedSlices: V[] = [V.east, V.north, V.west, V.south];
+
+            // Act
+            const actualSlices = V.slice(n);
+
+            // Assert
+            actualSlices.forEach((actualSlice, index) => {
+                const expectedSlice = expectedSlices[index];
+                expect(actualSlice.x).toBeCloseTo(expectedSlice.x, 5);
+                expect(actualSlice.y).toBeCloseTo(expectedSlice.y, 5);
+            });
+        });
+    });
 });

@@ -1,5 +1,22 @@
 import { SlideMouseEvent } from '@/events/types';
 import { Viewbox } from '@/store/types';
+import {
+    CurveMutableSerialized,
+    CurveSerialized,
+    EllipseMutableSerialized,
+    EllipseSerialized,
+    GraphicMutableSerialized,
+    GraphicSerialized,
+    ImageMutableSerialized,
+    ImageSerialized,
+    Keyed,
+    RectangleMutableSerialized,
+    RectangleSerialized,
+    TextboxMutableSerialized,
+    TextboxSerialized,
+    VideoMutableSerialized,
+    VideoSerialized
+} from '@/types';
 import SnapVector from '@/utilities/SnapVector';
 import V from '@/utilities/Vector';
 import SVG from 'svg.js';
@@ -34,6 +51,7 @@ export type ICurveRenderer = BaseGraphicRenderer & {
     setAnchor: (index: number, anchor: CurveAnchor) => void;
     addAnchor: (anchor: CurveAnchor) => number;
     removeAnchor: (index: number) => void;
+    setProps: (props: CurveMutableSerialized) => void;
 };
 
 export type IEllipseRenderer = BaseGraphicRenderer & {
@@ -44,6 +62,7 @@ export type IEllipseRenderer = BaseGraphicRenderer & {
     strokeColor: string;
     strokeWidth: number;
     setCenterAndDimensions: (center: V, dimensions: V) => void;
+    setProps: (props: EllipseMutableSerialized) => void;
 };
 
 export type IImageRenderer = BaseGraphicRenderer & {
@@ -52,6 +71,7 @@ export type IImageRenderer = BaseGraphicRenderer & {
     origin: V;
     dimensions: V;
     setOriginAndDimensions: (origin: V, dimensions: V) => void;
+    setProps: (props: ImageMutableSerialized) => void;
 };
 
 export type IRectangleRenderer = BaseGraphicRenderer & {
@@ -62,6 +82,7 @@ export type IRectangleRenderer = BaseGraphicRenderer & {
     strokeColor: string;
     strokeWidth: number;
     setOriginAndDimensions: (origin: V, dimensions: V) => void;
+    setProps: (props: RectangleMutableSerialized) => void;
 };
 
 export type ITextboxRenderer = BaseGraphicRenderer & {
@@ -73,6 +94,7 @@ export type ITextboxRenderer = BaseGraphicRenderer & {
     fontWeight: string;
     typeface: string;
     setOriginAndDimensions: (origin: V, dimensions: V) => void;
+    setProps: (props: TextboxMutableSerialized) => void;
 };
 
 export type IVideoRenderer = BaseGraphicRenderer & {
@@ -83,6 +105,7 @@ export type IVideoRenderer = BaseGraphicRenderer & {
     strokeColor: string;
     strokeWidth: number;
     setOriginAndDimensions: (origin: V, dimensions: V) => void;
+    setProps: (props: VideoMutableSerialized) => void;
 };
 
 export type IHelperRenderer = IBoxRenderer
@@ -154,7 +177,7 @@ export type ISnapVectorRenderer = BaseHelperRenderer & {
 export type IVertexRenderer = BaseHelperRenderer & {
     readonly type: GRAPHIC_TYPES.VERTEX;
     readonly role: VERTEX_ROLES;
-    readonly parent: IGraphicRenderer;
+    readonly parentId: string;
     center: V;
 }
 
@@ -165,42 +188,50 @@ export type IGraphicMaker = ICurveMaker
     | ITextboxMaker
     | IVideoMaker;
 
-type BaseGraphicMaker = {
+export type IGraphicMakerBase = {
     scale: number;
-    complete: () => void;
+    updateHelpers: () => void;
 };
 
-export type ICurveMaker = BaseGraphicMaker & {
-    readonly target: ICurveRenderer;
-    anchorListeners: (anchor: CurveAnchor) => {
-        setPoint: (event: SlideMouseEvent) => void;
-        setHandles: (event: SlideMouseEvent) => void;
-    };
+export type ICurveMaker = IGraphicMakerBase & {
+    create: (props: CurveMutableSerialized) => CurveSerialized;
+    initDraw: () => (event: SlideMouseEvent) => CurveMutableSerialized;
+    endDraw: () => CurveMutableSerialized;
+    addAnchor: (event: SlideMouseEvent) => CurveMutableSerialized;
+    initCreateAnchor: () => (event: SlideMouseEvent) => CurveMutableSerialized;
+    endCreateAnchor: () => void;
 };
 
-export type IEllipseMaker = BaseGraphicMaker & {
-    readonly target: IEllipseRenderer;
-    resizeListener: () => (event: SlideMouseEvent) => void;
+// ICurveMaker _doesn't_ have a "resize" operation.
+// Resize methods _must_ be specified at the individual type instead of at IGraphicMakerBase.
+export type IEllipseMaker = IGraphicMakerBase & {
+    create: (props: EllipseMutableSerialized) => EllipseSerialized;
+    initResize: (basePoint: V) => (event: SlideMouseEvent) => EllipseMutableSerialized;
+    endResize: () => void;
 };
 
-export type IImageMaker = BaseGraphicMaker & {
-    readonly target: IImageRenderer;
-    resizeListener: () => (event: SlideMouseEvent) => void;
+export type IImageMaker = IGraphicMakerBase & {
+    create: (props: ImageMutableSerialized & Pick<ImageSerialized, 'source' | 'dimensions'>) => ImageSerialized;
+    initResize: (basePoint: V) => (event: SlideMouseEvent) => ImageMutableSerialized;
+    endResize: () => void;
 };
 
-export type IRectangleMaker = BaseGraphicMaker & {
-    readonly target: IRectangleRenderer;
-    resizeListener: () => (event: SlideMouseEvent) => void;
+export type IRectangleMaker = IGraphicMakerBase & {
+    create: (props: RectangleMutableSerialized) => RectangleSerialized;
+    initResize: (basePoint: V) => (event: SlideMouseEvent) => RectangleMutableSerialized;
+    endResize: () => void;
 };
 
-export type ITextboxMaker = BaseGraphicMaker & {
-    readonly target: ITextboxRenderer;
-    resizeListener: () => (event: SlideMouseEvent) => void;
+export type ITextboxMaker = IGraphicMakerBase & {
+    create: (props: TextboxMutableSerialized) => TextboxSerialized;
+    initResize: (basePoint: V) => (event: SlideMouseEvent) => TextboxMutableSerialized;
+    endResize: () => void;
 };
 
-export type IVideoMaker = BaseGraphicMaker & {
-    readonly target: IVideoRenderer;
-    resizeListener: () => (event: SlideMouseEvent) => void;
+export type IVideoMaker = IGraphicMakerBase & {
+    create: (props: VideoMutableSerialized & Pick<VideoSerialized, 'source' | 'dimensions'>) => VideoSerialized;
+    initResize: (basePoint: V) => (event: SlideMouseEvent) => VideoMutableSerialized;
+    endResize: () => void;
 };
 
 export type IGraphicMarker = {
@@ -215,122 +246,61 @@ export type IGraphicMutator = ICurveMutator
     | ITextboxMutator
     | IVideoMutator;
 
-type BaseGraphicMutator = {
+export type IGraphicMutatorBase<T extends GRAPHIC_TYPES, U extends GraphicMutableSerialized> = {
+    readonly type: T;
     scale: number;
-    vertexListener: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => void;
-    rotateListener: () => (event: SlideMouseEvent) => void;
-    moveListener: (initialPosition: V, snapVectors: SnapVector[]) => (event: SlideMouseEvent) => void;
-    complete: () => void;
+    updateHelpers: () => void;
+    focus: () => void;
+    unfocus: () => void;
+    initMove: (initialPosition: V) => (event: SlideMouseEvent) => U;
+    endMove: () => void;
+    initVertexMove: (role: VERTEX_ROLES) => (event: SlideMouseEvent) => U;
+    endVertexMove: () => void;
+    initRotate: () => (event: SlideMouseEvent) => U;
+    endRotate: () => void;
 };
 
-export type ICurveMutator = BaseGraphicMutator & {
-    readonly type: GRAPHIC_TYPES.CURVE;
-    readonly target: ICurveRenderer;
-    anchorListener: (index: number, role: CURVE_ANCHOR_ROLES) => (event: SlideMouseEvent) => void;
-    setRotation: (rotation: number) => void;
-    setFillColor: (fillColor: string) => void;
-    setStrokeColor: (strokeColor: string) => void;
-    setStrokeWidth: (strokeWidth: number) => void;
+export type ICurveMutator = IGraphicMutatorBase<GRAPHIC_TYPES.CURVE, CurveMutableSerialized> & {
+    initAnchorMove: (index: number, role: CURVE_ANCHOR_ROLES) => (event: SlideMouseEvent) => CurveMutableSerialized;
+    endAnchorMove: () => void;
 };
 
-export type IEllipseMutator = BaseGraphicMutator & {
-    readonly type: GRAPHIC_TYPES.ELLIPSE;
-    readonly target: IEllipseRenderer;
-    setX: (x: number) => void;
-    setY: (y: number) => void;
-    setWidth: (width: number) => void;
-    setHeight: (height: number) => void;
-    setRotation: (rotation: number) => void;
-    setFillColor: (fillColor: string) => void;
-    setStrokeColor: (strokeColor: string) => void;
-    setStrokeWidth: (strokeWidth: number) => void;
-};
+export type IEllipseMutator = IGraphicMutatorBase<GRAPHIC_TYPES.ELLIPSE, EllipseMutableSerialized>;
 
-export type IImageMutator = BaseGraphicMutator & {
-    readonly type: GRAPHIC_TYPES.IMAGE;
-    readonly target: IImageRenderer;
-    setX: (x: number) => void;
-    setY: (y: number) => void;
-    setWidth: (width: number) => void;
-    setHeight: (height: number) => void;
-    setRotation: (rotation: number) => void;
-};
+export type IImageMutator = IGraphicMutatorBase<GRAPHIC_TYPES.IMAGE, ImageMutableSerialized>;
 
-export type IRectangleMutator = BaseGraphicMutator & {
-    readonly type: GRAPHIC_TYPES.RECTANGLE;
-    readonly target: IRectangleRenderer;
-    setX: (x: number) => void;
-    setY: (y: number) => void;
-    setWidth: (width: number) => void;
-    setHeight: (height: number) => void;
-    setRotation: (rotation: number) => void;
-    setFillColor: (fillColor: string) => void;
-    setStrokeColor: (strokeColor: string) => void;
-    setStrokeWidth: (strokeWidth: number) => void;
-};
+export type IRectangleMutator = IGraphicMutatorBase<GRAPHIC_TYPES.RECTANGLE, RectangleMutableSerialized>;
 
-export type ITextboxMutator = BaseGraphicMutator & {
-    readonly type: GRAPHIC_TYPES.TEXTBOX;
-    readonly target: ITextboxRenderer;
-    setX: (x: number) => void;
-    setY: (y: number) => void;
-    setWidth: (width: number) => void;
-    setHeight: (height: number) => void;
-    setText: (text: string) => void;
-    setRotation: (rotation: number) => void;
-};
+export type ITextboxMutator = IGraphicMutatorBase<GRAPHIC_TYPES.TEXTBOX, TextboxMutableSerialized>;
 
-export type IVideoMutator = BaseGraphicMutator & {
-    readonly type: GRAPHIC_TYPES.VIDEO;
-    readonly target: IVideoRenderer;
-    setX: (x: number) => void;
-    setY: (y: number) => void;
-    setWidth: (width: number) => void;
-    setHeight: (height: number) => void;
-    setRotation: (rotation: number) => void;
-    setStrokeColor: (strokeColor: string) => void;
-    setStrokeWidth: (strokeWidth: number) => void;
-};
+export type IVideoMutator = IGraphicMutatorBase<GRAPHIC_TYPES.VIDEO, VideoMutableSerialized>;
 
 export type ISlideRenderer = {
+    eventPublisherId: string;
+    slideId: string;
     readonly canvas: SVG.Doc;
     readonly rawViewbox: Viewbox;
     readonly zoom: number;
     readonly bounds: { origin: V; dimensions: V };
     cursor: string;
     cursorLock: boolean;
+    lockCursor: (cursor: string) => void;
+    unlockCursor: (cursor?: string) => void;
     getSnapVectors: (exclude: string[]) => SnapVector[];
-    renderSnapVectors: (snapVectors: { [key: string]: SnapVector }) => void;
-    unrenderAllSnapVectors: () => void;
-    makeCurveInteractive: (initialPosition: V) => ICurveMaker;
-    makeEllipseInteractive: (initialPosition: V) => IEllipseMaker;
-    makeImageInteractive: (initialPosition: V, source: string, dimensions: V) => IImageMaker;
-    makeRectangleInteractive: (initialPosition: V) => IRectangleMaker;
-    makeTextboxInteractive: (initialPosition: V) => ITextboxMaker;
-    makeVideoInteractive: (initialPosition: V, source: string, dimension: V) => IVideoMaker;
-    completeInteractiveMake: (graphicId: string) => void;
+    createGraphic: (props: GraphicSerialized, render?: boolean, emit?: boolean) => IGraphicRenderer;
+    initInteractiveCreate: (graphicId: string, graphicType: GRAPHIC_TYPES) => IGraphicMaker;
+    endInteractiveCreate: (graphicId: string) => void;
     getGraphic: (graphicId: string) => IGraphicRenderer;
-    getGraphics: () => { [key: string]: IGraphicRenderer };
-    setGraphic: (graphic: IGraphicRenderer) => void;
+    getGraphics: () => Keyed<IGraphicRenderer>;
     removeGraphic: (graphicId: string) => void;
-    focusGraphic: (graphicId: string) => IGraphicMutator;
-    unfocusGraphic: (graphicId: string) => void;
+    focusGraphic: (graphicId: string, emit?: boolean) => IGraphicMutator;
+    unfocusGraphic: (graphicId: string, emit?: boolean) => void;
     unfocusAllGraphics: (exclude?: string[]) => void;
     isFocused: (graphicId: string) => boolean;
     markGraphic: (graphicId: string) => IGraphicMarker;
     unmarkGraphic: (graphicId: string) => void;
     isMarked: (graphicId: string) => boolean;
-    broadcastSetGraphic: (graphic: IGraphicRenderer) => void;
-    broadcastRemoveGraphic: (graphicId: string) => void;
-    setX: (graphicId: string, x: number) => void;
-    setY: (graphicId: string, y: number) => void;
-    setFillColor: (graphicId: string, fillColor: string) => void;
-    setStrokeColor: (graphicId: string, strokeColor: string) => void;
-    setStrokeWidth: (graphicId: string, strokeWidth: number) => void;
-    setWidth: (graphicId: string, width: number) => void;
-    setHeight: (graphicId: string, height: number) => void;
-    setRotation: (graphicId: string, rotation: number) => void;
-    setText: (graphicId: string, text: string) => void;
+    setProps: (graphicId: string, graphicType: GRAPHIC_TYPES, props: GraphicMutableSerialized, emit?: boolean) => void;
 };
 
 export type BoundingBoxMutatorHelpers = {

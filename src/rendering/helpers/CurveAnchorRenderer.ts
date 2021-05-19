@@ -1,4 +1,4 @@
-import { decorateCurveAnchorEvents } from '@/events/decorators/curve_anchor';
+import { decorateCurveAnchorEvents } from '@/events/decorators';
 import V from '@/utilities/Vector';
 import SVG from 'svg.js';
 import { CURVE_ANCHOR_ROLES, GRAPHIC_TYPES, ICurveAnchorRenderer, ISlideRenderer } from '../types';

@@ -11,11 +11,11 @@
 
 <script lang='ts'>
 import { defineComponent, PropType } from 'vue';
-import { RectangleStoreModel } from '@/store/types';
+import { RectangleSerialized } from '@/types';
 
 const SvgRect = defineComponent({
     props: {
-        target: { type: Object as PropType<RectangleStoreModel>, required: true }
+        target: { type: Object as PropType<RectangleSerialized>, required: true }
     },
     setup: props => {
         const style: { [key: string]: string } = {
@@ -28,10 +28,10 @@ const SvgRect = defineComponent({
         return {
             x: props.target.origin.x,
             y: props.target.origin.y,
-            width: props.target.width,
-            height: props.target.height,
+            width: props.target.dimensions.x,
+            height: props.target.dimensions.y,
             style: Object.keys(style).map(key => `${key}:${style[key]}`).join(';'),
-            transformOrigin: `${props.target.origin.x + props.target.width / 2}px ${props.target.origin.y + props.target.height / 2}px`
+            transformOrigin: `${props.target.origin.x + props.target.dimensions.x / 2}px ${props.target.origin.y + props.target.dimensions.y / 2}px`
         };
     }
 });

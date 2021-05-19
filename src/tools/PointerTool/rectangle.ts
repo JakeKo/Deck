@@ -1,34 +1,35 @@
 import { RectangleMouseEvent, RECTANGLE_EVENTS, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { listen, listenOnce, unlisten } from '@/events/utilities';
+import { listen, listenOnce, unlisten } from '@/events';
 import { RectangleMutator } from '@/rendering/mutators';
 import { resolvePosition } from '../utilities';
 
 export function moveRectangle(event: RectangleMouseEvent): void {
     const { slide, baseEvent, target } = event.detail;
-    if (!baseEvent.ctrlKey && !slide.isFocused(target.id)) {
-        slide.unfocusAllGraphics([target.id]);
+    const { id: graphicId, type: graphicType } = target;
+    if (!baseEvent.ctrlKey && !slide.isFocused(graphicId)) {
+        slide.unfocusAllGraphics([graphicId]);
     }
 
-    const mutator = slide.focusGraphic(target.id) as RectangleMutator;
-    const moveListener = mutator.moveListener(resolvePosition(baseEvent, slide), slide.getSnapVectors([target.id]));
-    slide.cursor = 'move';
-    slide.cursorLock = true;
+    // Initialize mutator move tracking
+    const mutator = slide.focusGraphic(graphicId) as RectangleMutator;
+    const moveListener = mutator.initMove(resolvePosition(baseEvent, slide));
+    slide.lockCursor('move');
 
-    listen(SLIDE_EVENTS.MOUSEMOVE, move);
-    listenOnce(SLIDE_EVENTS.MOUSEUP, complete);
+    listen(SLIDE_EVENTS.MOUSEMOVE, 'rectangle--move', move);
+    listenOnce(SLIDE_EVENTS.MOUSEUP, 'rectangle--complete', complete);
 
     function move(event: SlideMouseEvent): void {
-        moveListener(event);
-        slide.broadcastSetGraphic(mutator.target);
+        const deltas = moveListener(event);
+        slide.setProps(graphicId, graphicType, deltas);
     }
 
     function complete(event: SlideMouseEvent): void {
-        moveListener(event);
-        slide.broadcastSetGraphic(mutator.target);
-        slide.cursorLock = false;
-        slide.unrenderAllSnapVectors();
-        unlisten(SLIDE_EVENTS.MOUSEMOVE, move);
-        listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, moveRectangle);
+        move(event);
+        mutator.endMove();
+        slide.unlockCursor();
+
+        unlisten(SLIDE_EVENTS.MOUSEMOVE, 'rectangle--move');
+        listenOnce(RECTANGLE_EVENTS.MOUSEDOWN, 'rectangle--init-move', moveRectangle);
     }
 }
 
@@ -42,7 +43,7 @@ export function hoverRectangle(event: RectangleMouseEvent): void {
 
     slide.markGraphic(target.id);
 
-    listenOnce(RECTANGLE_EVENTS.MOUSEOUT, unmark);
+    listenOnce(RECTANGLE_EVENTS.MOUSEOUT, 'unmark', unmark);
     function unmark(): void {
         slide.unmarkGraphic(target.id);
     }

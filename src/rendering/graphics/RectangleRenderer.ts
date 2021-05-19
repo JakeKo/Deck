@@ -1,4 +1,5 @@
 import { decorateRectangleEvents } from '@/events/decorators';
+import { RectangleMutableSerialized } from '@/types';
 import SnapVector from '@/utilities/SnapVector';
 import { radToDeg } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
@@ -184,6 +185,51 @@ class RectangleRenderer implements IRectangleRenderer {
             .translate(this._origin.x, this._origin.y)
             .size(this._dimensions.x, this._dimensions.y)
             .rotate(radToDeg(this._rotation));
+    }
+
+    /**
+     * Updates the graphic with the new provided properties and updates the rendering if necessary.
+     */
+    public setProps({ origin, dimensions, fillColor, strokeColor, strokeWidth, rotation }: RectangleMutableSerialized): void {
+        if (origin !== undefined) {
+            if (origin.x) {
+                this._origin.x = origin.x;
+            }
+
+            if (origin.y) {
+                this._origin.y = origin.y;
+            }
+
+            this._svg && this._svg.rotate(0).translate(this.origin.x, this.origin.y).rotate(radToDeg(this._rotation));
+        }
+
+        if (dimensions !== undefined) {
+            if (dimensions.x) {
+                this._dimensions.x = dimensions.x;
+            }
+
+            if (dimensions.y) {
+                this._dimensions.y = dimensions.y;
+            }
+
+            this._svg && this._svg.size(this._dimensions.x, this._dimensions.y);
+        }
+
+        if (fillColor !== undefined) {
+            this._fillColor = fillColor;
+            this._svg && this._svg.fill(this._fillColor);
+        }
+
+        if (strokeColor !== undefined || strokeWidth !== undefined) {
+            this._strokeColor = strokeColor === undefined ? this._strokeColor : strokeColor;
+            this._strokeWidth = strokeWidth === undefined ? this._strokeWidth : strokeWidth;
+            this._svg && this._svg.stroke({ color: this._strokeColor, width: this._strokeWidth });
+        }
+
+        if (rotation !== undefined) {
+            this._rotation = rotation;
+            this._svg && this._svg.rotate(radToDeg(this._rotation));
+        }
     }
 
     public render(): void {

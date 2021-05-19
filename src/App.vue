@@ -22,6 +22,7 @@ import PresentationLayer from './components/Presentation/PresentationLayer.vue';
 import GraphicEditor from './components/GraphicEditor.vue';
 import { PointerTool } from './tools';
 import { createStore } from './store';
+import initStoreEventBus from './store/eventBus';
 import { defineComponent, computed, readonly, provide } from 'vue';
 import './styling/application.css';
 import { useStyle } from './components/generic/core';
@@ -60,6 +61,7 @@ const App = defineComponent({
         const store = createStore();
         store.mutations.setActiveTool(PointerTool());
         provide('store', store);
+        initStoreEventBus(store);
 
         const showPresentation = computed(() => store.state.showPresentation);
 
