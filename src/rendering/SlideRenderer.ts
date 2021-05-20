@@ -45,8 +45,8 @@ import {
 } from './mutators';
 import {
     GRAPHIC_TYPES,
-    IGraphicMaker,
     IGraphicCreator,
+    IGraphicHighlighter,
     IGraphicMutator,
     IGraphicRenderer,
     ISlideRenderer
@@ -62,10 +62,11 @@ class SlideRenderer implements ISlideRenderer {
     public slideId: string;
 
     protected cursorLock = false;
+    protected highlightLock = false;
     protected graphics: Keyed<IGraphicRenderer>;
     protected graphicsFocused: Keyed<IGraphicMutator>;
-    protected graphicsInMaking: Keyed<IGraphicMaker>;
-    protected graphicsHighlighted: Keyed<IGraphicCreator>;
+    protected graphicsInMaking: Keyed<IGraphicCreator>;
+    protected graphicsHighlighted: Keyed<IGraphicHighlighter>;
     protected snapVectors: SnapVector[];
 
     constructor({
@@ -232,9 +233,9 @@ class SlideRenderer implements ISlideRenderer {
         return graphic;
     }
 
-    public initInteractiveCreate(graphicId: string, graphicType: GRAPHIC_TYPES): IGraphicMaker {
+    public initInteractiveCreate(graphicId: string, graphicType: GRAPHIC_TYPES): IGraphicCreator {
         const props = { slide: this, scale: 1 / this.zoom, graphicId };
-        let creator: IGraphicMaker | undefined;
+        let creator: IGraphicCreator | undefined;
 
         if (graphicType === GRAPHIC_TYPES.CURVE) {
             creator = new CurveCreator(props);
@@ -271,8 +272,8 @@ class SlideRenderer implements ISlideRenderer {
         }
 
         // Technically, this should never happen since a graphic cannot be deleted without being focused
-        if (this.isMarked(graphicId)) {
-            this.unmarkGraphic(graphicId);
+        if (this.isHighlighted(graphicId)) {
+            this.unhighlightGraphic(graphicId);
         }
 
         this.graphics[graphicId].unrender();
@@ -292,8 +293,8 @@ class SlideRenderer implements ISlideRenderer {
             return this.graphicsFocused[graphicId];
         }
 
-        if (this.isMarked(graphicId)) {
-            this.unmarkGraphic(graphicId);
+        if (this.isHighlighted(graphicId)) {
+            this.unhighlightGraphic(graphicId);
         }
 
         const graphic = this.getGraphic(graphicId);
@@ -351,9 +352,13 @@ class SlideRenderer implements ISlideRenderer {
         return this.graphicsFocused[graphicId] !== undefined;
     }
 
-    public markGraphic(graphicId: string): IGraphicCreator {
-        if (this.isMarked(graphicId)) {
+    public highlightGraphic(graphicId: string): IGraphicHighlighter | undefined {
+        if (this.isHighlighted(graphicId)) {
             return this.graphicsHighlighted[graphicId];
+        }
+
+        if (this.highlightLock) {
+            return;
         }
 
         const graphic = this.getGraphic(graphicId);
@@ -379,13 +384,25 @@ class SlideRenderer implements ISlideRenderer {
         return this.graphicsHighlighted[graphicId];
     }
 
-    public unmarkGraphic(graphicId: string): void {
-        this.graphicsHighlighted[graphicId] && this.graphicsHighlighted[graphicId].unmark();
+    public unhighlightGraphic(graphicId: string): void {
+        if (this.highlightLock) {
+            return;
+        }
+
+        this.graphicsHighlighted[graphicId] && this.graphicsHighlighted[graphicId].unhighlight();
         delete this.graphicsHighlighted[graphicId];
     }
 
-    public isMarked(graphicId: string): boolean {
+    public isHighlighted(graphicId: string): boolean {
         return this.graphicsHighlighted[graphicId] !== undefined;
+    }
+
+    public lockHighlights(): void {
+        this.highlightLock = true;
+    }
+
+    public unlockHighlights(): void {
+        this.highlightLock = false;
     }
 
     public setProps(graphicId: string, graphicType: GRAPHIC_TYPES, props: GraphicMutableSerialized, emit = true): void {

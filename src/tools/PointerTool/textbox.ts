@@ -14,6 +14,7 @@ export function moveTextbox(event: TextboxMouseEvent): void {
     const mutator = slide.focusGraphic(graphicId) as TextboxMutator;
     const moveListener = mutator.initMove(resolvePosition(baseEvent, slide));
     slide.lockCursor('move');
+    slide.lockHighlights();
 
     listen(SLIDE_EVENTS.MOUSEMOVE, 'textbox--move', move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, 'textbox--complete', complete);
@@ -27,6 +28,7 @@ export function moveTextbox(event: TextboxMouseEvent): void {
         move(event);
         mutator.endMove();
         slide.unlockCursor();
+        slide.unlockHighlights();
 
         unlisten(SLIDE_EVENTS.MOUSEMOVE, 'textbox--move');
         listenOnce(TEXTBOX_EVENTS.MOUSEDOWN, 'textbox--init-move', moveTextbox);
@@ -40,10 +42,10 @@ export function hoverTextbox(event: TextboxMouseEvent): void {
         return;
     }
 
-    slide.markGraphic(target.id);
+    slide.highlightGraphic(target.id);
 
-    listenOnce(TEXTBOX_EVENTS.MOUSEOUT, 'unmark', unmark);
-    function unmark(): void {
-        slide.unmarkGraphic(target.id);
+    listenOnce(TEXTBOX_EVENTS.MOUSEOUT, 'unhighlight', unhighlight);
+    function unhighlight(): void {
+        slide.unhighlightGraphic(target.id);
     }
 }

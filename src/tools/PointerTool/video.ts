@@ -14,6 +14,7 @@ export function moveVideo(event: VideoMouseEvent): void {
     const mutator = slide.focusGraphic(graphicId) as VideoMutator;
     const moveListener = mutator.initMove(resolvePosition(baseEvent, slide));
     slide.lockCursor('move');
+    slide.lockHighlights();
 
     listen(SLIDE_EVENTS.MOUSEMOVE, 'video--move', move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, 'video--complete', complete);
@@ -27,6 +28,7 @@ export function moveVideo(event: VideoMouseEvent): void {
         move(event);
         mutator.endMove();
         slide.unlockCursor();
+        slide.unlockHighlights();
 
         unlisten(SLIDE_EVENTS.MOUSEMOVE, 'video--move');
         listenOnce(VIDEO_EVENTS.MOUSEDOWN, 'video--init-move', moveVideo);
@@ -40,10 +42,10 @@ export function hoverVideo(event: VideoMouseEvent): void {
         return;
     }
 
-    slide.markGraphic(target.id);
+    slide.highlightGraphic(target.id);
 
-    listenOnce(VIDEO_EVENTS.MOUSEOUT, 'unmark', unmark);
-    function unmark(): void {
-        slide.unmarkGraphic(target.id);
+    listenOnce(VIDEO_EVENTS.MOUSEOUT, 'unhighlight', unhighlight);
+    function unhighlight(): void {
+        slide.unhighlightGraphic(target.id);
     }
 }

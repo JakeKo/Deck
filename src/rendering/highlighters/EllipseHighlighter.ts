@@ -1,7 +1,7 @@
 import { EllipseOutlineRenderer } from '../helpers';
-import { IEllipseRenderer, IGraphicCreator, ISlideRenderer } from '../types';
+import { IEllipseRenderer, IGraphicHighlighter, ISlideRenderer } from '../types';
 
-class EllipseHighlighter implements IGraphicCreator {
+class EllipseHighlighter implements IGraphicHighlighter {
     protected helper: EllipseOutlineRenderer;
 
     constructor({
@@ -28,7 +28,7 @@ class EllipseHighlighter implements IGraphicCreator {
         this.helper.scale = scale;
     }
 
-    public unmark(): void {
+    public unhighlight(): void {
         this.helper.unrender();
     }
 }

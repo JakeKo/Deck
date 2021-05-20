@@ -1,7 +1,7 @@
 import { RectangleOutlineRenderer } from '../helpers';
-import { IGraphicCreator, ISlideRenderer, ITextboxRenderer } from '../types';
+import { IGraphicHighlighter, ISlideRenderer, ITextboxRenderer } from '../types';
 
-class TextboxHighlighter implements IGraphicCreator {
+class TextboxHighlighter implements IGraphicHighlighter {
     protected helper: RectangleOutlineRenderer;
 
     constructor({
@@ -28,7 +28,7 @@ class TextboxHighlighter implements IGraphicCreator {
         this.helper.scale = scale;
     }
 
-    public unmark(): void {
+    public unhighlight(): void {
         this.helper.unrender();
     }
 }

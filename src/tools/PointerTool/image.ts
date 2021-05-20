@@ -14,6 +14,7 @@ export function moveImage(event: ImageMouseEvent): void {
     const mutator = slide.focusGraphic(graphicId) as ImageMutator;
     const moveListener = mutator.initMove(resolvePosition(baseEvent, slide));
     slide.lockCursor('move');
+    slide.lockHighlights();
 
     listen(SLIDE_EVENTS.MOUSEMOVE, 'image--move', move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, 'image--complete', complete);
@@ -27,6 +28,7 @@ export function moveImage(event: ImageMouseEvent): void {
         move(event);
         mutator.endMove();
         slide.unlockCursor();
+        slide.unlockHighlights();
 
         unlisten(SLIDE_EVENTS.MOUSEMOVE, 'image--move');
         listenOnce(IMAGE_EVENTS.MOUSEDOWN, 'image--init-move', moveImage);
@@ -40,10 +42,10 @@ export function hoverImage(event: ImageMouseEvent): void {
         return;
     }
 
-    slide.markGraphic(target.id);
+    slide.highlightGraphic(target.id);
 
-    listenOnce(IMAGE_EVENTS.MOUSEOUT, 'unmark', unmark);
-    function unmark(): void {
-        slide.unmarkGraphic(target.id);
+    listenOnce(IMAGE_EVENTS.MOUSEOUT, 'unhighlight', unhighlight);
+    function unhighlight(): void {
+        slide.unhighlightGraphic(target.id);
     }
 }
