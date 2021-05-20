@@ -1,7 +1,7 @@
 import { CurveOutlineRenderer } from '../helpers';
-import { ICurveRenderer, IGraphicCreator, ISlideRenderer } from '../types';
+import { ICurveRenderer, IGraphicHighlighter, ISlideRenderer } from '../types';
 
-class CurveHighlighter implements IGraphicCreator {
+class CurveHighlighter implements IGraphicHighlighter {
     protected helper: CurveOutlineRenderer;
 
     constructor({
@@ -27,7 +27,7 @@ class CurveHighlighter implements IGraphicCreator {
         this.helper.scale = scale;
     }
 
-    public unmark(): void {
+    public unhighlight(): void {
         this.helper.unrender();
     }
 }

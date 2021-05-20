@@ -14,6 +14,7 @@ export function moveCurve(event: CurveMouseEvent): void {
     const mutator = slide.focusGraphic(graphicId) as CurveMutator;
     const moveListener = mutator.initMove(resolvePosition(baseEvent, slide));
     slide.lockCursor('move');
+    slide.lockHighlights();
 
     listen(SLIDE_EVENTS.MOUSEMOVE, 'curve--move', move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, 'curve--complete', complete);
@@ -27,6 +28,7 @@ export function moveCurve(event: CurveMouseEvent): void {
         move(event);
         mutator.endMove();
         slide.unlockCursor();
+        slide.unlockHighlights();
 
         unlisten(SLIDE_EVENTS.MOUSEMOVE, 'curve--move');
         listenOnce(CURVE_EVENTS.MOUSEDOWN, 'curve--init-move', moveCurve);
@@ -42,6 +44,7 @@ export function moveCurveAnchor(event: CurveAnchorMouseEvent): void {
     // Handler cannot be instantiated immediately during each move event
     const anchorListener = mutator.initAnchorMove(index, role);
     slide.lockCursor('grabbing');
+    slide.lockHighlights();
 
     listen(SLIDE_EVENTS.MOUSEMOVE, 'curve-anchor--move', move);
     listenOnce(SLIDE_EVENTS.MOUSEUP, 'curve-anchor--complete', complete);
@@ -55,6 +58,7 @@ export function moveCurveAnchor(event: CurveAnchorMouseEvent): void {
         move(event);
         mutator.endAnchorMove();
         slide.unlockCursor('grab');
+        slide.unlockHighlights();
 
         unlisten(SLIDE_EVENTS.MOUSEMOVE, 'curve-anchor--move');
         listenOnce(CURVE_ANCHOR_EVENTS.MOUSEDOWN, 'curve-anchor--init-move', moveCurveAnchor);
@@ -68,10 +72,10 @@ export function hoverCurve(event: CurveMouseEvent): void {
         return;
     }
 
-    slide.markGraphic(target.id);
+    slide.highlightGraphic(target.id);
 
-    listenOnce(CURVE_EVENTS.MOUSEOUT, 'unmark', unmark);
-    function unmark(): void {
-        slide.unmarkGraphic(target.id);
+    listenOnce(CURVE_EVENTS.MOUSEOUT, 'unhighlight', unhighlight);
+    function unhighlight(): void {
+        slide.unhighlightGraphic(target.id);
     }
 }

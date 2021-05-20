@@ -1,7 +1,7 @@
 import { RectangleOutlineRenderer } from '../helpers';
-import { IGraphicCreator, IImageRenderer, ISlideRenderer } from '../types';
+import { IGraphicHighlighter, IImageRenderer, ISlideRenderer } from '../types';
 
-class ImageHighlighter implements IGraphicCreator {
+class ImageHighlighter implements IGraphicHighlighter {
     protected helper: RectangleOutlineRenderer;
 
     constructor({
@@ -28,7 +28,7 @@ class ImageHighlighter implements IGraphicCreator {
         this.helper.scale = scale;
     }
 
-    public unmark(): void {
+    public unhighlight(): void {
         this.helper.unrender();
     }
 }

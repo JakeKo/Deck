@@ -180,7 +180,7 @@ export type IVertexRenderer = BaseHelperRenderer & {
     center: V;
 }
 
-export type IGraphicMaker = ICurveCreator
+export type IGraphicCreator = ICurveCreator
     | IEllipseCreator
     | IImageCreator
     | IRectangleCreator
@@ -233,9 +233,9 @@ export type IVideoCreator = IGraphicCreatorBase & {
     endResize: () => void;
 };
 
-export type IGraphicCreator = {
+export type IGraphicHighlighter = {
     scale: number;
-    unmark: () => void;
+    unhighlight: () => void;
 };
 
 export type IGraphicMutator = ICurveMutator
@@ -286,7 +286,7 @@ export type ISlideRenderer = {
     unlockCursor: (cursor?: string) => void;
     getSnapVectors: (exclude: string[]) => SnapVector[];
     createGraphic: (props: GraphicSerialized, render?: boolean, emit?: boolean) => IGraphicRenderer;
-    initInteractiveCreate: (graphicId: string, graphicType: GRAPHIC_TYPES) => IGraphicMaker;
+    initInteractiveCreate: (graphicId: string, graphicType: GRAPHIC_TYPES) => IGraphicCreator;
     endInteractiveCreate: (graphicId: string) => void;
     getGraphic: (graphicId: string) => IGraphicRenderer;
     removeGraphic: (graphicId: string, emit?: boolean) => void;
@@ -294,9 +294,11 @@ export type ISlideRenderer = {
     unfocusGraphic: (graphicId: string, emit?: boolean) => void;
     unfocusAllGraphics: (exclude?: string[]) => void;
     isFocused: (graphicId: string) => boolean;
-    markGraphic: (graphicId: string) => IGraphicCreator;
-    unmarkGraphic: (graphicId: string) => void;
-    isMarked: (graphicId: string) => boolean;
+    highlightGraphic: (graphicId: string) => IGraphicHighlighter | undefined;
+    unhighlightGraphic: (graphicId: string) => void;
+    isHighlighted: (graphicId: string) => boolean;
+    lockHighlights: () => void;
+    unlockHighlights: () => void;
     setProps: (graphicId: string, graphicType: GRAPHIC_TYPES, props: GraphicMutableSerialized, emit?: boolean) => void;
 };
 
