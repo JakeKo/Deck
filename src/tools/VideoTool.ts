@@ -1,6 +1,6 @@
 import { listen, listenOnce, unlisten } from '@/events';
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { GRAPHIC_TYPES, IVideoMaker } from '@/rendering/types';
+import { GRAPHIC_TYPES, IVideoCreator } from '@/rendering/types';
 import { AppStore } from '@/store/types';
 import { provideId } from '@/utilities/IdProvider';
 import V from '@/utilities/Vector';
@@ -13,7 +13,7 @@ export default (store: AppStore): EditorTool => {
         return function make(event) {
             const { slide, baseEvent } = event.detail;
             const graphicId = provideId();
-            const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.VIDEO) as IVideoMaker;
+            const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.VIDEO) as IVideoCreator;
             slide.createGraphic(maker.create({ source: videoSource, dimensions }));
 
             let lastMouseEvent = event;

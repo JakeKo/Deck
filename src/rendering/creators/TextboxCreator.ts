@@ -4,9 +4,9 @@ import { TextboxMutableSerialized, TextboxSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
-import { IRectangleOutlineRenderer, ISlideRenderer, ITextboxMaker, ITextboxRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { IRectangleOutlineRenderer, ISlideRenderer, ITextboxCreator, ITextboxRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class TextboxCreator implements ITextboxMaker {
+class TextboxCreator implements ITextboxCreator {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;

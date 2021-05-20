@@ -1,6 +1,6 @@
 import { listen, listenOnce, unlisten } from '@/events';
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { GRAPHIC_TYPES, ICurveMaker } from '@/rendering/types';
+import { GRAPHIC_TYPES, ICurveCreator } from '@/rendering/types';
 import { AppStore } from '@/store/types';
 import { provideId } from '@/utilities/IdProvider';
 import { PointerTool } from '.';
@@ -10,7 +10,7 @@ export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide } = event.detail;
         const graphicId = provideId();
-        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.CURVE) as ICurveMaker;
+        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.CURVE) as ICurveCreator;
         slide.createGraphic(maker.create({}));
         slide.setProps(graphicId, GRAPHIC_TYPES.CURVE, maker.addAnchor(event));
 

@@ -4,9 +4,9 @@ import { ImageMutableSerialized, ImageSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
-import { IImageMaker, IImageRenderer, IRectangleOutlineRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { IImageCreator, IImageRenderer, IRectangleOutlineRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class ImageCreator implements IImageMaker {
+class ImageCreator implements IImageCreator {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;

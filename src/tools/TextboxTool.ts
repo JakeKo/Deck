@@ -1,6 +1,6 @@
 import { listen, listenOnce, unlisten } from '@/events';
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { GRAPHIC_TYPES, ITextboxMaker } from '@/rendering/types';
+import { GRAPHIC_TYPES, ITextboxCreator } from '@/rendering/types';
 import { AppStore } from '@/store/types';
 import { provideId } from '@/utilities/IdProvider';
 import { PointerTool } from '.';
@@ -11,7 +11,7 @@ export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
         const graphicId = provideId();
-        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.TEXTBOX) as ITextboxMaker;
+        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.TEXTBOX) as ITextboxCreator;
         slide.createGraphic(maker.create({}));
 
         let lastMouseEvent = event;

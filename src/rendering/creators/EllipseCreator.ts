@@ -4,9 +4,9 @@ import { EllipseMutableSerialized, EllipseSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { EllipseOutlineRenderer, VertexRenderer } from '../helpers';
-import { IEllipseMaker, IEllipseOutlineRenderer, IEllipseRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { IEllipseCreator, IEllipseOutlineRenderer, IEllipseRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class EllipseCreator implements IEllipseMaker {
+class EllipseCreator implements IEllipseCreator {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IEllipseOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;

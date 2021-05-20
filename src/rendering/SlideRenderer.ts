@@ -28,13 +28,13 @@ import {
     VideoCreator
 } from './creators';
 import {
-    CurveMarker,
-    EllipseMarker,
-    ImageMarker,
-    RectangleMarker,
-    TextboxMarker,
-    VideoMarker
-} from './markers';
+    CurveHighlighter,
+    EllipseHighlighter,
+    ImageHighlighter,
+    RectangleHighlighter,
+    TextboxHighlighter,
+    VideoHighlighter
+} from './highlighters';
 import {
     CurveMutator,
     EllipseMutator,
@@ -46,7 +46,7 @@ import {
 import {
     GRAPHIC_TYPES,
     IGraphicMaker,
-    IGraphicMarker,
+    IGraphicCreator,
     IGraphicMutator,
     IGraphicRenderer,
     ISlideRenderer
@@ -65,7 +65,7 @@ class SlideRenderer implements ISlideRenderer {
     protected graphics: Keyed<IGraphicRenderer>;
     protected graphicsFocused: Keyed<IGraphicMutator>;
     protected graphicsInMaking: Keyed<IGraphicMaker>;
-    protected graphicsHighlighted: Keyed<IGraphicMarker>;
+    protected graphicsHighlighted: Keyed<IGraphicCreator>;
     protected snapVectors: SnapVector[];
 
     constructor({
@@ -351,7 +351,7 @@ class SlideRenderer implements ISlideRenderer {
         return this.graphicsFocused[graphicId] !== undefined;
     }
 
-    public markGraphic(graphicId: string): IGraphicMarker {
+    public markGraphic(graphicId: string): IGraphicCreator {
         if (this.isMarked(graphicId)) {
             return this.graphicsHighlighted[graphicId];
         }
@@ -360,17 +360,17 @@ class SlideRenderer implements ISlideRenderer {
         let marker;
 
         if (graphic.type === CURVE) {
-            marker = new CurveMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new CurveHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === ELLIPSE) {
-            marker = new EllipseMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new EllipseHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === IMAGE) {
-            marker = new ImageMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new ImageHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === RECTANGLE) {
-            marker = new RectangleMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new RectangleHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === TEXTBOX) {
-            marker = new TextboxMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new TextboxHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === VIDEO) {
-            marker = new VideoMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new VideoHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }

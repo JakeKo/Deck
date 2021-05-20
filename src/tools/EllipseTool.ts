@@ -1,6 +1,6 @@
 import { listen, listenOnce, unlisten } from '@/events';
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { GRAPHIC_TYPES, IEllipseMaker } from '@/rendering/types';
+import { GRAPHIC_TYPES, IEllipseCreator } from '@/rendering/types';
 import { AppStore } from '@/store/types';
 import { provideId } from '@/utilities/IdProvider';
 import { PointerTool } from '.';
@@ -11,7 +11,7 @@ export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
         const graphicId = provideId();
-        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.ELLIPSE) as IEllipseMaker;
+        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.ELLIPSE) as IEllipseCreator;
         slide.createGraphic(maker.create({}));
 
         let lastMouseEvent = event;

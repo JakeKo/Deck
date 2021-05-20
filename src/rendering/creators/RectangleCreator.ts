@@ -4,9 +4,9 @@ import { RectangleMutableSerialized, RectangleSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
-import { IRectangleMaker, IRectangleOutlineRenderer, IRectangleRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { IRectangleCreator, IRectangleOutlineRenderer, IRectangleRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class RectangleCreator implements IRectangleMaker {
+class RectangleCreator implements IRectangleCreator {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;

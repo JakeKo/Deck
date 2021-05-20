@@ -4,9 +4,9 @@ import { VideoMutableSerialized, VideoSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
-import { IRectangleOutlineRenderer, ISlideRenderer, IVertexRenderer, IVideoMaker, IVideoRenderer, VERTEX_ROLES } from '../types';
+import { IRectangleOutlineRenderer, ISlideRenderer, IVertexRenderer, IVideoCreator, IVideoRenderer, VERTEX_ROLES } from '../types';
 
-class VideoCreator implements IVideoMaker {
+class VideoCreator implements IVideoCreator {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;
