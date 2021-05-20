@@ -127,19 +127,27 @@ class ImageRenderer implements IImageRenderer {
 
     public get transformedSnapVectors(): SnapVector[] {
         const box = this.transformedBox;
+        const topLeft = box.topLeft;
         const topCenter = box.topLeft.add(box.topLeft.towards(box.topRight).scale(0.5));
-        const leftCenter = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
+        const topRight = box.topRight;
+        const rightCenter = box.topRight.add(box.topRight.towards(box.bottomRight).scale(0.5));
+        const bottomRight = box.bottomRight;
         const bottomCenter = box.bottomRight.add(box.bottomRight.towards(box.bottomLeft).scale(0.5));
-        const rightCenter = box.bottomLeft.add(box.bottomLeft.towards(box.topLeft).scale(0.5));
+        const bottomLeft = box.bottomLeft;
+        const leftCenter = box.bottomLeft.add(box.bottomLeft.towards(box.topLeft).scale(0.5));
 
-        return [
-            new SnapVector(topCenter, V.east.rotate(box.rotation)),
-            new SnapVector(leftCenter, V.north.rotate(box.rotation)),
-            new SnapVector(bottomCenter, V.east.rotate(box.rotation)),
-            new SnapVector(rightCenter, V.north.rotate(box.rotation)),
-            new SnapVector(box.center, V.east.rotate(-box.rotation)),
-            new SnapVector(box.center, V.north.rotate(-box.rotation))
-        ];
+        return [V.north, V.east]
+            .map(direction => direction.rotate(box.rotation))
+            .flatMap(direction => [
+                new SnapVector(topLeft, direction),
+                new SnapVector(topCenter, direction),
+                new SnapVector(topRight, direction),
+                new SnapVector(rightCenter, direction),
+                new SnapVector(bottomRight, direction),
+                new SnapVector(bottomCenter, direction),
+                new SnapVector(bottomLeft, direction),
+                new SnapVector(leftCenter, direction)
+            ]);
     }
 
     public setOriginAndDimensions(origin: V, dimensions: V): void {
