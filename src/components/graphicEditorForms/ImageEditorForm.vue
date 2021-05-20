@@ -42,7 +42,7 @@
 </template>
 
 <script lang='ts'>
-import { degToRad, radToDeg } from '@/utilities/utilities';
+import { degToRad, radToDeg, round } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
@@ -75,19 +75,19 @@ const ImageEditorForm = defineComponent({
         });
 
         const x = computed({
-            get: () => props.image.origin.x,
+            get: () => round(props.image.origin.x, 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.image.id, GRAPHIC_TYPES.IMAGE, { origin: { x: value } });
             }
         });
         const y = computed({
-            get: () => props.image.origin.y,
+            get: () => round(props.image.origin.y, 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.image.id, GRAPHIC_TYPES.IMAGE, { origin: { y: value } });
             }
         });
         const width = computed({
-            get: () => props.image.dimensions.x,
+            get: () => round(props.image.dimensions.x, 1E-3),
             set: value => {
                 const height = value * props.image.dimensions.y / props.image.dimensions.x;
                 const newOrigin = correctForRotationWhenChangingDimensions({
@@ -110,7 +110,7 @@ const ImageEditorForm = defineComponent({
             }
         });
         const height = computed({
-            get: () => props.image.dimensions.y,
+            get: () => round(props.image.dimensions.y, 1E-3),
             set: value => {
                 const width = value * props.image.dimensions.x / props.image.dimensions.y;
                 const newOrigin = correctForRotationWhenChangingDimensions({
@@ -133,7 +133,7 @@ const ImageEditorForm = defineComponent({
             }
         });
         const rotation = computed({
-            get: () => radToDeg(props.image.rotation),
+            get: () => round(radToDeg(props.image.rotation), 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.image.id, GRAPHIC_TYPES.IMAGE, { rotation: degToRad(value) });
             }

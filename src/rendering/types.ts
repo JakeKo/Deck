@@ -9,7 +9,6 @@ import {
     GraphicSerialized,
     ImageMutableSerialized,
     ImageSerialized,
-    Keyed,
     RectangleMutableSerialized,
     RectangleSerialized,
     TextboxMutableSerialized,
@@ -181,19 +180,19 @@ export type IVertexRenderer = BaseHelperRenderer & {
     center: V;
 }
 
-export type IGraphicMaker = ICurveMaker
-    | IEllipseMaker
-    | IImageMaker
-    | IRectangleMaker
-    | ITextboxMaker
-    | IVideoMaker;
+export type IGraphicMaker = ICurveCreator
+    | IEllipseCreator
+    | IImageCreator
+    | IRectangleCreator
+    | ITextboxCreator
+    | IVideoCreator;
 
-export type IGraphicMakerBase = {
+export type IGraphicCreatorBase = {
     scale: number;
     updateHelpers: () => void;
 };
 
-export type ICurveMaker = IGraphicMakerBase & {
+export type ICurveCreator = IGraphicCreatorBase & {
     create: (props: CurveMutableSerialized) => CurveSerialized;
     initDraw: () => (event: SlideMouseEvent) => CurveMutableSerialized;
     endDraw: () => CurveMutableSerialized;
@@ -202,39 +201,39 @@ export type ICurveMaker = IGraphicMakerBase & {
     endCreateAnchor: () => void;
 };
 
-// ICurveMaker _doesn't_ have a "resize" operation.
-// Resize methods _must_ be specified at the individual type instead of at IGraphicMakerBase.
-export type IEllipseMaker = IGraphicMakerBase & {
+// ICurveCreator _doesn't_ have a "resize" operation.
+// Resize methods _must_ be specified at the individual type instead of at IGraphicCreatorBase.
+export type IEllipseCreator = IGraphicCreatorBase & {
     create: (props: EllipseMutableSerialized) => EllipseSerialized;
     initResize: (basePoint: V) => (event: SlideMouseEvent) => EllipseMutableSerialized;
     endResize: () => void;
 };
 
-export type IImageMaker = IGraphicMakerBase & {
+export type IImageCreator = IGraphicCreatorBase & {
     create: (props: ImageMutableSerialized & Pick<ImageSerialized, 'source' | 'dimensions'>) => ImageSerialized;
     initResize: (basePoint: V) => (event: SlideMouseEvent) => ImageMutableSerialized;
     endResize: () => void;
 };
 
-export type IRectangleMaker = IGraphicMakerBase & {
+export type IRectangleCreator = IGraphicCreatorBase & {
     create: (props: RectangleMutableSerialized) => RectangleSerialized;
     initResize: (basePoint: V) => (event: SlideMouseEvent) => RectangleMutableSerialized;
     endResize: () => void;
 };
 
-export type ITextboxMaker = IGraphicMakerBase & {
+export type ITextboxCreator = IGraphicCreatorBase & {
     create: (props: TextboxMutableSerialized) => TextboxSerialized;
     initResize: (basePoint: V) => (event: SlideMouseEvent) => TextboxMutableSerialized;
     endResize: () => void;
 };
 
-export type IVideoMaker = IGraphicMakerBase & {
+export type IVideoCreator = IGraphicCreatorBase & {
     create: (props: VideoMutableSerialized & Pick<VideoSerialized, 'source' | 'dimensions'>) => VideoSerialized;
     initResize: (basePoint: V) => (event: SlideMouseEvent) => VideoMutableSerialized;
     endResize: () => void;
 };
 
-export type IGraphicMarker = {
+export type IGraphicCreator = {
     scale: number;
     unmark: () => void;
 };
@@ -282,8 +281,7 @@ export type ISlideRenderer = {
     readonly rawViewbox: Viewbox;
     readonly zoom: number;
     readonly bounds: { origin: V; dimensions: V };
-    cursor: string;
-    cursorLock: boolean;
+    setCursor: (cursor: string) => void;
     lockCursor: (cursor: string) => void;
     unlockCursor: (cursor?: string) => void;
     getSnapVectors: (exclude: string[]) => SnapVector[];
@@ -291,13 +289,12 @@ export type ISlideRenderer = {
     initInteractiveCreate: (graphicId: string, graphicType: GRAPHIC_TYPES) => IGraphicMaker;
     endInteractiveCreate: (graphicId: string) => void;
     getGraphic: (graphicId: string) => IGraphicRenderer;
-    getGraphics: () => Keyed<IGraphicRenderer>;
-    removeGraphic: (graphicId: string) => void;
+    removeGraphic: (graphicId: string, emit?: boolean) => void;
     focusGraphic: (graphicId: string, emit?: boolean) => IGraphicMutator;
     unfocusGraphic: (graphicId: string, emit?: boolean) => void;
     unfocusAllGraphics: (exclude?: string[]) => void;
     isFocused: (graphicId: string) => boolean;
-    markGraphic: (graphicId: string) => IGraphicMarker;
+    markGraphic: (graphicId: string) => IGraphicCreator;
     unmarkGraphic: (graphicId: string) => void;
     isMarked: (graphicId: string) => boolean;
     setProps: (graphicId: string, graphicType: GRAPHIC_TYPES, props: GraphicMutableSerialized, emit?: boolean) => void;

@@ -75,7 +75,7 @@ import V from '@/utilities/Vector';
 import { computed, defineComponent, PropType, reactive, ref } from 'vue';
 import DeckComponent from '../generic/DeckComponent';
 import { ColorField, NumberField, ToggleField } from '../Core/Forms';
-import { degToRad, radToDeg } from '@/utilities/utilities';
+import { degToRad, radToDeg, round } from '@/utilities/utilities';
 import { correctForRotationWhenChangingDimensions } from './utilities';
 import { RectangleSerialized } from '@/types';
 import { GRAPHIC_TYPES } from '@/rendering/types';
@@ -107,19 +107,19 @@ const RectangleEditorForm = defineComponent({
 
         const lockAspectRatio = ref(false);
         const x = computed({
-            get: () => props.rectangle.origin.x,
+            get: () => round(props.rectangle.origin.x, 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.rectangle.id, GRAPHIC_TYPES.RECTANGLE, { origin: { x: value } });
             }
         });
         const y = computed({
-            get: () => props.rectangle.origin.y,
+            get: () => round(props.rectangle.origin.y, 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.rectangle.id, GRAPHIC_TYPES.RECTANGLE, { origin: { y: value } });
             }
         });
         const width = computed({
-            get: () => props.rectangle.dimensions.x,
+            get: () => round(props.rectangle.dimensions.x, 1E-3),
             set: value => {
                 const height = lockAspectRatio.value
                     ? value * props.rectangle.dimensions.y / props.rectangle.dimensions.x
@@ -144,7 +144,7 @@ const RectangleEditorForm = defineComponent({
             }
         });
         const height = computed({
-            get: () => props.rectangle.dimensions.y,
+            get: () => round(props.rectangle.dimensions.y, 1E-3),
             set: value => {
                 const width = lockAspectRatio.value
                     ? value * props.rectangle.dimensions.x / props.rectangle.dimensions.y
@@ -169,13 +169,13 @@ const RectangleEditorForm = defineComponent({
             }
         });
         const rotation = computed({
-            get: () => radToDeg(props.rectangle.rotation),
+            get: () => round(radToDeg(props.rectangle.rotation), 1E-3),
             set: value => {
                 store.mutations.setProps(props.slideId, props.rectangle.id, GRAPHIC_TYPES.RECTANGLE, { rotation: degToRad(value) });
             }
         });
         const strokeWidth = computed({
-            get: () => props.rectangle.strokeWidth,
+            get: () => round(props.rectangle.strokeWidth),
             set: value => {
                 store.mutations.setProps(props.slideId, props.rectangle.id, GRAPHIC_TYPES.RECTANGLE, { strokeWidth: value });
             }

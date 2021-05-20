@@ -1,6 +1,6 @@
 import { listen, listenOnce, unlisten } from '@/events';
 import { SlideKeyboardEvent, SlideMouseEvent, SLIDE_EVENTS } from '@/events/types';
-import { GRAPHIC_TYPES, IRectangleMaker } from '@/rendering/types';
+import { GRAPHIC_TYPES, IRectangleCreator } from '@/rendering/types';
 import { AppStore } from '@/store/types';
 import { provideId } from '@/utilities/IdProvider';
 import { PointerTool } from '.';
@@ -11,7 +11,7 @@ export default (store: AppStore): EditorTool => {
     function make(event: SlideMouseEvent): void {
         const { slide, baseEvent } = event.detail;
         const graphicId = provideId();
-        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.RECTANGLE) as IRectangleMaker;
+        const maker = slide.initInteractiveCreate(graphicId, GRAPHIC_TYPES.RECTANGLE) as IRectangleCreator;
         slide.createGraphic(maker.create({}));
 
         let lastMouseEvent = event;

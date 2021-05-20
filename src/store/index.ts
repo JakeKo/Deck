@@ -1,5 +1,5 @@
 import { dispatch } from '@/events';
-import { GraphicCreatedPayload, GraphicFocusedPayload, GraphicUnfocusedPayload, GraphicUpdatedPayload, GRAPHIC_EVENT_CODES } from '@/events/types';
+import { GraphicCreatedPayload, GraphicDeletedPayload, GraphicFocusedPayload, GraphicUnfocusedPayload, GraphicUpdatedPayload, GRAPHIC_EVENT_CODES } from '@/events/types';
 import { GRAPHIC_TYPES } from '@/rendering/types';
 import { themes } from '@/styling';
 import { THEMES } from '@/styling/types';
@@ -74,7 +74,7 @@ const propSetters = {
             graphic.fillColor = props.fillColor;
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
 
@@ -99,7 +99,7 @@ const propSetters = {
             graphic.fillColor = props.fillColor;
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
 
@@ -120,7 +120,7 @@ const propSetters = {
             setVector(props.dimensions, graphic.dimensions);
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
     },
@@ -137,7 +137,7 @@ const propSetters = {
             graphic.fillColor = props.fillColor;
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
 
@@ -158,7 +158,7 @@ const propSetters = {
             setVector(props.dimensions, graphic.dimensions);
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
 
@@ -187,7 +187,7 @@ const propSetters = {
             setVector(props.dimensions, graphic.dimensions);
         }
 
-        if (props.rotation) {
+        if (props.rotation !== undefined) {
             graphic.rotation = props.rotation;
         }
 
@@ -350,10 +350,18 @@ function createStore(): AppStore {
                 });
             }
         },
-        removeGraphic: (slideId, graphicId) => {
+        removeGraphic: (slideId, graphicId, emit = true) => {
             const slide = getSlide(state, slideId);
             if (slide !== undefined) {
                 delete slide.graphics[graphicId];
+            }
+
+            if (emit) {
+                dispatch<GraphicDeletedPayload>(GRAPHIC_EVENT_CODES.DELETED, {
+                    publisherId: state.eventPublisherId,
+                    slideId,
+                    graphicId
+                });
             }
         },
         setTheme: theme => {

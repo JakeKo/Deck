@@ -22,3 +22,15 @@ export function radToDeg(radians: number): number {
 export function degToRad(degrees: number): number {
     return degrees * Math.PI / 180;
 }
+
+/**
+ * Rounds the provided value to the nearest step.
+ */
+export function round(value: number, step = 1.0) {
+    if (Math.abs(value) < step) {
+        return 0;
+    }
+
+    const inverse = 1.0 / step;
+    return Math.round(value * inverse) / inverse;
+}

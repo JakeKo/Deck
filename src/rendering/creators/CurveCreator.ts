@@ -3,9 +3,9 @@ import { resolvePosition } from '@/tools/utilities';
 import { CurveMutableSerialized, CurveSerialized } from '@/types';
 import V from '@/utilities/Vector';
 import { CurveAnchorRenderer } from '../helpers';
-import { ICurveAnchorRenderer, ICurveMaker, ICurveRenderer, ISlideRenderer } from '../types';
+import { ICurveAnchorRenderer, ICurveCreator, ICurveRenderer, ISlideRenderer } from '../types';
 
-class CurveMaker implements ICurveMaker {
+class CurveCreator implements ICurveCreator {
     // TODO: Add a trail prop to track anchor points along the curve
     protected helpers: ({ anchor: ICurveAnchorRenderer }) | undefined;
     protected graphicId: string;
@@ -211,4 +211,4 @@ class CurveMaker implements ICurveMaker {
     }
 }
 
-export default CurveMaker;
+export default CurveCreator;

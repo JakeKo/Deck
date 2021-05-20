@@ -1,13 +1,13 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
-import { RectangleMutableSerialized, RectangleSerialized } from '@/types';
+import { EllipseMutableSerialized, EllipseSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
-import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
-import { IRectangleMaker, IRectangleOutlineRenderer, IRectangleRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { EllipseOutlineRenderer, VertexRenderer } from '../helpers';
+import { IEllipseCreator, IEllipseOutlineRenderer, IEllipseRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class RectangleMaker implements IRectangleMaker {
-    protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
+class EllipseCreator implements IEllipseCreator {
+    protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IEllipseOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;
     protected isResizing: boolean;
@@ -30,8 +30,8 @@ class RectangleMaker implements IRectangleMaker {
         this.helpersScale = scale;
     }
 
-    protected get graphic(): IRectangleRenderer {
-        return this.slide.getGraphic(this.graphicId) as IRectangleRenderer;
+    protected get graphic(): IEllipseRenderer {
+        return this.slide.getGraphic(this.graphicId) as IEllipseRenderer;
     }
 
     public set scale(scale: number) {
@@ -55,12 +55,13 @@ class RectangleMaker implements IRectangleMaker {
         }
 
         if (this.helpers) {
-            const { origin, dimensions } = this.graphic;
-            this.helpers[VERTEX_ROLES.TOP_LEFT].center = origin;
-            this.helpers[VERTEX_ROLES.TOP_RIGHT].center = origin.addX(dimensions.x);
-            this.helpers[VERTEX_ROLES.BOTTOM_LEFT].center = origin.addY(dimensions.y);
-            this.helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = origin.add(dimensions);
-            this.helpers.outline.origin = origin;
+            const { center, dimensions } = this.graphic;
+            const radius = dimensions.scale(0.5);
+            this.helpers[VERTEX_ROLES.TOP_LEFT].center = center.add(radius.neg);
+            this.helpers[VERTEX_ROLES.TOP_RIGHT].center = center.add(radius.signAs(V.southeast));
+            this.helpers[VERTEX_ROLES.BOTTOM_LEFT].center = center.add(radius);
+            this.helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = center.add(radius.signAs(V.northwest));
+            this.helpers.outline.center = center;
             this.helpers.outline.dimensions = dimensions;
         }
     }
@@ -68,7 +69,7 @@ class RectangleMaker implements IRectangleMaker {
     /**
      * Creates a serialized form of the target graphic given the provided props.
      */
-    public create(props: RectangleMutableSerialized): RectangleSerialized {
+    public create(props: EllipseMutableSerialized): EllipseSerialized {
         if (this.isCreated) {
             throw new Error(`Graphic with id ${this.graphicId} already created`);
         }
@@ -76,52 +77,52 @@ class RectangleMaker implements IRectangleMaker {
         this.isCreated = true;
         const graphic = {
             id: this.graphicId,
-            type: 'rectangle',
-            origin: new V(props.origin?.x ?? 0, props.origin?.y ?? 0),
+            type: 'ellipse',
+            center: new V(props.center?.x ?? 0, props.center?.y ?? 0),
             dimensions: new V(props.dimensions?.x ?? 0, props.dimensions?.y ?? 0),
             fillColor: props.fillColor ?? '#CCCCCC',
             strokeColor: props.strokeColor ?? 'none',
             strokeWidth: props.strokeWidth ?? 0,
             rotation: props.rotation ?? 0
-        } as RectangleSerialized;
+        } as EllipseSerialized;
 
-        const origin = V.from(graphic.origin);
+        const center = V.from(graphic.center);
         const dimensions = V.from(graphic.dimensions);
 
         this.helpers = {
             [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
                 slide: this.slide,
                 parentId: graphic.id,
-                center: origin,
+                center,
                 scale: this.helpersScale,
                 role: VERTEX_ROLES.TOP_LEFT
             }),
             [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
                 slide: this.slide,
                 parentId: graphic.id,
-                center: origin.addX(dimensions.x),
+                center: center.addX(dimensions.x),
                 scale: this.helpersScale,
                 role: VERTEX_ROLES.TOP_RIGHT
             }),
             [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
                 slide: this.slide,
                 parentId: graphic.id,
-                center: origin.addY(dimensions.y),
+                center: center.addY(dimensions.y),
                 scale: this.helpersScale,
                 role: VERTEX_ROLES.BOTTOM_LEFT
             }),
             [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
                 slide: this.slide,
                 parentId: graphic.id,
-                center: origin.add(dimensions),
+                center: center.add(dimensions),
                 scale: this.helpersScale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
             }),
-            outline: new RectangleOutlineRenderer({
+            outline: new EllipseOutlineRenderer({
                 slide: this.slide,
-                scale: this.helpersScale,
-                origin,
+                center,
                 dimensions,
+                scale: this.helpersScale,
                 rotation: graphic.rotation
             })
         };
@@ -133,7 +134,7 @@ class RectangleMaker implements IRectangleMaker {
      * Initialize this maker to begin tracking movement for the purpose of resizing.
      * This returns a handler to be called on each subsequent mouse event.
      */
-    public initResize(basePoint: V): (event: SlideMouseEvent) => RectangleMutableSerialized {
+    public initResize(basePoint: V): (event: SlideMouseEvent) => EllipseMutableSerialized {
         this.isResizing = true;
 
         if (this.helpers) {
@@ -152,10 +153,10 @@ class RectangleMaker implements IRectangleMaker {
             const rawOffset = basePoint.towards(position);
             const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, V.intermediates)) : rawOffset;
 
-            const origin = baseEvent.ctrlKey ? basePoint.add(offset.abs.neg) : basePoint.add(offset.scale(0.5).add(offset.abs.scale(-0.5)));
+            const center = baseEvent.ctrlKey ? basePoint : basePoint.add(offset.scale(0.5));
             const dimensions = baseEvent.ctrlKey ? offset.abs.scale(2) : offset.abs;
 
-            return { origin, dimensions };
+            return { center, dimensions };
         };
     }
 
@@ -178,4 +179,4 @@ class RectangleMaker implements IRectangleMaker {
     }
 }
 
-export default RectangleMaker;
+export default EllipseCreator;

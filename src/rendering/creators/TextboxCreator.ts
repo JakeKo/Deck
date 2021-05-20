@@ -1,13 +1,13 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
-import { EllipseMutableSerialized, EllipseSerialized } from '@/types';
+import { TextboxMutableSerialized, TextboxSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
-import { EllipseOutlineRenderer, VertexRenderer } from '../helpers';
-import { IEllipseMaker, IEllipseOutlineRenderer, IEllipseRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
+import { IRectangleOutlineRenderer, ISlideRenderer, ITextboxCreator, ITextboxRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class EllipseMaker implements IEllipseMaker {
-    protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IEllipseOutlineRenderer }) | undefined;
+class TextboxCreator implements ITextboxCreator {
+    protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;
     protected isResizing: boolean;
@@ -30,13 +30,12 @@ class EllipseMaker implements IEllipseMaker {
         this.helpersScale = scale;
     }
 
-    protected get graphic(): IEllipseRenderer {
-        return this.slide.getGraphic(this.graphicId) as IEllipseRenderer;
+    protected get graphic(): ITextboxRenderer {
+        return this.slide.getGraphic(this.graphicId) as ITextboxRenderer;
     }
 
     public set scale(scale: number) {
         this.helpersScale = scale;
-
         if (this.helpers) {
             this.helpers[VERTEX_ROLES.TOP_LEFT].scale = scale;
             this.helpers[VERTEX_ROLES.TOP_RIGHT].scale = scale;
@@ -55,13 +54,12 @@ class EllipseMaker implements IEllipseMaker {
         }
 
         if (this.helpers) {
-            const { center, dimensions } = this.graphic;
-            const radius = dimensions.scale(0.5);
-            this.helpers[VERTEX_ROLES.TOP_LEFT].center = center.add(radius.neg);
-            this.helpers[VERTEX_ROLES.TOP_RIGHT].center = center.add(radius.signAs(V.southeast));
-            this.helpers[VERTEX_ROLES.BOTTOM_LEFT].center = center.add(radius);
-            this.helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = center.add(radius.signAs(V.northwest));
-            this.helpers.outline.center = center;
+            const { origin, dimensions } = this.graphic;
+            this.helpers[VERTEX_ROLES.TOP_LEFT].center = origin;
+            this.helpers[VERTEX_ROLES.TOP_RIGHT].center = origin.addX(dimensions.x);
+            this.helpers[VERTEX_ROLES.BOTTOM_LEFT].center = origin.addY(dimensions.y);
+            this.helpers[VERTEX_ROLES.BOTTOM_RIGHT].center = origin.add(dimensions);
+            this.helpers.outline.origin = origin;
             this.helpers.outline.dimensions = dimensions;
         }
     }
@@ -69,7 +67,7 @@ class EllipseMaker implements IEllipseMaker {
     /**
      * Creates a serialized form of the target graphic given the provided props.
      */
-    public create(props: EllipseMutableSerialized): EllipseSerialized {
+    public create(props: TextboxMutableSerialized): TextboxSerialized {
         if (this.isCreated) {
             throw new Error(`Graphic with id ${this.graphicId} already created`);
         }
@@ -77,52 +75,53 @@ class EllipseMaker implements IEllipseMaker {
         this.isCreated = true;
         const graphic = {
             id: this.graphicId,
-            type: 'ellipse',
-            center: new V(props.center?.x ?? 0, props.center?.y ?? 0),
+            type: 'textbox',
+            origin: new V(props.origin?.x ?? 0, props.origin?.y ?? 0),
             dimensions: new V(props.dimensions?.x ?? 0, props.dimensions?.y ?? 0),
-            fillColor: props.fillColor ?? '#CCCCCC',
-            strokeColor: props.strokeColor ?? 'none',
-            strokeWidth: props.strokeWidth ?? 0,
+            text: props.text ?? '',
+            size: props.size ?? 12,
+            weight: props.weight ?? '400',
+            font: props.font ?? 'Arial',
             rotation: props.rotation ?? 0
-        } as EllipseSerialized;
+        } as TextboxSerialized;
 
-        const center = V.from(graphic.center);
+        const origin = V.from(graphic.origin);
         const dimensions = V.from(graphic.dimensions);
 
         this.helpers = {
             [VERTEX_ROLES.TOP_LEFT]: new VertexRenderer({
                 slide: this.slide,
                 parentId: graphic.id,
-                center,
+                center: origin,
                 scale: this.helpersScale,
                 role: VERTEX_ROLES.TOP_LEFT
             }),
             [VERTEX_ROLES.TOP_RIGHT]: new VertexRenderer({
                 slide: this.slide,
                 parentId: graphic.id,
-                center: center.addX(dimensions.x),
+                center: origin.addX(dimensions.x),
                 scale: this.helpersScale,
                 role: VERTEX_ROLES.TOP_RIGHT
             }),
             [VERTEX_ROLES.BOTTOM_LEFT]: new VertexRenderer({
                 slide: this.slide,
                 parentId: graphic.id,
-                center: center.addY(dimensions.y),
+                center: origin.addY(dimensions.y),
                 scale: this.helpersScale,
                 role: VERTEX_ROLES.BOTTOM_LEFT
             }),
             [VERTEX_ROLES.BOTTOM_RIGHT]: new VertexRenderer({
                 slide: this.slide,
                 parentId: graphic.id,
-                center: center.add(dimensions),
+                center: origin.add(dimensions),
                 scale: this.helpersScale,
                 role: VERTEX_ROLES.BOTTOM_RIGHT
             }),
-            outline: new EllipseOutlineRenderer({
+            outline: new RectangleOutlineRenderer({
                 slide: this.slide,
-                center,
-                dimensions,
                 scale: this.helpersScale,
+                origin,
+                dimensions,
                 rotation: graphic.rotation
             })
         };
@@ -134,7 +133,7 @@ class EllipseMaker implements IEllipseMaker {
      * Initialize this maker to begin tracking movement for the purpose of resizing.
      * This returns a handler to be called on each subsequent mouse event.
      */
-    public initResize(basePoint: V): (event: SlideMouseEvent) => EllipseMutableSerialized {
+    public initResize(basePoint: V): (event: SlideMouseEvent) => TextboxMutableSerialized {
         this.isResizing = true;
 
         if (this.helpers) {
@@ -153,10 +152,10 @@ class EllipseMaker implements IEllipseMaker {
             const rawOffset = basePoint.towards(position);
             const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, V.intermediates)) : rawOffset;
 
-            const center = baseEvent.ctrlKey ? basePoint : basePoint.add(offset.scale(0.5));
+            const origin = baseEvent.ctrlKey ? basePoint.add(offset.abs.neg) : basePoint.add(offset.scale(0.5).add(offset.abs.scale(-0.5)));
             const dimensions = baseEvent.ctrlKey ? offset.abs.scale(2) : offset.abs;
 
-            return { center, dimensions };
+            return { origin, dimensions };
         };
     }
 
@@ -179,4 +178,4 @@ class EllipseMaker implements IEllipseMaker {
     }
 }
 
-export default EllipseMaker;
+export default TextboxCreator;

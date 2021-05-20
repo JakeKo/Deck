@@ -87,15 +87,15 @@ function reevaluateCursor(event: SlideMouseEvent): void {
     const { slide, target } = event.detail;
 
     if (target === undefined) {
-        slide.cursor = 'default';
+        slide.setCursor('default');
     } else {
         const type = target.type;
         if ([GRAPHIC_TYPES.VERTEX, GRAPHIC_TYPES.CURVE_ANCHOR, GRAPHIC_TYPES.ROTATOR].indexOf(type) !== -1) {
-            slide.cursor = 'grab';
+            slide.setCursor('grab');
         } else if ([GRAPHIC_TYPES.CURVE, GRAPHIC_TYPES.ELLIPSE, GRAPHIC_TYPES.IMAGE, GRAPHIC_TYPES.RECTANGLE, GRAPHIC_TYPES.TEXTBOX, GRAPHIC_TYPES.VIDEO].indexOf(type) !== -1) {
-            slide.cursor = 'move';
+            slide.setCursor('move');
         } else {
-            slide.cursor = 'default';
+            slide.setCursor('default');
         }
     }
 }
@@ -178,5 +178,7 @@ function rotateGraphic(event: RotatorMouseEvent): void {
         slide.unlockCursor('grab');
 
         unlisten(SLIDE_EVENTS.MOUSEMOVE, 'rotate');
+        unlisten(SLIDE_EVENTS.KEYDOWN, 'rotator--key-down');
+        unlisten(SLIDE_EVENTS.KEYUP, 'rotator--key-up');
     }
 }

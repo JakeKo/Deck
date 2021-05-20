@@ -2,6 +2,7 @@ import { dispatch, listen } from '@/events';
 import { decorateSlideEvents } from '@/events/decorators';
 import {
     GraphicCreatedPayload,
+    GraphicDeletedPayload,
     GraphicFocusedPayload,
     GraphicUnfocusedPayload,
     GraphicUpdatedPayload,
@@ -19,21 +20,21 @@ import initRendererEventBus from './eventBus';
 import { CurveRenderer, EllipseRenderer, ImageRenderer, RectangleRenderer, TextboxRenderer, VideoRenderer } from './graphics';
 import { CanvasRenderer } from './helpers';
 import {
-    CurveMaker,
-    EllipseMaker,
-    ImageMaker,
-    RectangleMaker,
-    TextboxMaker,
-    VideoMaker
-} from './makers';
+    CurveCreator,
+    EllipseCreator,
+    ImageCreator,
+    RectangleCreator,
+    TextboxCreator,
+    VideoCreator
+} from './creators';
 import {
-    CurveMarker,
-    EllipseMarker,
-    ImageMarker,
-    RectangleMarker,
-    TextboxMarker,
-    VideoMarker
-} from './markers';
+    CurveHighlighter,
+    EllipseHighlighter,
+    ImageHighlighter,
+    RectangleHighlighter,
+    TextboxHighlighter,
+    VideoHighlighter
+} from './highlighters';
 import {
     CurveMutator,
     EllipseMutator,
@@ -45,7 +46,7 @@ import {
 import {
     GRAPHIC_TYPES,
     IGraphicMaker,
-    IGraphicMarker,
+    IGraphicCreator,
     IGraphicMutator,
     IGraphicRenderer,
     ISlideRenderer
@@ -60,14 +61,12 @@ class SlideRenderer implements ISlideRenderer {
     public eventPublisherId = 'renderer';
     public slideId: string;
 
-    private _graphics: Keyed<IGraphicRenderer>;
-    private _graphicsFocused: Keyed<IGraphicMutator>;
-    private _graphicsMaking: Keyed<IGraphicMaker>;
-    private _graphicsHighlighted: Keyed<IGraphicMarker>;
-    private _defaultCursor = 'default';
-    private _cursor: string;
-    private _cursorLock = false;
-    private _snapVectors: SnapVector[];
+    protected cursorLock = false;
+    protected graphics: Keyed<IGraphicRenderer>;
+    protected graphicsFocused: Keyed<IGraphicMutator>;
+    protected graphicsInMaking: Keyed<IGraphicMaker>;
+    protected graphicsHighlighted: Keyed<IGraphicCreator>;
+    protected snapVectors: SnapVector[];
 
     constructor({
         canvas,
@@ -87,13 +86,12 @@ class SlideRenderer implements ISlideRenderer {
         this.canvas = canvas;
         this.rawViewbox = rawViewbox;
         this.zoom = zoom;
-        this._graphics = {};
-        this._graphicsFocused = {};
-        this._graphicsMaking = {};
-        this._graphicsHighlighted = {};
-        this._cursor = this._defaultCursor;
+        this.graphics = {};
+        this.graphicsFocused = {};
+        this.graphicsInMaking = {};
+        this.graphicsHighlighted = {};
         this.slideId = slideId;
-        this._snapVectors = [
+        this.snapVectors = [
             new SnapVector(new V(croppedViewbox.width / 2, 0), V.east),
             new SnapVector(new V(croppedViewbox.width, croppedViewbox.height / 2), V.north),
             new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height), V.west),
@@ -102,6 +100,7 @@ class SlideRenderer implements ISlideRenderer {
             new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height / 2), V.east)
         ];
 
+        this.setCursor('default');
         initRendererEventBus(this);
         this._renderBackdrop(new V(croppedViewbox.width, croppedViewbox.height));
         decorateSlideEvents(this);
@@ -112,7 +111,7 @@ class SlideRenderer implements ISlideRenderer {
         listen(SLIDE_EVENTS.ZOOM, 'onSlideZoom', (event: SlideZoomEvent): void => this._setZoom(event.detail.zoom));
         listen(SLIDE_EVENTS.KEYDOWN, 'onSlideKeydown', (event: SlideKeyboardEvent): void => {
             if (['Backspace', 'Delete'].indexOf(event.detail.baseEvent.key) !== -1) {
-                this.removeGraphics(Object.keys(this._graphicsFocused));
+                Object.keys(this.graphicsFocused).forEach(graphicId => this.removeGraphic(graphicId));
             }
         });
     }
@@ -126,42 +125,39 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     /**
-     * @deprecated
-     * @see lockCursor
+     * Sets the slide cursor.
      */
-    public set cursor(cursor: string) {
-        if (this._cursorLock) {
+    public setCursor(cursor: string): void {
+        if (this.cursorLock) {
             return;
         }
 
-        this._cursor = cursor;
-        this.canvas.node.style.cursor = this._cursor;
+        this.canvas.node.style.cursor = cursor;
     }
 
     /**
-     * @deprecated
-     * @see lockCursor
+     * Sets the slide cursor and locks it so subsequent calls to lockCursor and setCursor will be ignored.
+     * Unlock the slide cursor by calling unlockCursor.
      */
-    public set cursorLock(cursorLock: boolean) {
-        this._cursorLock = cursorLock;
-    }
-
     public lockCursor(cursor: string): void {
-        this.cursor = cursor;
+        this.setCursor(cursor);
         this.cursorLock = true;
     }
 
+    /**
+     * Unlocks the slide cursor, accepting an optional cursor to immediately revert to.
+     */
     public unlockCursor(cursor?: string): void {
         this.cursorLock = false;
         if (cursor) {
-            this.cursor = cursor;
+            this.setCursor(cursor);
         }
     }
 
     public getSnapVectors(exclude: string[]): SnapVector[] {
         return [
-            ...this._snapVectors,
-            ...Object.values(this._graphics)
+            ...this.snapVectors,
+            ...Object.values(this.graphics)
                 .filter(g => !exclude.includes(g.id))
                 .map(g => [...g.staticSnapVectors, ...g.transformedSnapVectors])
                 .reduce((all, some) => [...all, ...some], [])
@@ -232,7 +228,7 @@ class SlideRenderer implements ISlideRenderer {
             });
         }
 
-        this._graphics[graphic.id] = graphic;
+        this.graphics[graphic.id] = graphic;
         return graphic;
     }
 
@@ -241,41 +237,37 @@ class SlideRenderer implements ISlideRenderer {
         let creator: IGraphicMaker | undefined;
 
         if (graphicType === GRAPHIC_TYPES.CURVE) {
-            creator = new CurveMaker(props);
+            creator = new CurveCreator(props);
         } else if (graphicType === GRAPHIC_TYPES.ELLIPSE) {
-            creator = new EllipseMaker(props);
+            creator = new EllipseCreator(props);
         } else if (graphicType === GRAPHIC_TYPES.IMAGE) {
-            creator = new ImageMaker(props);
+            creator = new ImageCreator(props);
         } else if (graphicType === GRAPHIC_TYPES.RECTANGLE) {
-            creator = new RectangleMaker(props);
+            creator = new RectangleCreator(props);
         } else if (graphicType === GRAPHIC_TYPES.TEXTBOX) {
-            creator = new TextboxMaker(props);
+            creator = new TextboxCreator(props);
         } else if (graphicType === GRAPHIC_TYPES.VIDEO) {
-            creator = new VideoMaker(props);
+            creator = new VideoCreator(props);
         } else {
             throw new Error(`Could not initialize interactive create session for unknown graphic type: ${graphicType}`);
         }
 
-        this._graphicsMaking[graphicId] = creator;
+        this.graphicsInMaking[graphicId] = creator;
         return creator;
     }
 
     public endInteractiveCreate(graphicId: string): void {
-        delete this._graphicsMaking[graphicId];
+        delete this.graphicsInMaking[graphicId];
     }
 
     public getGraphic(graphicId: string): IGraphicRenderer {
-        return this._graphics[graphicId];
+        return this.graphics[graphicId];
     }
 
-    public getGraphics(): { [key: string]: IGraphicRenderer } {
-        return this._graphics;
-    }
-
-    public removeGraphic(graphicId: string): void {
+    public removeGraphic(graphicId: string, emit = true): void {
         // Technically, this should always happen since a graphic cannot be deleted without being focued
         if (this.isFocused(graphicId)) {
-            this.unfocusGraphic(graphicId);
+            this.unfocusGraphic(graphicId, emit);
         }
 
         // Technically, this should never happen since a graphic cannot be deleted without being focused
@@ -283,17 +275,21 @@ class SlideRenderer implements ISlideRenderer {
             this.unmarkGraphic(graphicId);
         }
 
-        this._graphics[graphicId].unrender();
-        delete this._graphics[graphicId];
-    }
+        this.graphics[graphicId].unrender();
+        delete this.graphics[graphicId];
 
-    public removeGraphics(graphicIds: string[]): void {
-        graphicIds.forEach(graphicId => this.removeGraphic(graphicId));
+        if (emit) {
+            dispatch<GraphicDeletedPayload>(GRAPHIC_EVENT_CODES.DELETED, {
+                publisherId: this.eventPublisherId,
+                graphicId,
+                slideId: this.slideId
+            });
+        }
     }
 
     public focusGraphic(graphicId: string, emit = true): IGraphicMutator {
         if (this.isFocused(graphicId)) {
-            return this._graphicsFocused[graphicId];
+            return this.graphicsFocused[graphicId];
         }
 
         if (this.isMarked(graphicId)) {
@@ -319,7 +315,7 @@ class SlideRenderer implements ISlideRenderer {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }
 
-        this._graphicsFocused[graphicId] = mutator;
+        this.graphicsFocused[graphicId] = mutator;
 
         if (emit) {
             dispatch<GraphicFocusedPayload>(GRAPHIC_EVENT_CODES.FOCUSED, {
@@ -333,8 +329,8 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     public unfocusGraphic(graphicId: string, emit = true): void {
-        this.isFocused(graphicId) && this._graphicsFocused[graphicId].unfocus();
-        delete this._graphicsFocused[graphicId];
+        this.isFocused(graphicId) && this.graphicsFocused[graphicId].unfocus();
+        delete this.graphicsFocused[graphicId];
 
         if (emit) {
             dispatch<GraphicUnfocusedPayload>(GRAPHIC_EVENT_CODES.UNFOCUSED, {
@@ -346,50 +342,50 @@ class SlideRenderer implements ISlideRenderer {
     }
 
     public unfocusAllGraphics(exclude: string[] = []): void {
-        Object.keys(this._graphicsFocused)
+        Object.keys(this.graphicsFocused)
             .filter(graphicId => exclude.indexOf(graphicId) === -1)
             .forEach(graphicId => this.unfocusGraphic(graphicId));
     }
 
     public isFocused(graphicId: string): boolean {
-        return this._graphicsFocused[graphicId] !== undefined;
+        return this.graphicsFocused[graphicId] !== undefined;
     }
 
-    public markGraphic(graphicId: string): IGraphicMarker {
+    public markGraphic(graphicId: string): IGraphicCreator {
         if (this.isMarked(graphicId)) {
-            return this._graphicsHighlighted[graphicId];
+            return this.graphicsHighlighted[graphicId];
         }
 
         const graphic = this.getGraphic(graphicId);
         let marker;
 
         if (graphic.type === CURVE) {
-            marker = new CurveMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new CurveHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === ELLIPSE) {
-            marker = new EllipseMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new EllipseHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === IMAGE) {
-            marker = new ImageMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new ImageHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === RECTANGLE) {
-            marker = new RectangleMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new RectangleHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === TEXTBOX) {
-            marker = new TextboxMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new TextboxHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else if (graphic.type === VIDEO) {
-            marker = new VideoMarker({ slide: this, scale: 1 / this.zoom, target: graphic });
+            marker = new VideoHighlighter({ slide: this, scale: 1 / this.zoom, target: graphic });
         } else {
             throw new Error(`Cannot focus unrecognized graphic: ${graphic}`);
         }
 
-        this._graphicsHighlighted[graphicId] = marker;
-        return this._graphicsHighlighted[graphicId];
+        this.graphicsHighlighted[graphicId] = marker;
+        return this.graphicsHighlighted[graphicId];
     }
 
     public unmarkGraphic(graphicId: string): void {
-        this._graphicsHighlighted[graphicId] && this._graphicsHighlighted[graphicId].unmark();
-        delete this._graphicsHighlighted[graphicId];
+        this.graphicsHighlighted[graphicId] && this.graphicsHighlighted[graphicId].unmark();
+        delete this.graphicsHighlighted[graphicId];
     }
 
     public isMarked(graphicId: string): boolean {
-        return this._graphicsHighlighted[graphicId] !== undefined;
+        return this.graphicsHighlighted[graphicId] !== undefined;
     }
 
     public setProps(graphicId: string, graphicType: GRAPHIC_TYPES, props: GraphicMutableSerialized, emit = true): void {
@@ -399,12 +395,12 @@ class SlideRenderer implements ISlideRenderer {
         }
 
         graphic.setProps(props);
-        const mutator = this._graphicsFocused[graphicId];
+        const mutator = this.graphicsFocused[graphicId];
         if (mutator !== undefined) {
             mutator.updateHelpers();
         }
 
-        const makers = this._graphicsMaking[graphicId];
+        const makers = this.graphicsInMaking[graphicId];
         if (makers !== undefined) {
             makers.updateHelpers();
         }
@@ -423,9 +419,9 @@ class SlideRenderer implements ISlideRenderer {
     // When the zoom on the slide has changed, we need to correct for it so helpers don't shrink and grow
     private _setZoom(zoom: number): void {
         this.zoom = zoom;
-        Object.values(this._graphicsFocused).forEach(mutator => (mutator.scale = 1 / this.zoom));
-        Object.values(this._graphicsMaking).forEach(maker => (maker.scale = 1 / this.zoom));
-        Object.values(this._graphicsHighlighted).forEach(marker => (marker.scale = 1 / this.zoom));
+        Object.values(this.graphicsFocused).forEach(mutator => (mutator.scale = 1 / this.zoom));
+        Object.values(this.graphicsInMaking).forEach(maker => (maker.scale = 1 / this.zoom));
+        Object.values(this.graphicsHighlighted).forEach(marker => (marker.scale = 1 / this.zoom));
     }
 
     private _renderBackdrop(dimensions: V): void {

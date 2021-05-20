@@ -1,12 +1,12 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
-import { ImageMutableSerialized, ImageSerialized } from '@/types';
+import { RectangleMutableSerialized, RectangleSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
-import { IImageMaker, IImageRenderer, IRectangleOutlineRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { IRectangleCreator, IRectangleOutlineRenderer, IRectangleRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class ImageMaker implements IImageMaker {
+class RectangleCreator implements IRectangleCreator {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;
@@ -30,8 +30,8 @@ class ImageMaker implements IImageMaker {
         this.helpersScale = scale;
     }
 
-    protected get graphic(): IImageRenderer {
-        return this.slide.getGraphic(this.graphicId) as IImageRenderer;
+    protected get graphic(): IRectangleRenderer {
+        return this.slide.getGraphic(this.graphicId) as IRectangleRenderer;
     }
 
     public set scale(scale: number) {
@@ -68,7 +68,7 @@ class ImageMaker implements IImageMaker {
     /**
      * Creates a serialized form of the target graphic given the provided props.
      */
-    public create(props: ImageMutableSerialized & Pick<ImageSerialized, 'source' | 'dimensions'>): ImageSerialized {
+    public create(props: RectangleMutableSerialized): RectangleSerialized {
         if (this.isCreated) {
             throw new Error(`Graphic with id ${this.graphicId} already created`);
         }
@@ -76,12 +76,14 @@ class ImageMaker implements IImageMaker {
         this.isCreated = true;
         const graphic = {
             id: this.graphicId,
-            type: 'image',
-            source: props.source,
+            type: 'rectangle',
             origin: new V(props.origin?.x ?? 0, props.origin?.y ?? 0),
-            dimensions: props.dimensions,
+            dimensions: new V(props.dimensions?.x ?? 0, props.dimensions?.y ?? 0),
+            fillColor: props.fillColor ?? '#CCCCCC',
+            strokeColor: props.strokeColor ?? 'none',
+            strokeWidth: props.strokeWidth ?? 0,
             rotation: props.rotation ?? 0
-        } as ImageSerialized;
+        } as RectangleSerialized;
 
         const origin = V.from(graphic.origin);
         const dimensions = V.from(graphic.dimensions);
@@ -131,7 +133,7 @@ class ImageMaker implements IImageMaker {
      * Initialize this maker to begin tracking movement for the purpose of resizing.
      * This returns a handler to be called on each subsequent mouse event.
      */
-    public initResize(basePoint: V): (event: SlideMouseEvent) => ImageMutableSerialized {
+    public initResize(basePoint: V): (event: SlideMouseEvent) => RectangleMutableSerialized {
         this.isResizing = true;
 
         if (this.helpers) {
@@ -143,15 +145,12 @@ class ImageMaker implements IImageMaker {
             this.helpers.outline.render();
         }
 
-        const aspectRatio = this.graphic.dimensions;
-        const directions = V.intermediates.map(v => aspectRatio.signAs(v));
-
         return event => {
             const { baseEvent, slide } = event.detail;
             const position = resolvePosition(baseEvent, slide);
 
             const rawOffset = basePoint.towards(position);
-            const offset = rawOffset.projectOn(closestVector(rawOffset, directions));
+            const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, V.intermediates)) : rawOffset;
 
             const origin = baseEvent.ctrlKey ? basePoint.add(offset.abs.neg) : basePoint.add(offset.scale(0.5).add(offset.abs.scale(-0.5)));
             const dimensions = baseEvent.ctrlKey ? offset.abs.scale(2) : offset.abs;
@@ -179,4 +178,4 @@ class ImageMaker implements IImageMaker {
     }
 }
 
-export default ImageMaker;
+export default RectangleCreator;

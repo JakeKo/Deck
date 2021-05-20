@@ -1,12 +1,12 @@
 import { SlideMouseEvent } from '@/events/types';
 import { resolvePosition } from '@/tools/utilities';
-import { TextboxMutableSerialized, TextboxSerialized } from '@/types';
+import { ImageMutableSerialized, ImageSerialized } from '@/types';
 import { closestVector } from '@/utilities/utilities';
 import V from '@/utilities/Vector';
 import { RectangleOutlineRenderer, VertexRenderer } from '../helpers';
-import { IRectangleOutlineRenderer, ISlideRenderer, ITextboxMaker, ITextboxRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
+import { IImageCreator, IImageRenderer, IRectangleOutlineRenderer, ISlideRenderer, IVertexRenderer, VERTEX_ROLES } from '../types';
 
-class TextboxMaker implements ITextboxMaker {
+class ImageCreator implements IImageCreator {
     protected helpers: ({ [key in VERTEX_ROLES]: IVertexRenderer } & { outline: IRectangleOutlineRenderer }) | undefined;
     protected graphicId: string;
     protected slide: ISlideRenderer;
@@ -30,12 +30,13 @@ class TextboxMaker implements ITextboxMaker {
         this.helpersScale = scale;
     }
 
-    protected get graphic(): ITextboxRenderer {
-        return this.slide.getGraphic(this.graphicId) as ITextboxRenderer;
+    protected get graphic(): IImageRenderer {
+        return this.slide.getGraphic(this.graphicId) as IImageRenderer;
     }
 
     public set scale(scale: number) {
         this.helpersScale = scale;
+
         if (this.helpers) {
             this.helpers[VERTEX_ROLES.TOP_LEFT].scale = scale;
             this.helpers[VERTEX_ROLES.TOP_RIGHT].scale = scale;
@@ -67,7 +68,7 @@ class TextboxMaker implements ITextboxMaker {
     /**
      * Creates a serialized form of the target graphic given the provided props.
      */
-    public create(props: TextboxMutableSerialized): TextboxSerialized {
+    public create(props: ImageMutableSerialized & Pick<ImageSerialized, 'source' | 'dimensions'>): ImageSerialized {
         if (this.isCreated) {
             throw new Error(`Graphic with id ${this.graphicId} already created`);
         }
@@ -75,15 +76,12 @@ class TextboxMaker implements ITextboxMaker {
         this.isCreated = true;
         const graphic = {
             id: this.graphicId,
-            type: 'textbox',
+            type: 'image',
+            source: props.source,
             origin: new V(props.origin?.x ?? 0, props.origin?.y ?? 0),
-            dimensions: new V(props.dimensions?.x ?? 0, props.dimensions?.y ?? 0),
-            text: props.text ?? '',
-            size: props.size ?? 12,
-            weight: props.weight ?? '400',
-            font: props.font ?? 'Arial',
+            dimensions: props.dimensions,
             rotation: props.rotation ?? 0
-        } as TextboxSerialized;
+        } as ImageSerialized;
 
         const origin = V.from(graphic.origin);
         const dimensions = V.from(graphic.dimensions);
@@ -133,7 +131,7 @@ class TextboxMaker implements ITextboxMaker {
      * Initialize this maker to begin tracking movement for the purpose of resizing.
      * This returns a handler to be called on each subsequent mouse event.
      */
-    public initResize(basePoint: V): (event: SlideMouseEvent) => TextboxMutableSerialized {
+    public initResize(basePoint: V): (event: SlideMouseEvent) => ImageMutableSerialized {
         this.isResizing = true;
 
         if (this.helpers) {
@@ -145,12 +143,15 @@ class TextboxMaker implements ITextboxMaker {
             this.helpers.outline.render();
         }
 
+        const aspectRatio = this.graphic.dimensions;
+        const directions = V.intermediates.map(v => aspectRatio.signAs(v));
+
         return event => {
             const { baseEvent, slide } = event.detail;
             const position = resolvePosition(baseEvent, slide);
 
             const rawOffset = basePoint.towards(position);
-            const offset = baseEvent.shiftKey ? rawOffset.projectOn(closestVector(rawOffset, V.intermediates)) : rawOffset;
+            const offset = rawOffset.projectOn(closestVector(rawOffset, directions));
 
             const origin = baseEvent.ctrlKey ? basePoint.add(offset.abs.neg) : basePoint.add(offset.scale(0.5).add(offset.abs.scale(-0.5)));
             const dimensions = baseEvent.ctrlKey ? offset.abs.scale(2) : offset.abs;
@@ -178,4 +179,4 @@ class TextboxMaker implements ITextboxMaker {
     }
 }
 
-export default TextboxMaker;
+export default ImageCreator;
