@@ -6,6 +6,14 @@ import V from '@/utilities/Vector';
 import { BoxRenderer, RotatorRenderer, SnapVectorRenderer, VertexRenderer } from './helpers';
 import { BoundingBox, BoundingBoxMutatorHelpers, IGraphicRenderer, ISlideRenderer, VERTEX_ROLES } from './types';
 
+/**
+ * Helper type for encapsulating all the components of a snapping operation.
+ */
+type SnapOperation = {
+    pull: V;
+    snapVector: SnapVector;
+};
+
 export function makeBoxHelpers(target: IGraphicRenderer, slide: ISlideRenderer, scale: number): BoundingBoxMutatorHelpers {
     const box = target.transformedBox;
     return {
@@ -115,38 +123,44 @@ export function calculateMove({
     const rawMove = initialOrigin.towards(position.add(initialPosition.towards(initialOrigin)));
     const moveDirection = baseEvent.shiftKey ? closestVector(rawMove, [...V.cardinals, ...V.intermediates]) : V.zero;
 
-    const snapPulls: { shift: V; snapVector: SnapVector }[] = [];
+    const snapOperations: SnapOperation[] = [];
     if (!baseEvent.altKey) {
         const pullPoints = relativePullPoints.map(p => position.add(p));
-        const pullOptions = pullPoints.map(p => snapVectors.map(s => ({ shift: p.towards(s.getClosestPoint(p)), snapVector: s })))
-            .reduce((all, some) => [...all, ...some], [])
-            .filter(s => s.shift.magnitude < 25 && s.shift.isParallel(moveDirection))
+        const operationOptions = pullPoints
+            .flatMap(pullPoint => snapVectors
+                .filter(snapVector => pullPoint.towards(snapVector.origin).magnitude < 50)
+                .map(snapVector => ({
+                    pull: pullPoint.towards(snapVector.getClosestPoint(pullPoint)),
+                    snapVector
+                }))
+            )
+            .filter(({ pull }) => pull.magnitude < 25 && pull.isParallel(moveDirection))
             .sort((a, b) => {
-                if (a.shift.magnitude < b.shift.magnitude) return -1;
-                else if (a.shift.magnitude === b.shift.magnitude) return 0;
+                if (a.pull.magnitude < b.pull.magnitude) return -1;
+                else if (a.pull.magnitude === b.pull.magnitude) return 0;
                 else return 1;
             });
 
-        if (pullOptions.length >= 1) {
-            const [firstShift, ...otherShifts] = pullOptions;
-            snapPulls.push(firstShift);
+        if (operationOptions.length >= 1) {
+            const [firstOperation, ...otherOperations] = operationOptions;
+            snapOperations.push(firstOperation);
 
-            // Find the next closest shift that is perpendicular to the first shift (if there is one)
-            for (const shift of otherShifts) {
-                if (firstShift.shift.isPerpendicular(shift.shift)) {
-                    snapPulls.push(shift);
+            // Find the next closest pull that is perpendicular to the first pull (if there is one)
+            for (const operation of otherOperations) {
+                if (firstOperation.pull.isPerpendicular(operation.pull)) {
+                    snapOperations.push(operation);
                     break;
                 }
             }
         }
     }
 
-    const finalSnapPull = snapPulls.reduce((finalPull, pull) => finalPull.add(pull.shift), V.zero);
+    const aggregateOperation = snapOperations.reduce((aggregateOperation, operation) => aggregateOperation.add(operation.pull), V.zero);
 
     // TODO: Handle case where moveDirection and snapShift are neither parallel nor perpendicular
     return {
-        shift: (baseEvent.shiftKey ? rawMove.projectOn(moveDirection) : rawMove).add(finalSnapPull),
-        snapVectors: snapPulls.map(s => s.snapVector)
+        shift: (baseEvent.shiftKey ? rawMove.projectOn(moveDirection) : rawMove).add(aggregateOperation),
+        snapVectors: snapOperations.map(s => s.snapVector)
     };
 }
 

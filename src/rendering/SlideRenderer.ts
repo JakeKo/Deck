@@ -92,14 +92,17 @@ class SlideRenderer implements ISlideRenderer {
         this.graphicsInMaking = {};
         this.graphicsHighlighted = {};
         this.slideId = slideId;
-        this.snapVectors = [
-            new SnapVector(new V(croppedViewbox.width / 2, 0), V.east),
-            new SnapVector(new V(croppedViewbox.width, croppedViewbox.height / 2), V.north),
-            new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height), V.west),
-            new SnapVector(new V(0, croppedViewbox.height / 2), V.south),
-            new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height / 2), V.north),
-            new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height / 2), V.east)
-        ];
+        this.snapVectors = [V.north, V.east].flatMap(direction => [
+            new SnapVector(new V(0, 0), direction),
+            new SnapVector(new V(croppedViewbox.width / 2, 0), direction),
+            new SnapVector(new V(croppedViewbox.width, 0), direction),
+            new SnapVector(new V(croppedViewbox.width, croppedViewbox.height / 2), direction),
+            new SnapVector(new V(croppedViewbox.width, croppedViewbox.height), direction),
+            new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height), direction),
+            new SnapVector(new V(0, croppedViewbox.height), direction),
+            new SnapVector(new V(0, croppedViewbox.height / 2), direction),
+            new SnapVector(new V(croppedViewbox.width / 2, croppedViewbox.height / 2), direction)
+        ]);
 
         this.setCursor('default');
         initRendererEventBus(this);
