@@ -10,7 +10,6 @@
 
 <script lang='ts'>
 import Slide from './Slide.vue';
-import V from '@/utilities/Vector';
 import SlidePlaceholder from './SlidePlaceholder.vue';
 import DeckComponent from './generic/DeckComponent';
 import { dispatch } from '@/events';
@@ -29,7 +28,8 @@ const Editor = defineComponent({
                 display: 'flex',
                 flexGrow: '1',
                 overflow: 'scroll',
-                background: baseTheme.value.color.base.flush
+                background: baseTheme.value.color.base.flush,
+                zoom: store.state.editorViewbox.zoom.toString()
             }))
         });
         const defaultZoom = computed(() => {
@@ -46,7 +46,6 @@ const Editor = defineComponent({
         const slides = computed(() => store.state.slides);
 
         // Set the zoom level, then center the view on the slide
-        // Note: Editor zoom must be set manually to avoid scrolling before zooming
         async function reorientSlide(): Promise<void> {
             // For some reason, when returning from presentation view, root here is not quite defined in time
             // Spotty fix: just wait a wee bit
@@ -58,36 +57,30 @@ const Editor = defineComponent({
                 throw new Error('Root ref not specified.');
             }
 
-            store.mutations.setEditorZoom(defaultZoom.value);
+            // Note: Editor zoom must be set manually to avoid scrolling before zooming
             root.value.style.zoom = defaultZoom.value.toString();
             root.value.scrollTop = (root.value.scrollHeight - root.value.clientHeight) / 2;
             root.value.scrollLeft = (root.value.scrollWidth - root.value.clientWidth) / 2;
 
+            store.mutations.setEditorZoom(defaultZoom.value);
             dispatch<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { zoom: defaultZoom.value });
         }
 
         function handleMouseWheel(event: WheelEvent): void {
-            if (event.ctrlKey) {
-                if (root.value === undefined) {
-                    throw new Error('Root ref not specified.');
-                }
-
-                event.preventDefault();
-                const deltaZoom = event.deltaY < 0 ? 1.1 : 0.9;
-                const newZoom = store.state.editorViewbox.zoom * deltaZoom;
-                store.mutations.setEditorZoom(newZoom);
-                root.value.style.zoom = newZoom.toString();
-
-                dispatch<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { zoom: newZoom });
-
-                // TODO: Fetch absolute mouse position without hardcoded values
-                // TODO: Fix the math here (which is incorrect but not by much)
-                const absolutePosition = new V(event.clientX - 64, event.clientY - 28);
-                const absoluteDestination = absolutePosition.scale(1 / deltaZoom);
-                const scrollCorrection = absoluteDestination.towards(absolutePosition);
-                root.value.scrollLeft = root.value.scrollLeft + scrollCorrection.x;
-                root.value.scrollTop = root.value.scrollTop + scrollCorrection.y;
+            if (!event.ctrlKey) {
+                return;
             }
+
+            if (root.value === undefined) {
+                throw new Error('Root ref not specified.');
+            }
+
+            event.preventDefault();
+            const deltaZoom = event.deltaY < 0 ? 0.1 : -0.1;
+            const newZoom = store.state.editorViewbox.zoom + deltaZoom;
+
+            store.mutations.setEditorZoom(newZoom);
+            dispatch<SlideZoomEventPayload>(SLIDE_EVENTS.ZOOM, { zoom: newZoom });
         }
 
         onMounted(reorientSlide);
